@@ -1,0 +1,22 @@
+
+.PHONY: dummytest clean distclean
+.SUFFIXES: .edit.org .new.org
+
+dummytest:
+	for f in `ls *.edit.org */*.edit.org 2> /dev/null`; do \
+		$(MAKE) `dirname $$f`/`basename $$f .edit.org`.new.org ; \
+	done
+
+.edit.org.new.org:
+		cat $< | sed "s/* TODO/* BUG/" > $@
+
+clean:
+	rm -f *.log
+	rm -f *.edit.org
+	rm -f *.exist
+	rm -f *.patchset
+	rm -f *~
+
+distclean: clean
+	rm -f *.correl.org
+

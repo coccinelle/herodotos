@@ -1,0 +1,12 @@
+
+ ** INSTALL **
+
+	./configure
+	make
+	sudo make install
+
+ This will build and install a O'Caml bytecode version
+ of Herodotos.
+
+ To build the native version replace "make" by "make opt".
+ If you want both, you may use "make world".

@@ -1,0 +1,131 @@
+
+\chapter{HCL grammar}
+\label{sec:hcl-grammar}
+
+This document presents the grammar of the Herodotos Configuration
+Language used by the
+\href{http://www.diku.dk/~npalix/herodotos/}{Herodotos tool}.  The
+grammar uses some unspecified nonterminals, such as \T{id}, etc.
+These refer to the sets suggested by the name, {\em i.e.}, \T{id}
+refers to the set of possible identifiers.
+
+\ifhevea
+A PDF version of this documentation is available at
+\url{http://www.diku.dk/~npalix/herodotos/docs/herodotos.pdf}.
+\else
+A HTML version of this documentation is available online at
+\url{http://www.diku.dk/~npalix/herodotos/docs/herodotos.html}.
+\fi
+
+\section{Global attributes and top-level definitions}
+\label{sec:globattr}
+
+  \begin{grammar}
+    \RULE{config}
+    \CASE{\any{\NT{globattr}} \any{\NT{project}} \any{\NT{pattern}} \any{\NT{graph}}}
+
+    \RULE{globattr}
+    \CASE{prefix = \NT{string} \ttmid~projects = \NT{string}}
+    \CASE{patterns = \NT{string} \ttmid~results = \NT{string}}
+    \CASE{findcmd = \NT{string} \ttmid~flags = \NT{string}}
+    \CASE{findchild = \NT{int} \ttmid~cpucore = \NT{int}}
+
+    \RULE{project}
+    \CASE{project \NT{id} \ttlb \any{\NT{prjattr}}\ttrb}
+
+    \RULE{pattern}
+    \CASE{pattern \NT{id} \ttlb \any{\NT{patattr}}\ttrb}
+
+    \RULE{graph}
+    \CASE{graph \NT{filepath} \ttlb \any{\NT{grphattr}} \any{\NT{curve}}\ttrb}
+  \end{grammar}
+
+\section{Common attributes}
+\label{sec:commonattr}
+
+  \begin{grammar}
+    \RULE{styleattr}
+    \CASE{color = \NT{float} \NT{float} \NT{float}}
+    \CASE{linestyle = \NT{id} \ttmid~marktype = \NT{id}}
+    \CASE{legend = \NT{string}}
+  \end{grammar}
+
+\section{Project attributes}
+\label{sec:prjattr}
+
+  \begin{grammar}
+    \RULE{prjattr}
+    \CASE{flags = \NT{string} \ttmid~dir = \NT{string}}
+    \CASE{\NT{styleattr}}
+    \CASE{versions = \ttlb \ANY{(\NT{string},\NT{date},\NT{int})}\ttrb}
+  \end{grammar}
+
+\section{Pattern attributes}
+\label{sec:pattattr}
+
+  \begin{grammar}
+    \RULE{patattr}
+    \CASE{flags = \NT{string} \ttmid~file = \NT{string}}
+    \CASE{\NT{styleattr}}
+  \end{grammar}
+
+\section{Graphs rules}
+\label{sec:graph-rules}
+
+  \begin{grammar}
+    \RULE{curve}
+    \CASE{curve project \NT{id} \OPT{\ttlb \any{\NT{layoutattr}}\ttrb}}
+    \CASE{curve pattern \NT{id} \OPT{\ttlb \any{\NT{layoutattr}}\ttrb}}
+    \CASE{curve project \NT{id} pattern \NT{id} \ttlb \any{\NT{layoutattr}}\ttrb}
+    \CASE{curve \NT{string} \ttlb \any{\NT{layoutattr}}\ttrb}
+
+    \RULE{grphattr}
+    \CASE{xaxis = \NT{xtype} \ttmid~yaxis = \NT{ytype}}
+    \CASE{xlegend = \NT{string} \ttmid~ylegend = \NT{string}}
+    \CASE{pattern = \NT{id} \ttmid~project = \NT{id}}
+    \CASE{\NT{layoutattr}}
+
+    \RULE{xtype}
+    \CASE{version \ttmid~date}
+
+    \RULE{ytype}
+    \CASE{occurrences \ttmid~count \ttmid~density \ttmid~cumulcount}
+    \CASE{size \ttmid~sizepct \ttmid~birth \ttmid~death \ttmid~netincrease}
+    \CASE{birthfile \ttmid~deathfile \ttmid~avglifespan}
+    \CASE{avgage \ttmid~eldest \ttmid~eldestdeath}
+    \CASE{expertise \ttmid~patchexpert \ttmid~timeexpert}
+    \CASE{abstime \ttmid~reltime \ttmid~lifeexpect \ttmid~user}
+
+    \RULE{layoutattr}
+    \CASE{nooccurcolor = \NT{float} \NT{float} \NT{float}}
+    \CASE{notexistcolor = \NT{float} \NT{float} \NT{float}}
+    \CASE{filename = \NT{boolean}}
+    \CASE{ratio = \NT{boolean} \ttmid~factor = \NT{int}}
+    \CASE{data = \NT{expression}}
+    \CASE{\NT{styleattr}}
+  \end{grammar}
+
+\section{Expression rules}
+\label{sec:exp-rules}
+
+The operators \T{*} and \T{/} have priority over the operators \T{+}
+and \T{-}.
+
+  \begin{grammar}
+    \RULE{expression}
+    \CASE{project \NT{id}}
+    \CASE{pattern \NT{id}}
+    \CASE{\NT{expression} + \NT{expression}}
+    \CASE{\NT{expression} - \NT{expression}}
+    \CASE{\NT{expression} * \NT{expression}}
+    \CASE{\NT{expression} / \NT{expression}}
+    \CASE{(\NT{expression})}
+  \end{grammar}
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "herodotos.tex"
+%%% coding: utf-8
+%%% TeX-PDF-mode: t
+%%% ispell-local-dictionary: "american"
+%%% End:

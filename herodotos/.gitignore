@@ -1,0 +1,10 @@
+.depend
+.config
+Makefile.config
+herodotos
+herodotos.opt
+*.annot
+*.a
+*.o
+*.cm[aoix]
+*.cmxa

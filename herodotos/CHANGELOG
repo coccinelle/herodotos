@@ -1,0 +1,13 @@
+
+-*- org -*-
+
+ * 0.6.0
+ - Allow "strict" correlation where the link text
+   must match too.
+ - Cleaner use process: generation of edit and new
+   files depends on their status. New files are only
+   generated if the correlation if done. Edit files
+   are generated only if they differ from their
+   corresponding new files.
+ - Rewrite Org parser.
+ - Fix abscisse size for evolution curves.

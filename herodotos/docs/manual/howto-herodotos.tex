@@ -1,0 +1,45 @@
+\documentclass[twocolumn]{article}
+
+\usepackage{hevea}
+\usepackage{fullpage}
+\usepackage[pdftex]{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[pdfborder={0 0 0}]{hyperref}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{xspace}
+\usepackage{listings}
+%\usepackage{fancyvrb}
+%\usepackage{moreverb}
+%\usepackage{alltt}
+\usepackage{multicol}
+
+\newif\iflanguagestyle
+\languagestylefalse
+\input{macros_common}
+
+\input{macros}
+
+\begin{document}
+%------------------------------------------------------------------------------
+\title{
+{How to use Herodotos}\\
+{release \version}\\
+}
+
+\author{Nicolas Palix}
+
+\date{\today}
+
+\maketitle
+
+\input{howto}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: t
+%%% coding: utf-8
+%%% TeX-PDF-mode: t
+%%% ispell-local-dictionary: "american"
+%%% End:

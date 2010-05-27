@@ -1,0 +1,28 @@
+
+ == Requirements ==
+
+ * A org-mode capable matching tool
+	* For instance, Coccinelle (spatch)
+ * menhir, a O'Caml parser generator
+	* Only for building Herodotos
+
+ For EPS generation
+====================
+ * jgraph
+ * ps2eps
+
+ For conversion to PDF
+=======================
+ * pdftk
+ * epstopdf
+
+ For conversion to SVG images
+==============================
+ * inkscape ( > 0.46 )
+
+ == Improvements ==
+
+ * Native version of spatch (spatch.opt)
+
+ * Source code repositories should have been
+   indexed with glimpse (may improve spatch efficiency)

@@ -1,0 +1,8 @@
+.depend
+config_lexer.ml
+config_parser.ml
+config_parser.mli
+*.cmxa
+*.cm[ioax]
+*.a
+*.o

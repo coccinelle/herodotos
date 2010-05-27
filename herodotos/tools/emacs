@@ -1,0 +1,41 @@
+;; ===================================================
+(setq load-path (append '("~/.emacs.d"
+			  "~/.emacs.d/org.emacs"
+			  "/usr/local/share/emacs/site-lisp/")
+			load-path))
+
+(load "~/.emacs.d/cocci.el")
+(load "~/.emacs.d/cocci-ediff.el")
+
+;; Add the following lines to your ~/.emacs or equivalent:
+   (setq auto-mode-alist
+           (cons '("\\.cocci$" . cocci-mode) auto-mode-alist))
+   (autoload 'cocci-mode "cocci"
+           "Major mode for editing cocci code." t)
+;;
+;; You can also use cocci-mode to edit the files containing the
+;; isomorphisms with:
+  (setq auto-mode-alist
+           (cons '("\\.iso$" . cocci-mode) auto-mode-alist))
+;;
+(add-hook 'org-mode-hook 'font-lock-mode)
+
+;;; Org mode
+(require 'org-install)
+(require 'org-view-link)
+
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(add-hook 'org-mode-hook
+          '(lambda ()
+             (local-set-key [C-up] 'backward-paragraph)
+             (local-set-key [C-down] 'forward-paragraph)))
+(add-hook 'org-mode-hook
+          '(lambda ()
+             (local-set-key [down-mouse-3] 'org-view-mouse)))
+(add-hook 'org-mode-hook
+          '(lambda ()
+             (local-set-key (kbd "C-c C-o") 'org-view-mouse)))
+
+(setq font-lock-maximum-size 10000000000)

@@ -1,0 +1,37 @@
+This package was debianized by:
+
+    Nicolas Palix <npalix@diku.dk> on Sat, 30 Jan 2010 19:09:26 +0100.
+
+It was downloaded from <http://www.diku.dk/~npalix/herodotos/>
+
+Upstream Authors:
+    Nicolas Palix <npalix@diku.dk>
+
+Copyright:
+
+    2009-2010   University of Copenhagen
+    2009-2010   Nicolas Palix
+
+License:
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License (GPL)
+    version 2 as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+On Debian systems, the complete text of the GNU General Public
+License, version 2, can be found in /usr/share/common-licenses/GPL-2.
+
+On Debian systems, the complete text of the GNU Lesser General Public
+License, version 2.1, can be found in /usr/share/common-licenses/GPL-2.1.
+
+The Debian packaging is copyright 2010, Nicolas Palix <npalix@diku.dk> and
+is licensed under the GPL, see above.

@@ -1,0 +1,78 @@
+
+\label{chap:howto}
+
+At this point, you must have Herodotos installed. You now have to
+setup your environment and write a Herodotos Configuration file.
+
+\begin{enumerate}
+\item Setup the environment
+  \begin{itemize}
+  \item Copy default make files and define your working directory. If
+    you installed Herodotos from source, the default make files are
+    \texttt{herodotos/scripts}. For a package install, copy the files
+    from the Herodotos
+    examples\footnote{\texttt{/usr/share/doc/herodotos/examples/scripts}}.
+  \item Write a HC file which declares your projects, patterns and graphs.\\
+    If you want to have several .hc files, you should define the CONF
+    environment variable to select a default one. Every following make
+    command will then use that configuration file.
+  \end{itemize}
+
+\item Initialize the environment:
+
+  \texttt{make init}
+
+\item Compute raw data:
+
+  \texttt{make -j2}
+
+\item Correlate bug reports and propose an initial set of
+  correlations:
+
+  \texttt{make correl}
+
+  Note: Herodotos will automatically compute the changeset.
+
+\item Manually edit the remaining correlations
+
+  \texttt{\$EDITOR results/*/*.correl.org}
+
+  Emacs with the Org mode is recommended.
+  Org mode view-link add-on will transform your
+  emacs in a wizard to handle Coccinelle reports.
+
+  See \texttt{./tools/org-view-link.el}
+
+\item Use the new complementary correlation information
+
+  \texttt{make correl} (recompute the correlation and use the
+  correlation set manually provided)
+
+\item Check the result:
+
+  \texttt{make stat}
+
+\item Look for false positive
+
+  \begin{itemize}
+  \item \texttt{cp results/*/*.edit.org results/*/*.new.org}
+  \item Edit the new copy and annotate the reported TODO with either
+    BUG or FP.
+  \end{itemize}
+
+\item Generate graphs (or website):
+
+  \texttt{make [graph|web]}
+
+\item Edit and adjust your HC file\\
+
+  Iterate on steps 9 and 10.
+\end{enumerate}
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "herodotos.tex"
+%%% coding: utf-8
+%%% TeX-PDF-mode: t
+%%% ispell-local-dictionary: "american"
+%%% End:

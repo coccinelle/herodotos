@@ -1,0 +1,11 @@
+.depend
+.jgrfiles
+gr
+website
+results
+Makefile
+Makefile.images
+Makefile.prj
+Makefile.patchset
+.depend.erase
+.depend.patterns

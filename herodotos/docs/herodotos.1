@@ -1,0 +1,133 @@
+.\"  -*- nroff -*-
+.\" Please adjust this date whenever revising the manpage.
+.TH HERODOTOS 1 "April 15, 2010"
+
+.\" see http://www.fnal.gov/docs/products/ups/ReferenceManual/html/manpages.html
+.\" see http://www.linuxjournal.com/article/1158
+.\" see http://www.schweikhardt.net/man_page_howto.html
+.\" groff -Tascii -man ./herodotos.1 | more
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.\"
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics,
+.\" respectively. Also \fR for roman.
+.\" pad: src: deputy man page
+.SH NAME
+herodotos \- tracking occurrences of code patterns across several project versions.
+
+.SH SYNOPSIS
+.B herodotos
+.B -c
+.I <configfile>
+.B --init
+.RB [ --cvs ]
+.br
+.B herodotos
+.B -c
+.I <configfile>
+.B --correl
+.br
+.B herodotos
+.B -c
+.I <configfile>
+.RB [ --stat | --statcorrel | --statfp ]
+.br
+.B herodotos
+.B -c
+.I <configfile>
+.RB [ --eps ]
+.RB [ --png ]
+.RB [ -w | --web ]
+.RB [ -v | -vv | -vvv ]
+.br
+.B herodotos
+.B -c
+.I <configfile>
+.B --erase
+.RB [
+.I pattern
+.RB |
+.I project
+.RB ]
+.\"
+.SH DESCRIPTION
+\fBherodotos\fP is a program to correlate code pattern occurrences
+across several versions of software projects. Code pattern occurrences
+are identified by third partie software, such as Coccinelle. Herodotos
+builds and computes graphs and statistics about the occurrences. We
+currently computes information such as average lifetime, evolution of
+the number of occurrences, evolution of the occurrence density with
+respect to the project code base size, number of occurrences
+introduced by a new file, number of occurrences removed by deleting a
+file. Herodotos could be used to compare several kinds of patterns
+between multiple software projects. It is particularly useful to study
+evolution of bugs that can be described as code patterns.
+
+Herodotos do not assume to be used with a particular tool for finding
+occurrences, but it relies on the reports to be formatted in the Emacs
+Org mode with hyperlinks.
+
+.PP
+Further information about herodotos is available at
+\fBhttp://www.diku.dk/~npalix/herodotos/\fP.
+
+.SH OPTIONS
+Here is a summary of the most commonly used options:
+
+.TP
+.B -c \fI<configfile>\fP
+.TP
+.B --config \fI<configfile>\fP
+the Herodotos configuration file
+.TP
+.B --init
+initialize the environment
+.TP
+.B --correl
+launch the automatic correlation process
+.TP
+.B --stat --statcorrel --statfp
+compute the statistics, either related to the correlation, the false
+positives or both.
+.TP
+.B --longhelp
+see all the available options
+.TP
+.B -h, -help, --help
+show the list of options.
+
+.SH EXAMPLES
+
+  ./herodotos -c <hcl.file> --init
+.br
+  ./herodotos -c <hcl.file> --correl
+.br
+  ./herodotos -c <hcl.file> --web
+
+.SH AUTHOR
+\fBherodotos\fP was written by Nicolas Palix <npalix@diku.dk>.
+.PP
+This manual page was written by Nicolas Palix <npalix@diku.dk>.
+
+.SH REPORTING BUGS
+Send a mail to <npalix@diku.dk>
+
+.SH COPYRIGHT
+Copyright 2009, 2010, University of Copenhagen DIKU and INRIA.
+herodotos is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, according to version 2 of the License.
+
+.SH SEE ALSO
+spatch(1), diff(1)
+

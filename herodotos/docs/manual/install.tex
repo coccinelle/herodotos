@@ -1,0 +1,64 @@
+
+\chapter{Installation}
+\label{sec:install}
+
+\section{Requirements}
+\label{sec:requirements}
+
+\paragraph{To install Herodotos from the source}
+
+You need the O'Caml compiler. Herodotos parsers are generated with
+Menhir. However they have been pre-generated in the source package.
+
+\paragraph{To use Herodotos}
+
+You need the following:
+
+\begin{itemize}
+\item A org-mode capable matching tool. For instance, Coccinelle
+  (spatch) is perfect.
+
+\item Herodotos relies on EPS generation using jgraph and ps2eps. They
+  are thus mandatory.
+\item To convert to PDF files, Herodotos uses epstopdf which is part
+  of texlive. You may also consider installing pdftk to manipulate
+  PDF files.
+\item To easy diffusion of your results on the web, Herodotos is able
+  to generate a web site with images in PNG and SVG formats. If you
+  want to use this feature, you need to have imagemagick (for PNG) and
+  inkscape (for SVG). Note that the conversion to SVG needs the PDF
+  version of your graphs. You thus need to have epstopdf
+  available. Finally, this feature requires inscape version to be at
+  least 0.47.
+\item To improve the execution time of Coccinelle, you may consider
+  using the glimpse indexer.
+\end{itemize}
+
+\section{Sources}
+\label{sec:sources}
+
+Sources are available on several web sites:
+\begin{itemize}
+\item \url{http://www.diku.dk/~npalix/herodotos/}
+\item \url{https://launchpad.net/~npalix/+archive/herodotos}
+\item \url{https://launchpad.net/~npalix/+archive/herodotos-stable}
+\end{itemize}
+
+\section{Distribution package}
+\label{sec:distro-package}
+
+If you're under Ubuntu, you may add \texttt{ppa:npalix/herodotos} or
+\texttt{ppa:npalix/herodotos-stable} as an other software source in
+Synaptic. In that case, runtime dependencies are automatically
+handled.
+
+For more information, you can go to the PPA pages on Launchpad
+mentioned in previous section.
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "herodotos.tex"
+%%% coding: utf-8
+%%% TeX-PDF-mode: t
+%%% ispell-local-dictionary: "american"
+%%% End:

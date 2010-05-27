@@ -1,0 +1,90 @@
+
+Prerequisite:
+
+	Compile and install Herodotos
+
+	./configure && make world && sudo make install
+
+Instructions:
+
+ 1) Setup the environment
+
+      * Copy default make files from herodotos/scripts
+        and define your working directory
+
+          make -f Makefile.local
+
+      * Check in demo.hc that 'projects' attribute is
+        properly set up.
+
+ 2) Initialize the environment
+
+          make init
+
+ 3) Compute raw data
+
+          make -j2
+
+ 4) Compute changeset
+
+      * Edit Makefile.patchset
+         but it is not needed for the demo
+
+      * Execute computation
+
+          make -f Makefile.patchset
+
+  5) Correlate bug reports
+
+          make correl (build a initial set)
+          make correl (use the initial set)
+
+  6) Manually edit the remaining correlation
+
+          $EDITOR results/test/error.correl.org
+
+       Emacs with the Org mode is recommended.
+       Org mode view-link add-on will transform your
+       emacs in a wizard to handle Coccinelle reports.
+
+       See ./scripts/org-view-link.el
+
+  7) Use the new complementary correlation information
+
+          make correl
+
+  8) Check the result
+
+          make count
+
+  9) Look for false positive
+
+          cp results/test/error.edit.org results/test/error.new.org
+
+       * Edit the new copy and annotate the reported TODO
+         with either BUG or FP
+
+ 10) Generate graphs (or website)
+
+          make graph/web
+
+
+ 11) Edit and personalize demo.hc
+
+       * Iterate on steps 10 and 11.
+       * Available graph types:
+          - avgage
+          - avglifespan
+          - birth
+          - birthfile
+          - cumulsum
+          - death
+          - deathfile
+          - density
+          - eldest
+          - eldestdeath
+          - lifeexpect
+          - netincrease
+          - size
+          - sizepct
+          - sum

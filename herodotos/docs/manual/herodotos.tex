@@ -1,0 +1,65 @@
+\documentclass{report}
+
+\usepackage{hevea}
+\usepackage{fullpage}
+\usepackage[pdftex]{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[pdfborder={0 0 0}]{hyperref}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{xspace}
+\usepackage{listings}
+%\usepackage{fancyvrb}
+%\usepackage{moreverb}
+%\usepackage{alltt}
+\usepackage{multicol}
+
+\newif\iflanguagestyle
+\languagestylefalse
+\input{macros_common}
+\input{macros_grammar}
+
+\input{macros}
+
+\begin{document}
+%------------------------------------------------------------------------------
+\title{
+{\Huge \bf Herodotos}\\
+{User's manual}\\
+{release \version}\\
+}
+
+\author{Nicolas Palix}
+
+\date{\today}
+
+\maketitle
+\tableofcontents
+
+%******************************************************************************
+% Body
+%******************************************************************************
+
+%\part{User Manual}
+%\label{part:usermanual}
+
+\input{foreword}
+
+\input{install}
+
+\chapter{How to use Herodotos}
+\input{howto}
+
+\input{syntax}
+
+%\part{Examples}
+%\input{examples}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: t
+%%% coding: utf-8
+%%% TeX-PDF-mode: t
+%%% ispell-local-dictionary: "american"
+%%% End:

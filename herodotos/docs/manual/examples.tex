@@ -1,0 +1,690 @@
+\chapter{Linux, Wine, VLC, OpenSSL comparison}
+\label{sec:soft-comparison}
+
+\section{Preamble}
+\label{sec:ex-preamble}
+
+\begin{lstlisting}
+prefix="."
+patterns="/var/storage/smatch/cocci"
+projects="/var/storage/projects"
+results="./results"
+website="./web"
+findcmd="spatch %f -sp_file %p -dir %d 2> %b.log > %o"
+flags="-timeout 60 -use_glimpse"
+\end{lstlisting}
+
+\section{Projects}
+\label{sec:ex-projects}
+
+\begin{multicols}{2}
+\begin{lstlisting}
+project Linux {
+
+ scm=""
+ dir = "linux"
+ color = 1 0 0
+ linestyle = solid
+ marktype = circle
+ versions = {
+  ("2.6.13", 08/28/2005, 4289406)
+  ("2.6.14", 10/27/2005, 4399620)
+  ("2.6.15", 01/02/2006, 4481795)
+  ("2.6.16", 03/19/2006, 4601957)
+  ("2.6.17", 06/17/2006, 4669412)
+  ("2.6.18", 09/19/2006, 4750426)
+  ("2.6.19", 11/29/2006, 4890004)
+  ("2.6.20", 02/04/2007, 4972172)
+  ("2.6.21", 04/25/2007, 5060948)
+  ("2.6.22", 07/08/2007, 5215458)
+  ("2.6.23", 10/09/2007, 5272632)
+  ("2.6.24", 01/24/2008, 5455345)
+  ("2.6.25", 04/16/2008, 5679912)
+  ("2.6.26", 07/13/2008, 5780304)
+  ("2.6.27", 10/09/2008, 5903948)
+  ("2.6.28", 12/24/2008, 6219333)
+ }
+}
+
+project Wine {
+
+ scm=""
+ dir = "wine"
+ color = 0 0 1
+ linestyle = solid
+ marktype = box
+ versions = {
+  ("20050830", 08/30/2005, 1037069)
+  ("0.9" , 10/25/2005, 1051743)
+  ("0.9.5" , 01/04/2006, 1085684)
+  ("0.9.10" , 03/15/2006, 1107063)
+  ("0.9.16" , 06/21/2006, 1141730)
+  ("0.9.21" , 09/13/2006, 1181745)
+  ("0.9.26" , 11/24/2006, 1203677)
+  ("0.9.30" , 01/25/2007, 1227183)
+  ("0.9.36" , 04/27/2007, 1260912)
+  ("0.9.41" , 07/13/2007, 1298833)
+  ("0.9.47" , 10/12/2007, 1355986)
+  ("0.9.54" , 01/25/2008, 1393639)
+  ("0.9.60" , 04/18/2008, 1446788)
+  ("1.1.1" , 07/11/2008, 1482518)
+  ("1.1.6" , 10/10/2008, 1556194)
+  ("1.1.11" , 12/20/2008, 1586995)
+ }
+}
+
+project VLC {
+
+ scm=""
+ dir = "vlc"
+ color = 0 1 0
+ linestyle = solid
+ marktype = diamond
+ versions = {
+  ("0.8.2" , 06/25/2005, 213186)
+  ("0.8.4" , 11/26/2005, 240215)
+  ("0.8.4b", 12/14/2005, 239598)
+  ("0.8.5" , 05/14/2006, 256197)
+  ("0.8.6" , 12/10/2006, 263927)
+  ("0.8.6a", 03/11/2007, 263927)
+  ("0.8.6b", 04/18/2007, 265074)
+  ("0.8.6c", 06/16/2007, 265460)
+  ("0.8.6d", 11/30/2007, 264908)
+  ("0.8.6e", 02/27/2008, 265337)
+  ("0.8.6f", 03/31/2008, 266198)
+  ("0.8.6g", 05/17/2008, 266211)
+  ("0.8.6h", 06/03/2008, 266666)
+  ("0.8.6i", 07/08/2008, 266686)
+  ("0.9.0" , 08/24/2008, 326858)
+  ("0.9.4" , 10/06/2008, 327318)
+  ("0.9.8a", 12/02/2008, 327494)
+ }
+}
+
+project OpenSSL {
+
+ scm=""
+ dir = "openssl"
+ color = 0 0 0
+ linestyle = solid
+ marktype = triangle
+ versions = {
+  ("0.9.8", 07/05/2005, 199405)
+  ("0.9.8a", 10/11/2005, 200187)
+  ("0.9.8b", 05/04/2006, 200479)
+  ("0.9.8c", 09/05/2006, 203553)
+  ("0.9.8d", 09/28/2006, 203684)
+  ("0.9.8e", 02/23/2007, 205870)
+  ("0.9.8f", 10/11/2007, 208710)
+  ("0.9.8g", 10/19/2007, 208715)
+  ("0.9.8h", 05/28/2008, 216565)
+  ("0.9.8i", 09/15/2008, 219305)
+  ("0.9.8j", 01/07/2009, 231578)
+ }
+}
+\end{lstlisting}
+\end{multicols}
+
+\section{Patterns}
+\label{sec:ex-patterns}
+
+\begin{multicols}{2}
+\begin{lstlisting}
+pattern open {
+ file = "open.cocci"
+ color = 1 0 .5
+ linestyle = solid
+ marktype = circle
+}
+
+pattern kmalloc {
+ file = "kmalloc7.cocci"
+ color = 0 1 1
+ marktype = diamond
+ linestyle = solid
+}
+
+pattern malloc {
+ file = "malloc.cocci"
+ color = 0 1 1
+ marktype = diamond
+ linestyle = solid
+}
+
+pattern isnull {
+ file = "isnull.cocci"
+ color = 0 0 1
+ marktype = box
+ linestyle = solid
+}
+
+pattern null_ref {
+ file = "null_ref.cocci"
+ color = .5 .5 .5
+ marktype = cross
+ linestyle = solid
+}
+
+pattern notnull {
+ file = "notnull.cocci"
+ color = 0 .5 .5
+ marktype = x
+ linestyle = solid
+}
+
+pattern unused {
+ file = "unused.cocci"
+ color = .5 .5 1
+ marktype = box
+ linestyle = solid
+}
+
+pattern notand {
+ file = "notand.cocci"
+ flags = "-macro_file_builtins /var/storage/smatch/notand.h"
+ color = 0 1 .5
+ marktype = triangle
+ linestyle = solid
+}
+
+pattern unsigned {
+ file = "find_unsigned.cocci"
+ flags = "-all_includes"
+ color = 0 1 0
+ marktype = circle
+ linestyle = solid
+}
+
+pattern badzero {
+ file = "badzero.cocci"
+}
+\end{lstlisting}
+\end{multicols}
+
+\section{Graphs}
+\label{sec:ex-graphs}
+
+\begin{multicols}{2}
+\begin{lstlisting}
+graph gr/hist/linux-open.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Linux
+ curve pattern open
+}
+
+graph gr/hist/linux-kmalloc.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Linux
+ curve pattern kmalloc
+}
+
+graph gr/hist/linux-isnull.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Linux
+ curve pattern isnull
+}
+
+graph gr/hist/linux-null_ref.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Linux
+ curve pattern null_ref
+}
+
+graph gr/hist/linux-notnull.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Linux
+ curve pattern notnull
+}
+
+graph gr/hist/linux-unused.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Linux
+ curve pattern unused
+}
+
+graph gr/hist/linux-badzero.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Linux
+ curve pattern badzero
+}
+
+graph gr/hist/linux-notand.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Linux
+ curve pattern notand
+}
+
+graph gr/hist/linux-unsigned.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Linux
+ curve pattern unsigned
+}
+
+graph gr/hist/wine-malloc.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Wine
+ curve pattern malloc
+}
+
+graph gr/hist/wine-isnull.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Wine
+ curve pattern isnull
+}
+
+graph gr/hist/wine-null_ref.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Wine
+ curve pattern null_ref
+}
+
+graph gr/hist/wine-notnull.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Wine
+ curve pattern notnull
+}
+
+graph gr/hist/wine-unused.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Wine
+ curve pattern unused
+}
+
+graph gr/hist/wine-badzero.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Wine
+ curve pattern badzero
+}
+
+graph gr/hist/wine-notand.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Wine
+ curve pattern notand
+}
+
+graph gr/hist/wine-unsigned.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = Wine
+ curve pattern unsigned
+}
+
+graph gr/hist/vlc-null_ref.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ curve project VLC pattern null_ref {
+   notexistcolor = 0 0 0
+   nooccurcolor = 1 1 1
+   occurcolor = 0 1 1
+   filename = true
+   ratio = true
+ }
+}
+
+graph gr/hist/vlc-malloc.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = VLC
+ curve pattern malloc
+}
+
+graph gr/hist/vlc-isnull.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = VLC
+ curve pattern isnull
+}
+
+graph gr/hist/vlc-notnull.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = VLC
+ curve pattern notnull
+}
+
+graph gr/hist/vlc-unused.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = VLC
+ curve pattern unused
+}
+
+graph gr/hist/vlc-badzero.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = VLC
+ curve pattern badzero
+}
+
+graph gr/hist/vlc-notand.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = VLC
+ curve pattern notand
+}
+
+graph gr/hist/openssl-isnull.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = OpenSSL
+ curve pattern isnull
+}
+
+graph gr/hist/openssl-null_ref.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = OpenSSL
+ curve pattern null_ref
+}
+
+graph gr/hist/openssl-notnull.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = OpenSSL
+ curve pattern notnull
+}
+
+graph gr/hist/openssl-unused.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = OpenSSL
+ curve pattern unused
+}
+
+graph gr/hist/openssl-badzero.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = OpenSSL
+ curve pattern badzero
+}
+
+graph gr/hist/openssl-unsigned.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = occurrences
+ ylegend = ""
+ sort = true
+ project = OpenSSL
+ curve pattern unsigned
+}
+
+graph gr/evol/linux.jgr {
+ xaxis = date
+ xlegend = "Linux"
+ yaxis = sum
+ ylegend = "Number of defects"
+ legend = "defaults fontsize 8 left"
+ project = Linux
+ curve pattern open
+ curve pattern kmalloc {
+  legend = "kmalloc/malloc"
+ }
+ curve pattern isnull
+ curve pattern null_ref
+ curve pattern notnull
+ curve pattern unused
+ curve pattern notand
+ curve pattern unsigned
+}
+
+graph gr/evol/wine.jgr {
+ xaxis = date
+ xlegend = "Wine"
+ yaxis = sum
+ ylegend = "Number of defects"
+ legend = "off"
+ project = Wine
+ curve pattern malloc
+ curve pattern isnull
+ curve pattern null_ref
+ curve pattern notnull
+ curve pattern unused
+ curve pattern notand
+ curve pattern unsigned
+}
+
+graph gr/evol/openssl.jgr {
+ xaxis = date
+ xlegend = "OpenSSL"
+ yaxis = sum
+ ylegend = "Number of defects"
+ legend = "off"
+ project = OpenSSL
+ curve pattern isnull
+ curve pattern null_ref
+ curve pattern notnull
+ curve pattern unused
+ curve pattern unsigned
+}
+
+graph gr/evol/vlc.jgr {
+ xaxis = date
+ xlegend = "VLC"
+ yaxis = sum
+ ylegend = "Number of defects"
+ legend = "off"
+ project = VLC
+ curve pattern malloc
+ curve pattern isnull
+ curve pattern null_ref
+ curve pattern notnull
+ curve pattern unused
+ curve pattern notand
+}
+
+graph gr/size/code-size.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = size
+ ylegend = "Code size\nin MLOC"
+ factor= 1000000
+ legend = "defaults fontsize 6 x 800 y 3.4"
+ curve project Linux
+ curve project Wine
+ curve project VLC
+ curve project OpenSSL
+}
+
+graph gr/size/code-size-percentage.jgr {
+ xaxis = date
+ xlegend = ""
+ yaxis = sizepct
+ ylegend = "Percentage\nincrease"
+ legend = "defaults fontsize 6 x 180 y 45"
+ curve project Linux
+ curve project Wine
+ curve project VLC
+ curve project OpenSSL
+}
+
+graph gr/evol/badzero.jgr {
+ xaxis = date
+ yaxis = sum
+ xlegend = "badzero"
+ ylegend = "Number of defects"
+ legend = "defaults fontsize 8 x 1000 y 500"
+ pattern = badzero
+ curve project Linux
+ curve project Wine
+ curve project VLC
+ curve project OpenSSL
+}
+
+graph gr/evol/badzero-density.jgr {
+ xaxis = date
+ yaxis = density
+ xlegend = "badzero"
+ ylegend = "Density of defects\n(# by KLOC)"
+ legend = "off"
+ pattern = badzero
+ factor = 1000
+ curve project Linux
+ curve project Wine
+ curve project VLC
+ curve project OpenSSL
+}
+
+graph gr/total/sum.jgr {
+ xaxis = groups
+ xlegend = ""
+ yaxis = cumulsum
+ ylegend = ""
+ legend = "defaults x 2 y 550"
+ project = Linux
+ project = Wine
+ project = VLC
+ project = OpenSSL
+ group pattern open
+ group "(k)malloc" {
+   curve project Linux pattern kmalloc
+   curve project Wine pattern malloc
+   curve project VLC pattern malloc
+   curve project OpenSSL pattern malloc
+ }
+ group pattern isnull
+ group pattern null_ref
+ group pattern notnull
+ group pattern unused
+ group pattern badzero
+ group pattern notand
+ group pattern unsigned
+}
+
+graph gr/total/avg.jgr {
+ xaxis = groups
+ xlegend = ""
+ yaxis = avglifespan
+ ylegend = ""
+ legend = "off"
+ project = Linux
+ project = Wine
+ project = VLC
+ project = OpenSSL
+ group pattern open
+ group "(k)malloc" {
+   curve project Linux pattern kmalloc
+   curve project Wine pattern malloc
+   curve project VLC pattern malloc
+   curve project OpenSSL pattern malloc
+ }
+ group pattern isnull
+ group pattern null_ref
+ group pattern notnull
+ group pattern unused
+ group pattern badzero
+ group pattern notand
+ group pattern unsigned
+}
+\end{lstlisting}
+\end{multicols}
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "herodotos.tex"
+%%% coding: utf-8
+%%% TeX-PDF-mode: t
+%%% ispell-local-dictionary: "american"
+%%% End:

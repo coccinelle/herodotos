@@ -1,0 +1,39 @@
+herodotos (0.6.0rc3~1004npalix1) lucid; urgency=low
+
+  * Release candidate 3 for 0.6.0
+
+ -- Nicolas Palix <npalix@diku.dk>  Tue, 20 Apr 2010 18:24:02 +0200
+
+herodotos (0.6.0rc2~1004palix1) lucid; urgency=low
+
+  * Release candidate 2 for 0.6.0
+
+ -- Nicolas Palix <npalix@diku.dk>  Mon, 19 Apr 2010 08:59:37 +0200
+
+herodotos (0.6.0rc1~1004palix1) lucid; urgency=low
+
+  * Release candidate for 0.6.0
+
+ -- Nicolas Palix <npalix@diku.dk>  Thu, 15 Apr 2010 15:44:19 +0200
+
+herodotos (0.5.4rc2~1004palix1) lucid; urgency=low
+
+  * Support subproject (integration in the language will come later)
+
+ -- Nicolas Palix <npalix@diku.dk>  Mon, 08 Feb 2010 23:29:00 +0100
+
+herodotos (0.5.4rc1~1004palix2) lucid; urgency=low
+
+  * Add support to generate eps (texlive-extra-utils is no longer mandatory)
+  * Relax dependencies: remove pdftk, lower priority for inkscape (svg support)
+  * Recommend imagemagick for convertion to png
+  * Fix diff_ver script in demo
+
+ -- Nicolas Palix <npalix@diku.dk>  Thu, 04 Feb 2010 14:59:03 +0100
+
+herodotos (0.5.4rc1~1004palix1) lucid; urgency=low
+
+  * Import for Lucid
+
+ -- Nicolas Palix <npalix@diku.dk>  Thu, 04 Feb 2010 01:36:18 +0100
+

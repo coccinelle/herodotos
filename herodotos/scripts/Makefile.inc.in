@@ -1,0 +1,70 @@
+# Use the default version
+# but this may be the native one on some distro
+HERODOTOS=herodotos
+ifeq ($(D),1)
+FLAGS=--debug -v
+else ifeq ($(D),2)
+FLAGS=--debug -vv
+else ifeq ($(D),3)
+FLAGS=--debug -vvv
+else
+HERODOTOS=herodotos.opt
+FLAGS=
+endif
+
+CONF?=$(shell ls *.hc)
+RESULTS=$(shell grep "results=" $(CONF) 2> /dev/null | sed "s|results=\"\([^\"]*\)\"|\1|" 2> /dev/null)
+PRJS=$(shell find $(RESULTS) -mindepth 1 -maxdepth 1 -type d 2> /dev/null | grep -v CVS | sed "s|$(RESULTS)||g" 2> /dev/null)
+PROJECTS=$(PRJS:%=$(RESULTS)%)
+
+UPDATES=$(PRJS:%=update-%)
+
+.PHONY:: all projects update stat statcorrel statfp
+.PHONY:: init correl graph web h-stat clean
+.PHONY:: help check-conf
+.PHONY:: $(PROJECTS) $(UPDATES)
+
+-include .depend
+
+init correl web stat statfp: check-conf $(CONF)
+	$(HERODOTOS) $(FLAGS) -c $(CONF) --$@
+	@if [ "$@" = "init" ]; then echo "NEXT: make all [-jX]"; fi
+	@if [ "$@" = "init" ]; then echo "OR: dmake X (if you stand on the shoulders of giants !)"; fi
+	@if [ "$@" = "correl" ]; then echo "NEXT: Check for manual correlation. Then run 'make correl'"; fi
+	@if [ "$@" = "correl" ]; then echo "OR: Check for false positives"; fi
+	@if [ "$@" = "correl" ]; then echo "OR: See remaining work with 'make stat'"; fi
+	@if [ "$@" = "correl" ]; then echo "OR: Generate graphs with 'make [graph|web]'"; fi
+
+statcorrel: check-conf $(CONF)
+	$(HERODOTOS) $(FLAGS) -c $(CONF) --$@ 2> /dev/null
+
+all:: projects
+	@echo "NEXT: 'make correl'"
+
+graph: check-conf $(CONF)
+	$(HERODOTOS) $(FLAGS) -c $(CONF)
+
+h-stat: check-conf $(CONF)
+	$(HERODOTOS) $(FLAGS) -c $(CONF) -v
+
+update: check-conf $(UPDATES)
+
+$(UPDATES):
+	mkdir -p $(RESULTS)$(@:update-%=%)
+	cp SHAREDIR/Makefile.prj $(RESULTS)$(@:update-%=%)/Makefile
+	echo "PROJECT=$(@:update-%=%)" > $(RESULTS)$(@:update-%=%)/project
+
+check-conf:
+	@if [ "`echo $(CONF) | wc -w`" != "1" ]; then \
+	echo "\n\tMore than one $(HERODOTOS) configuration file available."; \
+	echo "\tPlease EXPLICITLY specify one with the CONF environment variable"; \
+	echo "\n\texport CONF=<yourfile>.hc (if you use bash)\n"; \
+	exit 1;fi
+
+clean::
+	rm -f *~
+
+help:
+	@echo "Start with 'make init' and follow the instructions! ;)"
+
+-include SHAREDIR/Makefile.images
