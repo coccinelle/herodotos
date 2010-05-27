@@ -1,0 +1,5 @@
+.depend
+*.cmxa
+*.a
+*.o
+*.cm[ioax]

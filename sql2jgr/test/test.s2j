@@ -1,0 +1,98 @@
+prefix="."
+dbconn="dbname='linuxbugs' user='npalix' password='nico' host='localhost'"
+projects="/home/npalix/Documents/build/herodotos-cvs/demo"
+website="./website"
+cpucore = 1
+
+project Test {
+	dir = test
+
+	versions = {
+	("ver0",12/31/1999,15)
+	("ver1",01/01/2001,16)
+	("ver2",01/01/2002,16)
+	}
+}
+
+graph gr/size.jgr {
+ xaxis = date
+ yaxis = size
+ legend = "off"
+ xlegend = ""
+
+ curve project Test
+}
+
+pattern Error;
+pattern Notes;
+pattern Notes2;
+
+graph gr/abs.jgr {
+ xaxis = date
+ yaxis = count
+ legend = "off"
+ xlegend = ""
+
+ project = Test
+
+ curve pattern Error
+}
+
+graph gr/occ1.jgr {
+ xaxis = date
+ yaxis = occurrences
+ xlegend = ""
+ filename = false
+ info = false
+
+ curve project Test pattern Error
+}
+
+graph gr/occ2.jgr {
+ xaxis = date
+ yaxis = occurrences
+ xlegend = ""
+ filename = true
+ info = false
+
+ curve project Test pattern Error
+}
+
+graph gr/occ3.jgr {
+ xaxis = date
+ yaxis = occurrences
+ xlegend = ""
+ filename = false
+ info = true
+
+ curve project Test pattern Error
+}
+
+graph gr/occ4.jgr {
+ xaxis = date
+ yaxis = occurrences
+ xlegend = ""
+ filename = true
+ info = true
+
+ curve project Test pattern Error
+}
+
+graph gr/ratio.jgr {
+ xaxis = version
+ yaxis = user
+ project = Test
+
+ curve "DB" {
+  sql = SELECT version_name, release_date, minor AS data FROM versions WHERE main=2 and major=6;
+ }
+ curve "Ratio" {
+  data = 10 * (pattern Error / pattern Notes)
+ }
+ curve "Cst" {
+  data = (pattern Notes2 / pattern Notes)
+ }
+ curve pattern Error
+ curve pattern Notes
+ curve pattern Notes2
+}
