@@ -6,7 +6,7 @@ DEPLOY=palace bossa
 
 SOURCES =
 SUBDIRS = commons exists hcl org diff scm graph html database engine
-MENHIR_PATH=menhirlib
+MENHIR_PATH=../menhirLib
 DEPDIRS = $(MENHIR_PATH)
 
 OCAMLLIBS=str.cma unix.cma

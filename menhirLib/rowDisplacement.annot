@@ -1,0 +1,2338 @@
+"rowDisplacement.ml" 44 2355 2359 "rowDisplacement.ml" 44 2355 2365
+type(
+  int -> int
+)
+ident(
+  def encode "rowDisplacement.ml" 50 2484 2484 --
+)
+"rowDisplacement.ml" 44 2355 2367 "rowDisplacement.ml" 44 2355 2379
+type(
+  int
+)
+ident(
+  def displacement "rowDisplacement.ml" 44 2355 2387 "rowDisplacement.ml" 48 2453 2482
+)
+"rowDisplacement.ml" 45 2395 2400 "rowDisplacement.ml" 45 2395 2412
+type(
+  int
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 44 2355 2367 "rowDisplacement.ml" 44 2355 2379
+)
+"rowDisplacement.ml" 45 2395 2413 "rowDisplacement.ml" 45 2395 2415
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.>=
+)
+"rowDisplacement.ml" 45 2395 2416 "rowDisplacement.ml" 45 2395 2417
+type(
+  int
+)
+"rowDisplacement.ml" 45 2395 2400 "rowDisplacement.ml" 45 2395 2417
+type(
+  bool
+)
+"rowDisplacement.ml" 46 2423 2427 "rowDisplacement.ml" 46 2423 2439
+type(
+  int
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 44 2355 2367 "rowDisplacement.ml" 44 2355 2379
+)
+"rowDisplacement.ml" 46 2423 2440 "rowDisplacement.ml" 46 2423 2443
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.lsl
+)
+"rowDisplacement.ml" 46 2423 2444 "rowDisplacement.ml" 46 2423 2445
+type(
+  int
+)
+"rowDisplacement.ml" 46 2423 2427 "rowDisplacement.ml" 46 2423 2445
+type(
+  int
+)
+"rowDisplacement.ml" 48 2453 2458 "rowDisplacement.ml" 48 2453 2459
+type(
+  int -> int
+)
+ident(
+  ext_ref Pervasives.~-
+)
+"rowDisplacement.ml" 48 2453 2459 "rowDisplacement.ml" 48 2453 2471
+type(
+  int
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 44 2355 2367 "rowDisplacement.ml" 44 2355 2379
+)
+"rowDisplacement.ml" 48 2453 2457 "rowDisplacement.ml" 48 2453 2472
+type(
+  int
+)
+"rowDisplacement.ml" 48 2453 2473 "rowDisplacement.ml" 48 2453 2476
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.lsl
+)
+"rowDisplacement.ml" 48 2453 2477 "rowDisplacement.ml" 48 2453 2478
+type(
+  int
+)
+"rowDisplacement.ml" 48 2453 2457 "rowDisplacement.ml" 48 2453 2478
+type(
+  int
+)
+"rowDisplacement.ml" 48 2453 2479 "rowDisplacement.ml" 48 2453 2480
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 48 2453 2481 "rowDisplacement.ml" 48 2453 2482
+type(
+  int
+)
+"rowDisplacement.ml" 48 2453 2457 "rowDisplacement.ml" 48 2453 2482
+type(
+  int
+)
+"rowDisplacement.ml" 45 2395 2397 "rowDisplacement.ml" 48 2453 2482
+type(
+  int
+)
+type(
+  int
+)
+"rowDisplacement.ml" 50 2484 2488 "rowDisplacement.ml" 50 2484 2494
+type(
+  int -> int
+)
+ident(
+  def decode "rowDisplacement.ml" 63 2967 2967 --
+)
+"rowDisplacement.ml" 50 2484 2496 "rowDisplacement.ml" 50 2484 2508
+type(
+  int
+)
+ident(
+  def displacement "rowDisplacement.ml" 50 2484 2516 "rowDisplacement.ml" 54 2588 2613
+)
+"rowDisplacement.ml" 51 2524 2529 "rowDisplacement.ml" 51 2524 2541
+type(
+  int
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 50 2484 2496 "rowDisplacement.ml" 50 2484 2508
+)
+"rowDisplacement.ml" 51 2524 2542 "rowDisplacement.ml" 51 2524 2546
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.land
+)
+"rowDisplacement.ml" 51 2524 2547 "rowDisplacement.ml" 51 2524 2548
+type(
+  int
+)
+"rowDisplacement.ml" 51 2524 2529 "rowDisplacement.ml" 51 2524 2548
+type(
+  int
+)
+"rowDisplacement.ml" 51 2524 2549 "rowDisplacement.ml" 51 2524 2550
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.=
+)
+"rowDisplacement.ml" 51 2524 2551 "rowDisplacement.ml" 51 2524 2552
+type(
+  int
+)
+"rowDisplacement.ml" 51 2524 2529 "rowDisplacement.ml" 51 2524 2552
+type(
+  bool
+)
+"rowDisplacement.ml" 52 2558 2562 "rowDisplacement.ml" 52 2558 2574
+type(
+  int
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 50 2484 2496 "rowDisplacement.ml" 50 2484 2508
+)
+"rowDisplacement.ml" 52 2558 2575 "rowDisplacement.ml" 52 2558 2578
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.lsr
+)
+"rowDisplacement.ml" 52 2558 2579 "rowDisplacement.ml" 52 2558 2580
+type(
+  int
+)
+"rowDisplacement.ml" 52 2558 2562 "rowDisplacement.ml" 52 2558 2580
+type(
+  int
+)
+"rowDisplacement.ml" 54 2588 2592 "rowDisplacement.ml" 54 2588 2593
+type(
+  int -> int
+)
+ident(
+  ext_ref Pervasives.~-
+)
+"rowDisplacement.ml" 54 2588 2594 "rowDisplacement.ml" 54 2588 2606
+type(
+  int
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 50 2484 2496 "rowDisplacement.ml" 50 2484 2508
+)
+"rowDisplacement.ml" 54 2588 2607 "rowDisplacement.ml" 54 2588 2610
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.lsr
+)
+"rowDisplacement.ml" 54 2588 2611 "rowDisplacement.ml" 54 2588 2612
+type(
+  int
+)
+"rowDisplacement.ml" 54 2588 2593 "rowDisplacement.ml" 54 2588 2613
+type(
+  int
+)
+"rowDisplacement.ml" 54 2588 2592 "rowDisplacement.ml" 54 2588 2613
+type(
+  int
+)
+"rowDisplacement.ml" 51 2524 2526 "rowDisplacement.ml" 54 2588 2613
+type(
+  int
+)
+type(
+  int
+)
+"rowDisplacement.ml" 73 3413 3417 "rowDisplacement.ml" 73 3413 3425
+type(
+  ('a -> 'a -> bool) ->
+  ('a -> bool) -> 'a -> int -> int -> 'a array array -> 'a table
+)
+ident(
+  def compress "rowDisplacement.ml" 257 8181 8181 --
+)
+"rowDisplacement.ml" 74 3426 3431 "rowDisplacement.ml" 74 3426 3436
+type(
+  'a -> 'a -> bool
+)
+ident(
+  def equal "rowDisplacement.ml" 75 3457 3461 "rowDisplacement.ml" 246 7671 7712
+)
+"rowDisplacement.ml" 75 3457 3462 "rowDisplacement.ml" 75 3457 3475
+type(
+  'a -> bool
+)
+ident(
+  def insignificant "rowDisplacement.ml" 76 3490 3494 "rowDisplacement.ml" 246 7671 7712
+)
+"rowDisplacement.ml" 76 3490 3495 "rowDisplacement.ml" 76 3490 3500
+type(
+  'a
+)
+ident(
+  def dummy "rowDisplacement.ml" 77 3507 3511 "rowDisplacement.ml" 246 7671 7712
+)
+"rowDisplacement.ml" 77 3507 3512 "rowDisplacement.ml" 77 3507 3513
+type(
+  int
+)
+ident(
+  def m "rowDisplacement.ml" 77 3507 3521 "rowDisplacement.ml" 246 7671 7712
+)
+"rowDisplacement.ml" 77 3507 3522 "rowDisplacement.ml" 77 3507 3523
+type(
+  int
+)
+ident(
+  def n "rowDisplacement.ml" 78 3531 3535 "rowDisplacement.ml" 246 7671 7712
+)
+"rowDisplacement.ml" 78 3531 3536 "rowDisplacement.ml" 78 3531 3537
+type(
+  'a array array
+)
+ident(
+  def t "rowDisplacement.ml" 79 3557 3561 "rowDisplacement.ml" 246 7671 7712
+)
+"rowDisplacement.ml" 83 3598 3608 "rowDisplacement.ml" 83 3598 3620
+type(
+  'a array array -> int
+)
+ident(
+  ext_ref Array.length
+)
+"rowDisplacement.ml" 83 3598 3621 "rowDisplacement.ml" 83 3598 3622
+type(
+  'a array array
+)
+ident(
+  int_ref t "rowDisplacement.ml" 78 3531 3536 "rowDisplacement.ml" 78 3531 3537
+)
+"rowDisplacement.ml" 83 3598 3608 "rowDisplacement.ml" 83 3598 3622
+type(
+  int
+)
+"rowDisplacement.ml" 83 3598 3623 "rowDisplacement.ml" 83 3598 3624
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.=
+)
+"rowDisplacement.ml" 83 3598 3625 "rowDisplacement.ml" 83 3598 3626
+type(
+  int
+)
+ident(
+  int_ref m "rowDisplacement.ml" 77 3507 3512 "rowDisplacement.ml" 77 3507 3513
+)
+"rowDisplacement.ml" 83 3598 3607 "rowDisplacement.ml" 83 3598 3627
+type(
+  bool
+)
+"rowDisplacement.ml" 83 3598 3600 "rowDisplacement.ml" 83 3598 3627
+type(
+  unit
+)
+"rowDisplacement.ml" 85 3644 3656 "rowDisplacement.ml" 85 3644 3657
+type(
+  int
+)
+"rowDisplacement.ml" 85 3644 3661 "rowDisplacement.ml" 85 3644 3662
+type(
+  int
+)
+ident(
+  int_ref m "rowDisplacement.ml" 77 3507 3512 "rowDisplacement.ml" 77 3507 3513
+)
+"rowDisplacement.ml" 85 3644 3663 "rowDisplacement.ml" 85 3644 3664
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.-
+)
+"rowDisplacement.ml" 85 3644 3665 "rowDisplacement.ml" 85 3644 3666
+type(
+  int
+)
+"rowDisplacement.ml" 85 3644 3661 "rowDisplacement.ml" 85 3644 3666
+type(
+  int
+)
+"rowDisplacement.ml" 86 3670 3684 "rowDisplacement.ml" 86 3670 3696
+type(
+  'a array -> int
+)
+ident(
+  ext_ref Array.length
+)
+"rowDisplacement.ml" 86 3670 3697 "rowDisplacement.ml" 86 3670 3698
+type(
+  'a array array
+)
+ident(
+  int_ref t "rowDisplacement.ml" 78 3531 3536 "rowDisplacement.ml" 78 3531 3537
+)
+"rowDisplacement.ml" 86 3670 3700 "rowDisplacement.ml" 86 3670 3701
+type(
+  int
+)
+"rowDisplacement.ml" 86 3670 3697 "rowDisplacement.ml" 86 3670 3702
+type(
+  'a array
+)
+"rowDisplacement.ml" 86 3670 3684 "rowDisplacement.ml" 86 3670 3702
+type(
+  int
+)
+"rowDisplacement.ml" 86 3670 3703 "rowDisplacement.ml" 86 3670 3704
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.=
+)
+"rowDisplacement.ml" 86 3670 3705 "rowDisplacement.ml" 86 3670 3706
+type(
+  int
+)
+ident(
+  int_ref n "rowDisplacement.ml" 77 3507 3522 "rowDisplacement.ml" 77 3507 3523
+)
+"rowDisplacement.ml" 86 3670 3683 "rowDisplacement.ml" 86 3670 3707
+type(
+  bool
+)
+"rowDisplacement.ml" 86 3670 3676 "rowDisplacement.ml" 86 3670 3707
+type(
+  unit
+)
+"rowDisplacement.ml" 85 3644 3648 "rowDisplacement.ml" 87 3708 3716
+type(
+  unit
+)
+"rowDisplacement.ml" 88 3718 3722 "rowDisplacement.ml" 88 3718 3726
+type(
+  bool
+)
+"rowDisplacement.ml" 84 3629 3638 "rowDisplacement.ml" 89 3727 3732
+type(
+  bool
+)
+"rowDisplacement.ml" 84 3629 3631 "rowDisplacement.ml" 89 3727 3732
+type(
+  unit
+)
+"rowDisplacement.ml" 93 3797 3803 "rowDisplacement.ml" 93 3797 3809
+type(
+  'a array -> 'a row
+)
+"rowDisplacement.ml" 93 3797 3811 "rowDisplacement.ml" 93 3797 3815
+type(
+  'a array
+)
+ident(
+  def line "rowDisplacement.ml" 93 3797 3828 "rowDisplacement.ml" 105 4019 4038
+)
+"rowDisplacement.ml" 95 3840 3852 "rowDisplacement.ml" 95 3840 3856
+type(
+  int -> 'a row -> 'a row
+)
+"rowDisplacement.ml" 95 3840 3858 "rowDisplacement.ml" 95 3840 3859
+type(
+  int
+)
+ident(
+  def j "rowDisplacement.ml" 95 3840 3867 "rowDisplacement.ml" 102 3959 4010
+)
+"rowDisplacement.ml" 95 3840 3868 "rowDisplacement.ml" 95 3840 3871
+type(
+  'a row
+)
+ident(
+  def row "rowDisplacement.ml" 96 3884 3890 "rowDisplacement.ml" 102 3959 4010
+)
+"rowDisplacement.ml" 96 3884 3893 "rowDisplacement.ml" 96 3884 3894
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 95 3840 3858 "rowDisplacement.ml" 95 3840 3859
+)
+"rowDisplacement.ml" 96 3884 3895 "rowDisplacement.ml" 96 3884 3896
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.<
+)
+"rowDisplacement.ml" 96 3884 3897 "rowDisplacement.ml" 96 3884 3898
+type(
+  int
+)
+"rowDisplacement.ml" 96 3884 3893 "rowDisplacement.ml" 96 3884 3898
+type(
+  bool
+)
+"rowDisplacement.ml" 97 3904 3905 "rowDisplacement.ml" 97 3904 3908
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 95 3840 3868 "rowDisplacement.ml" 95 3840 3871
+)
+"rowDisplacement.ml" 99 3920 3925 "rowDisplacement.ml" 99 3920 3926
+type(
+  'a
+)
+"rowDisplacement.ml" 99 3920 3929 "rowDisplacement.ml" 99 3920 3933
+type(
+  'a array
+)
+ident(
+  int_ref line "rowDisplacement.ml" 93 3797 3811 "rowDisplacement.ml" 93 3797 3815
+)
+"rowDisplacement.ml" 99 3920 3935 "rowDisplacement.ml" 99 3920 3936
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 95 3840 3858 "rowDisplacement.ml" 95 3840 3859
+)
+"rowDisplacement.ml" 99 3920 3929 "rowDisplacement.ml" 99 3920 3937
+type(
+  'a
+)
+"rowDisplacement.ml" 100 3941 3942 "rowDisplacement.ml" 100 3941 3946
+type(
+  int -> 'a row -> 'a row
+)
+ident(
+  int_ref loop "rowDisplacement.ml" 95 3840 3852 "rowDisplacement.ml" 95 3840 3856
+)
+"rowDisplacement.ml" 101 3947 3951 "rowDisplacement.ml" 101 3947 3952
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 95 3840 3858 "rowDisplacement.ml" 95 3840 3859
+)
+"rowDisplacement.ml" 101 3947 3953 "rowDisplacement.ml" 101 3947 3954
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.-
+)
+"rowDisplacement.ml" 101 3947 3955 "rowDisplacement.ml" 101 3947 3956
+type(
+  int
+)
+"rowDisplacement.ml" 101 3947 3950 "rowDisplacement.ml" 101 3947 3957
+type(
+  int
+)
+"rowDisplacement.ml" 102 3959 3966 "rowDisplacement.ml" 102 3959 3979
+type(
+  'a -> bool
+)
+ident(
+  int_ref insignificant "rowDisplacement.ml" 75 3457 3462 "rowDisplacement.ml" 75 3457 3475
+)
+"rowDisplacement.ml" 102 3959 3980 "rowDisplacement.ml" 102 3959 3981
+type(
+  'a
+)
+ident(
+  int_ref x "rowDisplacement.ml" 99 3920 3925 "rowDisplacement.ml" 99 3920 3926
+)
+"rowDisplacement.ml" 102 3959 3966 "rowDisplacement.ml" 102 3959 3981
+call(
+  stack
+)
+type(
+  bool
+)
+"rowDisplacement.ml" 102 3959 3987 "rowDisplacement.ml" 102 3959 3990
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 95 3840 3868 "rowDisplacement.ml" 95 3840 3871
+)
+"rowDisplacement.ml" 102 3959 3997 "rowDisplacement.ml" 102 3959 3998
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 95 3840 3858 "rowDisplacement.ml" 95 3840 3859
+)
+"rowDisplacement.ml" 102 3959 4000 "rowDisplacement.ml" 102 3959 4001
+type(
+  'a
+)
+ident(
+  int_ref x "rowDisplacement.ml" 99 3920 3925 "rowDisplacement.ml" 99 3920 3926
+)
+"rowDisplacement.ml" 102 3959 3996 "rowDisplacement.ml" 102 3959 4002
+type(
+  int * 'a
+)
+"rowDisplacement.ml" 102 3959 4006 "rowDisplacement.ml" 102 3959 4009
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 95 3840 3868 "rowDisplacement.ml" 95 3840 3871
+)
+"rowDisplacement.ml" 102 3959 3996 "rowDisplacement.ml" 102 3959 4009
+type(
+  'a row
+)
+"rowDisplacement.ml" 102 3959 3962 "rowDisplacement.ml" 102 3959 4010
+type(
+  'a row
+)
+"rowDisplacement.ml" 100 3941 3942 "rowDisplacement.ml" 102 3959 4010
+call(
+  tail
+)
+type(
+  'a row
+)
+"rowDisplacement.ml" 99 3920 3921 "rowDisplacement.ml" 102 3959 4010
+type(
+  'a row
+)
+"rowDisplacement.ml" 96 3884 3890 "rowDisplacement.ml" 102 3959 4010
+type(
+  'a row
+)
+"rowDisplacement.ml" 105 4019 4023 "rowDisplacement.ml" 105 4019 4027
+type(
+  int -> 'a row -> 'a row
+)
+ident(
+  int_ref loop "rowDisplacement.ml" 95 3840 3852 "rowDisplacement.ml" 95 3840 3856
+)
+"rowDisplacement.ml" 105 4019 4029 "rowDisplacement.ml" 105 4019 4030
+type(
+  int
+)
+ident(
+  int_ref n "rowDisplacement.ml" 77 3507 3522 "rowDisplacement.ml" 77 3507 3523
+)
+"rowDisplacement.ml" 105 4019 4031 "rowDisplacement.ml" 105 4019 4032
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.-
+)
+"rowDisplacement.ml" 105 4019 4033 "rowDisplacement.ml" 105 4019 4034
+type(
+  int
+)
+"rowDisplacement.ml" 105 4019 4028 "rowDisplacement.ml" 105 4019 4035
+type(
+  int
+)
+"rowDisplacement.ml" 105 4019 4036 "rowDisplacement.ml" 105 4019 4038
+type(
+  'a row
+)
+"rowDisplacement.ml" 105 4019 4023 "rowDisplacement.ml" 105 4019 4038
+call(
+  tail
+)
+type(
+  'a row
+)
+"rowDisplacement.ml" 95 3840 3844 "rowDisplacement.ml" 105 4019 4038
+type(
+  'a row
+)
+type(
+  'a row
+)
+"rowDisplacement.ml" 111 4118 4124 "rowDisplacement.ml" 111 4118 4128
+type(
+  'a row -> int
+)
+"rowDisplacement.ml" 111 4118 4130 "rowDisplacement.ml" 111 4118 4133
+type(
+  'a row
+)
+ident(
+  def row "rowDisplacement.ml" 111 4118 4144 "rowDisplacement.ml" 112 4152 4171
+)
+"rowDisplacement.ml" 112 4152 4156 "rowDisplacement.ml" 112 4152 4167
+type(
+  'a row -> int
+)
+ident(
+  ext_ref List.length
+)
+"rowDisplacement.ml" 112 4152 4168 "rowDisplacement.ml" 112 4152 4171
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 111 4118 4130 "rowDisplacement.ml" 111 4118 4133
+)
+"rowDisplacement.ml" 112 4152 4156 "rowDisplacement.ml" 112 4152 4171
+call(
+  tail
+)
+type(
+  int
+)
+type(
+  int
+)
+"rowDisplacement.ml" 117 4253 4259 "rowDisplacement.ml" 117 4253 4263
+type(
+  (int * int * 'a row) list
+)
+"rowDisplacement.ml" 118 4317 4321 "rowDisplacement.ml" 118 4317 4334
+type(
+  (int * int * 'a row) array -> (int * int * 'a row) list
+)
+ident(
+  ext_ref Array.to_list
+)
+"rowDisplacement.ml" 119 4337 4343 "rowDisplacement.ml" 119 4337 4353
+type(
+  (int -> 'a array -> int * int * 'a row) ->
+  'a array array -> (int * int * 'a row) array
+)
+ident(
+  ext_ref Array.mapi
+)
+"rowDisplacement.ml" 119 4337 4359 "rowDisplacement.ml" 119 4337 4360
+type(
+  int
+)
+ident(
+  def i "rowDisplacement.ml" 119 4337 4361 "rowDisplacement.ml" 121 4395 4412
+)
+"rowDisplacement.ml" 119 4337 4361 "rowDisplacement.ml" 119 4337 4365
+type(
+  'a array
+)
+ident(
+  def line "rowDisplacement.ml" 120 4369 4370 "rowDisplacement.ml" 121 4395 4412
+)
+"rowDisplacement.ml" 120 4369 4374 "rowDisplacement.ml" 120 4369 4377
+type(
+  'a row
+)
+"rowDisplacement.ml" 120 4369 4380 "rowDisplacement.ml" 120 4369 4386
+type(
+  'a array -> 'a row
+)
+ident(
+  int_ref sparse "rowDisplacement.ml" 93 3797 3803 "rowDisplacement.ml" 93 3797 3809
+)
+"rowDisplacement.ml" 120 4369 4387 "rowDisplacement.ml" 120 4369 4391
+type(
+  'a array
+)
+ident(
+  int_ref line "rowDisplacement.ml" 119 4337 4361 "rowDisplacement.ml" 119 4337 4365
+)
+"rowDisplacement.ml" 120 4369 4380 "rowDisplacement.ml" 120 4369 4391
+call(
+  stack
+)
+type(
+  'a row
+)
+"rowDisplacement.ml" 121 4395 4396 "rowDisplacement.ml" 121 4395 4397
+type(
+  int
+)
+ident(
+  int_ref i "rowDisplacement.ml" 119 4337 4359 "rowDisplacement.ml" 119 4337 4360
+)
+"rowDisplacement.ml" 121 4395 4399 "rowDisplacement.ml" 121 4395 4403
+type(
+  'a row -> int
+)
+ident(
+  int_ref rank "rowDisplacement.ml" 111 4118 4124 "rowDisplacement.ml" 111 4118 4128
+)
+"rowDisplacement.ml" 121 4395 4404 "rowDisplacement.ml" 121 4395 4407
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 120 4369 4374 "rowDisplacement.ml" 120 4369 4377
+)
+"rowDisplacement.ml" 121 4395 4399 "rowDisplacement.ml" 121 4395 4407
+call(
+  stack
+)
+type(
+  int
+)
+"rowDisplacement.ml" 121 4395 4409 "rowDisplacement.ml" 121 4395 4412
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 120 4369 4374 "rowDisplacement.ml" 120 4369 4377
+)
+"rowDisplacement.ml" 121 4395 4396 "rowDisplacement.ml" 121 4395 4412
+type(
+  int * int * 'a row
+)
+"rowDisplacement.ml" 120 4369 4370 "rowDisplacement.ml" 121 4395 4412
+type(
+  int * int * 'a row
+)
+"rowDisplacement.ml" 119 4337 4354 "rowDisplacement.ml" 122 4413 4420
+type(
+  int -> 'a array -> int * int * 'a row
+)
+"rowDisplacement.ml" 122 4413 4421 "rowDisplacement.ml" 122 4413 4422
+type(
+  'a array array
+)
+ident(
+  int_ref t "rowDisplacement.ml" 78 3531 3536 "rowDisplacement.ml" 78 3531 3537
+)
+"rowDisplacement.ml" 118 4317 4335 "rowDisplacement.ml" 123 4423 4428
+call(
+  stack
+)
+type(
+  (int * int * 'a row) array
+)
+"rowDisplacement.ml" 118 4317 4321 "rowDisplacement.ml" 123 4423 4428
+call(
+  stack
+)
+type(
+  (int * int * 'a row) list
+)
+type(
+  (int * int * 'a row) list
+)
+"rowDisplacement.ml" 133 4816 4822 "rowDisplacement.ml" 133 4816 4826
+type(
+  (int * int * 'a row) list
+)
+"rowDisplacement.ml" 134 4829 4833 "rowDisplacement.ml" 134 4829 4842
+type(
+  (int * int * 'a row -> int * int * 'a row -> int) ->
+  (int * int * 'a row) list -> (int * int * 'a row) list
+)
+ident(
+  ext_ref List.sort
+)
+"rowDisplacement.ml" 134 4829 4849 "rowDisplacement.ml" 134 4829 4850
+type(
+  int
+)
+"rowDisplacement.ml" 134 4829 4852 "rowDisplacement.ml" 134 4829 4857
+type(
+  int
+)
+ident(
+  def rank1 "rowDisplacement.ml" 134 4829 4862 "rowDisplacement.ml" 135 4879 4904
+)
+"rowDisplacement.ml" 134 4829 4859 "rowDisplacement.ml" 134 4829 4860
+type(
+  'a row
+)
+"rowDisplacement.ml" 134 4829 4848 "rowDisplacement.ml" 134 4829 4861
+type(
+  int * int * 'a row
+)
+"rowDisplacement.ml" 134 4829 4863 "rowDisplacement.ml" 134 4829 4864
+type(
+  int
+)
+"rowDisplacement.ml" 134 4829 4866 "rowDisplacement.ml" 134 4829 4871
+type(
+  int
+)
+ident(
+  def rank2 "rowDisplacement.ml" 135 4879 4885 "rowDisplacement.ml" 135 4879 4904
+)
+"rowDisplacement.ml" 134 4829 4873 "rowDisplacement.ml" 134 4829 4874
+type(
+  'a row
+)
+"rowDisplacement.ml" 134 4829 4862 "rowDisplacement.ml" 134 4829 4875
+type(
+  int * int * 'a row
+)
+"rowDisplacement.ml" 135 4879 4885 "rowDisplacement.ml" 135 4879 4892
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.compare
+)
+"rowDisplacement.ml" 135 4879 4893 "rowDisplacement.ml" 135 4879 4898
+type(
+  int
+)
+ident(
+  int_ref rank2 "rowDisplacement.ml" 134 4829 4866 "rowDisplacement.ml" 134 4829 4871
+)
+"rowDisplacement.ml" 135 4879 4899 "rowDisplacement.ml" 135 4879 4904
+type(
+  int
+)
+ident(
+  int_ref rank1 "rowDisplacement.ml" 134 4829 4852 "rowDisplacement.ml" 134 4829 4857
+)
+"rowDisplacement.ml" 135 4879 4885 "rowDisplacement.ml" 135 4879 4904
+type(
+  int
+)
+"rowDisplacement.ml" 134 4829 4843 "rowDisplacement.ml" 136 4905 4910
+type(
+  int * int * 'a row -> int * int * 'a row -> int
+)
+"rowDisplacement.ml" 136 4905 4911 "rowDisplacement.ml" 136 4905 4915
+type(
+  (int * int * 'a row) list
+)
+ident(
+  int_ref rows "rowDisplacement.ml" 117 4253 4259 "rowDisplacement.ml" 117 4253 4263
+)
+"rowDisplacement.ml" 134 4829 4833 "rowDisplacement.ml" 136 4905 4915
+call(
+  stack
+)
+type(
+  (int * int * 'a row) list
+)
+"rowDisplacement.ml" 141 4982 4988 "rowDisplacement.ml" 141 4982 5000
+type(
+  int array
+)
+"rowDisplacement.ml" 142 5015 5019 "rowDisplacement.ml" 142 5015 5029
+type(
+  int -> int -> int array
+)
+ident(
+  ext_ref Array.make
+)
+"rowDisplacement.ml" 142 5015 5030 "rowDisplacement.ml" 142 5015 5031
+type(
+  int
+)
+ident(
+  int_ref m "rowDisplacement.ml" 77 3507 3512 "rowDisplacement.ml" 77 3507 3513
+)
+"rowDisplacement.ml" 142 5015 5032 "rowDisplacement.ml" 142 5015 5033
+type(
+  int
+)
+"rowDisplacement.ml" 142 5015 5019 "rowDisplacement.ml" 142 5015 5033
+type(
+  int array
+)
+type(
+  int array
+)
+"rowDisplacement.ml" 148 5149 5155 "rowDisplacement.ml" 148 5149 5159
+type(
+  'a InfiniteArray.t
+)
+"rowDisplacement.ml" 149 5183 5187 "rowDisplacement.ml" 149 5183 5205
+type(
+  'a -> 'a InfiniteArray.t
+)
+ident(
+  ext_ref InfiniteArray.make
+)
+"rowDisplacement.ml" 149 5183 5206 "rowDisplacement.ml" 149 5183 5211
+type(
+  'a
+)
+ident(
+  int_ref dummy "rowDisplacement.ml" 76 3490 3495 "rowDisplacement.ml" 76 3490 3500
+)
+"rowDisplacement.ml" 149 5183 5187 "rowDisplacement.ml" 149 5183 5211
+call(
+  stack
+)
+type(
+  'a InfiniteArray.t
+)
+type(
+  'a InfiniteArray.t
+)
+"rowDisplacement.ml" 159 5557 5563 "rowDisplacement.ml" 159 5557 5567
+type(
+  int -> 'a row -> bool
+)
+"rowDisplacement.ml" 159 5557 5568 "rowDisplacement.ml" 159 5557 5569
+type(
+  int
+)
+ident(
+  def k "rowDisplacement.ml" 159 5557 5570 "rowDisplacement.ml" 192 6327 6339
+)
+"rowDisplacement.ml" 159 5557 5571 "rowDisplacement.ml" 159 5557 5574
+type(
+  'a row
+)
+ident(
+  def row "rowDisplacement.ml" 159 5557 5585 "rowDisplacement.ml" 192 6327 6339
+)
+"rowDisplacement.ml" 161 5595 5603 "rowDisplacement.ml" 161 5595 5604
+type(
+  int
+)
+"rowDisplacement.ml" 161 5595 5607 "rowDisplacement.ml" 161 5595 5627
+type(
+  'a InfiniteArray.t -> int
+)
+ident(
+  ext_ref InfiniteArray.extent
+)
+"rowDisplacement.ml" 161 5595 5628 "rowDisplacement.ml" 161 5595 5632
+type(
+  'a InfiniteArray.t
+)
+ident(
+  int_ref data "rowDisplacement.ml" 148 5149 5155 "rowDisplacement.ml" 148 5149 5159
+)
+"rowDisplacement.ml" 161 5595 5607 "rowDisplacement.ml" 161 5595 5632
+call(
+  stack
+)
+type(
+  int
+)
+"rowDisplacement.ml" 163 5637 5649 "rowDisplacement.ml" 163 5637 5653
+type(
+  (int * 'a) list -> bool
+)
+"rowDisplacement.ml" 164 5665 5673 "rowDisplacement.ml" 164 5665 5675
+type(
+  (int * 'a) list
+)
+"rowDisplacement.ml" 165 5679 5682 "rowDisplacement.ml" 165 5679 5686
+type(
+  bool
+)
+"rowDisplacement.ml" 166 5687 5696 "rowDisplacement.ml" 166 5687 5697
+type(
+  int
+)
+ident(
+  def j "rowDisplacement.ml" 174 5908 5911 "rowDisplacement.ml" 189 6306 6318
+)
+"rowDisplacement.ml" 166 5687 5699 "rowDisplacement.ml" 166 5687 5700
+type(
+  'a
+)
+ident(
+  def x "rowDisplacement.ml" 174 5908 5911 "rowDisplacement.ml" 189 6306 6318
+)
+"rowDisplacement.ml" 166 5687 5695 "rowDisplacement.ml" 166 5687 5701
+type(
+  int * 'a
+)
+"rowDisplacement.ml" 166 5687 5705 "rowDisplacement.ml" 166 5687 5708
+type(
+  (int * 'a) list
+)
+ident(
+  def row "rowDisplacement.ml" 174 5908 5911 "rowDisplacement.ml" 189 6306 6318
+)
+"rowDisplacement.ml" 166 5687 5695 "rowDisplacement.ml" 166 5687 5708
+type(
+  (int * 'a) list
+)
+"rowDisplacement.ml" 174 5908 5919 "rowDisplacement.ml" 174 5908 5920
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 159 5557 5568 "rowDisplacement.ml" 159 5557 5569
+)
+"rowDisplacement.ml" 174 5908 5921 "rowDisplacement.ml" 174 5908 5922
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 174 5908 5923 "rowDisplacement.ml" 174 5908 5924
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 166 5687 5696 "rowDisplacement.ml" 166 5687 5697
+)
+"rowDisplacement.ml" 174 5908 5919 "rowDisplacement.ml" 174 5908 5924
+type(
+  int
+)
+"rowDisplacement.ml" 174 5908 5925 "rowDisplacement.ml" 174 5908 5927
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.>=
+)
+"rowDisplacement.ml" 174 5908 5928 "rowDisplacement.ml" 174 5908 5929
+type(
+  int
+)
+"rowDisplacement.ml" 174 5908 5918 "rowDisplacement.ml" 174 5908 5930
+type(
+  bool
+)
+"rowDisplacement.ml" 174 5908 5911 "rowDisplacement.ml" 174 5908 5930
+type(
+  unit
+)
+"rowDisplacement.ml" 176 5933 5939 "rowDisplacement.ml" 176 5933 5940
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 159 5557 5568 "rowDisplacement.ml" 159 5557 5569
+)
+"rowDisplacement.ml" 176 5933 5941 "rowDisplacement.ml" 176 5933 5942
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 176 5933 5943 "rowDisplacement.ml" 176 5933 5944
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 166 5687 5696 "rowDisplacement.ml" 166 5687 5697
+)
+"rowDisplacement.ml" 176 5933 5939 "rowDisplacement.ml" 176 5933 5944
+type(
+  int
+)
+"rowDisplacement.ml" 176 5933 5945 "rowDisplacement.ml" 176 5933 5947
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.>=
+)
+"rowDisplacement.ml" 176 5933 5948 "rowDisplacement.ml" 176 5933 5949
+type(
+  int
+)
+ident(
+  int_ref d "rowDisplacement.ml" 161 5595 5603 "rowDisplacement.ml" 161 5595 5604
+)
+"rowDisplacement.ml" 176 5933 5939 "rowDisplacement.ml" 176 5933 5949
+type(
+  bool
+)
+"rowDisplacement.ml" 177 5955 5960 "rowDisplacement.ml" 177 5955 5964
+type(
+  bool
+)
+"rowDisplacement.ml" 185 6191 6200 "rowDisplacement.ml" 185 6191 6201
+type(
+  'a
+)
+"rowDisplacement.ml" 185 6191 6204 "rowDisplacement.ml" 185 6191 6221
+type(
+  'a InfiniteArray.t -> int -> 'a
+)
+ident(
+  ext_ref InfiniteArray.get
+)
+"rowDisplacement.ml" 185 6191 6222 "rowDisplacement.ml" 185 6191 6226
+type(
+  'a InfiniteArray.t
+)
+ident(
+  int_ref data "rowDisplacement.ml" 148 5149 5155 "rowDisplacement.ml" 148 5149 5159
+)
+"rowDisplacement.ml" 185 6191 6228 "rowDisplacement.ml" 185 6191 6229
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 159 5557 5568 "rowDisplacement.ml" 159 5557 5569
+)
+"rowDisplacement.ml" 185 6191 6230 "rowDisplacement.ml" 185 6191 6231
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 185 6191 6232 "rowDisplacement.ml" 185 6191 6233
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 166 5687 5696 "rowDisplacement.ml" 166 5687 5697
+)
+"rowDisplacement.ml" 185 6191 6227 "rowDisplacement.ml" 185 6191 6234
+type(
+  int
+)
+"rowDisplacement.ml" 185 6191 6204 "rowDisplacement.ml" 185 6191 6234
+call(
+  stack
+)
+type(
+  'a
+)
+"rowDisplacement.ml" 186 6238 6246 "rowDisplacement.ml" 186 6238 6259
+type(
+  'a -> bool
+)
+ident(
+  int_ref insignificant "rowDisplacement.ml" 75 3457 3462 "rowDisplacement.ml" 75 3457 3475
+)
+"rowDisplacement.ml" 186 6238 6260 "rowDisplacement.ml" 186 6238 6261
+type(
+  'a
+)
+ident(
+  int_ref y "rowDisplacement.ml" 185 6191 6200 "rowDisplacement.ml" 185 6191 6201
+)
+"rowDisplacement.ml" 186 6238 6246 "rowDisplacement.ml" 186 6238 6261
+call(
+  stack
+)
+type(
+  bool
+)
+"rowDisplacement.ml" 186 6238 6262 "rowDisplacement.ml" 186 6238 6264
+type(
+  bool -> bool -> bool
+)
+ident(
+  ext_ref Pervasives.||
+)
+"rowDisplacement.ml" 186 6238 6265 "rowDisplacement.ml" 186 6238 6270
+type(
+  'a -> 'a -> bool
+)
+ident(
+  int_ref equal "rowDisplacement.ml" 74 3426 3431 "rowDisplacement.ml" 74 3426 3436
+)
+"rowDisplacement.ml" 186 6238 6271 "rowDisplacement.ml" 186 6238 6272
+type(
+  'a
+)
+ident(
+  int_ref x "rowDisplacement.ml" 166 5687 5699 "rowDisplacement.ml" 166 5687 5700
+)
+"rowDisplacement.ml" 186 6238 6273 "rowDisplacement.ml" 186 6238 6274
+type(
+  'a
+)
+ident(
+  int_ref y "rowDisplacement.ml" 185 6191 6200 "rowDisplacement.ml" 185 6191 6201
+)
+"rowDisplacement.ml" 186 6238 6265 "rowDisplacement.ml" 186 6238 6274
+call(
+  stack
+)
+type(
+  bool
+)
+"rowDisplacement.ml" 186 6238 6246 "rowDisplacement.ml" 186 6238 6274
+type(
+  bool
+)
+"rowDisplacement.ml" 187 6280 6287 "rowDisplacement.ml" 187 6280 6291
+type(
+  (int * 'a) list -> bool
+)
+ident(
+  int_ref loop "rowDisplacement.ml" 163 5637 5649 "rowDisplacement.ml" 163 5637 5653
+)
+"rowDisplacement.ml" 187 6280 6292 "rowDisplacement.ml" 187 6280 6295
+type(
+  (int * 'a) list
+)
+ident(
+  int_ref row "rowDisplacement.ml" 166 5687 5705 "rowDisplacement.ml" 166 5687 5708
+)
+"rowDisplacement.ml" 187 6280 6287 "rowDisplacement.ml" 187 6280 6295
+call(
+  tail
+)
+type(
+  bool
+)
+"rowDisplacement.ml" 189 6306 6313 "rowDisplacement.ml" 189 6306 6318
+type(
+  bool
+)
+"rowDisplacement.ml" 186 6238 6243 "rowDisplacement.ml" 189 6306 6318
+type(
+  bool
+)
+"rowDisplacement.ml" 185 6191 6196 "rowDisplacement.ml" 189 6306 6318
+type(
+  bool
+)
+"rowDisplacement.ml" 176 5933 5936 "rowDisplacement.ml" 189 6306 6318
+type(
+  bool
+)
+"rowDisplacement.ml" 174 5908 5911 "rowDisplacement.ml" 189 6306 6318
+type(
+  bool
+)
+"rowDisplacement.ml" 163 5637 5656 "rowDisplacement.ml" 189 6306 6318
+type(
+  (int * 'a) list -> bool
+)
+"rowDisplacement.ml" 192 6327 6331 "rowDisplacement.ml" 192 6327 6335
+type(
+  'a row -> bool
+)
+ident(
+  int_ref loop "rowDisplacement.ml" 163 5637 5649 "rowDisplacement.ml" 163 5637 5653
+)
+"rowDisplacement.ml" 192 6327 6336 "rowDisplacement.ml" 192 6327 6339
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 159 5557 5571 "rowDisplacement.ml" 159 5557 5574
+)
+"rowDisplacement.ml" 192 6327 6331 "rowDisplacement.ml" 192 6327 6339
+call(
+  tail
+)
+type(
+  bool
+)
+"rowDisplacement.ml" 163 5637 5641 "rowDisplacement.ml" 192 6327 6339
+type(
+  bool
+)
+"rowDisplacement.ml" 161 5595 5599 "rowDisplacement.ml" 192 6327 6339
+type(
+  bool
+)
+type(
+  bool
+)
+"rowDisplacement.ml" 208 6898 6908 "rowDisplacement.ml" 208 6898 6911
+type(
+  int -> 'a row -> int
+)
+"rowDisplacement.ml" 208 6898 6912 "rowDisplacement.ml" 208 6898 6913
+type(
+  int
+)
+ident(
+  def k "rowDisplacement.ml" 208 6898 6914 "rowDisplacement.ml" 212 6966 6987
+)
+"rowDisplacement.ml" 208 6898 6914 "rowDisplacement.ml" 208 6898 6917
+type(
+  'a row
+)
+ident(
+  def row "rowDisplacement.ml" 208 6898 6918 "rowDisplacement.ml" 212 6966 6987
+)
+"rowDisplacement.ml" 209 6926 6933 "rowDisplacement.ml" 209 6926 6937
+type(
+  int -> 'a row -> bool
+)
+ident(
+  int_ref fits "rowDisplacement.ml" 159 5557 5563 "rowDisplacement.ml" 159 5557 5567
+)
+"rowDisplacement.ml" 209 6926 6938 "rowDisplacement.ml" 209 6926 6939
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 208 6898 6912 "rowDisplacement.ml" 208 6898 6913
+)
+"rowDisplacement.ml" 209 6926 6940 "rowDisplacement.ml" 209 6926 6943
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 208 6898 6914 "rowDisplacement.ml" 208 6898 6917
+)
+"rowDisplacement.ml" 209 6926 6933 "rowDisplacement.ml" 209 6926 6943
+call(
+  stack
+)
+type(
+  bool
+)
+"rowDisplacement.ml" 210 6949 6955 "rowDisplacement.ml" 210 6949 6956
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 208 6898 6912 "rowDisplacement.ml" 208 6898 6913
+)
+"rowDisplacement.ml" 212 6966 6972 "rowDisplacement.ml" 212 6966 6975
+type(
+  int -> 'a row -> int
+)
+ident(
+  int_ref fit "rowDisplacement.ml" 208 6898 6908 "rowDisplacement.ml" 208 6898 6911
+)
+"rowDisplacement.ml" 212 6966 6977 "rowDisplacement.ml" 212 6966 6978
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 208 6898 6912 "rowDisplacement.ml" 208 6898 6913
+)
+"rowDisplacement.ml" 212 6966 6979 "rowDisplacement.ml" 212 6966 6980
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 212 6966 6981 "rowDisplacement.ml" 212 6966 6982
+type(
+  int
+)
+"rowDisplacement.ml" 212 6966 6976 "rowDisplacement.ml" 212 6966 6983
+type(
+  int
+)
+"rowDisplacement.ml" 212 6966 6984 "rowDisplacement.ml" 212 6966 6987
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 208 6898 6914 "rowDisplacement.ml" 208 6898 6917
+)
+"rowDisplacement.ml" 212 6966 6972 "rowDisplacement.ml" 212 6966 6987
+call(
+  tail
+)
+type(
+  int
+)
+"rowDisplacement.ml" 209 6926 6930 "rowDisplacement.ml" 212 6966 6987
+type(
+  int
+)
+type(
+  int
+)
+"rowDisplacement.ml" 215 6995 7001 "rowDisplacement.ml" 215 6995 7004
+type(
+  'a row -> int
+)
+"rowDisplacement.ml" 215 6995 7005 "rowDisplacement.ml" 215 6995 7008
+type(
+  'a row
+)
+ident(
+  def row "rowDisplacement.ml" 216 7011 7015 "rowDisplacement.ml" 220 7083 7096
+)
+"rowDisplacement.ml" 216 7011 7021 "rowDisplacement.ml" 216 7011 7024
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 215 6995 7005 "rowDisplacement.ml" 215 6995 7008
+)
+"rowDisplacement.ml" 217 7030 7036 "rowDisplacement.ml" 217 7030 7038
+type(
+  'a row
+)
+"rowDisplacement.ml" 218 7042 7043 "rowDisplacement.ml" 218 7042 7044
+type(
+  int
+)
+"rowDisplacement.ml" 219 7062 7069 "rowDisplacement.ml" 219 7062 7070
+type(
+  int
+)
+ident(
+  def j "rowDisplacement.ml" 220 7083 7084 "rowDisplacement.ml" 220 7083 7096
+)
+"rowDisplacement.ml" 219 7062 7072 "rowDisplacement.ml" 219 7062 7073
+type(
+  'a
+)
+"rowDisplacement.ml" 219 7062 7068 "rowDisplacement.ml" 219 7062 7074
+type(
+  int * 'a
+)
+"rowDisplacement.ml" 219 7062 7078 "rowDisplacement.ml" 219 7062 7079
+type(
+  (int * 'a) list
+)
+"rowDisplacement.ml" 219 7062 7068 "rowDisplacement.ml" 219 7062 7079
+type(
+  'a row
+)
+"rowDisplacement.ml" 220 7083 7084 "rowDisplacement.ml" 220 7083 7087
+type(
+  int -> 'a row -> int
+)
+ident(
+  int_ref fit "rowDisplacement.ml" 208 6898 6908 "rowDisplacement.ml" 208 6898 6911
+)
+"rowDisplacement.ml" 220 7083 7089 "rowDisplacement.ml" 220 7083 7090
+type(
+  int -> int
+)
+ident(
+  ext_ref Pervasives.~-
+)
+"rowDisplacement.ml" 220 7083 7090 "rowDisplacement.ml" 220 7083 7091
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 219 7062 7069 "rowDisplacement.ml" 219 7062 7070
+)
+"rowDisplacement.ml" 220 7083 7088 "rowDisplacement.ml" 220 7083 7092
+type(
+  int
+)
+"rowDisplacement.ml" 220 7083 7093 "rowDisplacement.ml" 220 7083 7096
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 215 6995 7005 "rowDisplacement.ml" 215 6995 7008
+)
+"rowDisplacement.ml" 220 7083 7084 "rowDisplacement.ml" 220 7083 7096
+call(
+  tail
+)
+type(
+  int
+)
+"rowDisplacement.ml" 216 7011 7015 "rowDisplacement.ml" 220 7083 7096
+type(
+  int
+)
+"rowDisplacement.ml" 225 7152 7162 "rowDisplacement.ml" 225 7152 7167
+type(
+  int -> (int * 'a) list -> unit
+)
+"rowDisplacement.ml" 225 7152 7168 "rowDisplacement.ml" 225 7152 7169
+type(
+  int
+)
+ident(
+  def k "rowDisplacement.ml" 225 7152 7172 "rowDisplacement.ml" 230 7255 7267
+)
+"rowDisplacement.ml" 226 7181 7187 "rowDisplacement.ml" 226 7181 7189
+type(
+  (int * 'a) list
+)
+"rowDisplacement.ml" 227 7193 7194 "rowDisplacement.ml" 227 7193 7196
+type(
+  unit
+)
+"rowDisplacement.ml" 228 7197 7204 "rowDisplacement.ml" 228 7197 7205
+type(
+  int
+)
+ident(
+  def j "rowDisplacement.ml" 229 7220 7221 "rowDisplacement.ml" 230 7255 7267
+)
+"rowDisplacement.ml" 228 7197 7207 "rowDisplacement.ml" 228 7197 7208
+type(
+  'a
+)
+ident(
+  def x "rowDisplacement.ml" 229 7220 7221 "rowDisplacement.ml" 230 7255 7267
+)
+"rowDisplacement.ml" 228 7197 7203 "rowDisplacement.ml" 228 7197 7209
+type(
+  int * 'a
+)
+"rowDisplacement.ml" 228 7197 7213 "rowDisplacement.ml" 228 7197 7216
+type(
+  (int * 'a) list
+)
+ident(
+  def row "rowDisplacement.ml" 229 7220 7221 "rowDisplacement.ml" 230 7255 7267
+)
+"rowDisplacement.ml" 228 7197 7203 "rowDisplacement.ml" 228 7197 7216
+type(
+  (int * 'a) list
+)
+"rowDisplacement.ml" 229 7220 7221 "rowDisplacement.ml" 229 7220 7238
+type(
+  'a InfiniteArray.t -> int -> 'a -> unit
+)
+ident(
+  ext_ref InfiniteArray.set
+)
+"rowDisplacement.ml" 229 7220 7239 "rowDisplacement.ml" 229 7220 7243
+type(
+  'a InfiniteArray.t
+)
+ident(
+  int_ref data "rowDisplacement.ml" 148 5149 5155 "rowDisplacement.ml" 148 5149 5159
+)
+"rowDisplacement.ml" 229 7220 7245 "rowDisplacement.ml" 229 7220 7246
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 225 7152 7168 "rowDisplacement.ml" 225 7152 7169
+)
+"rowDisplacement.ml" 229 7220 7247 "rowDisplacement.ml" 229 7220 7248
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 229 7220 7249 "rowDisplacement.ml" 229 7220 7250
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 228 7197 7204 "rowDisplacement.ml" 228 7197 7205
+)
+"rowDisplacement.ml" 229 7220 7244 "rowDisplacement.ml" 229 7220 7251
+type(
+  int
+)
+"rowDisplacement.ml" 229 7220 7252 "rowDisplacement.ml" 229 7220 7253
+type(
+  'a
+)
+ident(
+  int_ref x "rowDisplacement.ml" 228 7197 7207 "rowDisplacement.ml" 228 7197 7208
+)
+"rowDisplacement.ml" 229 7220 7221 "rowDisplacement.ml" 229 7220 7253
+call(
+  stack
+)
+type(
+  unit
+)
+"rowDisplacement.ml" 230 7255 7256 "rowDisplacement.ml" 230 7255 7261
+type(
+  int -> (int * 'a) list -> unit
+)
+ident(
+  int_ref write "rowDisplacement.ml" 225 7152 7162 "rowDisplacement.ml" 225 7152 7167
+)
+"rowDisplacement.ml" 230 7255 7262 "rowDisplacement.ml" 230 7255 7263
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 225 7152 7168 "rowDisplacement.ml" 225 7152 7169
+)
+"rowDisplacement.ml" 230 7255 7264 "rowDisplacement.ml" 230 7255 7267
+type(
+  (int * 'a) list
+)
+ident(
+  int_ref row "rowDisplacement.ml" 228 7197 7213 "rowDisplacement.ml" 228 7197 7216
+)
+"rowDisplacement.ml" 230 7255 7256 "rowDisplacement.ml" 230 7255 7267
+call(
+  tail
+)
+type(
+  unit
+)
+"rowDisplacement.ml" 229 7220 7221 "rowDisplacement.ml" 230 7255 7267
+type(
+  unit
+)
+"rowDisplacement.ml" 225 7152 7172 "rowDisplacement.ml" 230 7255 7267
+type(
+  (int * 'a) list -> unit
+)
+"rowDisplacement.ml" 236 7415 7421 "rowDisplacement.ml" 236 7415 7423
+type(
+  unit
+)
+"rowDisplacement.ml" 237 7426 7430 "rowDisplacement.ml" 237 7426 7439
+type(
+  (int * int * 'a row -> unit) -> (int * int * 'a row) list -> unit
+)
+ident(
+  ext_ref List.iter
+)
+"rowDisplacement.ml" 237 7426 7446 "rowDisplacement.ml" 237 7426 7447
+type(
+  int
+)
+ident(
+  def i "rowDisplacement.ml" 238 7460 7466 "rowDisplacement.ml" 240 7580 7614
+)
+"rowDisplacement.ml" 237 7426 7449 "rowDisplacement.ml" 237 7426 7450
+type(
+  int
+)
+"rowDisplacement.ml" 237 7426 7452 "rowDisplacement.ml" 237 7426 7455
+type(
+  'a row
+)
+ident(
+  def row "rowDisplacement.ml" 238 7460 7466 "rowDisplacement.ml" 240 7580 7614
+)
+"rowDisplacement.ml" 237 7426 7445 "rowDisplacement.ml" 237 7426 7456
+type(
+  int * int * 'a row
+)
+"rowDisplacement.ml" 238 7460 7470 "rowDisplacement.ml" 238 7460 7471
+type(
+  int
+)
+"rowDisplacement.ml" 238 7460 7474 "rowDisplacement.ml" 238 7460 7477
+type(
+  'a row -> int
+)
+ident(
+  int_ref fit "rowDisplacement.ml" 215 6995 7001 "rowDisplacement.ml" 215 6995 7004
+)
+"rowDisplacement.ml" 238 7460 7478 "rowDisplacement.ml" 238 7460 7481
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 237 7426 7452 "rowDisplacement.ml" 237 7426 7455
+)
+"rowDisplacement.ml" 238 7460 7474 "rowDisplacement.ml" 238 7460 7481
+call(
+  stack
+)
+type(
+  int
+)
+"rowDisplacement.ml" 239 7561 7567 "rowDisplacement.ml" 239 7561 7572
+type(
+  int -> 'a row -> unit
+)
+ident(
+  int_ref write "rowDisplacement.ml" 225 7152 7162 "rowDisplacement.ml" 225 7152 7167
+)
+"rowDisplacement.ml" 239 7561 7573 "rowDisplacement.ml" 239 7561 7574
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 238 7460 7470 "rowDisplacement.ml" 238 7460 7471
+)
+"rowDisplacement.ml" 239 7561 7575 "rowDisplacement.ml" 239 7561 7578
+type(
+  'a row
+)
+ident(
+  int_ref row "rowDisplacement.ml" 237 7426 7452 "rowDisplacement.ml" 237 7426 7455
+)
+"rowDisplacement.ml" 239 7561 7567 "rowDisplacement.ml" 239 7561 7578
+call(
+  stack
+)
+type(
+  unit
+)
+"rowDisplacement.ml" 240 7580 7586 "rowDisplacement.ml" 240 7580 7598
+type(
+  int array
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 141 4982 4988 "rowDisplacement.ml" 141 4982 5000
+)
+"rowDisplacement.ml" 240 7580 7600 "rowDisplacement.ml" 240 7580 7601
+type(
+  int
+)
+ident(
+  int_ref i "rowDisplacement.ml" 237 7426 7446 "rowDisplacement.ml" 237 7426 7447
+)
+"rowDisplacement.ml" 240 7580 7606 "rowDisplacement.ml" 240 7580 7612
+type(
+  int -> int
+)
+ident(
+  int_ref encode "rowDisplacement.ml" 44 2355 2359 "rowDisplacement.ml" 44 2355 2365
+)
+"rowDisplacement.ml" 240 7580 7613 "rowDisplacement.ml" 240 7580 7614
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 238 7460 7470 "rowDisplacement.ml" 238 7460 7471
+)
+"rowDisplacement.ml" 240 7580 7606 "rowDisplacement.ml" 240 7580 7614
+call(
+  stack
+)
+type(
+  int
+)
+"rowDisplacement.ml" 240 7580 7586 "rowDisplacement.ml" 240 7580 7614
+type(
+  unit
+)
+"rowDisplacement.ml" 239 7561 7567 "rowDisplacement.ml" 240 7580 7614
+type(
+  unit
+)
+"rowDisplacement.ml" 238 7460 7466 "rowDisplacement.ml" 240 7580 7614
+type(
+  unit
+)
+"rowDisplacement.ml" 237 7426 7440 "rowDisplacement.ml" 241 7615 7620
+type(
+  int * int * 'a row -> unit
+)
+"rowDisplacement.ml" 241 7615 7621 "rowDisplacement.ml" 241 7615 7625
+type(
+  (int * int * 'a row) list
+)
+ident(
+  int_ref rows "rowDisplacement.ml" 133 4816 4822 "rowDisplacement.ml" 133 4816 4826
+)
+"rowDisplacement.ml" 237 7426 7430 "rowDisplacement.ml" 241 7615 7625
+call(
+  stack
+)
+type(
+  unit
+)
+"rowDisplacement.ml" 246 7671 7673 "rowDisplacement.ml" 246 7671 7685
+type(
+  int array
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 141 4982 4988 "rowDisplacement.ml" 141 4982 5000
+)
+"rowDisplacement.ml" 246 7671 7687 "rowDisplacement.ml" 246 7671 7707
+type(
+  'a InfiniteArray.t -> 'a array
+)
+ident(
+  ext_ref InfiniteArray.domain
+)
+"rowDisplacement.ml" 246 7671 7708 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a InfiniteArray.t
+)
+ident(
+  int_ref data "rowDisplacement.ml" 148 5149 5155 "rowDisplacement.ml" 148 5149 5159
+)
+"rowDisplacement.ml" 246 7671 7687 "rowDisplacement.ml" 246 7671 7712
+call(
+  stack
+)
+type(
+  'a array
+)
+"rowDisplacement.ml" 246 7671 7673 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 236 7415 7417 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 225 7152 7154 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 215 6995 6997 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 208 6898 6900 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 159 5557 5559 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 148 5149 5151 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 141 4982 4984 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 133 4816 4818 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 117 4253 4255 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 111 4118 4120 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 93 3797 3799 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 84 3629 3631 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+"rowDisplacement.ml" 83 3598 3600 "rowDisplacement.ml" 246 7671 7712
+type(
+  'a table
+)
+type(
+  'a table
+)
+"rowDisplacement.ml" 257 8181 8185 "rowDisplacement.ml" 257 8181 8188
+type(
+  int array * 'a array -> int -> int -> 'a
+)
+ident(
+  def get "rowDisplacement.ml" 269 8669 8669 --
+)
+"rowDisplacement.ml" 257 8181 8190 "rowDisplacement.ml" 257 8181 8202
+type(
+  int array
+)
+ident(
+  def displacement "rowDisplacement.ml" 257 8181 8210 "rowDisplacement.ml" 264 8528 8542
+)
+"rowDisplacement.ml" 257 8181 8204 "rowDisplacement.ml" 257 8181 8208
+type(
+  'a array
+)
+ident(
+  def data "rowDisplacement.ml" 257 8181 8210 "rowDisplacement.ml" 264 8528 8542
+)
+"rowDisplacement.ml" 257 8181 8189 "rowDisplacement.ml" 257 8181 8209
+type(
+  int array * 'a array
+)
+"rowDisplacement.ml" 257 8181 8210 "rowDisplacement.ml" 257 8181 8211
+type(
+  int
+)
+ident(
+  def i "rowDisplacement.ml" 257 8181 8212 "rowDisplacement.ml" 264 8528 8542
+)
+"rowDisplacement.ml" 257 8181 8212 "rowDisplacement.ml" 257 8181 8213
+type(
+  int
+)
+ident(
+  def j "rowDisplacement.ml" 258 8216 8218 "rowDisplacement.ml" 264 8528 8542
+)
+"rowDisplacement.ml" 258 8216 8226 "rowDisplacement.ml" 258 8216 8227
+type(
+  int
+)
+"rowDisplacement.ml" 258 8216 8228 "rowDisplacement.ml" 258 8216 8230
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.<=
+)
+"rowDisplacement.ml" 258 8216 8231 "rowDisplacement.ml" 258 8216 8232
+type(
+  int
+)
+ident(
+  int_ref i "rowDisplacement.ml" 257 8181 8210 "rowDisplacement.ml" 257 8181 8211
+)
+"rowDisplacement.ml" 258 8216 8226 "rowDisplacement.ml" 258 8216 8232
+type(
+  bool
+)
+"rowDisplacement.ml" 258 8216 8233 "rowDisplacement.ml" 258 8216 8235
+type(
+  bool -> bool -> bool
+)
+ident(
+  ext_ref Pervasives.&&
+)
+"rowDisplacement.ml" 258 8216 8236 "rowDisplacement.ml" 258 8216 8237
+type(
+  int
+)
+ident(
+  int_ref i "rowDisplacement.ml" 257 8181 8210 "rowDisplacement.ml" 257 8181 8211
+)
+"rowDisplacement.ml" 258 8216 8238 "rowDisplacement.ml" 258 8216 8239
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.<
+)
+"rowDisplacement.ml" 258 8216 8240 "rowDisplacement.ml" 258 8216 8252
+type(
+  int array -> int
+)
+ident(
+  ext_ref Array.length
+)
+"rowDisplacement.ml" 258 8216 8253 "rowDisplacement.ml" 258 8216 8265
+type(
+  int array
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 257 8181 8190 "rowDisplacement.ml" 257 8181 8202
+)
+"rowDisplacement.ml" 258 8216 8240 "rowDisplacement.ml" 258 8216 8265
+type(
+  int
+)
+"rowDisplacement.ml" 258 8216 8236 "rowDisplacement.ml" 258 8216 8265
+type(
+  bool
+)
+"rowDisplacement.ml" 258 8216 8225 "rowDisplacement.ml" 258 8216 8266
+type(
+  bool
+)
+"rowDisplacement.ml" 258 8216 8218 "rowDisplacement.ml" 258 8216 8266
+type(
+  unit
+)
+"rowDisplacement.ml" 259 8268 8274 "rowDisplacement.ml" 259 8268 8275
+type(
+  int
+)
+"rowDisplacement.ml" 259 8268 8278 "rowDisplacement.ml" 259 8268 8284
+type(
+  int -> int
+)
+ident(
+  int_ref decode "rowDisplacement.ml" 50 2484 2488 "rowDisplacement.ml" 50 2484 2494
+)
+"rowDisplacement.ml" 259 8268 8285 "rowDisplacement.ml" 259 8268 8297
+type(
+  int array
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 257 8181 8190 "rowDisplacement.ml" 257 8181 8202
+)
+"rowDisplacement.ml" 259 8268 8299 "rowDisplacement.ml" 259 8268 8300
+type(
+  int
+)
+ident(
+  int_ref i "rowDisplacement.ml" 257 8181 8210 "rowDisplacement.ml" 257 8181 8211
+)
+"rowDisplacement.ml" 259 8268 8285 "rowDisplacement.ml" 259 8268 8301
+type(
+  int
+)
+"rowDisplacement.ml" 259 8268 8278 "rowDisplacement.ml" 259 8268 8301
+call(
+  stack
+)
+type(
+  int
+)
+"rowDisplacement.ml" 260 8305 8315 "rowDisplacement.ml" 260 8305 8316
+type(
+  int
+)
+"rowDisplacement.ml" 260 8305 8317 "rowDisplacement.ml" 260 8305 8319
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.<=
+)
+"rowDisplacement.ml" 260 8305 8320 "rowDisplacement.ml" 260 8305 8321
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 259 8268 8274 "rowDisplacement.ml" 259 8268 8275
+)
+"rowDisplacement.ml" 260 8305 8322 "rowDisplacement.ml" 260 8305 8323
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 260 8305 8324 "rowDisplacement.ml" 260 8305 8325
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 257 8181 8212 "rowDisplacement.ml" 257 8181 8213
+)
+"rowDisplacement.ml" 260 8305 8320 "rowDisplacement.ml" 260 8305 8325
+type(
+  int
+)
+"rowDisplacement.ml" 260 8305 8315 "rowDisplacement.ml" 260 8305 8325
+type(
+  bool
+)
+"rowDisplacement.ml" 260 8305 8326 "rowDisplacement.ml" 260 8305 8328
+type(
+  bool -> bool -> bool
+)
+ident(
+  ext_ref Pervasives.&&
+)
+"rowDisplacement.ml" 260 8305 8329 "rowDisplacement.ml" 260 8305 8330
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 259 8268 8274 "rowDisplacement.ml" 259 8268 8275
+)
+"rowDisplacement.ml" 260 8305 8331 "rowDisplacement.ml" 260 8305 8332
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 260 8305 8333 "rowDisplacement.ml" 260 8305 8334
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 257 8181 8212 "rowDisplacement.ml" 257 8181 8213
+)
+"rowDisplacement.ml" 260 8305 8329 "rowDisplacement.ml" 260 8305 8334
+type(
+  int
+)
+"rowDisplacement.ml" 260 8305 8335 "rowDisplacement.ml" 260 8305 8336
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.<
+)
+"rowDisplacement.ml" 260 8305 8337 "rowDisplacement.ml" 260 8305 8349
+type(
+  'a array -> int
+)
+ident(
+  ext_ref Array.length
+)
+"rowDisplacement.ml" 260 8305 8350 "rowDisplacement.ml" 260 8305 8354
+type(
+  'a array
+)
+ident(
+  int_ref data "rowDisplacement.ml" 257 8181 8204 "rowDisplacement.ml" 257 8181 8208
+)
+"rowDisplacement.ml" 260 8305 8337 "rowDisplacement.ml" 260 8305 8354
+type(
+  int
+)
+"rowDisplacement.ml" 260 8305 8329 "rowDisplacement.ml" 260 8305 8354
+type(
+  bool
+)
+"rowDisplacement.ml" 260 8305 8314 "rowDisplacement.ml" 260 8305 8355
+type(
+  bool
+)
+"rowDisplacement.ml" 260 8305 8307 "rowDisplacement.ml" 260 8305 8355
+type(
+  unit
+)
+"rowDisplacement.ml" 264 8528 8530 "rowDisplacement.ml" 264 8528 8534
+type(
+  'a array
+)
+ident(
+  int_ref data "rowDisplacement.ml" 257 8181 8204 "rowDisplacement.ml" 257 8181 8208
+)
+"rowDisplacement.ml" 264 8528 8536 "rowDisplacement.ml" 264 8528 8537
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 259 8268 8274 "rowDisplacement.ml" 259 8268 8275
+)
+"rowDisplacement.ml" 264 8528 8538 "rowDisplacement.ml" 264 8528 8539
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 264 8528 8540 "rowDisplacement.ml" 264 8528 8541
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 257 8181 8212 "rowDisplacement.ml" 257 8181 8213
+)
+"rowDisplacement.ml" 264 8528 8536 "rowDisplacement.ml" 264 8528 8541
+type(
+  int
+)
+"rowDisplacement.ml" 264 8528 8530 "rowDisplacement.ml" 264 8528 8542
+type(
+  'a
+)
+"rowDisplacement.ml" 260 8305 8307 "rowDisplacement.ml" 264 8528 8542
+type(
+  'a
+)
+"rowDisplacement.ml" 259 8268 8270 "rowDisplacement.ml" 264 8528 8542
+type(
+  'a
+)
+"rowDisplacement.ml" 258 8216 8218 "rowDisplacement.ml" 264 8528 8542
+type(
+  'a
+)
+"rowDisplacement.ml" 269 8669 8673 "rowDisplacement.ml" 269 8669 8679
+type(
+  ('a -> 'b -> int) -> ('c -> int -> 'd) -> 'a * 'c -> 'b -> int -> 'd
+)
+ident(
+  def getget "rowDisplacement.ml" 271 8787 8810 --
+)
+"rowDisplacement.ml" 269 8669 8680 "rowDisplacement.ml" 269 8669 8696
+type(
+  'a -> 'b -> int
+)
+ident(
+  def get_displacement "rowDisplacement.ml" 269 8669 8697 "rowDisplacement.ml" 271 8787 8810
+)
+"rowDisplacement.ml" 269 8669 8697 "rowDisplacement.ml" 269 8669 8705
+type(
+  'c -> int -> 'd
+)
+ident(
+  def get_data "rowDisplacement.ml" 269 8669 8706 "rowDisplacement.ml" 271 8787 8810
+)
+"rowDisplacement.ml" 269 8669 8707 "rowDisplacement.ml" 269 8669 8719
+type(
+  'a
+)
+ident(
+  def displacement "rowDisplacement.ml" 269 8669 8727 "rowDisplacement.ml" 271 8787 8810
+)
+"rowDisplacement.ml" 269 8669 8721 "rowDisplacement.ml" 269 8669 8725
+type(
+  'c
+)
+ident(
+  def data "rowDisplacement.ml" 269 8669 8727 "rowDisplacement.ml" 271 8787 8810
+)
+"rowDisplacement.ml" 269 8669 8706 "rowDisplacement.ml" 269 8669 8726
+type(
+  'a * 'c
+)
+"rowDisplacement.ml" 269 8669 8727 "rowDisplacement.ml" 269 8669 8728
+type(
+  'b
+)
+ident(
+  def i "rowDisplacement.ml" 269 8669 8729 "rowDisplacement.ml" 271 8787 8810
+)
+"rowDisplacement.ml" 269 8669 8729 "rowDisplacement.ml" 269 8669 8730
+type(
+  int
+)
+ident(
+  def j "rowDisplacement.ml" 270 8733 8735 "rowDisplacement.ml" 271 8787 8810
+)
+"rowDisplacement.ml" 270 8733 8739 "rowDisplacement.ml" 270 8733 8740
+type(
+  int
+)
+"rowDisplacement.ml" 270 8733 8743 "rowDisplacement.ml" 270 8733 8749
+type(
+  int -> int
+)
+ident(
+  int_ref decode "rowDisplacement.ml" 50 2484 2488 "rowDisplacement.ml" 50 2484 2494
+)
+"rowDisplacement.ml" 270 8733 8751 "rowDisplacement.ml" 270 8733 8767
+type(
+  'a -> 'b -> int
+)
+ident(
+  int_ref get_displacement "rowDisplacement.ml" 269 8669 8680 "rowDisplacement.ml" 269 8669 8696
+)
+"rowDisplacement.ml" 270 8733 8768 "rowDisplacement.ml" 270 8733 8780
+type(
+  'a
+)
+ident(
+  int_ref displacement "rowDisplacement.ml" 269 8669 8707 "rowDisplacement.ml" 269 8669 8719
+)
+"rowDisplacement.ml" 270 8733 8781 "rowDisplacement.ml" 270 8733 8782
+type(
+  'b
+)
+ident(
+  int_ref i "rowDisplacement.ml" 269 8669 8727 "rowDisplacement.ml" 269 8669 8728
+)
+"rowDisplacement.ml" 270 8733 8750 "rowDisplacement.ml" 270 8733 8783
+call(
+  stack
+)
+type(
+  int
+)
+"rowDisplacement.ml" 270 8733 8743 "rowDisplacement.ml" 270 8733 8783
+call(
+  stack
+)
+type(
+  int
+)
+"rowDisplacement.ml" 271 8787 8789 "rowDisplacement.ml" 271 8787 8797
+type(
+  'c -> int -> 'd
+)
+ident(
+  int_ref get_data "rowDisplacement.ml" 269 8669 8697 "rowDisplacement.ml" 269 8669 8705
+)
+"rowDisplacement.ml" 271 8787 8798 "rowDisplacement.ml" 271 8787 8802
+type(
+  'c
+)
+ident(
+  int_ref data "rowDisplacement.ml" 269 8669 8721 "rowDisplacement.ml" 269 8669 8725
+)
+"rowDisplacement.ml" 271 8787 8804 "rowDisplacement.ml" 271 8787 8805
+type(
+  int
+)
+ident(
+  int_ref k "rowDisplacement.ml" 270 8733 8739 "rowDisplacement.ml" 270 8733 8740
+)
+"rowDisplacement.ml" 271 8787 8806 "rowDisplacement.ml" 271 8787 8807
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"rowDisplacement.ml" 271 8787 8808 "rowDisplacement.ml" 271 8787 8809
+type(
+  int
+)
+ident(
+  int_ref j "rowDisplacement.ml" 269 8669 8729 "rowDisplacement.ml" 269 8669 8730
+)
+"rowDisplacement.ml" 271 8787 8803 "rowDisplacement.ml" 271 8787 8810
+type(
+  int
+)
+"rowDisplacement.ml" 271 8787 8789 "rowDisplacement.ml" 271 8787 8810
+call(
+  tail
+)
+type(
+  'd
+)
+"rowDisplacement.ml" 270 8733 8735 "rowDisplacement.ml" 271 8787 8810
+type(
+  'd
+)

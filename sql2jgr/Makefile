@@ -37,7 +37,7 @@ $(DEP):
 	$(MAKE) -C $@
 
 .ml.cmo:
-	$(OCAMLC) -c $@ $(CFLAGS) $^
+	$(OCAMLC) -c $@ $(CFLAGS) $<
 
 $(TARGET): $(DEP) $(OBJS)
 	$(OCAMLC) -o $(TARGET) $(LFLAGS) $(ALLLIBS) $(OBJS)
@@ -50,6 +50,7 @@ distclean clean:
 depend:
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 	#ocamldep $(SRC) > .depend
-	ocamldep $(INCLUDES) $(LIBS) $(SRC) > .depend
+	ocamldep $(SUBDIRS:%=-I %) $(SRC) > .depend
+	#ocamldep $(SRC) > .depend
 
 -include .depend

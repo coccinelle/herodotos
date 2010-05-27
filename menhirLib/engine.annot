@@ -1,0 +1,2184 @@
+"engine.ml" 30 1310 1316 "engine.ml" 30 1310 1320
+type(
+  exn
+)
+ident(
+  def _eRR "engine.ml" 40 1659 1661 "engine.ml" 366 11592 11595
+)
+"engine.ml" 31 1329 1333 "engine.ml" 31 1329 1338
+type(
+  exn
+)
+type(
+  exn
+)
+"engine.ml" 40 1659 1665 "engine.ml" 40 1659 1672
+type(
+  ('a, 'b, T.token) EngineTypes.env -> unit
+)
+ident(
+  def discard "engine.ml" 55 2227 2229 "engine.ml" 366 11592 11595
+)
+"engine.ml" 40 1659 1673 "engine.ml" 40 1659 1676
+type(
+  ('a, 'b, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 41 1679 1683 "engine.ml" 47 1889 1917
+)
+"engine.ml" 41 1679 1687 "engine.ml" 41 1679 1693
+type(
+  Lexing.lexbuf
+)
+"engine.ml" 41 1679 1696 "engine.ml" 41 1679 1699
+type(
+  ('a, 'b, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 40 1659 1673 "engine.ml" 40 1659 1676
+)
+"engine.ml" 41 1679 1696 "engine.ml" 41 1679 1706
+type(
+  Lexing.lexbuf
+)
+"engine.ml" 42 1710 1718 "engine.ml" 42 1710 1723
+type(
+  T.token
+)
+"engine.ml" 42 1710 1726 "engine.ml" 42 1710 1729
+type(
+  ('a, 'b, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 40 1659 1673 "engine.ml" 40 1659 1676
+)
+"engine.ml" 42 1710 1726 "engine.ml" 42 1710 1735
+type(
+  Lexing.lexbuf -> T.token
+)
+"engine.ml" 42 1710 1736 "engine.ml" 42 1710 1742
+type(
+  Lexing.lexbuf
+)
+ident(
+  int_ref lexbuf "engine.ml" 41 1679 1687 "engine.ml" 41 1679 1693
+)
+"engine.ml" 42 1710 1726 "engine.ml" 42 1710 1742
+call(
+  stack
+)
+type(
+  T.token
+)
+"engine.ml" 43 1746 1750 "engine.ml" 43 1746 1753
+type(
+  ('a, 'b, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 40 1659 1673 "engine.ml" 40 1659 1676
+)
+"engine.ml" 43 1746 1763 "engine.ml" 43 1746 1768
+type(
+  T.token
+)
+ident(
+  int_ref token "engine.ml" 42 1710 1718 "engine.ml" 42 1710 1723
+)
+"engine.ml" 43 1746 1750 "engine.ml" 43 1746 1768
+type(
+  unit
+)
+"engine.ml" 44 1770 1774 "engine.ml" 44 1770 1793
+type(
+  Lexing.lexbuf -> terminal -> unit
+)
+ident(
+  ext_ref Log.lookahead_token
+)
+"engine.ml" 44 1770 1794 "engine.ml" 44 1770 1800
+type(
+  Lexing.lexbuf
+)
+ident(
+  int_ref lexbuf "engine.ml" 41 1679 1687 "engine.ml" 41 1679 1693
+)
+"engine.ml" 44 1770 1802 "engine.ml" 44 1770 1818
+type(
+  T.token -> terminal
+)
+ident(
+  ext_ref T.token2terminal
+)
+"engine.ml" 44 1770 1819 "engine.ml" 44 1770 1824
+type(
+  T.token
+)
+ident(
+  int_ref token "engine.ml" 42 1710 1718 "engine.ml" 42 1710 1723
+)
+"engine.ml" 44 1770 1801 "engine.ml" 44 1770 1825
+call(
+  stack
+)
+type(
+  terminal
+)
+"engine.ml" 44 1770 1774 "engine.ml" 44 1770 1825
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 45 1827 1835 "engine.ml" 45 1827 1842
+type(
+  int
+)
+"engine.ml" 45 1827 1845 "engine.ml" 45 1827 1848
+type(
+  ('a, 'b, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 40 1659 1673 "engine.ml" 40 1659 1676
+)
+"engine.ml" 45 1827 1845 "engine.ml" 45 1827 1856
+type(
+  int
+)
+"engine.ml" 45 1827 1857 "engine.ml" 45 1827 1858
+type(
+  int -> int -> int
+)
+ident(
+  ext_ref Pervasives.+
+)
+"engine.ml" 45 1827 1859 "engine.ml" 45 1827 1860
+type(
+  int
+)
+"engine.ml" 45 1827 1845 "engine.ml" 45 1827 1860
+type(
+  int
+)
+"engine.ml" 46 1864 1871 "engine.ml" 46 1864 1878
+type(
+  int
+)
+ident(
+  int_ref shifted "engine.ml" 45 1827 1835 "engine.ml" 45 1827 1842
+)
+"engine.ml" 46 1864 1879 "engine.ml" 46 1864 1881
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.>=
+)
+"engine.ml" 46 1864 1882 "engine.ml" 46 1864 1883
+type(
+  int
+)
+"engine.ml" 46 1864 1871 "engine.ml" 46 1864 1883
+type(
+  bool
+)
+"engine.ml" 47 1889 1895 "engine.ml" 47 1889 1898
+type(
+  ('a, 'b, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 40 1659 1673 "engine.ml" 40 1659 1676
+)
+"engine.ml" 47 1889 1910 "engine.ml" 47 1889 1917
+type(
+  int
+)
+ident(
+  int_ref shifted "engine.ml" 45 1827 1835 "engine.ml" 45 1827 1842
+)
+"engine.ml" 47 1889 1895 "engine.ml" 47 1889 1917
+type(
+  unit
+)
+"engine.ml" 46 1864 1868 "engine.ml" 47 1889 1917
+type(
+  unit
+)
+"engine.ml" 45 1827 1831 "engine.ml" 47 1889 1917
+type(
+  unit
+)
+"engine.ml" 44 1770 1774 "engine.ml" 47 1889 1917
+type(
+  unit
+)
+"engine.ml" 43 1746 1750 "engine.ml" 47 1889 1917
+type(
+  unit
+)
+"engine.ml" 42 1710 1714 "engine.ml" 47 1889 1917
+type(
+  unit
+)
+"engine.ml" 41 1679 1683 "engine.ml" 47 1889 1917
+type(
+  unit
+)
+"engine.ml" 82 3508 3518 "engine.ml" 82 3508 3521
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> bool -> void
+)
+ident(
+  def run "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 82 3508 3522 "engine.ml" 82 3508 3525
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 82 3508 3526 "engine.ml" 105 4270 4279
+)
+"engine.ml" 82 3508 3526 "engine.ml" 82 3508 3540
+type(
+  bool
+)
+ident(
+  def please_discard "engine.ml" 82 3508 3541 "engine.ml" 105 4270 4279
+)
+"engine.ml" 86 3612 3620 "engine.ml" 86 3612 3621
+type(
+  state
+)
+"engine.ml" 86 3612 3624 "engine.ml" 86 3612 3627
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 82 3508 3522 "engine.ml" 82 3508 3525
+)
+"engine.ml" 86 3612 3624 "engine.ml" 86 3612 3635
+type(
+  state
+)
+"engine.ml" 87 3639 3643 "engine.ml" 87 3639 3652
+type(
+  state -> unit
+)
+ident(
+  ext_ref Log.state
+)
+"engine.ml" 87 3639 3653 "engine.ml" 87 3639 3654
+type(
+  state
+)
+ident(
+  int_ref s "engine.ml" 86 3612 3620 "engine.ml" 86 3612 3621
+)
+"engine.ml" 87 3639 3643 "engine.ml" 87 3639 3654
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 94 3877 3884 "engine.ml" 94 3877 3898
+type(
+  bool
+)
+ident(
+  int_ref please_discard "engine.ml" 82 3508 3526 "engine.ml" 82 3508 3540
+)
+"engine.ml" 95 3904 3910 "engine.ml" 95 3904 3917
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> unit
+)
+ident(
+  int_ref discard "engine.ml" 40 1659 1665 "engine.ml" 40 1659 1672
+)
+"engine.ml" 95 3904 3918 "engine.ml" 95 3904 3921
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 82 3508 3522 "engine.ml" 82 3508 3525
+)
+"engine.ml" 95 3904 3910 "engine.ml" 95 3904 3921
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 94 3877 3881 "engine.ml" 95 3904 3921
+type(
+  unit
+)
+"engine.ml" 101 4125 4129 "engine.ml" 101 4125 4148
+type(
+  state ->
+  ((state, semantic_value, T.token) EngineTypes.env -> production -> void) ->
+  ((state, semantic_value, T.token) EngineTypes.env -> void) ->
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  ext_ref T.default_reduction
+)
+"engine.ml" 102 4149 4155 "engine.ml" 102 4149 4156
+type(
+  state
+)
+ident(
+  int_ref s "engine.ml" 86 3612 3620 "engine.ml" 86 3612 3621
+)
+"engine.ml" 103 4157 4163 "engine.ml" 103 4157 4169
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> production -> void
+)
+ident(
+  int_ref reduce "engine.ml" 187 6868 6874 "engine.ml" 187 6868 6880
+)
+"engine.ml" 104 4219 4225 "engine.ml" 104 4219 4233
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref continue "engine.ml" 107 4281 4287 "engine.ml" 107 4281 4295
+)
+"engine.ml" 105 4270 4276 "engine.ml" 105 4270 4279
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 82 3508 3522 "engine.ml" 82 3508 3525
+)
+"engine.ml" 101 4125 4129 "engine.ml" 105 4270 4279
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 94 3877 3881 "engine.ml" 105 4270 4279
+type(
+  void
+)
+"engine.ml" 87 3639 3643 "engine.ml" 105 4270 4279
+type(
+  void
+)
+"engine.ml" 86 3612 3616 "engine.ml" 105 4270 4279
+type(
+  void
+)
+type(
+  void
+)
+"engine.ml" 107 4281 4287 "engine.ml" 107 4281 4295
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  def continue "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 107 4281 4296 "engine.ml" 107 4281 4299
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 107 4281 4300 "engine.ml" 125 4905 4921
+)
+"engine.ml" 120 4798 4805 "engine.ml" 120 4798 4808
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 107 4281 4296 "engine.ml" 107 4281 4299
+)
+"engine.ml" 120 4798 4805 "engine.ml" 120 4798 4816
+type(
+  int
+)
+"engine.ml" 120 4798 4817 "engine.ml" 120 4798 4818
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.=
+)
+"engine.ml" 120 4798 4819 "engine.ml" 120 4798 4823
+type(
+  int
+)
+"engine.ml" 120 4798 4805 "engine.ml" 120 4798 4823
+type(
+  bool
+)
+"engine.ml" 121 4835 4841 "engine.ml" 121 4835 4868
+type(
+  unit -> unit
+)
+ident(
+  ext_ref Log.resuming_error_handling
+)
+"engine.ml" 121 4835 4868 "engine.ml" 121 4835 4870
+type(
+  unit
+)
+"engine.ml" 121 4835 4841 "engine.ml" 121 4835 4870
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 122 4872 4878 "engine.ml" 122 4872 4883
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref error "engine.ml" 254 8710 8716 "engine.ml" 254 8710 8721
+)
+"engine.ml" 122 4872 4884 "engine.ml" 122 4872 4887
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 107 4281 4296 "engine.ml" 107 4281 4299
+)
+"engine.ml" 122 4872 4878 "engine.ml" 122 4872 4887
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 120 4798 4829 "engine.ml" 123 4888 4895
+type(
+  void
+)
+"engine.ml" 125 4905 4911 "engine.ml" 125 4905 4917
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref action "engine.ml" 133 5224 5230 "engine.ml" 133 5224 5236
+)
+"engine.ml" 125 4905 4918 "engine.ml" 125 4905 4921
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 107 4281 4296 "engine.ml" 107 4281 4299
+)
+"engine.ml" 125 4905 4911 "engine.ml" 125 4905 4921
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 120 4798 4802 "engine.ml" 125 4905 4921
+type(
+  void
+)
+type(
+  void
+)
+"engine.ml" 133 5224 5230 "engine.ml" 133 5224 5236
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  def action "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 133 5224 5237 "engine.ml" 133 5224 5240
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 133 5224 5241 "engine.ml" 147 5817 5826
+)
+"engine.ml" 139 5435 5443 "engine.ml" 139 5435 5448
+type(
+  T.token
+)
+"engine.ml" 139 5435 5451 "engine.ml" 139 5435 5454
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 133 5224 5237 "engine.ml" 133 5224 5240
+)
+"engine.ml" 139 5435 5451 "engine.ml" 139 5435 5460
+type(
+  T.token
+)
+"engine.ml" 140 5464 5468 "engine.ml" 140 5464 5476
+type(
+  state ->
+  T.terminal ->
+  T.semantic_value ->
+  ((state, semantic_value, T.token) EngineTypes.env ->
+   bool -> terminal -> semantic_value -> state -> void) ->
+  ((state, semantic_value, T.token) EngineTypes.env -> production -> void) ->
+  ((state, semantic_value, T.token) EngineTypes.env -> void) ->
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  ext_ref T.action
+)
+"engine.ml" 141 5477 5483 "engine.ml" 141 5477 5486
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 133 5224 5237 "engine.ml" 133 5224 5240
+)
+"engine.ml" 141 5477 5483 "engine.ml" 141 5477 5494
+type(
+  state
+)
+"engine.ml" 142 5537 5544 "engine.ml" 142 5537 5560
+type(
+  T.token -> T.terminal
+)
+ident(
+  ext_ref T.token2terminal
+)
+"engine.ml" 142 5537 5561 "engine.ml" 142 5537 5566
+type(
+  T.token
+)
+ident(
+  int_ref token "engine.ml" 139 5435 5443 "engine.ml" 139 5435 5448
+)
+"engine.ml" 142 5537 5543 "engine.ml" 142 5537 5567
+call(
+  stack
+)
+type(
+  T.terminal
+)
+"engine.ml" 143 5600 5607 "engine.ml" 143 5600 5620
+type(
+  T.token -> T.semantic_value
+)
+ident(
+  ext_ref T.token2value
+)
+"engine.ml" 143 5600 5621 "engine.ml" 143 5600 5626
+type(
+  T.token
+)
+ident(
+  int_ref token "engine.ml" 139 5435 5443 "engine.ml" 139 5435 5448
+)
+"engine.ml" 143 5600 5606 "engine.ml" 143 5600 5627
+call(
+  stack
+)
+type(
+  T.semantic_value
+)
+"engine.ml" 144 5628 5634 "engine.ml" 144 5628 5639
+type(
+  (state, semantic_value, T.token) EngineTypes.env ->
+  bool -> terminal -> semantic_value -> state -> void
+)
+ident(
+  int_ref shift "engine.ml" 155 6133 6139 "engine.ml" 155 6133 6144
+)
+"engine.ml" 145 5690 5696 "engine.ml" 145 5690 5702
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> production -> void
+)
+ident(
+  int_ref reduce "engine.ml" 187 6868 6874 "engine.ml" 187 6868 6880
+)
+"engine.ml" 146 5753 5759 "engine.ml" 146 5753 5767
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref initiate "engine.ml" 235 8259 8265 "engine.ml" 235 8259 8273
+)
+"engine.ml" 147 5817 5823 "engine.ml" 147 5817 5826
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 133 5224 5237 "engine.ml" 133 5224 5240
+)
+"engine.ml" 140 5464 5468 "engine.ml" 147 5817 5826
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 139 5435 5439 "engine.ml" 147 5817 5826
+type(
+  void
+)
+type(
+  void
+)
+"engine.ml" 155 6133 6139 "engine.ml" 155 6133 6144
+type(
+  (state, semantic_value, T.token) EngineTypes.env ->
+  bool -> terminal -> semantic_value -> state -> void
+)
+ident(
+  def shift "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 155 6133 6145 "engine.ml" 155 6133 6148
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 156 6149 6155 "engine.ml" 181 6706 6732
+)
+"engine.ml" 156 6149 6156 "engine.ml" 156 6149 6170
+type(
+  bool
+)
+ident(
+  def please_discard "engine.ml" 157 6179 6185 "engine.ml" 181 6706 6732
+)
+"engine.ml" 157 6179 6186 "engine.ml" 157 6179 6194
+type(
+  terminal
+)
+ident(
+  def terminal "engine.ml" 158 6207 6213 "engine.ml" 181 6706 6732
+)
+"engine.ml" 158 6207 6214 "engine.ml" 158 6207 6219
+type(
+  semantic_value
+)
+ident(
+  def value "engine.ml" 159 6238 6244 "engine.ml" 181 6706 6732
+)
+"engine.ml" 159 6238 6245 "engine.ml" 159 6238 6247
+type(
+  state
+)
+ident(
+  def s' "engine.ml" 160 6257 6263 "engine.ml" 181 6706 6732
+)
+"engine.ml" 164 6304 6308 "engine.ml" 164 6304 6317
+type(
+  terminal -> state -> unit
+)
+ident(
+  ext_ref Log.shift
+)
+"engine.ml" 164 6304 6318 "engine.ml" 164 6304 6326
+type(
+  terminal
+)
+ident(
+  int_ref terminal "engine.ml" 157 6179 6186 "engine.ml" 157 6179 6194
+)
+"engine.ml" 164 6304 6327 "engine.ml" 164 6304 6329
+type(
+  state
+)
+ident(
+  int_ref s' "engine.ml" 159 6238 6245 "engine.ml" 159 6238 6247
+)
+"engine.ml" 164 6304 6308 "engine.ml" 164 6304 6329
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 169 6440 6448 "engine.ml" 169 6440 6454
+type(
+  Lexing.lexbuf
+)
+"engine.ml" 169 6440 6457 "engine.ml" 169 6440 6460
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 155 6133 6145 "engine.ml" 155 6133 6148
+)
+"engine.ml" 169 6440 6457 "engine.ml" 169 6440 6467
+type(
+  Lexing.lexbuf
+)
+"engine.ml" 170 6471 6475 "engine.ml" 170 6471 6478
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 155 6133 6145 "engine.ml" 155 6133 6148
+)
+"engine.ml" 171 6490 6504 "engine.ml" 171 6490 6507
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 155 6133 6145 "engine.ml" 155 6133 6148
+)
+"engine.ml" 171 6490 6504 "engine.ml" 171 6490 6515
+type(
+  state
+)
+"engine.ml" 172 6517 6530 "engine.ml" 172 6517 6535
+type(
+  semantic_value
+)
+ident(
+  int_ref value "engine.ml" 158 6207 6214 "engine.ml" 158 6207 6219
+)
+"engine.ml" 173 6537 6552 "engine.ml" 173 6537 6558
+type(
+  Lexing.lexbuf
+)
+ident(
+  int_ref lexbuf "engine.ml" 169 6440 6448 "engine.ml" 169 6440 6454
+)
+"engine.ml" 173 6537 6552 "engine.ml" 173 6537 6577
+type(
+  Lexing.position
+)
+"engine.ml" 174 6579 6592 "engine.ml" 174 6579 6598
+type(
+  Lexing.lexbuf
+)
+ident(
+  int_ref lexbuf "engine.ml" 169 6440 6448 "engine.ml" 169 6440 6454
+)
+"engine.ml" 174 6579 6592 "engine.ml" 174 6579 6616
+type(
+  Lexing.position
+)
+"engine.ml" 175 6618 6631 "engine.ml" 175 6618 6634
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 155 6133 6145 "engine.ml" 155 6133 6148
+)
+"engine.ml" 175 6618 6631 "engine.ml" 175 6618 6640
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+"engine.ml" 170 6471 6488 "engine.ml" 176 6642 6647
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+"engine.ml" 170 6471 6475 "engine.ml" 176 6642 6647
+type(
+  unit
+)
+"engine.ml" 180 6683 6687 "engine.ml" 180 6683 6690
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 155 6133 6145 "engine.ml" 155 6133 6148
+)
+"engine.ml" 180 6683 6702 "engine.ml" 180 6683 6704
+type(
+  state
+)
+ident(
+  int_ref s' "engine.ml" 159 6238 6245 "engine.ml" 159 6238 6247
+)
+"engine.ml" 180 6683 6687 "engine.ml" 180 6683 6704
+type(
+  unit
+)
+"engine.ml" 181 6706 6710 "engine.ml" 181 6706 6713
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> bool -> void
+)
+ident(
+  int_ref run "engine.ml" 82 3508 3518 "engine.ml" 82 3508 3521
+)
+"engine.ml" 181 6706 6714 "engine.ml" 181 6706 6717
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 155 6133 6145 "engine.ml" 155 6133 6148
+)
+"engine.ml" 181 6706 6718 "engine.ml" 181 6706 6732
+type(
+  bool
+)
+ident(
+  int_ref please_discard "engine.ml" 156 6149 6156 "engine.ml" 156 6149 6170
+)
+"engine.ml" 181 6706 6710 "engine.ml" 181 6706 6732
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 180 6683 6687 "engine.ml" 181 6706 6732
+type(
+  void
+)
+"engine.ml" 170 6471 6475 "engine.ml" 181 6706 6732
+type(
+  void
+)
+"engine.ml" 169 6440 6444 "engine.ml" 181 6706 6732
+type(
+  void
+)
+"engine.ml" 164 6304 6308 "engine.ml" 181 6706 6732
+type(
+  void
+)
+type(
+  void
+)
+"engine.ml" 187 6868 6874 "engine.ml" 187 6868 6880
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> production -> void
+)
+ident(
+  def reduce "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 187 6868 6881 "engine.ml" 187 6868 6884
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 187 6868 6885 "engine.ml" 225 7967 7993
+)
+"engine.ml" 187 6868 6886 "engine.ml" 187 6868 6890
+type(
+  production
+)
+ident(
+  def prod "engine.ml" 187 6868 6905 "engine.ml" 225 7967 7993
+)
+"engine.ml" 191 6949 6953 "engine.ml" 191 6949 6973
+type(
+  production -> unit
+)
+ident(
+  ext_ref Log.reduce_or_accept
+)
+"engine.ml" 191 6949 6974 "engine.ml" 191 6949 6978
+type(
+  production
+)
+ident(
+  int_ref prod "engine.ml" 187 6868 6886 "engine.ml" 187 6868 6890
+)
+"engine.ml" 191 6949 6953 "engine.ml" 191 6949 6978
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 206 7491 7492 "engine.ml" 206 7491 7509
+type(
+  production -> T.semantic_action
+)
+ident(
+  ext_ref T.semantic_action
+)
+"engine.ml" 206 7491 7510 "engine.ml" 206 7491 7514
+type(
+  production
+)
+ident(
+  int_ref prod "engine.ml" 187 6868 6886 "engine.ml" 187 6868 6890
+)
+"engine.ml" 206 7491 7515 "engine.ml" 206 7491 7518
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 187 6868 6881 "engine.ml" 187 6868 6884
+)
+"engine.ml" 206 7491 7492 "engine.ml" 206 7491 7518
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 207 7520 7521 "engine.ml" 207 7520 7525
+type(
+  bool
+)
+"engine.ml" 206 7491 7492 "engine.ml" 207 7520 7525
+type(
+  bool
+)
+"engine.ml" 208 7526 7537 "engine.ml" 208 7526 7542
+type(
+  exn
+)
+"engine.ml" 209 7546 7547 "engine.ml" 209 7546 7552
+type(
+  bool
+)
+"engine.ml" 204 7472 7479 "engine.ml" 210 7553 7558
+type(
+  bool
+)
+"engine.ml" 220 7879 7885 "engine.ml" 220 7879 7888
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 187 6868 6881 "engine.ml" 187 6868 6884
+)
+"engine.ml" 220 7879 7900 "engine.ml" 220 7879 7906
+type(
+  state -> production -> state
+)
+ident(
+  ext_ref T.goto
+)
+"engine.ml" 220 7879 7907 "engine.ml" 220 7879 7910
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 187 6868 6881 "engine.ml" 187 6868 6884
+)
+"engine.ml" 220 7879 7907 "engine.ml" 220 7879 7916
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+"engine.ml" 220 7879 7907 "engine.ml" 220 7879 7922
+type(
+  state
+)
+"engine.ml" 220 7879 7923 "engine.ml" 220 7879 7927
+type(
+  production
+)
+ident(
+  int_ref prod "engine.ml" 187 6868 6886 "engine.ml" 187 6868 6890
+)
+"engine.ml" 220 7879 7900 "engine.ml" 220 7879 7927
+call(
+  stack
+)
+type(
+  state
+)
+"engine.ml" 220 7879 7885 "engine.ml" 220 7879 7927
+type(
+  unit
+)
+"engine.ml" 221 7929 7935 "engine.ml" 221 7929 7938
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> bool -> void
+)
+ident(
+  int_ref run "engine.ml" 82 3508 3518 "engine.ml" 82 3508 3521
+)
+"engine.ml" 221 7929 7939 "engine.ml" 221 7929 7942
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 187 6868 6881 "engine.ml" 187 6868 6884
+)
+"engine.ml" 221 7929 7943 "engine.ml" 221 7929 7948
+type(
+  bool
+)
+"engine.ml" 221 7929 7935 "engine.ml" 221 7929 7948
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 210 7553 7564 "engine.ml" 223 7950 7957
+type(
+  void
+)
+"engine.ml" 225 7967 7973 "engine.ml" 225 7967 7989
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref errorbookkeeping "engine.ml" 246 8533 8539 "engine.ml" 246 8533 8555
+)
+"engine.ml" 225 7967 7990 "engine.ml" 225 7967 7993
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 187 6868 6881 "engine.ml" 187 6868 6884
+)
+"engine.ml" 225 7967 7973 "engine.ml" 225 7967 7993
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 204 7472 7476 "engine.ml" 225 7967 7993
+type(
+  void
+)
+"engine.ml" 191 6949 6953 "engine.ml" 225 7967 7993
+type(
+  void
+)
+type(
+  void
+)
+"engine.ml" 235 8259 8265 "engine.ml" 235 8259 8273
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  def initiate "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 235 8259 8274 "engine.ml" 235 8259 8277
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 235 8259 8278 "engine.ml" 244 8505 8531
+)
+"engine.ml" 236 8287 8299 "engine.ml" 236 8287 8302
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 235 8259 8274 "engine.ml" 235 8259 8277
+)
+"engine.ml" 236 8287 8299 "engine.ml" 236 8287 8310
+type(
+  int
+)
+"engine.ml" 236 8287 8311 "engine.ml" 236 8287 8313
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.>=
+)
+"engine.ml" 236 8287 8314 "engine.ml" 236 8287 8315
+type(
+  int
+)
+"engine.ml" 236 8287 8298 "engine.ml" 236 8287 8316
+type(
+  bool
+)
+"engine.ml" 236 8287 8291 "engine.ml" 236 8287 8316
+type(
+  unit
+)
+"engine.ml" 237 8318 8325 "engine.ml" 237 8318 8335
+type(
+  bool
+)
+ident(
+  ext_ref T.recovery
+)
+"engine.ml" 237 8318 8336 "engine.ml" 237 8318 8338
+type(
+  bool -> bool -> bool
+)
+ident(
+  ext_ref Pervasives.&&
+)
+"engine.ml" 237 8318 8339 "engine.ml" 237 8318 8342
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 235 8259 8274 "engine.ml" 235 8259 8277
+)
+"engine.ml" 237 8318 8339 "engine.ml" 237 8318 8350
+type(
+  int
+)
+"engine.ml" 237 8318 8351 "engine.ml" 237 8318 8352
+type(
+  int -> int -> bool
+)
+ident(
+  ext_ref Pervasives.=
+)
+"engine.ml" 237 8318 8353 "engine.ml" 237 8318 8354
+type(
+  int
+)
+"engine.ml" 237 8318 8339 "engine.ml" 237 8318 8354
+type(
+  bool
+)
+"engine.ml" 237 8318 8325 "engine.ml" 237 8318 8354
+type(
+  bool
+)
+"engine.ml" 238 8366 8372 "engine.ml" 238 8366 8397
+type(
+  terminal -> unit
+)
+ident(
+  ext_ref Log.discarding_last_token
+)
+"engine.ml" 238 8366 8399 "engine.ml" 238 8366 8415
+type(
+  T.token -> terminal
+)
+ident(
+  ext_ref T.token2terminal
+)
+"engine.ml" 238 8366 8416 "engine.ml" 238 8366 8419
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 235 8259 8274 "engine.ml" 235 8259 8277
+)
+"engine.ml" 238 8366 8416 "engine.ml" 238 8366 8425
+type(
+  T.token
+)
+"engine.ml" 238 8366 8398 "engine.ml" 238 8366 8426
+call(
+  stack
+)
+type(
+  terminal
+)
+"engine.ml" 238 8366 8372 "engine.ml" 238 8366 8426
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 239 8428 8434 "engine.ml" 239 8428 8441
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> unit
+)
+ident(
+  int_ref discard "engine.ml" 40 1659 1665 "engine.ml" 40 1659 1672
+)
+"engine.ml" 239 8428 8442 "engine.ml" 239 8428 8445
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 235 8259 8274 "engine.ml" 235 8259 8277
+)
+"engine.ml" 239 8428 8434 "engine.ml" 239 8428 8445
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 240 8447 8453 "engine.ml" 240 8447 8456
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 235 8259 8274 "engine.ml" 235 8259 8277
+)
+"engine.ml" 240 8447 8468 "engine.ml" 240 8447 8469
+type(
+  int
+)
+"engine.ml" 240 8447 8453 "engine.ml" 240 8447 8469
+type(
+  unit
+)
+"engine.ml" 241 8471 8477 "engine.ml" 241 8471 8483
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref action "engine.ml" 133 5224 5230 "engine.ml" 133 5224 5236
+)
+"engine.ml" 241 8471 8484 "engine.ml" 241 8471 8487
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 235 8259 8274 "engine.ml" 235 8259 8277
+)
+"engine.ml" 241 8471 8477 "engine.ml" 241 8471 8487
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 240 8447 8453 "engine.ml" 241 8471 8487
+type(
+  void
+)
+"engine.ml" 239 8428 8434 "engine.ml" 241 8471 8487
+type(
+  void
+)
+"engine.ml" 237 8318 8360 "engine.ml" 242 8488 8495
+type(
+  void
+)
+"engine.ml" 244 8505 8511 "engine.ml" 244 8505 8527
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref errorbookkeeping "engine.ml" 246 8533 8539 "engine.ml" 246 8533 8555
+)
+"engine.ml" 244 8505 8528 "engine.ml" 244 8505 8531
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 235 8259 8274 "engine.ml" 235 8259 8277
+)
+"engine.ml" 244 8505 8511 "engine.ml" 244 8505 8531
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 237 8318 8322 "engine.ml" 244 8505 8531
+type(
+  void
+)
+"engine.ml" 236 8287 8291 "engine.ml" 244 8505 8531
+type(
+  void
+)
+type(
+  void
+)
+"engine.ml" 246 8533 8539 "engine.ml" 246 8533 8555
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  def errorbookkeeping "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 246 8533 8556 "engine.ml" 246 8533 8559
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 247 8562 8566 "engine.ml" 250 8662 8675
+)
+"engine.ml" 247 8562 8566 "engine.ml" 247 8562 8595
+type(
+  unit -> unit
+)
+ident(
+  ext_ref Log.initiating_error_handling
+)
+"engine.ml" 247 8562 8595 "engine.ml" 247 8562 8597
+type(
+  unit
+)
+"engine.ml" 247 8562 8566 "engine.ml" 247 8562 8597
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 248 8599 8603 "engine.ml" 248 8599 8606
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 246 8533 8556 "engine.ml" 246 8533 8559
+)
+"engine.ml" 248 8599 8624 "engine.ml" 248 8599 8627
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 246 8533 8556 "engine.ml" 246 8533 8559
+)
+"engine.ml" 248 8599 8624 "engine.ml" 248 8599 8635
+type(
+  int
+)
+"engine.ml" 248 8599 8603 "engine.ml" 248 8599 8635
+type(
+  unit
+)
+"engine.ml" 249 8637 8641 "engine.ml" 249 8637 8644
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 246 8533 8556 "engine.ml" 246 8533 8559
+)
+"engine.ml" 249 8637 8656 "engine.ml" 249 8637 8660
+type(
+  int
+)
+"engine.ml" 249 8637 8641 "engine.ml" 249 8637 8660
+type(
+  unit
+)
+"engine.ml" 250 8662 8666 "engine.ml" 250 8662 8671
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref error "engine.ml" 254 8710 8716 "engine.ml" 254 8710 8721
+)
+"engine.ml" 250 8662 8672 "engine.ml" 250 8662 8675
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 246 8533 8556 "engine.ml" 246 8533 8559
+)
+"engine.ml" 250 8662 8666 "engine.ml" 250 8662 8675
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 249 8637 8641 "engine.ml" 250 8662 8675
+type(
+  void
+)
+"engine.ml" 248 8599 8603 "engine.ml" 250 8662 8675
+type(
+  void
+)
+"engine.ml" 247 8562 8566 "engine.ml" 250 8662 8675
+type(
+  void
+)
+"engine.ml" 254 8710 8716 "engine.ml" 254 8710 8721
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  def error "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 254 8710 8722 "engine.ml" 254 8710 8725
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 254 8710 8726 "engine.ml" 266 9180 9189
+)
+"engine.ml" 259 8835 8839 "engine.ml" 259 8835 8847
+type(
+  state ->
+  T.terminal ->
+  T.semantic_value ->
+  ((state, semantic_value, T.token) EngineTypes.env ->
+   bool -> terminal -> semantic_value -> state -> void) ->
+  ((state, semantic_value, T.token) EngineTypes.env -> production -> void) ->
+  ((state, semantic_value, T.token) EngineTypes.env -> void) ->
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  ext_ref T.action
+)
+"engine.ml" 260 8848 8854 "engine.ml" 260 8848 8857
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 254 8710 8722 "engine.ml" 254 8710 8725
+)
+"engine.ml" 260 8848 8854 "engine.ml" 260 8848 8865
+type(
+  state
+)
+"engine.ml" 261 8908 8914 "engine.ml" 261 8908 8930
+type(
+  T.terminal
+)
+ident(
+  ext_ref T.error_terminal
+)
+"engine.ml" 262 8971 8977 "engine.ml" 262 8971 8990
+type(
+  T.semantic_value
+)
+ident(
+  ext_ref T.error_value
+)
+"engine.ml" 263 8991 8997 "engine.ml" 263 8991 9008
+type(
+  (state, semantic_value, T.token) EngineTypes.env ->
+  bool -> terminal -> semantic_value -> state -> void
+)
+ident(
+  int_ref error_shift "engine.ml" 268 9191 9197 "engine.ml" 268 9191 9208
+)
+"engine.ml" 264 9053 9059 "engine.ml" 264 9053 9071
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> production -> void
+)
+ident(
+  int_ref error_reduce "engine.ml" 279 9548 9554 "engine.ml" 279 9548 9566
+)
+"engine.ml" 265 9116 9122 "engine.ml" 265 9116 9132
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref error_fail "engine.ml" 286 9707 9713 "engine.ml" 286 9707 9723
+)
+"engine.ml" 266 9180 9186 "engine.ml" 266 9180 9189
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 254 8710 8722 "engine.ml" 254 8710 8725
+)
+"engine.ml" 259 8835 8839 "engine.ml" 266 9180 9189
+call(
+  tail
+)
+type(
+  void
+)
+type(
+  void
+)
+"engine.ml" 268 9191 9197 "engine.ml" 268 9191 9208
+type(
+  (state, semantic_value, T.token) EngineTypes.env ->
+  bool -> terminal -> semantic_value -> state -> void
+)
+ident(
+  def error_shift "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 268 9191 9209 "engine.ml" 268 9191 9212
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 268 9191 9213 "engine.ml" 277 9500 9546
+)
+"engine.ml" 268 9191 9213 "engine.ml" 268 9191 9227
+type(
+  bool
+)
+ident(
+  def please_discard "engine.ml" 268 9191 9228 "engine.ml" 277 9500 9546
+)
+"engine.ml" 268 9191 9228 "engine.ml" 268 9191 9236
+type(
+  terminal
+)
+ident(
+  def terminal "engine.ml" 268 9191 9237 "engine.ml" 277 9500 9546
+)
+"engine.ml" 268 9191 9237 "engine.ml" 268 9191 9242
+type(
+  semantic_value
+)
+ident(
+  def value "engine.ml" 268 9191 9243 "engine.ml" 277 9500 9546
+)
+"engine.ml" 268 9191 9243 "engine.ml" 268 9191 9245
+type(
+  state
+)
+ident(
+  def s' "engine.ml" 272 9332 9336 "engine.ml" 277 9500 9546
+)
+"engine.ml" 272 9332 9344 "engine.ml" 272 9332 9352
+type(
+  terminal
+)
+ident(
+  int_ref terminal "engine.ml" 268 9191 9228 "engine.ml" 268 9191 9236
+)
+"engine.ml" 272 9332 9353 "engine.ml" 272 9332 9354
+type(
+  terminal -> terminal -> bool
+)
+ident(
+  ext_ref Pervasives.=
+)
+"engine.ml" 272 9332 9355 "engine.ml" 272 9332 9371
+type(
+  terminal
+)
+ident(
+  ext_ref T.error_terminal
+)
+"engine.ml" 272 9332 9344 "engine.ml" 272 9332 9371
+type(
+  bool
+)
+"engine.ml" 272 9332 9372 "engine.ml" 272 9332 9374
+type(
+  bool -> bool -> bool
+)
+ident(
+  ext_ref Pervasives.&&
+)
+"engine.ml" 272 9332 9375 "engine.ml" 272 9332 9380
+type(
+  semantic_value
+)
+ident(
+  int_ref value "engine.ml" 268 9191 9237 "engine.ml" 268 9191 9242
+)
+"engine.ml" 272 9332 9381 "engine.ml" 272 9332 9382
+type(
+  semantic_value -> semantic_value -> bool
+)
+ident(
+  ext_ref Pervasives.=
+)
+"engine.ml" 272 9332 9383 "engine.ml" 272 9332 9396
+type(
+  semantic_value
+)
+ident(
+  ext_ref T.error_value
+)
+"engine.ml" 272 9332 9375 "engine.ml" 272 9332 9396
+type(
+  bool
+)
+"engine.ml" 272 9332 9343 "engine.ml" 272 9332 9397
+type(
+  bool
+)
+"engine.ml" 272 9332 9336 "engine.ml" 272 9332 9397
+type(
+  unit
+)
+"engine.ml" 276 9464 9468 "engine.ml" 276 9464 9486
+type(
+  state -> unit
+)
+ident(
+  ext_ref Log.handling_error
+)
+"engine.ml" 276 9464 9487 "engine.ml" 276 9464 9490
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 268 9191 9209 "engine.ml" 268 9191 9212
+)
+"engine.ml" 276 9464 9487 "engine.ml" 276 9464 9498
+type(
+  state
+)
+"engine.ml" 276 9464 9468 "engine.ml" 276 9464 9498
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 277 9500 9504 "engine.ml" 277 9500 9509
+type(
+  (state, semantic_value, T.token) EngineTypes.env ->
+  bool -> terminal -> semantic_value -> state -> void
+)
+ident(
+  int_ref shift "engine.ml" 155 6133 6139 "engine.ml" 155 6133 6144
+)
+"engine.ml" 277 9500 9510 "engine.ml" 277 9500 9513
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 268 9191 9209 "engine.ml" 268 9191 9212
+)
+"engine.ml" 277 9500 9514 "engine.ml" 277 9500 9528
+type(
+  bool
+)
+ident(
+  int_ref please_discard "engine.ml" 268 9191 9213 "engine.ml" 268 9191 9227
+)
+"engine.ml" 277 9500 9529 "engine.ml" 277 9500 9537
+type(
+  terminal
+)
+ident(
+  int_ref terminal "engine.ml" 268 9191 9228 "engine.ml" 268 9191 9236
+)
+"engine.ml" 277 9500 9538 "engine.ml" 277 9500 9543
+type(
+  semantic_value
+)
+ident(
+  int_ref value "engine.ml" 268 9191 9237 "engine.ml" 268 9191 9242
+)
+"engine.ml" 277 9500 9544 "engine.ml" 277 9500 9546
+type(
+  state
+)
+ident(
+  int_ref s' "engine.ml" 268 9191 9243 "engine.ml" 268 9191 9245
+)
+"engine.ml" 277 9500 9504 "engine.ml" 277 9500 9546
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 276 9464 9468 "engine.ml" 277 9500 9546
+type(
+  void
+)
+"engine.ml" 272 9332 9336 "engine.ml" 277 9500 9546
+type(
+  void
+)
+"engine.ml" 279 9548 9554 "engine.ml" 279 9548 9566
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> production -> void
+)
+ident(
+  def error_reduce "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 279 9548 9567 "engine.ml" 279 9548 9570
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 279 9548 9571 "engine.ml" 284 9686 9705
+)
+"engine.ml" 279 9548 9571 "engine.ml" 279 9548 9575
+type(
+  production
+)
+ident(
+  def prod "engine.ml" 283 9650 9654 "engine.ml" 284 9686 9705
+)
+"engine.ml" 283 9650 9654 "engine.ml" 283 9650 9672
+type(
+  state -> unit
+)
+ident(
+  ext_ref Log.handling_error
+)
+"engine.ml" 283 9650 9673 "engine.ml" 283 9650 9676
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 279 9548 9567 "engine.ml" 279 9548 9570
+)
+"engine.ml" 283 9650 9673 "engine.ml" 283 9650 9684
+type(
+  state
+)
+"engine.ml" 283 9650 9654 "engine.ml" 283 9650 9684
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 284 9686 9690 "engine.ml" 284 9686 9696
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> production -> void
+)
+ident(
+  int_ref reduce "engine.ml" 187 6868 6874 "engine.ml" 187 6868 6880
+)
+"engine.ml" 284 9686 9697 "engine.ml" 284 9686 9700
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 279 9548 9567 "engine.ml" 279 9548 9570
+)
+"engine.ml" 284 9686 9701 "engine.ml" 284 9686 9705
+type(
+  production
+)
+ident(
+  int_ref prod "engine.ml" 279 9548 9571 "engine.ml" 279 9548 9575
+)
+"engine.ml" 284 9686 9690 "engine.ml" 284 9686 9705
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 283 9650 9654 "engine.ml" 284 9686 9705
+type(
+  void
+)
+"engine.ml" 286 9707 9713 "engine.ml" 286 9707 9723
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  def error_fail "engine.ml" 82 3508 3510 "engine.ml" 366 11592 11595
+)
+"engine.ml" 286 9707 9724 "engine.ml" 286 9707 9727
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  def env "engine.ml" 291 9817 9821 "engine.ml" 308 10174 10181
+)
+"engine.ml" 291 9817 9825 "engine.ml" 291 9817 9829
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+"engine.ml" 291 9817 9832 "engine.ml" 291 9817 9835
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 286 9707 9724 "engine.ml" 286 9707 9727
+)
+"engine.ml" 291 9817 9832 "engine.ml" 291 9817 9841
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+"engine.ml" 292 9845 9853 "engine.ml" 292 9845 9857
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+"engine.ml" 292 9845 9860 "engine.ml" 292 9845 9864
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+ident(
+  int_ref cell "engine.ml" 291 9817 9825 "engine.ml" 291 9817 9829
+)
+"engine.ml" 292 9845 9860 "engine.ml" 292 9845 9869
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+"engine.ml" 293 9873 9880 "engine.ml" 293 9873 9884
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+ident(
+  int_ref next "engine.ml" 292 9845 9853 "engine.ml" 292 9845 9857
+)
+"engine.ml" 293 9873 9885 "engine.ml" 293 9873 9887
+type(
+  (state, semantic_value) EngineTypes.stack ->
+  (state, semantic_value) EngineTypes.stack -> bool
+)
+ident(
+  ext_ref Pervasives.==
+)
+"engine.ml" 293 9873 9888 "engine.ml" 293 9873 9892
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+ident(
+  int_ref cell "engine.ml" 291 9817 9825 "engine.ml" 291 9817 9829
+)
+"engine.ml" 293 9873 9880 "engine.ml" 293 9873 9892
+type(
+  bool
+)
+"engine.ml" 297 9937 9943 "engine.ml" 297 9937 9948
+type(
+  exn -> void
+)
+ident(
+  ext_ref Pervasives.raise
+)
+"engine.ml" 297 9937 9949 "engine.ml" 297 9937 9953
+type(
+  exn
+)
+ident(
+  int_ref _eRR "engine.ml" 30 1310 1316 "engine.ml" 30 1310 1320
+)
+"engine.ml" 297 9937 9943 "engine.ml" 297 9937 9953
+type(
+  void
+)
+"engine.ml" 304 10099 10105 "engine.ml" 304 10099 10108
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 286 9707 9724 "engine.ml" 286 9707 9727
+)
+"engine.ml" 304 10099 10118 "engine.ml" 304 10099 10122
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+ident(
+  int_ref next "engine.ml" 292 9845 9853 "engine.ml" 292 9845 9857
+)
+"engine.ml" 304 10099 10105 "engine.ml" 304 10099 10122
+type(
+  unit
+)
+"engine.ml" 305 10124 10130 "engine.ml" 305 10124 10133
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 286 9707 9724 "engine.ml" 286 9707 9727
+)
+"engine.ml" 305 10124 10145 "engine.ml" 305 10124 10149
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+ident(
+  int_ref cell "engine.ml" 291 9817 9825 "engine.ml" 291 9817 9829
+)
+"engine.ml" 305 10124 10145 "engine.ml" 305 10124 10155
+type(
+  state
+)
+"engine.ml" 305 10124 10130 "engine.ml" 305 10124 10155
+type(
+  unit
+)
+"engine.ml" 306 10157 10163 "engine.ml" 306 10157 10168
+type(
+  (state, semantic_value, T.token) EngineTypes.env -> void
+)
+ident(
+  int_ref error "engine.ml" 254 8710 8716 "engine.ml" 254 8710 8721
+)
+"engine.ml" 306 10157 10169 "engine.ml" 306 10157 10172
+type(
+  (state, semantic_value, T.token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 286 9707 9724 "engine.ml" 286 9707 9727
+)
+"engine.ml" 306 10157 10163 "engine.ml" 306 10157 10172
+call(
+  tail
+)
+type(
+  void
+)
+"engine.ml" 305 10124 10130 "engine.ml" 306 10157 10172
+type(
+  void
+)
+"engine.ml" 299 9955 9964 "engine.ml" 308 10174 10181
+type(
+  void
+)
+"engine.ml" 293 9873 9877 "engine.ml" 308 10174 10181
+type(
+  void
+)
+"engine.ml" 292 9845 9849 "engine.ml" 308 10174 10181
+type(
+  void
+)
+"engine.ml" 291 9817 9821 "engine.ml" 308 10174 10181
+type(
+  void
+)
+"engine.ml" 312 10268 10274 "engine.ml" 312 10268 10279
+type(
+  state -> (Lexing.lexbuf -> token) -> Lexing.lexbuf -> semantic_value
+)
+ident(
+  def entry "engine.ml" 364 11588 11590 "engine.ml" 366 11592 11595
+)
+"engine.ml" 313 10280 10287 "engine.ml" 313 10280 10288
+type(
+  state
+)
+ident(
+  def s "engine.ml" 314 10298 10304 "engine.ml" 364 11588 11590
+)
+"engine.ml" 314 10298 10305 "engine.ml" 314 10298 10310
+type(
+  Lexing.lexbuf -> token
+)
+ident(
+  def lexer "engine.ml" 315 10337 10343 "engine.ml" 364 11588 11590
+)
+"engine.ml" 315 10337 10344 "engine.ml" 315 10337 10350
+type(
+  Lexing.lexbuf
+)
+ident(
+  def lexbuf "engine.ml" 316 10368 10374 "engine.ml" 364 11588 11590
+)
+"engine.ml" 321 10535 10547 "engine.ml" 321 10535 10552
+type(
+  (state, T.semantic_value) EngineTypes.stack
+)
+"engine.ml" 322 10557 10571 "engine.ml" 322 10557 10572
+type(
+  state
+)
+ident(
+  int_ref s "engine.ml" 313 10280 10287 "engine.ml" 313 10280 10288
+)
+"engine.ml" 323 10611 10624 "engine.ml" 323 10611 10637
+type(
+  T.semantic_value
+)
+ident(
+  ext_ref T.error_value
+)
+"engine.ml" 324 10665 10680 "engine.ml" 324 10665 10686
+type(
+  Lexing.lexbuf
+)
+ident(
+  int_ref lexbuf "engine.ml" 315 10337 10344 "engine.ml" 315 10337 10350
+)
+"engine.ml" 324 10665 10680 "engine.ml" 324 10665 10705
+type(
+  Lexing.position
+)
+"engine.ml" 325 10719 10732 "engine.ml" 325 10719 10738
+type(
+  Lexing.lexbuf
+)
+ident(
+  int_ref lexbuf "engine.ml" 315 10337 10344 "engine.ml" 315 10337 10350
+)
+"engine.ml" 325 10719 10732 "engine.ml" 325 10719 10756
+type(
+  Lexing.position
+)
+"engine.ml" 326 10773 10786 "engine.ml" 326 10773 10791
+type(
+  (state, T.semantic_value) EngineTypes.stack
+)
+ident(
+  int_ref empty "engine.ml" 321 10535 10547 "engine.ml" 321 10535 10552
+)
+"engine.ml" 321 10535 10555 "engine.ml" 327 10793 10798
+type(
+  (state, T.semantic_value) EngineTypes.stack
+)
+"engine.ml" 331 10852 10860 "engine.ml" 331 10852 10865
+type(
+  token
+)
+"engine.ml" 332 10876 10882 "engine.ml" 332 10876 10887
+type(
+  Lexing.lexbuf -> token
+)
+ident(
+  int_ref lexer "engine.ml" 314 10298 10305 "engine.ml" 314 10298 10310
+)
+"engine.ml" 332 10876 10888 "engine.ml" 332 10876 10894
+type(
+  Lexing.lexbuf
+)
+ident(
+  int_ref lexbuf "engine.ml" 315 10337 10344 "engine.ml" 315 10337 10350
+)
+"engine.ml" 332 10876 10882 "engine.ml" 332 10876 10894
+call(
+  stack
+)
+type(
+  token
+)
+type(
+  token
+)
+"engine.ml" 337 10945 10949 "engine.ml" 337 10945 10968
+type(
+  Lexing.lexbuf -> terminal -> unit
+)
+ident(
+  ext_ref Log.lookahead_token
+)
+"engine.ml" 337 10945 10969 "engine.ml" 337 10945 10975
+type(
+  Lexing.lexbuf
+)
+ident(
+  int_ref lexbuf "engine.ml" 315 10337 10344 "engine.ml" 315 10337 10350
+)
+"engine.ml" 337 10945 10977 "engine.ml" 337 10945 10993
+type(
+  token -> terminal
+)
+ident(
+  ext_ref T.token2terminal
+)
+"engine.ml" 337 10945 10994 "engine.ml" 337 10945 10999
+type(
+  token
+)
+ident(
+  int_ref token "engine.ml" 331 10852 10860 "engine.ml" 331 10852 10865
+)
+"engine.ml" 337 10945 10976 "engine.ml" 337 10945 11000
+call(
+  stack
+)
+type(
+  terminal
+)
+"engine.ml" 337 10945 10949 "engine.ml" 337 10945 11000
+call(
+  stack
+)
+type(
+  unit
+)
+"engine.ml" 341 11044 11052 "engine.ml" 341 11044 11055
+type(
+  (state, semantic_value, token) EngineTypes.env
+)
+"engine.ml" 342 11060 11074 "engine.ml" 342 11060 11079
+type(
+  Lexing.lexbuf -> token
+)
+ident(
+  int_ref lexer "engine.ml" 314 10298 10305 "engine.ml" 314 10298 10310
+)
+"engine.ml" 343 11081 11096 "engine.ml" 343 11081 11102
+type(
+  Lexing.lexbuf
+)
+ident(
+  int_ref lexbuf "engine.ml" 315 10337 10344 "engine.ml" 315 10337 10350
+)
+"engine.ml" 344 11104 11118 "engine.ml" 344 11104 11123
+type(
+  token
+)
+ident(
+  int_ref token "engine.ml" 331 10852 10860 "engine.ml" 331 10852 10865
+)
+"engine.ml" 345 11125 11141 "engine.ml" 345 11125 11148
+type(
+  int
+)
+ident(
+  ext_ref Pervasives.max_int
+)
+"engine.ml" 346 11150 11172 "engine.ml" 346 11150 11179
+type(
+  int
+)
+ident(
+  ext_ref Pervasives.max_int
+)
+"engine.ml" 347 11181 11195 "engine.ml" 347 11181 11200
+type(
+  (state, semantic_value) EngineTypes.stack
+)
+ident(
+  int_ref empty "engine.ml" 321 10535 10547 "engine.ml" 321 10535 10552
+)
+"engine.ml" 348 11202 11218 "engine.ml" 348 11202 11219
+type(
+  state
+)
+ident(
+  int_ref s "engine.ml" 313 10280 10287 "engine.ml" 313 10280 10288
+)
+"engine.ml" 341 11044 11058 "engine.ml" 349 11221 11226
+type(
+  (state, semantic_value, token) EngineTypes.env
+)
+"engine.ml" 359 11483 11494 "engine.ml" 359 11483 11495
+type(
+  void
+)
+"engine.ml" 359 11483 11506 "engine.ml" 359 11483 11509
+type(
+  (state, semantic_value, token) EngineTypes.env -> bool -> void
+)
+ident(
+  int_ref run "engine.ml" 82 3508 3518 "engine.ml" 82 3508 3521
+)
+"engine.ml" 359 11483 11510 "engine.ml" 359 11483 11513
+type(
+  (state, semantic_value, token) EngineTypes.env
+)
+ident(
+  int_ref env "engine.ml" 341 11044 11052 "engine.ml" 341 11044 11055
+)
+"engine.ml" 359 11483 11514 "engine.ml" 359 11483 11519
+type(
+  bool
+)
+"engine.ml" 359 11483 11506 "engine.ml" 359 11483 11519
+call(
+  stack
+)
+type(
+  void
+)
+"engine.ml" 360 11523 11529 "engine.ml" 360 11523 11541
+type(
+  semantic_value
+)
+"engine.ml" 359 11483 11489 "engine.ml" 360 11523 11541
+type(
+  semantic_value
+)
+"engine.ml" 363 11570 11583 "engine.ml" 363 11570 11584
+type(
+  semantic_value
+)
+ident(
+  def v "engine.ml" 364 11588 11589 "engine.ml" 364 11588 11590
+)
+"engine.ml" 363 11570 11576 "engine.ml" 363 11570 11584
+type(
+  exn
+)
+"engine.ml" 364 11588 11589 "engine.ml" 364 11588 11590
+type(
+  semantic_value
+)
+ident(
+  int_ref v "engine.ml" 363 11570 11583 "engine.ml" 363 11570 11584
+)
+"engine.ml" 354 11327 11331 "engine.ml" 364 11588 11590
+type(
+  semantic_value
+)
+"engine.ml" 341 11044 11048 "engine.ml" 364 11588 11590
+type(
+  semantic_value
+)
+"engine.ml" 337 10945 10949 "engine.ml" 364 11588 11590
+type(
+  semantic_value
+)
+"engine.ml" 331 10852 10856 "engine.ml" 364 11588 11590
+type(
+  semantic_value
+)
+"engine.ml" 321 10535 10539 "engine.ml" 364 11588 11590
+type(
+  semantic_value
+)
+type(
+  semantic_value
+)

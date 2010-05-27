@@ -4,8 +4,9 @@ LEXER_SOURCES = exist_lexer.mll
 PARSER_SOURCES = exist_parser.mly
 ML_SOURCES = exists.ml csv.ml
 SOURCES = $(PARSER_SOURCES:.mly=.ml) $(LEXER_SOURCES:.mll=.ml) $(ML_SOURCES)
-MENHIR_PATH=../menhirlib
-INCLUDES = -I $(MENHIR_PATH) -I ../commons
+#MENHIR_PATH=../menhirlib
+#INCLUDES = -I $(MENHIR_PATH) -I ../commons
+INCLUDES = -I ../commons
 
 # Automatic computation
 -include ../Makefile.config

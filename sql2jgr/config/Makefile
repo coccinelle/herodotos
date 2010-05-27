@@ -6,13 +6,14 @@ SOURCES = setup.ml $(PARSER_SOURCES:.mly=.ml) $(LEXER_SOURCES:.mll=.ml) config.m
 # Automatic computation
 -include ../Makefile.config
 
-ifeq ("$(shell ocamlfind query menhirLib)","")
-MENHIR_PATH=../menhirLib
-else
-MENHIR_PATH=$(shell ocamlfind query menhirLib)
-endif
+#ifeq ("$(shell ocamlfind query menhirLib)","")
+#MENHIR_PATH=../menhirLib
+#else
+#MENHIR_PATH=$(shell ocamlfind query menhirLib)
+#endif
 
-INCLUDES = -I $(MENHIR_PATH) -I ../commons
+#INCLUDES = -I $(MENHIR_PATH) -I ../commons
+INCLUDES = -I ../commons
 
 OBJS = $(SOURCES:.ml=.cmo)
 OPTOBJS = $(OBJS:.cmo=.cmx)
