@@ -59,6 +59,27 @@ let get_femax fel bug =
       fmax
   with _ -> raise (FileNotFound fb)
 
+let get_data_of conn curve =
+  let (_, _, catts, pos) = curve in
+    try
+      let query = Config.get_query catts in
+	if query <> "" then
+	  begin
+	    prerr_endline ("Query: "^query);
+	    (*
+	      Query the database using the connection conn
+	      and the query 'query'
+	    *)
+	    try
+	      (query, Database.get_tuples conn query)
+	    with _ ->
+	      raise (Config.Misconfigurationat ("*** ERROR *** Check query \""^query^"\"", pos))
+	  end
+	else
+	  raise (Config.Misconfigurationat ("*** ERROR *** Empty query!", pos))
+    with _ ->
+      raise (Config.Misconfigurationat ("*** ERROR *** No query found!", pos))
+
 let compute_bug_info vb1 vb2 prefix fel vlist scmpath vminopt bug =
   let fmin = get_femin fel bug in
   let fmax = get_femax fel bug in
@@ -332,6 +353,7 @@ let get_scmpath scmfeature prj =
   else
     ""
 
+(*
 let build_evolution_for_org vb debug name grinfo scmfeature atts curve allbugs evolfunc project patt info =
   let (linetype, color, marktype, marksize, label) = info in
   let (_, _, catts, _) = curve in
@@ -356,6 +378,7 @@ let build_evolution_for_org vb debug name grinfo scmfeature atts curve allbugs e
     with _ ->
       prerr_endline ("*** ERROR *** Pb in " ^ name ^" curve " ^ prj ^ " and "^patt);
       None
+*)
 
 let build_evolution_for_single vb debug name grinfo scmfeature atts curve allbugs evolfunc project patt =
   let linetype = Graph.get_linetype debug name atts curve "linetype solid" in
@@ -378,11 +401,21 @@ let build_evolution_for_single vb debug name grinfo scmfeature atts curve allbug
 	  )
 
       | _  ->
-	  let bugset = "" in (* FIXME *)
+	  let bugset = "" in (* FIXME NICO *)
 	  let info = snd (List.find (by_bugset bugset) allbugs) in
 	  let (varray, fel, bl, _) = info in
 	  let values = transpose varray fel in
 	    Some (varray, linetype, color, marktype, marksize, label, bugset, crop varray atts curve values)
+
+let build_simple_evolution vb debug name grinfo scmfeature atts curve info =
+  let linetype = Graph.get_linetype debug name atts curve "linetype solid" in
+  let color   = Graph.get_color debug name atts curve in
+  let marktype = Graph.get_marktype debug name atts curve "" in
+  let marksize = Graph.get_marksize debug name atts curve "" in
+  let label = Graph.get_label curve "noname" in
+  let (query, (varray, data)) = info in
+  let values = wrap_single_some data in
+    Some (varray, linetype, color, marktype, marksize, label, query, crop varray atts curve values)
 
 let is_align varray1 varray2 =
   let dlist1 = Array.fold_left (fun acc (_, d,_,_) -> d::acc) [] varray1 in
@@ -507,24 +540,26 @@ let build_evolution_of_size vb debug name grinfo scmfeature atts curve evolfunc 
 	       Misc.report_error pos "project must be defined to draw 'size' and 'sizepct' graphs."
     )
 
-let build_evolution vb debug name grinfo scmfeature atts curve allbugs evolfunc : value option =
+let build_evolution vb debug conn name grinfo scmfeature atts curve : value option =
   Debug.profile_code "Helper.build_evolution"
     (fun () ->
-       let (project, pattern, catts, pos) = curve in
+       build_simple_evolution vb debug name grinfo scmfeature atts curve (get_data_of conn curve)
+(*
        let patt_list = Config.get_pattern atts pattern catts in
 	 match patt_list with
 	     [] ->  (* For size and sizepct graphs *)
 	       build_evolution_of_size vb debug name grinfo scmfeature atts curve evolfunc
 	   | [patt] ->
-	       build_evolution_for_single vb debug name grinfo scmfeature atts curve allbugs evolfunc project patt
+		 build_evolution_for_single vb debug name grinfo scmfeature atts curve data evolfunc project patt
 	   | _ ->
 	       raise Unimplemented
+*)
     )
 
-let build_evolutions vb debug name grinfo scmfeature atts curves allbugs evolfunc =
+let build_evolutions vb debug conn name grinfo scmfeature atts curves =
   List.fold_left
     (fun evols curve ->
-       match build_evolution vb debug name grinfo scmfeature atts curve allbugs evolfunc with
+       match build_evolution vb debug conn name grinfo scmfeature atts curve with
 	   None      -> evols
 	 | Some evol -> evol::evols
     ) [] curves
@@ -695,14 +730,14 @@ let draw_curve ch msg mindate ((vlist, linetype, color, marktype, marksize, labe
 	 Printf.fprintf ch ("\n\n")
     )
 
-let draw vb debug name grdft (atts, curves) allbugs =
+let draw vb debug conn name grdft (atts, curves) =
   Debug.profile_code "Helper.draw"
     (fun () ->
-       let (msg, xdft, ydft, fdft, xmax, ymax, scm, evolfunc) = grdft in
+       let (msg, xdft, ydft, fdft, xmax, ymax, scm, _) = grdft in
        let vers = Config.get_grversinfos atts curves in
 	 let gname = !Setup.prefix ^"/"^ name in
 	 let grinfo = get_info debug name atts xdft ydft fdft in
-	 let evols = build_evolutions vb debug name grinfo scm atts curves allbugs evolfunc in
+	 let evols = build_evolutions vb debug conn name grinfo scm atts curves in
 	 let (_,_,mindate,_) = Array.get vers 0 in
 	 let xmin = Config.get_xmin debug name atts in
 	 let xmax = xmax vers evols in

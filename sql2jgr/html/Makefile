@@ -1,10 +1,8 @@
-TARGET = graph
+TARGET = html
 
-SOURCES =\
-	graph.ml helper.ml group.ml stats.ml      \
-	defects.ml user.ml expertise.ml
+SOURCES = html.ml
 INTFS =
-INCLUDES = -I ../commons -I ../config -I ../scm -I ../database
+INCLUDES = -I ../commons -I ../hcl
 
 # Automatic computation
 -include ../Makefile.config
@@ -13,7 +11,6 @@ OBJS = $(SOURCES:.ml=.cmo)
 OPTOBJS = $(OBJS:.cmo=.cmx)
 LIB=$(TARGET).cma
 OPTLIB=$(LIB:.cma=.cmxa)
-
 # The Caml compilers.
 OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
 OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
@@ -43,6 +40,7 @@ $(OPTLIB): $(OPTOBJS)
 	$(OCAMLOPT) -a -o $(OPTLIB) $(OPTOBJS)
 
 clean::
+	rm -f $(TARGET)
 	rm -f *.cm[aiox] *.cmxa *.a *.o *.annot
 	rm -f *~ .*~
 

@@ -1,5 +1,5 @@
 OCAMLFIND=ocamlfind
-SUBDIRS=commons config database scm graph
+SUBDIRS=commons config database scm graph html
 EXTLIBS=postgresql
 
 SRC=engine.ml sql2jgr.ml

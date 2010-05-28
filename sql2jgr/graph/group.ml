@@ -125,7 +125,7 @@ let draw_curve ch msg prjnum idx (_, linetype, color, _, marksize, label, file, 
     Printf.fprintf ch ("\n");
     idx +1
 
-let draw vb debug name grdft (atts, groups) allbugs =
+let draw vb debug conn name grdft (atts, groups) allbugs =
   let (msg, xdft, ydft, fdft, xmax, ymax, scm, evolfunc) = grdft in
   let gname = !Setup.prefix ^"/"^ name in
   let outch = Misc.create_dir_and_open debug gname in

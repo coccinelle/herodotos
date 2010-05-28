@@ -10,7 +10,7 @@ NATIVELIBS=unix.cma threads.cma postgresql.cma
 #LIBS=$(shell $(OCAMLFIND) query -a-format $(LIBNAMES))
 LIBS=
 LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
-FLAGS=$(LIBDIR:%=-I %)
+FLAGS=$(LIBDIR:%=-I %) -I ../config
 CFLAGS=-thread $(FLAGS)
 #LFLAGS=-thread $(FLAGS) -custom -ccopt  $(NATIVELIBS) $(LIBS)
 LFLAGS=-thread $(FLAGS)  $(NATIVELIBS) $(LIBS)

@@ -61,6 +61,12 @@ let sort_by_date v1 v2 =
   let (_,d2,_,_) = v2 in
     compare d1 d2
 
+let compute_versinfos vs =
+  let m = get_vers_min vs in
+  let list = List.map (get_versinfo m) vs in
+  let ordered = List.sort sort_by_date list in
+    Array.of_list ordered
+
 let get_versinfos p =
   try
     let (optarray, atts) = Setup.PrjTbl.find Setup.projects p in
@@ -75,11 +81,7 @@ let get_versinfos p =
 				 | _ -> false
 			    ) atts
 		with
-		    Ast_config.Version (depth, vs) ->
-		      let m = get_vers_min vs in
-		      let list = List.map (get_versinfo m) vs in
-		      let ordered = List.sort sort_by_date list in
-			(depth, Array.of_list ordered)
+		    Ast_config.Version (depth, vs) -> (depth, compute_versinfos vs)
 		  | _ -> raise Unrecoverable
 	      with _ ->
 		raise (Warning ("project versions are not set for "^p))
@@ -103,7 +105,7 @@ let show_attr attr =
       | Ast_config.Factor (f) -> prerr_endline ("factor = "^string_of_float f)
       | Ast_config.File (sopt) ->
 	  (match sopt with
-	       None -> prerr_endline ("file = none") 
+	       None -> prerr_endline ("file = none")
 	     | Some s -> prerr_endline ("file = \""^s^"\"")
 	  )
       | Ast_config.Filename b -> prerr_endline ("filename = "^Misc.string_of_bool b)
@@ -150,6 +152,14 @@ let show_attr attr =
 	  )
 	    *)
       |_ -> ()
+
+let get_query atts =
+  List.fold_left
+    (fun q att ->
+       match att with
+	   Ast_config.SQLData s -> s
+	 | _ -> q
+    ) "" atts
 
 let get_dft_project atts =
   try

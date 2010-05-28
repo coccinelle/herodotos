@@ -1,7 +1,24 @@
-(* A simple replacement for psql *)
 
 open Printf
 open Postgresql
+
+exception Unexpected of string
+
+let sqldate_to_tm sqldate =
+  match Str.split (Str.regexp_string "-") sqldate with
+      [year;month;day] ->
+	let y = int_of_string year in
+	let m = int_of_string month in
+	let d = int_of_string day in
+	  snd (Unix.mktime
+		 {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
+		  (* Don't care about the time *)
+		  Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
+		  (* Will be normalized by mktime *)
+		  Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
+		 }
+	      )
+    | _ -> raise (Unexpected "Unsupported format date. YYYY-MM-DD expected from PostgreSQL.")
 
 let print_conn_info conn =
   printf "dbname  = %s\n" conn#db;
@@ -34,10 +51,61 @@ let print_res conn res =
   | Nonfatal_error -> printf "Non fatal error: %s\n" res#error
   | Fatal_error -> printf "Fatal error: %s\n" res#error
 
+let build_varray res =
+  let vs =
+    let rec init tuple =
+	if tuple = res#ntuples then
+	  []
+	else
+	  let name = res#getvalue tuple 0 in (* Should be version_name *)
+	  let date = sqldate_to_tm (res#getvalue tuple 1) in (* Should be release_date *)
+	    (name, date, 0)::init (tuple+1) (* Size is considered to be zero *)
+    in
+      init 0
+  in
+    Config.compute_versinfos vs
+
+(*
+  let labellist = res#get_fnames_lst in
+  print_endline (String.concat ";" labellist);
+
+  let find_idx_of labellst name =
+  let labels = Array.of_list labellst in
+  let rec lkup i =
+  if (Array.get labels i) = name then
+  i
+  else
+  lkup (i+1)
+  in
+  lkup 0
+*)
+
+let read_tuples conn res =
+  match res#status with
+    | Empty_query -> raise (Unexpected "Empty query")
+    | Command_ok -> raise (Unexpected ("Command ok ["^res#cmd_status^"]\n"))
+    | Tuples_ok ->
+	printf "%i tuples with %i fields\n" res#ntuples res#nfields;
+	let data = Array.init (res#ntuples)
+	  (fun tuple -> float_of_string (res#getvalue tuple 2))
+	in
+	let varray = build_varray res in
+	  (varray, data)
+    | Copy_out -> raise (Unexpected "Copy out")
+    | Copy_in -> raise (Unexpected "Copy in")
+    | Bad_response -> raise (Unexpected ("Bad response: "^ res#error))
+    | Nonfatal_error -> raise (Unexpected ("Non fatal error: "^ res#error))
+    | Fatal_error -> raise (Unexpected ("Fatal error: " ^ res#error))
+
 let rec dump_res conn =
   match conn#get_result with
   | Some res -> print_res conn res; flush stdout; dump_res conn
   | None -> ()
+
+let dump_tuples conn =
+  match conn#get_result with
+  | Some res -> read_tuples conn res
+  | None -> raise (Unexpected "No results !")
 
 let rec dump_notification conn =
   match conn#notifies with
@@ -71,11 +139,15 @@ let open_db vb conninfo : connection =
 let close_db (conn: connection) =
   conn#finish
 
-let query (conn:connection) (sql: string) =
+let test_query (conn:connection) (sql: string) =
   try
     conn#send_query sql;
     dump_res conn
   with End_of_file -> close_db conn
+
+let get_tuples (conn:connection) (sql: string) =
+  conn#send_query sql;
+  dump_tuples conn
 
 (*************************************************)
 let main () =
