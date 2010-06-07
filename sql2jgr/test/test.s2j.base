@@ -59,6 +59,33 @@ pattern Real;
 pattern Param;
 pattern Size;
 
+#define COUNT_CURVE(patt, patt2)                       \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, sum(data) as data       \
+       	 	FROM "Count evol"                      \
+       	 	WHERE standardized_name = patt2        \
+		GROUP BY version_name, release_date;   \
+ }
+
+graph gr/db-count.jgr {
+ xaxis = date
+ yaxis = user
+ project = Test
+
+ COUNT_CURVE(Block, 'Block')
+# COUNT_CURVE(Null , 'Null' )
+ COUNT_CURVE(Var  , 'Var'  )
+ COUNT_CURVE(Inull, 'Inull')
+ COUNT_CURVE(Range, 'Range')
+ COUNT_CURVE(Lock , 'Lock' )
+ COUNT_CURVE(Intr , 'Intr' )
+ COUNT_CURVE(Free , 'Free' )
+ COUNT_CURVE(Float, 'Float')
+ COUNT_CURVE(Real , 'Real' )
+ COUNT_CURVE(Param, 'Param')
+ COUNT_CURVE(Size , 'Size' )
+}
+
 #define ORIG_CURVE(patt, patt2)                        \
  curve pattern patt {				       \
    sql = SELECT version_name, release_date, data       \
