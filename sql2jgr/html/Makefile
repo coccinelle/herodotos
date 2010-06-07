@@ -2,7 +2,7 @@ TARGET = html
 
 SOURCES = html.ml
 INTFS =
-INCLUDES = -I ../commons -I ../hcl
+INCLUDES = -I ../commons -I ../config
 
 # Automatic computation
 -include ../Makefile.config

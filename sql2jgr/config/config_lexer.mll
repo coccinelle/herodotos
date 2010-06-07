@@ -96,7 +96,7 @@ rule token = parse
   | "true"                    { P.TBOOL(true)    }
   | "false"                   { P.TBOOL(false)   }
 (*  | ":="                      { P.TCOLEQ } *)
-  | ":"                       { P.TCOLON         } 
+  | ":"                       { P.TCOLON         }
   | '-'                       { P.TMINUS }
   | '+'                       { P.TPLUS  }
   | '*'                       { P.TSTAR  }
@@ -112,7 +112,9 @@ rule token = parse
 (*   | '['                       { P.TLAB } *)
 (*   | ']'                       { P.TRAB } *)
 
-  | '"'                       { P.TSTRING (string lexbuf) }
+  | '"'                       { P.TSTRING2Q (string2q lexbuf) }
+
+  | '\''                      { P.TSTRING1Q (string1q lexbuf) }
 
   | float                     { P.TFloat(float_of_string(tok lexbuf)) }
   | decimal                   { P.TInt(int_of_string(tok lexbuf)) }
@@ -120,13 +122,13 @@ rule token = parse
   | eof                       { P.EOF }
   | _ { lexerr "unrecognised symbol, in token rule: " (tok lexbuf) }
 
-and string  = parse
+and string2q = parse
   | '"'                                       { "" }
   | ['\n' '\r' '\011' '\012'] as x
-      {	set_newline lexbuf; Misc.string_of_char x ^ string lexbuf (*P.EOL*) }
-  | (_ as x)                   { Misc.string_of_char x ^ string lexbuf }
-  | ("\\" (oct | oct oct | oct oct oct)) as x { x ^ string lexbuf }
-  | ("\\x" (hex | hex hex)) as x              { x ^ string lexbuf }
+      {	set_newline lexbuf; Misc.string_of_char x ^ string2q lexbuf (*P.EOL*) }
+  | (_ as x)                   { Misc.string_of_char x ^ string2q lexbuf }
+  | ("\\" (oct | oct oct | oct oct oct)) as x { x ^ string2q lexbuf }
+  | ("\\x" (hex | hex hex)) as x              { x ^ string2q lexbuf }
   | ("\\" (_ as v)) as x
        {
          (match v with
@@ -137,7 +139,28 @@ and string  = parse
          | '\n' -> set_newline lexbuf
          | _ -> lexerr "unrecognised symbol:" (tok lexbuf)
 	 );
-          x ^ string lexbuf
+          x ^ string2q lexbuf
+       }
+  | _ { lexerr "unrecognised symbol: " (tok lexbuf) }
+
+and string1q = parse
+  | '\''                                       { "" }
+  | ['\n' '\r' '\011' '\012'] as x
+      {	set_newline lexbuf; Misc.string_of_char x ^ string1q lexbuf (*P.EOL*) }
+  | (_ as x)                   { Misc.string_of_char x ^ string1q lexbuf }
+  | ("\\" (oct | oct oct | oct oct oct)) as x { x ^ string1q lexbuf }
+  | ("\\x" (hex | hex hex)) as x              { x ^ string1q lexbuf }
+  | ("\\" (_ as v)) as x
+       {
+         (match v with
+         | 'n' -> ()  | 't' -> () | 'v'  -> ()  | 'b' -> () | 'r' -> ()
+	 | 'f' -> ()  | 'a' -> ()
+	 | '\\' -> () | '?' -> () | '\'' -> ()  | '"' -> ()
+         | 'e' -> ()
+         | '\n' -> set_newline lexbuf
+         | _ -> lexerr "unrecognised symbol:" (tok lexbuf)
+	 );
+          x ^ string1q lexbuf
        }
   | _ { lexerr "unrecognised symbol: " (tok lexbuf) }
 

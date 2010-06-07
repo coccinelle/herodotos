@@ -1,13 +1,63 @@
 
 exception Unsupported of string
 
-let build_stat_of vb1 vb2 name singleprj grinfo scmfeature allbugs evolfunc curve =
+let emptyarr:(string * int * Unix.tm * int) array = Array.of_list []
+
+let get_grdata_of name conn atts =
+  let query = Config.get_query atts in
+    if query <> "" then
+      begin
+	prerr_endline ("Query: "^query);
+	(*
+	  Query the database using the connection conn
+	  and the query 'query'
+	*)
+	try
+	  (query, Database.get_grtuples conn query)
+	with _ ->
+	  Printexc.print_backtrace stderr;
+	  raise (Config.Misconfiguration ("Check query \""^query^"\" of "^name))
+      end
+    else
+      raise (Config.Misconfiguration ("Empty query in graph "^name^"!"))
+
+let get_data_of conn atts pos =
+  let query = Config.get_query atts in
+    if query <> "" then
+      begin
+	prerr_endline ("Query: "^query);
+	(*
+	  Query the database using the connection conn
+	  and the query 'query'
+	*)
+	try
+	  (query, Database.get_tuples conn query)
+	with _ ->
+	  Printexc.print_backtrace stderr;
+	  raise (Config.Misconfigurationat ("Check query \""^query^"\"", pos))
+      end
+    else
+      raise (Config.Misconfigurationat ("Empty query!", pos))
+
+
+let build_graph vb1 vb2 name atts conn =
   let linetype = "linetype none" in
-  let (prjopt, pattopt, catts, _) = curve in
-  let patt = match pattopt with None -> "" | Some v -> v in
-  let vminopt = Config.get_vmin_of patt in
+  let color   = "" in
+(*     Graph.get_color false name [] curve *)
+  let marksize = Graph.get_marksize_in_atts_or_dft vb1 name atts " marksize 0.6 " in
+  let info = get_grdata_of name conn atts in
+  let (query, (xlegend, ylegend, data)) = info in
+    List.map (fun (label, value) ->
+		let values = Helper.wrap_single_some value in
+		  (emptyarr, linetype, color, "", marksize, label, query, values)
+	     ) data
+
+let build_stat_of vb1 vb2 name singleprj conn scmfeature atts curve =
+  let linetype = "linetype none" in
+  let (prjopt, pattopt, catts, pos) = curve in
+(*   let patt = match pattopt with None -> "" | Some v -> v in *)
   let color   = if singleprj then
-    let newcurve = (None, pattopt,[],Misc.dummy_pos) in
+    let newcurve = (None, pattopt,[], pos) in
       (*
 	Fool get_color function when there is only one project.
 	The color will thus default to the pattern color. :D
@@ -16,38 +66,48 @@ let build_stat_of vb1 vb2 name singleprj grinfo scmfeature allbugs evolfunc curv
   else
     Graph.get_color false name [] curve
   in
-    (* FIXME atts of graph should not be empty. *)
-  let marksize = Graph.get_marksize vb1 name [] curve " marksize 0.6 " in
-  let bugset = "" in (* FIXME *)
-  let info = snd (List.find (Helper.by_bugset bugset) allbugs) in
-  let (varray, fel, fbl, _) = info in
   let (label, scmpath) = match prjopt with
       None -> ("noname", "")
     | Some prj -> (prj, Helper.get_scmpath scmfeature prj)
   in
-    if scmpath <> "" then (
-      prerr_endline (label^"/"^patt^": Using git info. This may take some time.");
-      Git.load_authors scmpath
-    );
-    let bugs = Helper.compute_graph vb1 vb2 "" fel fbl varray scmpath vminopt in
-    let values = evolfunc varray bugs grinfo vminopt in
-      (varray, linetype, color, "", marksize, label, bugset, values)
+  let marksize = Graph.get_marksize vb1 name atts curve " marksize 0.6 " in
+  let info = get_data_of conn catts pos in
+  let (query, (_, data)) = info in
+  let values = Helper.wrap_single_some data in
+    (emptyarr, linetype, color, "", marksize, label, query, values)
 
-let build_stat vb debug name grinfo scmfeature projects groups allbugs evolfunc =
+let build_stat vb debug name conn scmfeature projects groups atts =
   let singleprj = if List.length projects = 1 then true else false in
-    List.flatten
-      (List.map
-	 (fun group ->
-	    match group with
-		Ast_config.GrpCurve (_, curves) ->
-		  List.map (build_stat_of vb debug name singleprj grinfo scmfeature allbugs evolfunc) curves
-	      | Ast_config.GrpPatt (patt, _) ->
-		  List.map (fun prj ->
-			      let curve = (Some prj, Some patt,[],Misc.dummy_pos) in
-				build_stat_of vb debug name singleprj grinfo scmfeature allbugs evolfunc curve
-			   ) projects
-	 ) groups
-      )
+    if groups <> [] then
+      begin
+	prerr_endline "Some groups/curves defined";
+	List.flatten
+	  (List.map
+	     (fun group ->
+		match group with
+		    Ast_config.GrpCurve (_, curves) ->
+		      List.rev (List.fold_left
+			(fun tail curve ->
+			   try
+			     (build_stat_of vb debug name singleprj conn scmfeature atts curve)::tail
+			   with _ -> tail
+			) [] curves)
+		  | Ast_config.GrpPatt (patt, _) ->
+		      List.rev (List.fold_left
+				  (fun tail prj ->
+				     let curve = (Some prj, Some patt,[],Misc.dummy_pos) in
+				       try
+					 (build_stat_of vb debug name singleprj conn scmfeature atts curve)::tail
+				       with _ -> tail
+				  ) [] projects)
+	     ) groups
+	  )
+      end
+    else
+      begin
+	prerr_endline "No group/curve defined";
+	build_graph vb debug name atts conn
+      end
 
 let compute_labels groups fstep =
   let array = Array.of_list groups in
@@ -125,16 +185,16 @@ let draw_curve ch msg prjnum idx (_, linetype, color, _, marksize, label, file, 
     Printf.fprintf ch ("\n");
     idx +1
 
-let draw vb debug conn name grdft (atts, groups) allbugs =
-  let (msg, xdft, ydft, fdft, xmax, ymax, scm, evolfunc) = grdft in
+let draw vb debug conn name grdft (atts, groups) =
+  let (msg, xdft, ydft, fdft, xmax, ymax, scm, _) = grdft in
   let gname = !Setup.prefix ^"/"^ name in
   let outch = Misc.create_dir_and_open debug gname in
   let grinfo = Helper.get_info debug name atts xdft ydft fdft in
   let projects = Config.get_projects atts in
-  let prjnum = List.length projects in
-  let evols = build_stat vb debug name grinfo scm projects groups allbugs evolfunc in
+  let prjnum = max (List.length projects) 1 in
+  let evols = build_stat vb debug name conn scm projects groups atts in
     prerr_endline ("Drawing "^gname);
-    draw_header outch (xmax (Array.of_list []) evols) (ymax evols) grinfo prjnum groups;
+    draw_header outch (float_of_int (List.length evols)) (ymax evols) grinfo prjnum groups;
     ignore(List.fold_left (draw_curve outch msg prjnum) 0 evols);
     close_out outch;
     gname

@@ -1,5 +1,5 @@
 prefix="."
-dbconn="dbname='linuxbugs' user='npalix' password='nico' host='localhost'"
+dbconn="dbname='linuxbugs' user='npalix' password='nico' host='localhost' port='5432'"
 projects="/home/npalix/Documents/build/herodotos-cvs/demo"
 website="./website"
 cpucore = 1
@@ -46,97 +46,52 @@ project Test {
  }
 }
 
-pattern Release;
+pattern Block;
+pattern Null;
+pattern Var;
+pattern Inull;
+pattern Range;
+pattern Lock;
+pattern Intr;
+pattern Free;
+pattern Float;
+pattern Real;
+pattern Param;
+pattern Size;
 
-/*
-graph gr/size.jgr {
- xaxis = date
- yaxis = size
- legend = "off"
- xlegend = ""
-
- curve project Test
-}
-
-pattern Error;
-pattern Notes;
-pattern Notes2;
-
-graph gr/abs.jgr {
- xaxis = date
- yaxis = count
- legend = "off"
- xlegend = ""
-
- project = Test
-
- curve pattern Error
-}
-
-graph gr/occ1.jgr {
- xaxis = date
- yaxis = occurrences
- xlegend = ""
- filename = false
- info = false
-
- curve project Test pattern Error
-}
-
-graph gr/occ2.jgr {
- xaxis = date
- yaxis = occurrences
- xlegend = ""
- filename = true
- info = false
-
- curve project Test pattern Error
-}
-
-graph gr/occ3.jgr {
- xaxis = date
- yaxis = occurrences
- xlegend = ""
- filename = false
- info = true
-
- curve project Test pattern Error
-}
-
-graph gr/occ4.jgr {
- xaxis = date
- yaxis = occurrences
- xlegend = ""
- filename = true
- info = true
-
- curve project Test pattern Error
-}
-
-graph gr/ratio.jgr {
- xaxis = version
- yaxis = user
- project = Test
-
- curve "Ratio" {
-  data = 10 * (pattern Error / pattern Notes)
+#define ORIG_CURVE(patt, patt2)                        \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, data       \
+       	 	FROM "Origin of bugs in last release"  \
+       	 	WHERE standardized_name = patt2;       \
  }
- curve "Cst" {
-  data = (pattern Notes2 / pattern Notes)
- }
- curve pattern Error
- curve pattern Notes
- curve pattern Notes2
-}
-*/
 
-
-graph gr/db.jgr {
+graph gr/db-orig.jgr {
  xaxis = date
  yaxis = user
  project = Test
 
- curve pattern Release {
-   sql = SELECT version_name, release_date, minor AS data FROM versions WHERE main=2 and major=6;
- }
+ ORIG_CURVE(Block, 'Block')
+# ORIG_CURVE(Null , 'Null' )
+ ORIG_CURVE(Var  , 'Var'  )
+ ORIG_CURVE(Inull, 'Inull')
+ ORIG_CURVE(Range, 'Range')
+ ORIG_CURVE(Lock , 'Lock' )
+ ORIG_CURVE(Intr , 'Intr' )
+ ORIG_CURVE(Free , 'Free' )
+ ORIG_CURVE(Float, 'Float')
+ ORIG_CURVE(Real , 'Real' )
+ ORIG_CURVE(Param, 'Param')
+ ORIG_CURVE(Size , 'Size' )
+}
+
+graph gr/db-group-count.jgr {
+ xaxis = groups
+ legend = "off"
+ sql = SELECT standardized_name AS group, count AS data FROM "Bugs per OSDI category (2.6.33)";
+}
+
+graph gr/db-group-avg.jgr {
+ xaxis = groups
+ sql = SELECT * FROM "Avg age";
 }

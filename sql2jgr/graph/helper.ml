@@ -73,12 +73,13 @@ let get_data_of conn curve =
 	    try
 	      (query, Database.get_tuples conn query)
 	    with _ ->
-	      raise (Config.Misconfigurationat ("*** ERROR *** Check query \""^query^"\"", pos))
+(* 	      Printexc.print_backtrace stderr; *)
+	      raise (Config.Misconfigurationat ("Check query \""^query^"\"", pos))
 	  end
 	else
-	  raise (Config.Misconfigurationat ("*** ERROR *** Empty query!", pos))
-    with _ ->
-      raise (Config.Misconfigurationat ("*** ERROR *** No query found!", pos))
+	  raise (Config.Misconfigurationat ("Empty query!", pos))
+    with Not_found ->
+      raise (Config.Misconfigurationat ("No query found!", pos))
 
 let compute_bug_info vb1 vb2 prefix fel vlist scmpath vminopt bug =
   let fmin = get_femin fel bug in
@@ -407,7 +408,7 @@ let build_evolution_for_single vb debug name grinfo scmfeature atts curve allbug
 	  let values = transpose varray fel in
 	    Some (varray, linetype, color, marktype, marksize, label, bugset, crop varray atts curve values)
 
-let build_simple_evolution vb debug name grinfo scmfeature atts curve info =
+let build_simple_evolution vb debug name scmfeature atts curve info =
   let linetype = Graph.get_linetype debug name atts curve "linetype solid" in
   let color   = Graph.get_color debug name atts curve in
   let marktype = Graph.get_marktype debug name atts curve "" in
@@ -543,7 +544,11 @@ let build_evolution_of_size vb debug name grinfo scmfeature atts curve evolfunc 
 let build_evolution vb debug conn name grinfo scmfeature atts curve : value option =
   Debug.profile_code "Helper.build_evolution"
     (fun () ->
-       build_simple_evolution vb debug name grinfo scmfeature atts curve (get_data_of conn curve)
+       try
+	 build_simple_evolution vb debug name scmfeature atts curve (get_data_of conn curve)
+       with _ ->
+(* 	 Printexc.print_backtrace stderr; *)
+	 None
 (*
        let patt_list = Config.get_pattern atts pattern catts in
 	 match patt_list with
@@ -735,20 +740,20 @@ let draw vb debug conn name grdft (atts, curves) =
     (fun () ->
        let (msg, xdft, ydft, fdft, xmax, ymax, scm, _) = grdft in
        let vers = Config.get_grversinfos atts curves in
-	 let gname = !Setup.prefix ^"/"^ name in
-	 let grinfo = get_info debug name atts xdft ydft fdft in
-	 let evols = build_evolutions vb debug conn name grinfo scm atts curves in
-	 let (_,_,mindate,_) = Array.get vers 0 in
-	 let xmin = Config.get_xmin debug name atts in
-	 let xmax = xmax vers evols in
-	 let ymax = ymax evols in
-	 let vmins = mark_vmin debug name atts curves in
-	 let outch = Misc.create_dir_and_open debug gname in
-	   prerr_endline ("Drawing "^gname);
-	   draw_header outch xmin xmax ymax grinfo vers;
-	   List.iter (draw_vmin outch ymax) vmins;
-	   mark_zero_once := false;
-	   List.iter (draw_curve outch msg (Config.get_abs_days_of mindate)) (List.rev evols);
-	   close_out outch;
-	   gname
+       let gname = !Setup.prefix ^"/"^ name in
+       let grinfo = get_info debug name atts xdft ydft fdft in
+       let evols = build_evolutions vb debug conn name grinfo scm atts curves in
+       let (_,_,mindate,_) = Array.get vers 0 in
+       let xmin = Config.get_xmin debug name atts in
+       let xmax = xmax vers evols in
+       let ymax = ymax evols in
+       let vmins = mark_vmin debug name atts curves in
+       let outch = Misc.create_dir_and_open debug gname in
+	 prerr_endline ("Drawing "^gname);
+	 draw_header outch xmin xmax ymax grinfo vers;
+	 List.iter (draw_vmin outch ymax) vmins;
+	 mark_zero_once := false;
+	 List.iter (draw_curve outch msg (Config.get_abs_days_of mindate)) (List.rev evols);
+	 close_out outch;
+	 gname
     )

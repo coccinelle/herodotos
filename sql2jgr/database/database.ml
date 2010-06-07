@@ -97,6 +97,33 @@ let read_tuples conn res =
     | Nonfatal_error -> raise (Unexpected ("Non fatal error: "^ res#error))
     | Fatal_error -> raise (Unexpected ("Fatal error: " ^ res#error))
 
+let read_grtuples conn res =
+  match res#status with
+    | Empty_query -> raise (Unexpected "Empty query")
+    | Command_ok -> raise (Unexpected ("Command ok ["^res#cmd_status^"]\n"))
+    | Tuples_ok ->
+	begin
+	  printf "%i tuples with %i fields\n" res#ntuples res#nfields;
+	  match res#get_fnames_lst with
+	      xlegend:: ylegend::_ ->
+		let data = Array.init (res#ntuples)
+		  (fun tuple ->
+		     let label = res#getvalue tuple 0 in
+		     let value =
+		       Array.init 1 (fun _ -> float_of_string (res#getvalue tuple 1))
+		     in
+		       (label, value)
+		  )
+		in
+		  (xlegend, ylegend, Array.to_list data)
+	    | _ ->  raise (Unexpected "SQL query must return at least two columns")
+	end
+    | Copy_out -> raise (Unexpected "Copy out")
+    | Copy_in -> raise (Unexpected "Copy in")
+    | Bad_response -> raise (Unexpected ("Bad response: "^ res#error))
+    | Nonfatal_error -> raise (Unexpected ("Non fatal error: "^ res#error))
+    | Fatal_error -> raise (Unexpected ("Fatal error: " ^ res#error))
+
 let rec dump_res conn =
   match conn#get_result with
   | Some res -> print_res conn res; flush stdout; dump_res conn
@@ -105,6 +132,11 @@ let rec dump_res conn =
 let dump_tuples conn =
   match conn#get_result with
   | Some res -> read_tuples conn res
+  | None -> raise (Unexpected "No results !")
+
+let dump_grtuples conn =
+  match conn#get_result with
+  | Some res -> read_grtuples conn res
   | None -> raise (Unexpected "No results !")
 
 let rec dump_notification conn =
@@ -146,8 +178,14 @@ let test_query (conn:connection) (sql: string) =
   with End_of_file -> close_db conn
 
 let get_tuples (conn:connection) (sql: string) =
-  conn#send_query sql;
-  dump_tuples conn
+  read_tuples conn (conn#exec sql)
+(*   conn#send_query sql; *)
+(*   dump_tuples conn *)
+
+let get_grtuples (conn:connection) (sql: string) =
+  read_grtuples conn (conn#exec sql)
+(*   conn#send_query sql; *)
+(*   dump_grtuples conn *)
 
 (*************************************************)
 let main () =

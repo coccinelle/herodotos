@@ -391,7 +391,8 @@ let get_grversinfos gatts curves =
        in
        let mindate = List.fold_left (get_min_of_arrays) 0.0 vinfosarr in
        let vinfos = List.map Array.to_list vinfosarr in
-       let updinfos = List.map (update_days mindate) (List.flatten vinfos) in
+       let uniquelist = Misc.unique_list (List.flatten vinfos) in
+       let updinfos = List.map (update_days mindate)  uniquelist in
        let sortedlist = List.sort sort_by_date updinfos in
        let sorted = Array.of_list sortedlist in
 	 sorted

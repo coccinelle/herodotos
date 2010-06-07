@@ -27,7 +27,8 @@ let options = [
   "--longhelp", Arg.Set longhelp, " Display this list of options and the supported graph types";
   "--eps", Arg.Clear pdf, " disable the (default) generation of PDF with 'epstopdf'";
   "--png", Arg.Set png, " enable the generation of png images (in default mode)";
-
+  "--profile", Arg.Unit (fun () -> prerr_endline "*** PROFILING ENABLED ***";
+			   Debug.profile := Debug.PALL), " gather timing information about the main functions";
   "--version", Arg.Set version, " Print Herodotos version";
   "-v", Arg.Set verbose1, " verbose mode";
   "-vv", Arg.Set verbose2, " more verbose mode";

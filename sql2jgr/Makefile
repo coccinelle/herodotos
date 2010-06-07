@@ -17,10 +17,10 @@ DEP = $(SUBDIRS)
 
 INCLUDES=$(SUBDIRS:%=-I %) $(LIBDIR:%=-I %)
 FLAGS=$(INCLUDES)
-CFLAGS=-thread $(FLAGS)
+CFLAGS=-g -thread $(FLAGS)
 LFLAGS=-g -thread $(FLAGS) -custom -ccopt $(LIBDIR:%=-L%)
 
-OPT=1
+OPT=0
 ifeq ($(OPT),1)
 OCAMLC=ocamlfind ocamlc -predicates native
 else
@@ -30,7 +30,7 @@ endif
 all: $(TARGET)
 
 .SUFFIXES: .ml .cmo
-.PHONY: all depend clean distclean $(DEP)
+.PHONY: all depend clean distclean $(DEP) test
 
 $(LIBS): $(LIBS:%.cma=%)
 $(DEP):
@@ -41,6 +41,9 @@ $(DEP):
 
 $(TARGET): $(DEP) $(OBJS)
 	$(OCAMLC) -o $(TARGET) $(LFLAGS) $(ALLLIBS) $(OBJS)
+
+test:
+	$(MAKE) -C test
 
 distclean clean:
 	rm -rf $(TARGET)

@@ -47,7 +47,7 @@ let gen_graph v1 v2 conn pdf png web name graph =
 	  Ast_config.Curves curves ->
 	    Helper.draw v1 v2 conn name User.dfts (atts, curves)
 	| Ast_config.Groups groups ->
-	    Group.draw v1 v2 conn name User.dfts (atts, groups) []
+	    Group.draw v1 v2 conn name User.dfts (atts, groups)
     in
       if pdf then
 	let pdfname = Str.replace_first (Str.regexp_string ".jgr")".pdf" jgrname in

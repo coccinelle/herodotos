@@ -315,17 +315,20 @@ let get_marksize_in_atts atts =
       | _ -> raise Unrecoverable
   with _ -> raise Not_Found
 
+let get_marksize_in_atts_or_dft db g atts dft =
+  try
+    get_marksize_in_atts atts
+  with _ ->
+    if db then prerr_endline ("Marksize of "^g^" is not defined.");
+    dft
+
 (* FIXME: See get_marktype - Should use project and pattern definitions *)
 let get_marksize db g atts curve dft =
   try
     let (_,_,catts,_) = curve in
       get_marksize_in_atts catts
   with _ ->
-    try
-      get_marksize_in_atts atts
-    with _ ->
-      if db then prerr_endline ("Marksize of "^g^" is not defined.");
-      dft
+    get_marksize_in_atts_or_dft db g atts dft
 
 let get_user_label atts =
   try

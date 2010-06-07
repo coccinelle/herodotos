@@ -27,7 +27,8 @@
 %token<int> TInt
 %token<float> TFloat
 %token<string> TId
-%token<string> TSTRING
+%token<string> TSTRING2Q
+%token<string> TSTRING1Q
 %token<bool> TBOOL
 
 %left TPLUS TMINUS
@@ -51,11 +52,11 @@ project:
   TPROJECT name=TId TLCB atts=list(attr) TRCB { Setup.addPrj name (None, atts) }
 
 gbattr:
-  TPREFIX      TEQUAL p=TSTRING        { Setup.setPrefix(p)}
-| TPROJECTS    TEQUAL p=TSTRING        { Setup.setPrjDir(p)}
-| TWEBSITE     TEQUAL p=TSTRING        { Setup.setWebsiteDir(p)}
-| TFLAGS       TEQUAL f=TSTRING        { Setup.setFlags(f)}
-| TDBCONN      TEQUAL s=TSTRING        { Setup.setDBConn(s)}
+  TPREFIX      TEQUAL p=TSTRING2Q        { Setup.setPrefix(p)}
+| TPROJECTS    TEQUAL p=TSTRING2Q        { Setup.setPrjDir(p)}
+| TWEBSITE     TEQUAL p=TSTRING2Q        { Setup.setWebsiteDir(p)}
+| TFLAGS       TEQUAL f=TSTRING2Q        { Setup.setFlags(f)}
+| TDBCONN      TEQUAL s=TSTRING2Q        { Setup.setDBConn(s)}
 | TCPUCORE     TEQUAL c=TInt           { Setup.setCPUcore(c)}
 
 attr:
@@ -69,15 +70,15 @@ attr:
 | TDIR           TEQUAL d=path                     { Ast_config.Dir(d)}
 | TSUBDIR        TEQUAL d=path                     { Ast_config.SubDir(d)}
 | TFACTOR        TEQUAL f=float                    { Ast_config.Factor(f)}
-| TFILE          TEQUAL f=TSTRING
+| TFILE          TEQUAL f=TSTRING2Q
     { if f = "" then Ast_config.File(None) else Ast_config.File(Some f) }
 | TFILE          TEQUAL TNONE                      { Ast_config.File(None)}
 | TFILENAME      TEQUAL b=TBOOL                    { Ast_config.Filename(b)}
 | TFORMAT        TEQUAL dft=TId                    { Ast_config.Format(dft) }
 | TINFO          TEQUAL b=TBOOL                    { Ast_config.Info(b)}
-| TLEGEND        TEQUAL l=TSTRING                  { Ast_config.Legend(l)}
-| TXLEGEND       TEQUAL l=TSTRING                  { Ast_config.XLegend(to_jgraph_fmt l)}
-| TYLEGEND       TEQUAL l=TSTRING                  { Ast_config.YLegend(to_jgraph_fmt l)}
+| TLEGEND        TEQUAL l=TSTRING2Q                  { Ast_config.Legend(l)}
+| TXLEGEND       TEQUAL l=TSTRING2Q                  { Ast_config.XLegend(to_jgraph_fmt l)}
+| TYLEGEND       TEQUAL l=TSTRING2Q                  { Ast_config.YLegend(to_jgraph_fmt l)}
 | TYLEGENDFACTOR TEQUAL f=TId                      { Ast_config.YLegendFactor(f)}
 | TLINESTYLE     TEQUAL s=TId                      { Ast_config.LineType(s)}
 | TMARKTYPE      TEQUAL m=TId                      { Ast_config.MarkType(m)}
@@ -95,16 +96,16 @@ attr:
     let count = List.fold_left max 0 cl in
       Ast_config.Version(count, vl)
   }
-| TVMIN          TEQUAL v=TSTRING                  { Ast_config.VMin(v)}
-| TSCM           TEQUAL v=TSTRING                  { Ast_config.SCM(v)}
-| TFLAGS         TEQUAL f=TSTRING                  { Ast_config.Flags(f)}
+| TVMIN          TEQUAL v=TSTRING2Q                  { Ast_config.VMin(v)}
+| TSCM           TEQUAL v=TSTRING2Q                  { Ast_config.SCM(v)}
+| TFLAGS         TEQUAL f=TSTRING2Q                  { Ast_config.Flags(f)}
 | TSIZE          TEQUAL x=float y=float            { Ast_config.Size(x,y)}
 
 attrs:
   TLCB atts=list(attr) TRCB {atts}
 
 version:
-  TLPAR name=TSTRING TCOMMA d=date TCOMMA size=TInt TRPAR {
+  TLPAR name=TSTRING2Q TCOMMA d=date TCOMMA size=TInt TRPAR {
     let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in
       (count, (name, d, size))
   }
@@ -124,8 +125,8 @@ pattern:
 | TPATTERN name=TId TSC        { Setup.addDft name []   }
 
 graph:
-  TGRAPH name=path TLCB atts=list(attr) cs=list(curve) TRCB  { Setup.addGph name (atts,Ast_config.Curves(cs)) }
-| TGRAPH name=path TLCB atts=list(attr) gs=nonempty_list(group) TRCB  { Setup.addGph name (atts,Ast_config.Groups(gs)) }
+  TGRAPH name=path TLCB atts=list(attr) cs=nonempty_list(curve) TRCB  { Setup.addGph name (atts,Ast_config.Curves(cs)) }
+| TGRAPH name=path TLCB atts=list(attr) gs=list(group) TRCB  { Setup.addGph name (atts,Ast_config.Groups(gs)) }
 
 curve:
   TCURVE TPROJECT p=TId            { (Some p,None  ,   [], Misc.getpos $startpos($1) $endofs) }
@@ -136,13 +137,13 @@ curve:
     { (Some p, Some d, atts, Misc.getpos $startpos($1) $endofs) }
 | TCURVE TPROJECT p=TId TPATTERN d=TId
     { (Some p, Some d, [], Misc.getpos $startpos($1) $endofs) }
-| TCURVE name=TSTRING atts=attrs
+| TCURVE name=TSTRING2Q atts=attrs
     {(None, None, Ast_config.Legend(name)::atts,Misc.getpos $startpos($1) $endofs)}
 | TEMPTY TCURVE
     { (None, None, [], Misc.getpos $startpos($1) $endofs) }
 
 group:
-  TGROUP name=TSTRING TLCB cs=list(curve) TRCB { Ast_config.GrpCurve(name,cs)}
+  TGROUP name=TSTRING2Q TLCB cs=list(curve) TRCB { Ast_config.GrpCurve(name,cs)}
 | TGROUP TPATTERN d=TId                        { Ast_config.GrpPatt(d, Misc.getpos $startpos($1) $endofs)}
 
 path:
@@ -207,8 +208,10 @@ sql:
  sql=list(sql_tok) TSC               { (String.concat " " sql) ^ ";"}
 
 sql_tok:
-    e=gid                         { e   }
+    e=gid                         { e               }
   | c=TInt                        { string_of_int c }
+  | s=TSTRING2Q                   { "\""^s^"\""     }
+  | s=TSTRING1Q                   { "'"^s^"'"       }
   | TMINUS                        { "-" }
   | TPLUS                         { "+" }
   | TSTAR                         { "*" }
