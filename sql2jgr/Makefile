@@ -57,3 +57,5 @@ depend:
 	#ocamldep $(SRC) > .depend
 
 -include .depend
+
+-include Makefile.dev

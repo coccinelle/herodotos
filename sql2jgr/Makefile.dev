@@ -1,0 +1,5 @@
+
+push:
+	git push
+	git push forge
+
