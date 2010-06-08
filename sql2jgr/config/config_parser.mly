@@ -144,7 +144,7 @@ curve:
 
 group:
   TGROUP name=TSTRING2Q TLCB cs=list(curve) TRCB { Ast_config.GrpCurve(name,cs)}
-| TGROUP TPATTERN d=TId                        { Ast_config.GrpPatt(d, Misc.getpos $startpos($1) $endofs)}
+| TGROUP TPATTERN d=TId                          { Ast_config.GrpPatt(d, Misc.getpos $startpos($1) $endofs)}
 
 path:
   p=separated_nonempty_list(TSLASH, gid)        { String.concat "/" p }

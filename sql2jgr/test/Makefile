@@ -1,6 +1,7 @@
 CONF=test.s2j
 #FLAGS?=-vvv --debug --profile
-FLAGS?=-v
+#FLAGS?=-v
+FLAGS=
 
 all: $(CONF)
 	../sql2jgr -c $^ $(FLAGS)

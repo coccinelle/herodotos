@@ -46,6 +46,8 @@ project Test {
  }
 }
 
+#include "subdir.s2j"
+
 pattern Block;
 pattern Null;
 pattern Var;
@@ -73,7 +75,7 @@ graph gr/db-count.jgr {
  project = Test
 
  COUNT_CURVE(Block, 'Block')
-# COUNT_CURVE(Null , 'Null' )
+// COUNT_CURVE(Null , 'Null' )
  COUNT_CURVE(Var  , 'Var'  )
  COUNT_CURVE(Inull, 'Inull')
  COUNT_CURVE(Range, 'Range')
@@ -99,7 +101,7 @@ graph gr/db-orig.jgr {
  project = Test
 
  ORIG_CURVE(Block, 'Block')
-# ORIG_CURVE(Null , 'Null' )
+// ORIG_CURVE(Null , 'Null' )
  ORIG_CURVE(Var  , 'Var'  )
  ORIG_CURVE(Inull, 'Inull')
  ORIG_CURVE(Range, 'Range')
@@ -115,10 +117,57 @@ graph gr/db-orig.jgr {
 graph gr/db-group-count.jgr {
  xaxis = groups
  legend = "off"
- sql = SELECT standardized_name AS group, count AS data FROM "Bugs per OSDI category (2.6.33)";
+ sql = SELECT standardized_name, data FROM "Bugs per OSDI category" \
+       WHERE version_name='linux-2.6.33';
+}
+
+#define DIR_CURVE(patt, patt2, dir) \
+  curve pattern patt {              \
+   sql = SELECT standardized_name, "Number of errors" FROM "Per dir and cat for 2.6.33" \
+         WHERE standardized_name = patt2 AND "Directory name" = dir; \
+  }
+
+#define DIR_GRP(dir, dir2)        \
+ group dir {          		  \
+  DIR_CURVE(Block, 'Block', dir2) \
+  DIR_CURVE(Null , 'Null' , dir2) \
+  DIR_CURVE(Var  , 'Var'  , dir2) \
+  DIR_CURVE(Inull, 'Inull', dir2) \
+  DIR_CURVE(Range, 'Range', dir2) \
+  DIR_CURVE(Lock , 'Lock' , dir2) \
+  DIR_CURVE(Intr , 'Intr' , dir2) \
+  DIR_CURVE(Free , 'Free' , dir2) \
+  DIR_CURVE(Float, 'Float', dir2) \
+  DIR_CURVE(Real , 'Real' , dir2) \
+  DIR_CURVE(Param, 'Param', dir2) \
+  DIR_CURVE(Size , 'Size' , dir2) \
+ }
+
+graph gr/db-group-count-per-dir.jgr {
+ xaxis = groups
+// legend = "off"
+
+/*
+ project = Other
+ project = Staging
+ project = Drivers
+ project = Net
+ project = Arch
+ project = FS
+*/
+
+ DIR_GRP("Arch"   , 'arch')
+ DIR_GRP("Drivers", 'drivers')
+ DIR_GRP("Staging", 'staging')
+ DIR_GRP("FS"     , 'fs')
+ DIR_GRP("Net"    , 'net')
+ DIR_GRP("Other"  , 'other')
 }
 
 graph gr/db-group-avg.jgr {
  xaxis = groups
+ legend = "off"
+ factor = 365.25
+ ylegend = "Years"
  sql = SELECT * FROM "Avg age";
 }

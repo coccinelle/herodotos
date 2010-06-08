@@ -80,12 +80,12 @@ let build_varray res =
   lkup 0
 *)
 
-let read_tuples conn res =
+let read_tuples vb conn res =
   match res#status with
     | Empty_query -> raise (Unexpected "Empty query")
     | Command_ok -> raise (Unexpected ("Command ok ["^res#cmd_status^"]\n"))
     | Tuples_ok ->
-	printf "%i tuples with %i fields\n" res#ntuples res#nfields;
+	if vb then printf "%i tuples with %i fields\n" res#ntuples res#nfields;
 	let data = Array.init (res#ntuples)
 	  (fun tuple -> float_of_string (res#getvalue tuple 2))
 	in
@@ -97,13 +97,13 @@ let read_tuples conn res =
     | Nonfatal_error -> raise (Unexpected ("Non fatal error: "^ res#error))
     | Fatal_error -> raise (Unexpected ("Fatal error: " ^ res#error))
 
-let read_grtuples conn res =
+let read_grtuples vb conn res =
   match res#status with
     | Empty_query -> raise (Unexpected "Empty query")
     | Command_ok -> raise (Unexpected ("Command ok ["^res#cmd_status^"]\n"))
     | Tuples_ok ->
 	begin
-	  printf "%i tuples with %i fields\n" res#ntuples res#nfields;
+	  if vb then printf "%i tuples with %i fields\n" res#ntuples res#nfields;
 	  match res#get_fnames_lst with
 	      xlegend:: ylegend::_ ->
 		let data = Array.init (res#ntuples)
@@ -129,14 +129,14 @@ let rec dump_res conn =
   | Some res -> print_res conn res; flush stdout; dump_res conn
   | None -> ()
 
-let dump_tuples conn =
+let dump_tuples vb conn =
   match conn#get_result with
-  | Some res -> read_tuples conn res
+  | Some res -> read_tuples vb conn res
   | None -> raise (Unexpected "No results !")
 
-let dump_grtuples conn =
+let dump_grtuples vb conn =
   match conn#get_result with
-  | Some res -> read_grtuples conn res
+  | Some res -> read_grtuples vb conn res
   | None -> raise (Unexpected "No results !")
 
 let rec dump_notification conn =
@@ -177,13 +177,13 @@ let test_query (conn:connection) (sql: string) =
     dump_res conn
   with End_of_file -> close_db conn
 
-let get_tuples (conn:connection) (sql: string) =
-  read_tuples conn (conn#exec sql)
+let get_tuples vb (conn:connection) (sql: string) =
+  read_tuples vb conn (conn#exec sql)
 (*   conn#send_query sql; *)
 (*   dump_tuples conn *)
 
-let get_grtuples (conn:connection) (sql: string) =
-  read_grtuples conn (conn#exec sql)
+let get_grtuples vb (conn:connection) (sql: string) =
+  read_grtuples vb conn (conn#exec sql)
 (*   conn#send_query sql; *)
 (*   dump_grtuples conn *)
 

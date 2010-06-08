@@ -59,19 +59,19 @@ let get_femax fel bug =
       fmax
   with _ -> raise (FileNotFound fb)
 
-let get_data_of conn curve =
+let get_data_of vb conn curve =
   let (_, _, catts, pos) = curve in
     try
       let query = Config.get_query catts in
 	if query <> "" then
 	  begin
-	    prerr_endline ("Query: "^query);
+	    if vb then prerr_endline ("Query: "^query);
 	    (*
 	      Query the database using the connection conn
 	      and the query 'query'
 	    *)
 	    try
-	      (query, Database.get_tuples conn query)
+	      (query, Database.get_tuples vb conn query)
 	    with _ ->
 (* 	      Printexc.print_backtrace stderr; *)
 	      raise (Config.Misconfigurationat ("Check query \""^query^"\"", pos))
@@ -545,7 +545,7 @@ let build_evolution vb debug conn name grinfo scmfeature atts curve : value opti
   Debug.profile_code "Helper.build_evolution"
     (fun () ->
        try
-	 build_simple_evolution vb debug name scmfeature atts curve (get_data_of conn curve)
+	 build_simple_evolution vb debug name scmfeature atts curve (get_data_of debug conn curve)
        with _ ->
 (* 	 Printexc.print_backtrace stderr; *)
 	 None
