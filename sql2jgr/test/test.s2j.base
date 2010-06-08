@@ -4,8 +4,8 @@ projects="/home/npalix/Documents/build/herodotos-cvs/demo"
 website="./website"
 cpucore = 1
 
-project Test {
-  dir = test
+project Linux {
+  dir = linux
 
   versions = {
   ("linux-2.6.0",  12/18/2003, 3626873)
@@ -69,10 +69,10 @@ pattern Size;
 		GROUP BY version_name, release_date;   \
  }
 
-graph gr/db-count.jgr {
+graph gr/count-evol.jgr {
  xaxis = date
  yaxis = user
- project = Test
+ project = Linux
 
  COUNT_CURVE(Block, 'Block')
 // COUNT_CURVE(Null , 'Null' )
@@ -90,15 +90,17 @@ graph gr/db-count.jgr {
 
 #define ORIG_CURVE(patt, patt2)                        \
  curve pattern patt {				       \
-   sql = SELECT version_name, release_date, data       \
-       	 	FROM "Origin of bugs in last release"  \
-       	 	WHERE standardized_name = patt2;       \
+   sql = SELECT version_name, release_date, number_of_bugs_already_present       \
+       	 	FROM "Origin of bugs"                  \
+       	 	WHERE standardized_name = patt2        \
+		AND for_version_name='linux-2.6.33'    \
+		ORDER BY release_date;                 \
  }
 
-graph gr/db-orig.jgr {
+graph gr/orig-2.6.33.jgr {
  xaxis = date
  yaxis = user
- project = Test
+ project = Linux
 
  ORIG_CURVE(Block, 'Block')
 // ORIG_CURVE(Null , 'Null' )
@@ -114,7 +116,7 @@ graph gr/db-orig.jgr {
  ORIG_CURVE(Size , 'Size' )
 }
 
-graph gr/db-group-count.jgr {
+graph gr/count.jgr {
  xaxis = groups
  legend = "off"
  sql = SELECT standardized_name, data FROM "Bugs per OSDI category" \
@@ -143,18 +145,8 @@ graph gr/db-group-count.jgr {
   DIR_CURVE(Size , 'Size' , dir2) \
  }
 
-graph gr/db-group-count-per-dir.jgr {
+graph gr/count-per-dir.jgr {
  xaxis = groups
-// legend = "off"
-
-/*
- project = Other
- project = Staging
- project = Drivers
- project = Net
- project = Arch
- project = FS
-*/
 
  DIR_GRP("Arch"   , 'arch')
  DIR_GRP("Drivers", 'drivers')
@@ -164,7 +156,7 @@ graph gr/db-group-count-per-dir.jgr {
  DIR_GRP("Other"  , 'other')
 }
 
-graph gr/db-group-avg.jgr {
+graph gr/avg-ages.jgr {
  xaxis = groups
  legend = "off"
  factor = 365.25
