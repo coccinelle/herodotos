@@ -125,8 +125,9 @@ graph gr/count.jgr {
 
 #define DIR_CURVE(patt, patt2, dir) \
   curve pattern patt {              \
-   sql = SELECT standardized_name, "Number of errors" FROM "Per dir and cat for 2.6.33" \
-         WHERE standardized_name = patt2 AND "Directory name" = dir; \
+   sql = SELECT standardized_name, "Number of errors" FROM "Per dir and cat" \
+         WHERE standardized_name = patt2 AND "Directory name" = dir          \
+	       AND version_name = 'linux-2.6.33'; \
   }
 
 #define DIR_GRP(dir, dir2)        \
@@ -134,23 +135,23 @@ graph gr/count.jgr {
   DIR_CURVE(Block, 'Block', dir2) \
   DIR_CURVE(Null , 'Null' , dir2) \
   DIR_CURVE(Var  , 'Var'  , dir2) \
-  DIR_CURVE(Inull, 'Inull', dir2) \
   DIR_CURVE(Range, 'Range', dir2) \
   DIR_CURVE(Lock , 'Lock' , dir2) \
   DIR_CURVE(Intr , 'Intr' , dir2) \
   DIR_CURVE(Free , 'Free' , dir2) \
   DIR_CURVE(Float, 'Float', dir2) \
   DIR_CURVE(Real , 'Real' , dir2) \
-  DIR_CURVE(Param, 'Param', dir2) \
   DIR_CURVE(Size , 'Size' , dir2) \
  }
+//  DIR_CURVE(Inull, 'Inull', dir2) \
+//  DIR_CURVE(Param, 'Param', dir2) \
 
 graph gr/count-per-dir.jgr {
  xaxis = groups
 
- DIR_GRP("Arch"   , 'arch')
  DIR_GRP("Drivers", 'drivers')
  DIR_GRP("Staging", 'staging')
+ DIR_GRP("Arch"   , 'arch')
  DIR_GRP("FS"     , 'fs')
  DIR_GRP("Net"    , 'net')
  DIR_GRP("Other"  , 'other')

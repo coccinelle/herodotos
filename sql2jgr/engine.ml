@@ -124,17 +124,16 @@ let run v1 v2 v3 config pdf png web freearg =
     Config.fixcolor ();
     if v1 then Config.show_config v2 v3;
 
-    prerr_endline ("Connecting to "^ !Setup.dbconn);
+    if v1 then prerr_endline ("Connecting to "^ !Setup.dbconn);
     try
       let conn = Database.open_db v1 !Setup.dbconn in
-	prerr_endline "Connection - OK !";
-	prerr_endline "Testing...";
+	if v1 then prerr_endline "Connection - OK !";
 	gen_graphs v1 v2 v3 config conn pdf png web conn freearg;
-	prerr_endline "Disconnecting...";
+	if v1 then prerr_endline "Disconnecting...";
 	Database.close_db conn;
-	prerr_endline "Done."
+	if v1 then prerr_endline "Done."
     with Postgresql.Error (e) ->
-      prerr_endline "Connection - KO !";
+      if v1 then prerr_endline "Connection - KO !";
       match e with
 	| Postgresql.Field_out_of_range (_, _)
 	| Postgresql.Tuple_out_of_range (_, _)

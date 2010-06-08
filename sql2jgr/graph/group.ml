@@ -95,7 +95,11 @@ let build_stat vb debug name conn scmfeature groups atts =
 			(fun tail curve ->
 			   try
 			     (build_stat_of vb debug name singleprj conn scmfeature grpname atts curve)::tail
-			   with _ -> tail
+			   with
+			       Config.Misconfigurationat( msg, pos) ->
+				 Misc.print_error pos msg;
+				 tail
+			     | _ -> tail
 			) [] curves)
 		  | Ast_config.GrpPatt _ ->
 		      raise (Unsupported "group pattern")

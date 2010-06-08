@@ -56,6 +56,9 @@ depend:
 	ocamldep $(SUBDIRS:%=-I %) $(SRC) > .depend
 	#ocamldep $(SRC) > .depend
 
+install:
+	$(INSTALL_BIN) sql2jgr $(BINDIR)
+
 -include .depend
 
 -include Makefile.dev
