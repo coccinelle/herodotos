@@ -124,5 +124,37 @@ let print_orgs ch prefix orgfile orgs =
       (fun o ->
 	 let orgstr = insert_correl_report prefix orgfile patt o in
 	   Printf.fprintf ch "%s" orgstr
-      ) orgs;
+      ) orgs
 
+(*
+ *********************************************
+ **          PROCESSING OF NOTES            **
+ *********************************************
+ *)
+let insert_note prefix src patt org =
+  let (_, s, r, file, ver, pos, face, t, _, _, sub) = org in
+(*  let text = Org.clean_link_text prefix ver file pos t in*)
+  let (line, colb, cole) = pos in
+  let file_id = "get_file('"^ver^"', '"^Misc.get_canonical_name prefix ver file^"')" in
+  let values = String.concat ", "
+    [file_id;
+     s2s src;
+     s2s patt;
+     string_of_int line;
+     string_of_int colb;
+     string_of_int cole;
+     s2s t]
+  in
+    Printf.sprintf "(%s)" values
+
+let print_orgs_as_notes ch prefix orgfile orgs =
+  let file = Filename.chop_suffix (Filename.basename orgfile) Global.bugext in
+  let (p,patt) =
+    (* TODO: Fixme. This may not work according to the names of the projects *)
+    match Str.split (Str.regexp_string Global.sep) file with
+	[] -> raise (Malformed ("Malformed bug filename: "^orgfile))
+      | p::tail -> (p,String.concat Global.sep tail)
+  in
+  let fields = "file_id, data_source,  note_error_name, line_no, column_start, column_end, text_link" in
+  let values = String.concat ",\n\t" (List.map (insert_note prefix orgfile patt) orgs) in
+    Printf.fprintf ch "INSERT INTO notes (%s) VALUES\n\t%s;\n" fields values

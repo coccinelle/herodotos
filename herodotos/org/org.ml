@@ -265,7 +265,7 @@ let parse_org v file : Ast_org.orgs =
   Debug.profile_code_silent "parse_org"
     (fun () ->
        try
-	 let in_ch = open_in file in
+	 let in_ch = if file <> "-" then open_in file else stdin in
 	 let ast = List.flatten (parse_all_lines v file in_ch) in
 	   close_in in_ch;
 	   List.rev ast

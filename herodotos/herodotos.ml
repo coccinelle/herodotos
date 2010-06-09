@@ -24,6 +24,7 @@ let test = ref false
 let erase = ref false
 
 let sql = ref false
+let sqlnotes = ref false
 
 let freearg = ref ""
 
@@ -50,7 +51,8 @@ let options = [
   "--eps", Arg.Clear pdf, " disable the (default) generation of PDF with 'epstopdf'";
   "--png", Arg.Set png, " enable the generation of png images (in default mode)";
 
-  "--to-sql", Arg.Set sql, " Convert the parsed Org file to SQL";
+  "--to-sql", Arg.Set sql, " Convert the parsed Org file to SQL (tables of errors)";
+  "--to-sql-notes", Arg.Unit (fun () -> sqlnotes:=true;sql:=true), " Convert the parsed Org file to SQL (table of notes)";
 
   "--stat", Arg.Set stat, " Compute statistics";
   "--statcorrel", Arg.Set statcorrel, " Compute statistics about correlations";
@@ -151,29 +153,36 @@ let main aligned =
 		  if ((String.length !prefix) = 0) then prerr_endline "*** WARNING *** Prefix not set";
 		  if not !sql then prerr_endline " Parsing...\n";
 		  let ast = Org.parse_org (not !sql) !orgfile in
-		    if not !sql then prerr_endline ("\nChecking... ("^string_of_int (List.length ast)^" elements)");
-		    if !Misc.debug then
-		      (Misc.print_stack (List.map (Org.make_org "") ast);
-		       prerr_newline ();
-		      );
-		    let (msg, formatted) =
-		      try
-			("", Org.format_orgs !prefix 1 ast)
-		      with Misc.Strip msg -> (msg, [])
-		    in
-		      if not !sql then
-			prerr_endline ("\nConverting... ("^string_of_int (List.length formatted)^" elements)\n");
- 		      if msg <> "" then prerr_endline msg;
-		      if formatted = []
-		      then prerr_endline "Failed!"
-		      else
-			(if !sql then
-			   Sql.print_orgs stdout !prefix !orgfile formatted
-			 else
-			   Org.print_orgs_raw stderr !prefix formatted;
-			 if not !sql then prerr_endline "\nDone!")
+		    if ast = [] then
+		      prerr_endline "Org file"
+		    else
+		      begin
+			if not !sql then prerr_endline ("\nChecking... ("^string_of_int (List.length ast)^" elements)");
+			if !Misc.debug then
+			  (Misc.print_stack (List.map (Org.make_org "") ast);
+			   prerr_newline ();
+			  );
+			let (msg, formatted) =
+			  try
+			    ("", Org.format_orgs !prefix 1 ast)
+			  with Misc.Strip msg -> (msg, [])
+			in
+			  if not !sql then
+			    prerr_endline ("\nConverting... ("^string_of_int (List.length formatted)^" elements)\n");
+ 			  if msg <> "" then prerr_endline msg;
+			  if formatted = [] then
+			    prerr_endline "Failed!"
+			  else
+			    (if !sql then
+			       if !sqlnotes then
+				 Sql.print_orgs_as_notes stdout !prefix !orgfile formatted
+			       else
+				 Sql.print_orgs stdout !prefix !orgfile formatted
+			     else
+			       Org.print_orgs_raw stderr !prefix formatted;
+			     if not !sql then prerr_endline "\nDone!")
+		      end
 		end
-
 	      else
 		Arg.usage aligned usage_msg
       end
