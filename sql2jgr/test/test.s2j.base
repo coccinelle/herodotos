@@ -97,7 +97,7 @@ graph gr/count-evol.jgr {
 		ORDER BY release_date;                 \
  }
 
-graph gr/orig-2.6.33.jgr {
+graph gr/orig-2_6_33.jgr {
  xaxis = date
  yaxis = user
  project = Linux
@@ -119,6 +119,7 @@ graph gr/orig-2.6.33.jgr {
 graph gr/count.jgr {
  xaxis = groups
  legend = "off"
+ size = 6 2
  sql = SELECT standardized_name, data FROM "Bugs per OSDI category" \
        WHERE version_name='linux-2.6.33';
 }
@@ -162,5 +163,6 @@ graph gr/avg-ages.jgr {
  legend = "off"
  factor = 365.25
  ylegend = "Years"
+ size = 6 2
  sql = SELECT * FROM "Avg age";
 }
