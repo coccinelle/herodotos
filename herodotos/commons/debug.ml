@@ -45,15 +45,15 @@ let check_profile category =
   | PNONE -> false
   | PSOME l -> List.mem category l
 
-let _profile_table = ref (Hashtbl.create 101)
+let _profile_table = Hashtbl.create 101
 
 let adjust_profile_entry category difftime =
   let (xtime, xcount) =
-    (try Hashtbl.find !_profile_table category
+    (try Hashtbl.find _profile_table category
     with Not_found ->
       let xtime = ref 0.0 in
       let xcount = ref 0 in
-	Hashtbl.add !_profile_table category (xtime, xcount);
+	Hashtbl.add _profile_table category (xtime, xcount);
       (xtime, xcount)
     ) in
   xtime := !xtime +. difftime;
@@ -89,7 +89,7 @@ let profile_diagnostic () =
   if !profile = PNONE then "" else
     begin
       let xs =
-	Hashtbl.fold (fun k v acc -> (k,v)::acc) !_profile_table []
+	Hashtbl.fold (fun k v acc -> (k,v)::acc) _profile_table []
 	+> List.sort (fun (k1, (t1,n1)) (k2, (t2,n2)) -> compare t2 t1)
       in
 	with_open_stringbuf
