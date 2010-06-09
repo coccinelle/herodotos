@@ -110,7 +110,11 @@ let read_grtuples vb conn res =
 		  (fun tuple ->
 		     let label = res#getvalue tuple 0 in
 		     let value =
-		       Array.init 1 (fun _ -> float_of_string (res#getvalue tuple 1))
+		       Array.init 1 (fun _ ->
+				       try
+					 Some (float_of_string (res#getvalue tuple 1))
+				       with _ -> None
+				    )
 		     in
 		       (label, value)
 		  )

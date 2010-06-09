@@ -48,9 +48,18 @@ let build_graph vb1 vb2 name atts conn =
   let factor = Graph.get_factor vb1 name atts 1.0 in
   let info = get_grdata_of vb2 name conn atts in
   let (query, (xlegend, ylegend, data)) = info in
-    List.map (fun (label, value) ->
-		let values = Helper.wrap_single_some (Array.map (fun v -> v/.factor) value)  in
-		  (emptyarr, linetype, color, "", marksize, (label, ""), query, values)
+    List.map (fun (label, values) ->
+		let wrap_values =
+		  Helper.wrap_single
+		    (Array.map
+		       (fun vopt ->
+			  match vopt with
+			      None -> None
+			    | Some v -> Some (v/.factor)
+		       ) values
+		    )
+		in
+		  (emptyarr, linetype, color, "", marksize, (label, ""), query, wrap_values)
 	     ) data
 
 let build_stat_of vb1 vb2 name singleprj conn scmfeature grpname atts curve =
@@ -78,7 +87,7 @@ let build_stat_of vb1 vb2 name singleprj conn scmfeature grpname atts curve =
     if data = [] then ("", Helper.wrap_single (Array.init 1 (fun _ -> None)))
     else
       let (label, v) = List.hd data in
-	(label, Helper.wrap_single_some v)
+	(label, Helper.wrap_single v)
   in
     (emptyarr, linetype, color, "", marksize, (grplabel, label), query, values)
 
