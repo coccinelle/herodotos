@@ -67,8 +67,8 @@ let position ops =
 
 let clean_link_text prefix v f pos t =
   let (l,_,_) = pos in
-  let endstr = Printf.sprintf " %s/%s::%d" v f l in
-  let re = Str.regexp ((Str.quote endstr)^"$") in
+  let endstr = Printf.sprintf "%s/%s::%d" v f l in
+  let re = Str.regexp (" ?"^(Str.quote endstr)^"$") in
   let re_prefix = Str.regexp_string prefix in
   let new_t = Str.replace_first re_prefix "" t in
     Str.global_replace re "" new_t
