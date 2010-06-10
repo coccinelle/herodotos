@@ -186,7 +186,7 @@ let main aligned =
 				   if !extract = "" then formatted
 				   else Orgfilter.filter_version !extract !prefix formatted
 				 in
-				   Org.print_orgs_raw stderr !prefix filtered;
+				   Org.print_orgs_raw stdout !prefix filtered;
 				   if vb then prerr_endline "\nDone!")
 			end
 		end
