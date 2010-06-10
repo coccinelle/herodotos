@@ -66,6 +66,7 @@ pattern Size;
    sql = SELECT version_name, release_date, sum(data) as data       \
        	 	FROM "Count evol"                      \
        	 	WHERE standardized_name = patt2        \
+		AND release_date > '2002-01-01'        \
 		GROUP BY version_name, release_date;   \
  }
 
@@ -151,6 +152,8 @@ graph gr/count.jgr {
 
 graph gr/count-per-dir.jgr {
  xaxis = groups
+ size = 6 2
+ legend = "defaults x 50 y 60"
 
  DIR_GRP("Drivers", 'drivers')
  DIR_GRP("Staging", 'staging')
