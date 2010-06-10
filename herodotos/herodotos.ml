@@ -6,6 +6,7 @@ let help = ref false
 let longhelp = ref false
 let orgfile = ref ""
 let prefix = ref ""
+let extract = ref ""
 let version = ref false
 let verbose1 = ref false
 let verbose2 = ref false
@@ -39,6 +40,7 @@ let options = [
   "--cvs", Arg.Set cvs, " Generation of .cvsignore files (in init mode)";
   "--debug", Arg.Set Misc.debug, " Debug mode";
   "--erase", Arg.Set erase, " Erase some data";
+  "--extract", Arg.Set_string extract, "version Gives the version to extract from a correlated report";
   "-h", Arg.Set help, " Display this list of options";
   "-help", Arg.Set help, " Display this list of options";
   "--help", Arg.Set help, " Display this list of options";
@@ -179,7 +181,11 @@ let main aligned =
 			       else
 				 Sql.print_orgs stdout !prefix !orgfile formatted
 			     else
-			       Org.print_orgs_raw stderr !prefix formatted;
+			       let filtered =
+				 if !extract = "" then formatted
+				 else Orgfilter.filter_version !extract !prefix formatted
+			       in
+				 Org.print_orgs_raw stderr !prefix filtered;
 			     if not !sql then prerr_endline "\nDone!")
 		      end
 		end
