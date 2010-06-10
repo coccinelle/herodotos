@@ -83,6 +83,7 @@ attr:
 | TYLEGEND       TEQUAL l=TSTRING                  { Ast_config.YLegend(to_jgraph_fmt l)}
 | TYLEGENDFACTOR TEQUAL f=TId                      { Ast_config.YLegendFactor(f)}
 | TLINESTYLE     TEQUAL s=TId                      { Ast_config.LineType(s)}
+| TMARKTYPE      TEQUAL TNONE                      { Ast_config.MarkType("none")}
 | TMARKTYPE      TEQUAL m=TId                      { Ast_config.MarkType(m)}
 | TMARKSIZE      TEQUAL v=float                    { Ast_config.MarkSize(v)}
 | TXAXIS         TEQUAL t=TId                      { Ast_config.XAxis(t)}
