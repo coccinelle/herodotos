@@ -64,6 +64,7 @@ gbattr:
 
 attr:
   TCOLOR         TEQUAL r=float v=float b=float    { Ast_config.Color(r,v,b) }
+| TCORREL        TEQUAL TNONE                      { Ast_config.Correl("none") }
 | TCORREL        TEQUAL dft=TId                    { Ast_config.Correl(dft) }
 | TCLEANCOLOR    TEQUAL r=float v=float b=float    { Ast_config.CleanColor(r,v,b)}
 | TPATTERN       TEQUAL dft=TId                    { Ast_config.DftPattern(dft)}
