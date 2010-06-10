@@ -155,8 +155,8 @@ deploy: sudo_install
 		ssh $$h -C "make -C build/herodotos sudo_install"; \
 	done
 
-scripts/Makefile.inc: scripts/Makefile.inc.in
-	sed "s|SHAREDIR|$(SHAREDIR)|" $^ > $@
+scripts/Makefile.inc: scripts/Makefile.inc.in Makefile.config
+	sed "s|SHAREDIR|$(SHAREDIR)|" $@.in > $@
 
 install:
 	mkdir -p $(DESTDIR)$(BINDIR)
