@@ -3,8 +3,8 @@
 %}
 
 %token EOL
-%token TSTAR TSLASH TCOLON TPLUS TEQUAL TSPACE
-%token TVERT THASH TLAB TRAB
+%token TSTAR TSLASH TCOLON TEQUAL TSPACE
+%token TVERT THASHPLUS TLAB TRAB
 %token TVIEW TFACE TLINB TCOLB TCOLE TORG TCONFIG
 %token TSTODO TTODO TOK TBUG TNONBUG TFP TSAME TUNRELATED TUNKNOWN TIGNORED
 %token<int> TInt
@@ -23,7 +23,7 @@
 
 tail:
    nonempty_list(TSTAR) TSPACE TORG TSPACE TCONFIG EOL      {      }
- | THASH TPLUS TSTODO TCOLON TSPACE TTODO TSPACE TVERT nonempty_list(tailelm) EOL        {}
+ | THASHPLUS TSTODO TCOLON TSPACE TTODO TSPACE TVERT nonempty_list(tailelm) EOL        {}
 
 tailelm:
    TSPACE TBUG       {}
@@ -90,9 +90,8 @@ textelm_nospecial:
  |  TCOLON                              { ":"             }
  |  TCONFIG                             { "config"        }
  |  TSTAR                               { "*"             }
- |  TPLUS                               { "+"             }
  |  TEQUAL                              { "="             }
- |  THASH                               { "#"             }
+ |  THASHPLUS                           { "#+"            }
  |  TIGNORED                            { "IGNORED"       }
 (* |  s=status_elm                        { Org_helper.get_status s    } *)
 
