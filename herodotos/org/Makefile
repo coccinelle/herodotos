@@ -4,9 +4,7 @@ LEXER_SOURCES = org_lexer.mll
 PARSER_SOURCES = org_parser.mly
 SOURCES = org_helper.ml $(PARSER_SOURCES:.mly=.ml) $(LEXER_SOURCES:.mll=.ml) \
 	  org.ml bugs.ml orgfilter.ml
-#MENHIR_PATH=../menhirlib
-#INCLUDES = -I $(MENHIR_PATH) -I ../commons -I ../diff
-INCLUDES = -I ../commons -I ../diff
+INCLUDES = -I ../commons
 
 # Automatic computation
 -include ../Makefile.config
