@@ -109,6 +109,8 @@ rule token = parse
   | '{'                       { P.TLCB }
   | '}'                       { P.TRCB }
   | ';'                       { P.TSC }
+  | '<'                       { P.TLT }
+  | '>'                       { P.TGT }
 (*   | '['                       { P.TLAB } *)
 (*   | ']'                       { P.TRAB } *)
 

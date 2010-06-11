@@ -17,7 +17,7 @@
 
 %token EOF
 %token TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS
-%token TLCB TRCB TLPAR TRPAR TSC TCOLON
+%token TLCB TRCB TLPAR TRPAR TLT TGT TSC TCOLON
 %token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE
 %token TPREFIX TPROJECTS TWEBSITE TFLAGS TCPUCORE TSQL TDBCONN
 %token TSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT
@@ -221,3 +221,5 @@ sql_tok:
   | TLPAR                         { "(" }
   | TRPAR                         { ")" }
   | TCOLON                        { ":" }
+  | TLT                           { "<" }
+  | TGT                           { ">" }
