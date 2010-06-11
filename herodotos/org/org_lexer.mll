@@ -60,9 +60,8 @@ rule token = parse
   | '*'                       { P.TSTAR      }
   | ':'                       { P.TCOLON     }
   | '='                       { P.TEQUAL     }
-  | '+'                       { P.TPLUS      }
   | '|'                       { P.TVERT      }
-  | '#'                       { P.THASH      }
+  | "#+"                      { P.THASHPLUS  }
   | '['                       { P.TLAB       }
   | ']'                       { P.TRAB       }
   | '/'                       { P.TSLASH     }
