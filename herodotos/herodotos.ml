@@ -201,7 +201,8 @@ let _ =
     with Arg.Bad msg ->
       (prerr_string msg; exit 0));
     main aligned;
-    prerr_endline (Debug.profile_diagnostic ())
+    if !Debug.profile <> Debug.PNONE then
+      prerr_endline (Debug.profile_diagnostic ())
 
 
 (* For ratio computation *)
