@@ -16,34 +16,67 @@ OCAMLLIBS=unix.cma threads.cma str.cma $(EXTLIBS:%=%.cma)
 LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
 ALLLIBS=$(OCAMLLIBS) $(LIBS)
 
+NOBJS=$(OBJS:%.cmo=%.cmx)
+NLIBS=$(LIBS:%.cma=%.cmxa)
+ALLNLIBS=$(ALLLIBS:%.cma=%.cmxa)
+
+EXEC = $(TARGET)
 DEP = $(SUBDIRS)
 
 INCLUDES=$(SUBDIRS:%=-I %) $(LIBDIR:%=-I %)
 FLAGS=$(INCLUDES)
 CFLAGS=-g -thread $(FLAGS)
-LFLAGS=-g -thread $(FLAGS) -custom -ccopt $(LIBDIR:%=-L%)
+LFLAGS=-g -thread $(FLAGS) -ccopt $(LIBDIR:%=-L%)
+BLFLAGS=-custom
 
-OPT=0
-ifeq ($(OPT),1)
-OCAMLC=ocamlfind ocamlc -predicates native
+ifeq ("$(OPTBIN)",".opt")
+OCAMLC=$(OCAMLFIND) ocamlc -predicates native
+OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates native
 else
-OCAMLC=ocamlfind ocamlc
+OCAMLC=$(OCAMLFIND) ocamlc
+OCAMLOPT=$(OCAMLFIND) ocamlopt
 endif
 
-all: $(TARGET)
+.PHONY:: all all.opt clean distclean $(DEP)
+.PHONY:: depend install uninstall
+.PHONY:: test
 
-.SUFFIXES: .ml .cmo
-.PHONY: all depend clean distclean $(DEP) test
+all: init bytecode
+opt: all.opt
+all.opt: init native-noopt
+world: init bytecode native
+
+init: depend
+bytecode: $(EXEC)
+native: $(EXEC).opt
+native-noopt: native
+	mv -f $(EXEC).opt $(EXEC)
 
 $(LIBS): $(LIBS:%.cma=%)
 $(DEP):
 	$(MAKE) -C $@
 
-.ml.cmo:
-	$(OCAMLC) -c $@ $(CFLAGS) $<
+#
+# To compile bytecode version
+#
 
-$(TARGET): $(DEP) $(OBJS)
-	$(OCAMLC) -o $(TARGET) $(LFLAGS) $(ALLLIBS) $(OBJS)
+$(LIBS): $(LIBS:%.cma=%)
+$(DEP):
+	$(MAKE) -C $@
+
+$(EXEC): $(LIBS) $(OBJS)
+	$(OCAMLC) -o $@ $(BLFLAGS) $(LFLAGS) $(ALLLIBS) $(OBJS)
+
+#
+# To compile native version
+#
+
+$(NLIBS): $(NLIBS:%.cmxa=%.opt)
+$(DEP:%=%.opt):
+	$(MAKE) -C $(@:%.opt=%) all.opt
+
+$(EXEC).opt: $(NLIBS) $(NOBJS)
+	$(OCAMLOPT) -o $@ $(LFLAGS) $(ALLNLIBS) $(NOBJS)
 
 test:
 	$(MAKE) -C test
@@ -53,6 +86,17 @@ distclean clean:
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 	rm -rf *.cm[aiox] *.a *.o *~
 	rm -rf .depend Makefile.config
+
+.SUFFIXES: .ml .mli .cmo .cmi .cmx .cma
+
+.mli.cmi:
+	$(OCAMLC) -c $<
+
+.ml.cmo:
+	$(OCAMLC) -c $@ $(CFLAGS) $<
+
+.ml.cmx:
+	$(OCAMLOPT) -c $@ $(CFLAGS) $<
 
 depend:
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done

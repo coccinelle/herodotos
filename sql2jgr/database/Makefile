@@ -1,9 +1,12 @@
+include ../Makefile.config
+
 OCAMLFIND=ocamlfind
 
 SRC=database.ml
 TARGET=database
 
 OBJS=$(SRC:%.ml=%.cmo)
+OPTOBJS=$(SRC:%.ml=%.cmx)
 LIBNAMES=unix postgresql
 NATIVELIBS=unix.cma threads.cma postgresql.cma
 
@@ -21,20 +24,25 @@ OPTLIB=$(LIB:.cma=.cmxa)
 all: $(LIB)
 all.opt: $(OPTLIB)
 
-
-OPT=1
-ifeq ($(OPT),1)
-OCAMLC=ocamlfind ocamlc -predicates native
+ifeq ("$(OPTBIN)",".opt")
+OCAMLC=$(OCAMLFIND) ocamlc -predicates native
+OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates native
 else
-OCAMLC=ocamlfind ocamlc
+OCAMLC=$(OCAMLFIND) ocamlc
+OCAMLOPT=$(OCAMLFIND) ocamlopt
 endif
 
-.SUFFIXES: .ml .cmo
+.SUFFIXES: .ml .cmo .cmi .cmx
 .PHONY: all depend
 
-.ml.cmo:
-	$(OCAMLC) -c $@ $(CFLAGS) $^
+.mli.cmi:
+	$(OCAMLC) -c $<
 
+.ml.cmo:
+	$(OCAMLC) -c $@ $(CFLAGS) $<
+
+.ml.cmx:
+	$(OCAMLOPT) -c $@ $(CFLAGS) $<
 
 $(LIB): $(OBJS)
 	$(OCAMLC) -a -o $(LIB) $(OBJS)
