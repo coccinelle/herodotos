@@ -1,4 +1,3 @@
-.depend
 .jgrfiles
 gr
 website
@@ -7,5 +6,4 @@ Makefile
 Makefile.images
 Makefile.prj
 Makefile.patchset
-.depend.erase
-.depend.patterns
+.depend.*

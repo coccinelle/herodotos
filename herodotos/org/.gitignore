@@ -1,8 +1,3 @@
-.depend
 org_lexer.ml
 org_parser.ml
 org_parser.mli
-*.cmxa
-*.cm[ioax]
-*.a
-*.o

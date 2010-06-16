@@ -1,9 +1,7 @@
-.depend
 .jgrfiles
 gr
 website
 results
 demo.hc
-.depend.patterns
-.depend.erase
-.depend.graphs
+.depend.*
+

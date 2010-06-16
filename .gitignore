@@ -1,2 +1,9 @@
 *.annot
 *~
+.depend
+.depend
+*.cmxa
+*.cmxs
+*.cm[ioax]
+*.a
+*.o
