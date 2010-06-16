@@ -191,7 +191,7 @@ let get_grtuples vb (conn:connection) (sql: string) =
 (*   conn#send_query sql; *)
 (*   dump_grtuples conn *)
 
-(*************************************************)
+(*************************************************
 let main () =
   if Obj.is_block (Obj.repr Unix.stdin) then
     failwith "cannot run on Windows";
@@ -216,3 +216,4 @@ let _ =
   try main () with
   | Error e -> prerr_endline (string_of_error e)
   | e -> prerr_endline (Printexc.to_string e)
+*************************************************)
