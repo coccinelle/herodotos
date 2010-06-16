@@ -1,5 +1,5 @@
 prefix="."
-dbconn="dbname='linuxbugs' user='npalix' password='nico' host='localhost' port='5432'"
+dbconn="dbname='linuxbugs' host='localhost' port='5432'"
 projects="/home/npalix/Documents/build/herodotos-cvs/demo"
 website="./website"
 cpucore = 1
