@@ -1,3 +1,6 @@
+
+-include Makefile.config
+
 OCAMLFIND=ocamlfind
 SUBDIRS=commons config database scm graph html
 EXTLIBS=postgresql
@@ -49,6 +52,7 @@ distclean clean:
 	rm -rf $(TARGET)
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 	rm -rf *.cm[aiox] *.a *.o *~
+	rm -rf .depend Makefile.config
 
 depend:
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
@@ -56,9 +60,15 @@ depend:
 	ocamldep $(SUBDIRS:%=-I %) $(SRC) > .depend
 	#ocamldep $(SRC) > .depend
 
-install:
-	$(INSTALL_BIN) sql2jgr $(BINDIR)
-
 -include .depend
+
+Makefile.config:
+	@echo "\n\tRun ./configure first\n"
+
+install:
+	$(INSTALL_PROGRAM) $(TARGET) $(DESTDIR)$(BINDIR)
+
+uninstall:
+	rm -f $(DESTDIR)$(BINDIR)/$(TARGET)
 
 -include Makefile.dev
