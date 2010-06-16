@@ -8,8 +8,8 @@
 # Prelude
 ######################################################################
 
-my $project =        "sql2org";
-my $projectcmdline = "sql2org -c <configuration file>";
+my $project =        "sql2jgr";
+my $projectcmdline = "$project -c <configuration file>";
 
 my $prefix="/usr/local";
 my $opt=".opt";
