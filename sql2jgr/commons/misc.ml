@@ -28,6 +28,13 @@ let getpos pos ofs =
     }
 
 let dummy_pos = getpos Lexing.dummy_pos 0
+let dummy_pos_in file =
+  {
+    Ast.file  = file;
+    Ast.line  = 0;
+    Ast.colfr = 0;
+    Ast.colto = 0;
+  }
 
 let print_error pos str =
   prerr_endline ((print_pos pos) ^ str)

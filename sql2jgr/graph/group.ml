@@ -39,16 +39,16 @@ let get_data_of vb conn atts pos =
     else
       raise (Config.Misconfigurationat ("Empty query!", pos))
 
-
 let build_graph vb1 vb2 name atts conn =
   let linetype = "linetype none" in
-  let color   = "" in
 (*     Graph.get_color false name [] curve *)
   let marksize = Graph.get_marksize_in_atts_or_dft vb1 name atts " marksize 0.6 " in
   let factor = Graph.get_factor vb1 name atts 1.0 in
   let info = get_grdata_of vb2 name conn atts in
   let (query, (xlegend, ylegend, data)) = info in
     List.map (fun (label, values) ->
+		let curve = (None, Some label, [], Misc.dummy_pos_in name) in
+		let color = Graph.get_color vb2 name atts curve in
 		let wrap_values =
 		  Helper.wrap_single
 		    (Array.map
