@@ -1,3 +1,4 @@
+PREFIX?=/usr/local
 SUBDIRS=herodotos org2sql sql2jgr
 
 .PHONY: all world clean distclean push
@@ -9,7 +10,7 @@ all world distclean clean install uninstall:
 
 configure:
 	for d in $(SUBDIRS); do \
-		cd $$d ; ./$@; cd - 2> /dev/null;\
+		cd $$d ; ./$@ --prefix=$(PREFIX) ; cd - 2> /dev/null;\
 	done
 
 push:
