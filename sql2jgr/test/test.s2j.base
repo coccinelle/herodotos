@@ -48,18 +48,45 @@ project Linux {
 
 #include "subdir.s2j"
 
-pattern Block;
-pattern Null;
-pattern Var;
-pattern Inull;
-pattern Range;
-pattern Lock;
-pattern Intr;
-pattern Free;
-pattern Float;
-pattern Real;
-pattern Param;
-pattern Size;
+pattern Block {
+ color = 0 1 0
+}
+pattern Null {
+ color = 0 .5 0
+}
+pattern Var {
+ color = 0 1 .5
+}
+pattern INull {
+ color = 1 0 0
+}
+pattern Range {
+ color = 0 0 0
+}
+pattern Lock {
+ color = .5 0 1
+}
+pattern Intr {
+ color = 0 .5 1
+}
+pattern LockIntr {
+ color = .5 .5 1
+}
+pattern Free {
+ color = .5 0 0
+}
+pattern Float {
+ color = 0 1 1
+}
+pattern Real {
+ color = 0 0 .5
+}
+pattern Param {
+ color = 0 0 1
+}
+pattern Size {
+ color = .5 0 .5
+}
 
 #define COUNT_CURVE(patt, patt2)                       \
  curve pattern patt {				       \
@@ -78,10 +105,11 @@ graph gr/count-evol.jgr {
  COUNT_CURVE(Block, 'Block')
 // COUNT_CURVE(Null , 'Null' )
  COUNT_CURVE(Var  , 'Var'  )
- COUNT_CURVE(Inull, 'Inull')
+ COUNT_CURVE(INull, 'INull')
  COUNT_CURVE(Range, 'Range')
  COUNT_CURVE(Lock , 'Lock' )
  COUNT_CURVE(Intr , 'Intr' )
+ COUNT_CURVE(LockIntr , 'LockIntr' )
  COUNT_CURVE(Free , 'Free' )
  COUNT_CURVE(Float, 'Float')
  COUNT_CURVE(Real , 'Real' )
@@ -106,10 +134,11 @@ graph gr/orig-2_6_33.jgr {
  ORIG_CURVE(Block, 'Block')
 // ORIG_CURVE(Null , 'Null' )
  ORIG_CURVE(Var  , 'Var'  )
- ORIG_CURVE(Inull, 'Inull')
+ ORIG_CURVE(INull, 'INull')
  ORIG_CURVE(Range, 'Range')
  ORIG_CURVE(Lock , 'Lock' )
  ORIG_CURVE(Intr , 'Intr' )
+ ORIG_CURVE(LockIntr , 'LockIntr' )
  ORIG_CURVE(Free , 'Free' )
  ORIG_CURVE(Float, 'Float')
  ORIG_CURVE(Real , 'Real' )
@@ -127,41 +156,80 @@ graph gr/count.jgr {
 }
 */
 
-#define DIR_CURVE(patt, patt2, dir) \
+#define DIR_CURVE(ver, patt, patt2, dir) \
   curve pattern patt {              \
    sql = SELECT standardized_name, "Number of errors" FROM "Per dir and cat" \
          WHERE standardized_name = patt2 AND dirname = dir          \
-	       AND version_name = 'linux-2.6.33'; \
+	       AND version_name = ver; \
   }
 
-#define DIR_GRP(dir, dir2)        \
+#define DIR_GRP(ver, dir, dir2)   \
  group dir {          		  \
-  DIR_CURVE(Block, 'Block', dir2) \
-  DIR_CURVE(Null , 'Null' , dir2) \
-  DIR_CURVE(Var  , 'Var'  , dir2) \
-  DIR_CURVE(Range, 'Range', dir2) \
-  DIR_CURVE(Lock , 'Lock' , dir2) \
-  DIR_CURVE(Intr , 'Intr' , dir2) \
-  DIR_CURVE(Free , 'Free' , dir2) \
-  DIR_CURVE(Float, 'Float', dir2) \
-  DIR_CURVE(Real , 'Real' , dir2) \
-  DIR_CURVE(Size , 'Size' , dir2) \
+  DIR_CURVE(ver, Block, 'Block', dir2) \
+  DIR_CURVE(ver, Null , 'Null' , dir2) \
+  DIR_CURVE(ver, Var  , 'Var'  , dir2) \
+  DIR_CURVE(ver, INull, 'INull', dir2) \
+  DIR_CURVE(ver, Range, 'Range', dir2) \
+  DIR_CURVE(ver, Lock , 'Lock' , dir2) \
+  DIR_CURVE(ver, Intr , 'Intr' , dir2) \
+  DIR_CURVE(ver, LockIntr , 'LockIntr' , dir2) \
+  DIR_CURVE(ver, Free , 'Free' , dir2) \
+  DIR_CURVE(ver, Float, 'Float', dir2) \
+  DIR_CURVE(ver, Real , 'Real' , dir2) \
+  DIR_CURVE(ver, Size , 'Size' , dir2) \
  }
-//  DIR_CURVE(Inull, 'Inull', dir2) \
-//  DIR_CURVE(Param, 'Param', dir2) \
+//  DIR_CURVE(ver, Param, 'Param', dir2) \
 
-graph gr/count-per-dir.jgr {
+graph gr/count-per-dir-4-241.jgr {
  xaxis = groups
  size = 6 2
  legend = "defaults x 50 y 60"
 
- DIR_GRP("Drivers", 'drivers')
- DIR_GRP("Staging", 'staging')
- DIR_GRP("Sound"  , 'sound')
- DIR_GRP("Arch"   , 'arch')
- DIR_GRP("FS"     , 'fs')
- DIR_GRP("Net"    , 'net')
- DIR_GRP("Other"  , 'other')
+ DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
+ DIR_GRP('linux-2.4.1', "Arch"   , 'arch')
+ DIR_GRP('linux-2.4.1', "FS"     , 'fs')
+ DIR_GRP('linux-2.4.1', "Net"    , 'net')
+ DIR_GRP('linux-2.4.1', "Other"  , 'other')
+}
+
+graph gr/count-per-dir-4-260.jgr {
+ xaxis = groups
+ size = 6 2
+ legend = "defaults x 50 y 25"
+
+ DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
+ DIR_GRP('linux-2.6.0', "Sound"  , 'sound')
+ DIR_GRP('linux-2.6.0', "Arch"   , 'arch')
+ DIR_GRP('linux-2.6.0', "FS"     , 'fs')
+ DIR_GRP('linux-2.6.0', "Net"    , 'net')
+ DIR_GRP('linux-2.6.0', "Other"  , 'other')
+}
+
+graph gr/count-per-dir-4-2612.jgr {
+ xaxis = groups
+ size = 6 2
+ legend = "defaults x 50 y 25"
+
+ DIR_GRP('linux-2.6.12', "Drivers", 'drivers')
+ DIR_GRP('linux-2.6.12', "Sound"  , 'sound')
+ DIR_GRP('linux-2.6.12', "Arch"   , 'arch')
+ DIR_GRP('linux-2.6.12', "FS"     , 'fs')
+ DIR_GRP('linux-2.6.12', "Net"    , 'net')
+ DIR_GRP('linux-2.6.12', "Other"  , 'other')
+}
+
+graph gr/count-per-dir-4-2633.jgr {
+ xaxis = groups
+ size = 6 2
+ legend = "defaults x 50 y 60"
+
+ DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
+ DIR_GRP('linux-2.6.33', "Staging", 'staging')
+ DIR_GRP('linux-2.6.33', "Sound"  , 'sound')
+ DIR_GRP('linux-2.6.33', "Arch"   , 'arch')
+ DIR_GRP('linux-2.6.33', "FS"     , 'fs')
+ DIR_GRP('linux-2.6.33', "Net"    , 'net')
+ DIR_GRP('linux-2.6.33', "Other"  , 'other')
 }
 
 graph gr/avg-ages.jgr {
