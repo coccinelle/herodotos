@@ -79,10 +79,10 @@ orgs.opt: $(MENHIR_PATH).opt commons.opt diff.opt
 
 .SUFFIXES: .ml .mli .cmo .cmi .cmx .cma
 
-.ml.cmo:
+.mli.cmi:
 	$(OCAMLC) -c $<
 
-.mli.cmi:
+.ml.cmo:
 	$(OCAMLC) -c $<
 
 .ml.cmx:
