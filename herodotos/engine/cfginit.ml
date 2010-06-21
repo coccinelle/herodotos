@@ -195,11 +195,16 @@ let comp_makefile_for_group atts group =
 let compute_makefile () =
   let cmdslist =  Setup.GphTbl.fold
     (fun name (atts, subgraph) cmds ->
-       match subgraph with
-	   Ast_config.Curves curves ->
-	     comp_makefile_for_curves atts curves :: cmds
-	 | Ast_config.Groups groups ->
-	     List.map (comp_makefile_for_group atts) groups @ cmds
+       match Config.get_ytype name atts with
+	   "size" | "sizepct" | "usersize" -> cmds
+	   | _ ->
+	       begin
+		 match subgraph with
+		     Ast_config.Curves curves ->
+		       comp_makefile_for_curves atts curves :: cmds
+		   | Ast_config.Groups groups ->
+		       List.map (comp_makefile_for_group atts) groups @ cmds
+	       end
     ) Setup.graphs []
   in
   let cmds = List.flatten cmdslist in
