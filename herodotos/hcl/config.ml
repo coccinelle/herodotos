@@ -680,9 +680,9 @@ let get_projects_of gatts curves =
       (List.map
 	 (fun (project, _,atts,_) ->
 	    try
-	      [get_project (gatts@atts) project]
+	      [get_project (atts@gatts) project]
 	    with _ ->
-	      get_projects (gatts@atts)
+	      get_projects (atts@gatts)
 	 ) curves
       )
   )
@@ -727,7 +727,7 @@ let get_bugset_of_curve gatts curve : string list =
   let (project, pattern, atts, pos) = curve in
     try
       (* FIXME Give priority of atts over gatts *)
-      let p = get_project (gatts@atts) project in
+      let p = get_project (atts@gatts) project in
       let d_list = get_pattern false gatts pattern atts in
 	List.map (fun d ->
 		    locate_data p d Global.bugext)
@@ -747,7 +747,7 @@ let get_cmdlist gatts curve =
   let (project, pattern, atts, pos) = curve in
     try
       (* FIXME Give priority of atts over gatts *)
-      let p = get_project (gatts@atts) project in
+      let p = get_project (atts@gatts) project in
       let d_list = get_pattern true gatts pattern atts in
 	List.map (fun d ->
 		    let data = locate_data p d Global.origext in
