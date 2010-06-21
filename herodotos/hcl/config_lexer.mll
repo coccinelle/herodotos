@@ -63,6 +63,7 @@ rule token = parse
   | "findcmd"                 { P.TFINDCMD       }
   | "findchild"               { P.TFINDCHILD     }
   | "flags"                   { P.TSPFLAGS       }
+  | "footer"                  { P.TFOOTER        }
   | "format"                  { P.TFORMAT        }
   | "graph"                   { P.TGRAPH         }
   | "group"                   { P.TGROUP         }

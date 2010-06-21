@@ -23,7 +23,7 @@
 %token TFINDCHILD
 %token TSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT
 %token TLEGEND TXLEGEND TXMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR
-%token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR
+%token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR TFOOTER
 %token TFILE TFILENAME TRATIO TSORT TGROUP TINFO TSIZE TVMIN TPRUNE TAUTHOR
 %token<int> TInt
 %token<float> TFloat
@@ -77,12 +77,14 @@ attr:
     { if f = "" then Ast_config.File(None) else Ast_config.File(Some f) }
 | TFILE          TEQUAL TNONE                      { Ast_config.File(None)}
 | TFILENAME      TEQUAL b=TBOOL                    { Ast_config.Filename(b)}
+| TFOOTER        TEQUAL l=TSTRING                  { Ast_config.Footer(l)}
 | TFORMAT        TEQUAL dft=TId                    { Ast_config.Format(dft) }
 | TINFO          TEQUAL b=TBOOL                    { Ast_config.Info(b)}
 | TLEGEND        TEQUAL l=TSTRING                  { Ast_config.Legend(l)}
 | TXLEGEND       TEQUAL l=TSTRING                  { Ast_config.XLegend(to_jgraph_fmt l)}
 | TYLEGEND       TEQUAL l=TSTRING                  { Ast_config.YLegend(to_jgraph_fmt l)}
 | TYLEGENDFACTOR TEQUAL f=TId                      { Ast_config.YLegendFactor(f)}
+| TLINESTYLE     TEQUAL TNONE                      { Ast_config.LineType("none")}
 | TLINESTYLE     TEQUAL s=TId                      { Ast_config.LineType(s)}
 | TMARKTYPE      TEQUAL TNONE                      { Ast_config.MarkType("none")}
 | TMARKTYPE      TEQUAL m=TId                      { Ast_config.MarkType(m)}

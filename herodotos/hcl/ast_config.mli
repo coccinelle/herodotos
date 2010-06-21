@@ -24,6 +24,7 @@ type attr =
   | Factor of float
   | File of string option
   | Filename of bool
+  | Footer of string
   | Format of string
   | Info of bool
   | DftProject of string

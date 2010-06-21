@@ -126,6 +126,7 @@ let show_attr attr =
 	     | Some s -> prerr_endline ("file = \""^s^"\"")
 	  )
       | Ast_config.Filename b -> prerr_endline ("filename = "^Misc.string_of_bool b)
+      | Ast_config.Footer f -> prerr_endline ("footer = \""^f^"\"")
       | Ast_config.Format mode -> prerr_endline ("format = "^mode)
       | Ast_config.Author (b) -> prerr_endline ("author = "^Misc.string_of_bool b)
       | Ast_config.Info b -> prerr_endline ("info = "^Misc.string_of_bool b)
