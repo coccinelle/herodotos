@@ -131,7 +131,7 @@ graph gr/orig-2_6_33.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 2
+ size = 1.5 1
 
  ORIG_CURVE(Block, 'Block')
 // ORIG_CURVE(Null , 'Null' )
@@ -152,7 +152,7 @@ graph gr/orig-2_6_33.jgr {
 graph gr/count.jgr {
  xaxis = groups
  legend = "off"
- size = 6 2
+ size = 3 1
  sql = SELECT standardized_name, data FROM "Bugs per OSDI category" \
        WHERE version_name='linux-2.6.33';
 }
@@ -184,7 +184,7 @@ graph gr/count.jgr {
 
 graph gr/count-per-dir-4-241.jgr {
  xaxis = groups
- size = 6 2
+ size = 3 1
  legend = "defaults x 55 y 45"
 
  DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
@@ -196,7 +196,7 @@ graph gr/count-per-dir-4-241.jgr {
 
 graph gr/count-per-dir-4-260.jgr {
  xaxis = groups
- size = 6 2
+ size = 3 1
  legend = "off"
 
  DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
@@ -209,7 +209,7 @@ graph gr/count-per-dir-4-260.jgr {
 
 graph gr/count-per-dir-4-2612.jgr {
  xaxis = groups
- size = 6 2
+ size = 3 1
  legend = "off"
 
  DIR_GRP('linux-2.6.12', "Drivers", 'drivers')
@@ -222,7 +222,7 @@ graph gr/count-per-dir-4-2612.jgr {
 
 graph gr/count-per-dir-4-2633.jgr {
  xaxis = groups
- size = 6 2
+ size = 3 1
  legend = "off"
 
  DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
@@ -239,6 +239,6 @@ graph gr/avg-ages.jgr {
  legend = "off"
  factor = 365.25
  ylegend = "Years"
- size = 6 2
+ size = 3 1
  sql = SELECT * FROM "Avg age";
 }
