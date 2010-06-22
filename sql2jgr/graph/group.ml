@@ -182,7 +182,7 @@ let check_label label =
     end
   else ""
 
-let draw_curve ch msg prjnum idx (_, linetype, color, _, marksize, (_,label), file, data) =
+let draw_curve ch msg prjnum idx ynodata (_, linetype, color, _, marksize, (_,label), file, data) =
   let labelstr = check_label label in
 (*   let labelstr = if idx < prjnum then Printf.sprintf " label : %s" label else "" in *)
     Printf.fprintf ch ("(* %s\n\t%s *)\n") msg file;
@@ -193,7 +193,7 @@ let draw_curve ch msg prjnum idx (_, linetype, color, _, marksize, (_,label), fi
 			(match dopt with
 			     None ->
 			       Printf.fprintf ch "newstring fontsize 4 rotate 90";
-			       Printf.fprintf ch " x % 2.2f y 1 hjl vjc : No data\n"
+			       Printf.fprintf ch " x % 2.2f y %d hjl vjc : No data\n" ynodata
 				 ((float_of_int idx) +. 0.5)
 			   | Some d ->
 			       let pos = Printf.sprintf "% 2.2f % 4f" ((float_of_int idx) +. 0.5) d in
@@ -214,8 +214,10 @@ let draw vb debug conn name grdft (atts, groups) =
   let grpnum = List.length groups in
   let evolnum = List.length evols in
   let prjnum = if grpnum = 0 then evolnum else grpnum in
+  let y_max = ymax evols in
+  let ynodata = if y_max > 10 then 1 else 0 in
     prerr_endline ("Drawing "^gname);
-    draw_header outch (float_of_int evolnum) (ymax evols) grinfo prjnum evols;
-    ignore(List.fold_left (draw_curve outch msg prjnum) 0 evols);
+    draw_header outch (float_of_int evolnum) y_max grinfo prjnum evols;
+    ignore(List.fold_left (draw_curve outch msg prjnum ynodata) 0 evols);
     close_out outch;
     gname
