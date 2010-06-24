@@ -122,7 +122,7 @@ graph gr/count-evol-inull.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 2
+ size = 3 1
  ymin = 240
 
  COUNT_CURVE(INull, 'INull')
