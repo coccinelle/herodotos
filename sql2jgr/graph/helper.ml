@@ -745,8 +745,14 @@ let draw vb debug conn name grdft (atts, curves) =
        let evols = build_evolutions vb debug conn name grinfo scm atts curves in
        let (_,_,mindate,_) = Array.get vers 0 in
        let xmin = Config.get_xmin debug name atts in
+       let yminopt = Config.get_ymin atts in
        let xmax = xmax vers evols in
-       let ymax = ymax evols in
+       let ymax =
+	 if yminopt = None
+	 then ymax evols
+	 else let Some ymin = yminopt in
+	   (ymin, snd (ymax evols))
+       in
        let vmins = mark_vmin debug name atts curves in
        let outch = Misc.create_dir_and_open debug gname in
 	 prerr_endline ("Drawing "^gname);

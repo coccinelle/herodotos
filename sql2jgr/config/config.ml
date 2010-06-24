@@ -261,6 +261,19 @@ let get_xmin db g atts =
     if db then prerr_endline ("XMin of "^g^" is not defined. Assuming 0.");
     0.0
 
+let get_ymin atts =
+  try
+    match
+      List.find (fun x ->
+		   match x with
+		       Ast_config.YMin _ -> true
+		     | _ -> false
+		) atts
+    with
+	Ast_config.YMin v -> Some v
+      | _ -> raise Unrecoverable
+  with Not_found -> None
+
 let get_scm prj =
   try
     let atts = snd (Setup.PrjTbl.find Setup.projects prj) in

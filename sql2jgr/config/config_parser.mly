@@ -21,7 +21,7 @@
 %token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE
 %token TPREFIX TPROJECTS TWEBSITE TFLAGS TCPUCORE TSQL TDBCONN
 %token TSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT
-%token TLEGEND TXLEGEND TXMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR
+%token TLEGEND TXLEGEND TXMIN TYMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR
 %token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR
 %token TFILE TFILENAME TRATIO TGROUP TINFO TSIZE TVMIN TPRUNE TAUTHOR
 %token<int> TInt
@@ -85,6 +85,7 @@ attr:
 | TMARKSIZE      TEQUAL v=float                    { Ast_config.MarkSize(v)}
 | TXAXIS         TEQUAL t=TId                      { Ast_config.XAxis(t)}
 | TXMIN          TEQUAL v=float                    { Ast_config.XMin(v)}
+| TYMIN          TEQUAL v=float                    { Ast_config.YMin(v)}
 | TYAXIS         TEQUAL t=gid                      { Ast_config.YAxis(t)}
 | TNOTEXISTCOLOR TEQUAL r=float v=float b=float    { Ast_config.NotExistColor(r,v,b)}
 | TPROJECT       TEQUAL prj=TId                    { Ast_config.DftProject(prj)}

@@ -89,6 +89,7 @@ rule token = parse
   | "website"                 { P.TWEBSITE       }
   | "xaxis"                   { P.TXAXIS         }
   | "xmin"                    { P.TXMIN          }
+  | "ymin"                    { P.TYMIN          }
   | "xlegend"                 { P.TXLEGEND       }
   | "yaxis"                   { P.TYAXIS         }
   | "ylegend"                 { P.TYLEGEND       }
