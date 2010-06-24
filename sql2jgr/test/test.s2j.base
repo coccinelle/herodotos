@@ -141,6 +141,7 @@ graph gr/orig-2_6_33.jgr {
  yaxis = user
  project = Linux
  size = 1.5 1
+ ylegend = "Number of bugs"
 
  ORIG_CURVE(Block, 'Block')
 // ORIG_CURVE(Null , 'Null' )
