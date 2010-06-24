@@ -8,8 +8,9 @@ all: $(CONF)
 gr/db-orig.pdf: $(CONF)
 	../$(SQL2JGR) -c $^ $(FLAGS) $(@:%.pdf=%.jgr)
 
-$(CONF): $(CONF).base
+$(CONF): $(CONF).base count-per-dir.s2j rate-per-dir.s2j subdir.s2j
 	 cpp -P -U linux $(@:%=%.base) > $@
 
 clean:
 	rm -f *~
+
