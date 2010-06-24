@@ -26,7 +26,7 @@
 graph gr/rate-per-dir-4-241.jgr {
  xaxis = groups
  size = 3 1
- legend = "defaults x 63 y 45 fontsize 8"
+ legend = "off" //"defaults x 63 y 45 fontsize 8"
 
  RATE_DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
  RATE_DIR_GRP('linux-2.4.1', "Arch"   , 'arch')
