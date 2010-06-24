@@ -182,7 +182,7 @@ let check_label label =
     end
   else ""
 
-let draw_curve ch msg prjnum idx ynodata (_, linetype, color, _, marksize, (_,label), file, data) =
+let draw_curve ch msg prjnum ynodata idx (_, linetype, color, _, marksize, (_,label), file, data) =
   let labelstr = check_label label in
 (*   let labelstr = if idx < prjnum then Printf.sprintf " label : %s" label else "" in *)
     Printf.fprintf ch ("(* %s\n\t%s *)\n") msg file;
