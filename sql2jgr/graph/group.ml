@@ -161,7 +161,7 @@ draw_hash_labels
 %s
 %s
 
-yaxis size 1 min %02.4f max %02.4f size %02.2f label fontsize 9 : %s
+yaxis min %02.4f max %02.4f size %02.2f label fontsize 9 : %s
 mhash 1 hash_labels fontsize 8
 
 %s\n\n"
