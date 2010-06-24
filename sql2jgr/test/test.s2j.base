@@ -106,7 +106,7 @@ graph gr/count-evol.jgr {
  COUNT_CURVE(Block, 'Block')
 // COUNT_CURVE(Null , 'Null' )
  COUNT_CURVE(Var  , 'Var'  )
- COUNT_CURVE(INull, 'INull')
+// COUNT_CURVE(INull, 'INull')
  COUNT_CURVE(Range, 'Range')
  COUNT_CURVE(Lock , 'Lock' )
  COUNT_CURVE(Intr , 'Intr' )
@@ -116,6 +116,15 @@ graph gr/count-evol.jgr {
  COUNT_CURVE(Real , 'Real' )
  COUNT_CURVE(Param, 'Param')
  COUNT_CURVE(Size , 'Size' )
+}
+
+graph gr/count-evol-inull.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 2
+
+ COUNT_CURVE(INull, 'INull')
 }
 
 #define ORIG_CURVE(patt, patt2)                        \
