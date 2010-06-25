@@ -121,6 +121,7 @@ let show_attr attr =
       | Ast_config.MarkType (s) -> prerr_endline ("marktype = "^s)
       | Ast_config.MarkSize (v) -> prerr_endline ("marksize = "^string_of_float v)
       | Ast_config.XMin (v) -> prerr_endline ("xmin = "^string_of_float v)
+      | Ast_config.YMin (v) -> prerr_endline ("ymin = "^string_of_float v)
       | Ast_config.XAxis (s) -> prerr_endline ("xaxis = "^s)
       | Ast_config.YAxis (s) -> prerr_endline ("yaxis = "^s)
       | Ast_config.Ratio b -> prerr_endline ("ratio = "^Misc.string_of_bool b)

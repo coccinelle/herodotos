@@ -748,10 +748,9 @@ let draw vb debug conn name grdft (atts, curves) =
        let yminopt = Config.get_ymin atts in
        let xmax = xmax vers evols in
        let ymax =
-	 if yminopt = None
-	 then ymax evols
-	 else let Some ymin = yminopt in
-	   (ymin, snd (ymax evols))
+	 match yminopt with
+	     None ->      ymax evols
+	   | Some ymin -> (ymin, snd (ymax evols))
        in
        let vmins = mark_vmin debug name atts curves in
        let outch = Misc.create_dir_and_open debug gname in
