@@ -102,19 +102,18 @@ graph gr/count-evol.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 2
+ size = 3 1.5
 
  COUNT_CURVE(Block, 'Block')
 // COUNT_CURVE(Null , 'Null' )
  COUNT_CURVE(Var  , 'Var'  )
 // COUNT_CURVE(INull, 'INull')
  COUNT_CURVE(Range, 'Range')
- COUNT_CURVE(Lock , 'Lock' )
  COUNT_CURVE(Intr , 'Intr' )
  COUNT_CURVE(LockIntr , 'LockIntr' )
  COUNT_CURVE(Free , 'Free' )
  COUNT_CURVE(Float, 'Float')
- COUNT_CURVE(Real , 'Real' )
+// COUNT_CURVE(Real , 'Real' )
  COUNT_CURVE(Param, 'Param')
  COUNT_CURVE(Size , 'Size' )
 }
@@ -123,9 +122,9 @@ graph gr/count-evol-inull.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 1
- ymin = 240
+ size = 3 1.5
 
+ COUNT_CURVE(Lock , 'Lock' )
  COUNT_CURVE(INull, 'INull')
 }
 
@@ -155,7 +154,7 @@ graph gr/orig-2_6_33.jgr {
  ORIG_CURVE(LockIntr , 'LockIntr' )
  ORIG_CURVE(Free , 'Free' )
  ORIG_CURVE(Float, 'Float')
- ORIG_CURVE(Real , 'Real' )
+// ORIG_CURVE(Real , 'Real' )
  ORIG_CURVE(Param, 'Param')
  ORIG_CURVE(Size , 'Size' )
 }
@@ -193,7 +192,7 @@ graph gr/orig-pct-2_6_33.jgr {
  ORIG_CURVE_PCT(LockIntr , 'LockIntr' )
  ORIG_CURVE_PCT(Free , 'Free' )
  ORIG_CURVE_PCT(Float, 'Float')
- ORIG_CURVE_PCT(Real , 'Real' )
+// ORIG_CURVE_PCT(Real , 'Real' )
  ORIG_CURVE_PCT(Param, 'Param')
  ORIG_CURVE_PCT(Size , 'Size' )
 }
@@ -218,5 +217,5 @@ graph gr/avg-ages.jgr {
  factor = 365.25
  ylegend = "Years"
  size = 3 1
- sql = SELECT * FROM "Avg age";
+ sql = SELECT * FROM "Avg age" WHERE NOT standardized_name = 'Real';
 }
