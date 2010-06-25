@@ -18,9 +18,9 @@
   RATE_DIR_CURVE(ver, LockIntr , 'LockIntr' , dir2) \
   RATE_DIR_CURVE(ver, Free , 'Free' , dir2) \
   RATE_DIR_CURVE(ver, Float, 'Float', dir2) \
-  RATE_DIR_CURVE(ver, Real , 'Real' , dir2) \
   RATE_DIR_CURVE(ver, Size , 'Size' , dir2) \
  }
+//  RATE_DIR_CURVE(ver, Real , 'Real' , dir2) \
 //  RATE_DIR_CURVE(ver, Param, 'Param', dir2) \
 
 graph gr/rate-per-dir-4-241.jgr {
