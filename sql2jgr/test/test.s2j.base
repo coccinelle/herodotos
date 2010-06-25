@@ -94,6 +94,7 @@ pattern Size {
        	 	FROM "Count evol"                      \
        	 	WHERE standardized_name = patt2        \
 		AND release_date > '2002-01-01'        \
+		ORDER BY release_date                  \
 		GROUP BY version_name, release_date;   \
  }
 
