@@ -1,0 +1,68 @@
+pattern FALSE { color = 1 0 0 }
+pattern TRUE  { color = 0 1 0 }
+
+#define RATE_DEF_CURVE(ver, curve_name, patt2, def) \
+  curve pattern def {                               \
+   legend = curve_name                              \
+   sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386 \
+         WHERE standardized_name = patt2            \
+	       AND version_name = ver               \
+	       AND def_compiled = def;              \
+  }
+
+#define RATE_DEF_GRP(ver, patt, patt2)         \
+ group patt {          		               \
+  RATE_DEF_CURVE(ver, "Default", patt2, TRUE ) \
+  RATE_DEF_CURVE(ver, "Non dft", patt2, FALSE) \
+ }
+
+#define RATE_DEF(ver)   \
+  RATE_DEF_GRP(ver, "Block"    , 'Block'    ) \
+  RATE_DEF_GRP(ver, "Null"     , 'Null'     ) \
+  RATE_DEF_GRP(ver, "Var"      , 'Var'      ) \
+  RATE_DEF_GRP(ver, "INull"    , 'INull'    ) \
+  RATE_DEF_GRP(ver, "Range"    , 'Range'    ) \
+  RATE_DEF_GRP(ver, "Lock"     , 'Lock'     ) \
+  RATE_DEF_GRP(ver, "Intr"     , 'Intr'     ) \
+  RATE_DEF_GRP(ver, "LockIntr" , 'LockIntr' ) \
+  RATE_DEF_GRP(ver, "Free"     , 'Free'     ) \
+  RATE_DEF_GRP(ver, "Size"     , 'Size'     )
+
+//  RATE_DEF_GRP(ver, "Float"    , 'Float'    ) \
+
+graph gr/rate-4-241-x86.jgr {
+ xaxis = groups
+ size = 3 1
+ //"defaults x 63 y 45 fontsize 8"
+ legend = "off
+
+newstring fontsize 6 x 3 y 0.005 hjl vjb : Part of defconfig
+newcurve marktype box linetype none color 0. 1. 0.  marksize 0.6
+pts 2 0.005
+
+newstring fontsize 6 x 3 y 0.004 hjl vjb : Not part of defconfig
+newcurve marktype box linetype none color 1. 0. 0.  marksize 0.6
+pts 2 0.004
+
+"
+
+ RATE_DEF('linux-2.4.1')
+}
+
+graph gr/rate-4-2633-x86.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off
+
+newstring fontsize 6 x 7 y 0.008 hjl vjb : Part of defconfig
+newcurve marktype box linetype none color 0. 1. 0.  marksize 0.6
+pts 6 0.008
+
+newstring fontsize 6 x 7 y 0.006 hjl vjb : Not part of defconfig
+newcurve marktype box linetype none color 1. 0. 0.  marksize 0.6
+pts 6 0.006
+
+"
+
+ RATE_DEF('linux-2.6.33')
+}
