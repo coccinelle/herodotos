@@ -20,8 +20,6 @@ pattern TRUE  { color = 0 1 0 }
   RATE_DEF_GRP(ver, "Block"    , 'Block'    ) \
   RATE_DEF_GRP(ver, "Null"     , 'Null'     ) \
   RATE_DEF_GRP(ver, "Var"      , 'Var'      ) \
-  RATE_DEF_GRP(ver, "INull"    , 'INull'    ) \
-  RATE_DEF_GRP(ver, "Range"    , 'Range'    ) \
   RATE_DEF_GRP(ver, "Lock"     , 'Lock'     ) \
   RATE_DEF_GRP(ver, "Intr"     , 'Intr'     ) \
   RATE_DEF_GRP(ver, "LockIntr" , 'LockIntr' ) \
@@ -29,6 +27,8 @@ pattern TRUE  { color = 0 1 0 }
   RATE_DEF_GRP(ver, "Size"     , 'Size'     )
 
 //  RATE_DEF_GRP(ver, "Float"    , 'Float'    ) \
+//  RATE_DEF_GRP(ver, "INull"    , 'INull'    ) \
+//  RATE_DEF_GRP(ver, "Range"    , 'Range'    ) \
 
 graph gr/rate-4-241-x86.jgr {
  xaxis = groups
