@@ -122,6 +122,7 @@ let show_attr attr =
       | Ast_config.MarkSize (v) -> prerr_endline ("marksize = "^string_of_float v)
       | Ast_config.XMin (v) -> prerr_endline ("xmin = "^string_of_float v)
       | Ast_config.YMin (v) -> prerr_endline ("ymin = "^string_of_float v)
+      | Ast_config.YMax (v) -> prerr_endline ("ymax = "^string_of_float v)
       | Ast_config.XAxis (s) -> prerr_endline ("xaxis = "^s)
       | Ast_config.YAxis (s) -> prerr_endline ("yaxis = "^s)
       | Ast_config.Ratio b -> prerr_endline ("ratio = "^Misc.string_of_bool b)
@@ -261,6 +262,19 @@ let get_xmin db g atts =
   with _ ->
     if db then prerr_endline ("XMin of "^g^" is not defined. Assuming 0.");
     0.0
+
+let get_ymax atts =
+  try
+    match
+      List.find (fun x ->
+		   match x with
+		       Ast_config.YMax _ -> true
+		     | _ -> false
+		) atts
+    with
+	Ast_config.YMax v -> Some v
+      | _ -> raise Unrecoverable
+  with Not_found -> None
 
 let get_ymin atts =
   try

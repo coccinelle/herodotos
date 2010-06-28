@@ -90,6 +90,7 @@ rule token = parse
   | "xaxis"                   { P.TXAXIS         }
   | "xmin"                    { P.TXMIN          }
   | "ymin"                    { P.TYMIN          }
+  | "ymax"                    { P.TYMAX          }
   | "xlegend"                 { P.TXLEGEND       }
   | "yaxis"                   { P.TYAXIS         }
   | "ylegend"                 { P.TYLEGEND       }
@@ -104,6 +105,7 @@ rule token = parse
   | '/'                       { P.TSLASH }
   | ','                       { P.TCOMMA }
   | ' '                       { token lexbuf }
+  | "!="                      { P.TNEQ   }
   | '='                       { P.TEQUAL }
   | '('                       { P.TLPAR }
   | ')'                       { P.TRPAR }

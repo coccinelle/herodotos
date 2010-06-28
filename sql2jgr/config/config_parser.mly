@@ -16,12 +16,13 @@
 // TCOLEQ TLAB TRAB
 
 %token EOF
-%token TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS
+%token TNEQ TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS
 %token TLCB TRCB TLPAR TRPAR TLT TGT TSC TCOLON
 %token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE
 %token TPREFIX TPROJECTS TWEBSITE TFLAGS TCPUCORE TSQL TDBCONN
 %token TSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT
-%token TLEGEND TXLEGEND TXMIN TYMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR
+%token TLEGEND TXLEGEND TXMIN TYMIN TYMAX TXAXIS TYAXIS
+%token TYLEGEND TYLEGENDFACTOR TFACTOR
 %token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR
 %token TFILE TFILENAME TRATIO TGROUP TINFO TSIZE TVMIN TPRUNE TAUTHOR
 %token<int> TInt
@@ -86,6 +87,7 @@ attr:
 | TXAXIS         TEQUAL t=TId                      { Ast_config.XAxis(t)}
 | TXMIN          TEQUAL v=float                    { Ast_config.XMin(v)}
 | TYMIN          TEQUAL v=float                    { Ast_config.YMin(v)}
+| TYMAX          TEQUAL v=float                    { Ast_config.YMax(v)}
 | TYAXIS         TEQUAL t=gid                      { Ast_config.YAxis(t)}
 | TNOTEXISTCOLOR TEQUAL r=float v=float b=float    { Ast_config.NotExistColor(r,v,b)}
 | TPROJECT       TEQUAL prj=TId                    { Ast_config.DftProject(prj)}
@@ -213,14 +215,15 @@ sql_tok:
   | c=TInt                        { string_of_int c }
   | s=TSTRING2Q                   { "\""^s^"\""     }
   | s=TSTRING1Q                   { "'"^s^"'"       }
-  | TMINUS                        { "-" }
-  | TPLUS                         { "+" }
-  | TSTAR                         { "*" }
-  | TSLASH                        { "/" }
-  | TCOMMA                        { "," }
-  | TEQUAL                        { "=" }
-  | TLPAR                         { "(" }
-  | TRPAR                         { ")" }
-  | TCOLON                        { ":" }
-  | TLT                           { "<" }
-  | TGT                           { ">" }
+  | TMINUS                        { "-"  }
+  | TPLUS                         { "+"  }
+  | TSTAR                         { "*"  }
+  | TSLASH                        { "/"  }
+  | TCOMMA                        { ","  }
+  | TNEQ                          { "!=" }
+  | TEQUAL                        { "="  }
+  | TLPAR                         { "("  }
+  | TRPAR                         { ")"  }
+  | TCOLON                        { ":"  }
+  | TLT                           { "<"  }
+  | TGT                           { ">"  }

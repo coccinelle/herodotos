@@ -735,23 +735,28 @@ let draw_curve ch msg mindate ((vlist, linetype, color, marktype, marksize, labe
 	 Printf.fprintf ch ("\n\n")
     )
 
+let set_ymin atts (ymin, ymax) =
+  match Config.get_ymin atts with
+      None ->      (ymin, ymax)
+    | Some ymin -> (ymin, ymax)
+
+let set_ymax atts (ymin, ymax) =
+  match Config.get_ymax atts with
+      None ->      (ymin, ymax)
+    | Some ymax -> (ymin, ymax)
+
 let draw vb debug conn name grdft (atts, curves) =
   Debug.profile_code "Helper.draw"
     (fun () ->
-       let (msg, xdft, ydft, fdft, xmax, ymax, scm, _) = grdft in
+       let (msg, xdft, ydft, fdft, xmax, ymax_f, scm, _) = grdft in
        let vers = Config.get_grversinfos atts curves in
        let gname = !Setup.prefix ^"/"^ name in
        let grinfo = get_info debug name atts xdft ydft fdft in
        let evols = build_evolutions vb debug conn name grinfo scm atts curves in
        let (_,_,mindate,_) = Array.get vers 0 in
        let xmin = Config.get_xmin debug name atts in
-       let yminopt = Config.get_ymin atts in
        let xmax = xmax vers evols in
-       let ymax =
-	 match yminopt with
-	     None ->      ymax evols
-	   | Some ymin -> (ymin, snd (ymax evols))
-       in
+       let ymax = set_ymax atts (set_ymin atts (ymax_f evols)) in
        let vmins = mark_vmin debug name atts curves in
        let outch = Misc.create_dir_and_open debug gname in
 	 prerr_endline ("Drawing "^gname);

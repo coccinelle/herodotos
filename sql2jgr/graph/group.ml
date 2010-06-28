@@ -206,7 +206,7 @@ let draw_curve ch msg prjnum ynodata idx (_, linetype, color, _, marksize, (_,la
 
 let draw vb debug conn name grdft (atts, groups) =
   _labellist := [];
-  let (msg, xdft, ydft, fdft, xmax, ymax, scm, _) = grdft in
+  let (msg, xdft, ydft, fdft, xmax, ymax_f, scm, _) = grdft in
   let gname = !Setup.prefix ^"/"^ name in
   let outch = Misc.create_dir_and_open debug gname in
   let grinfo = Helper.get_info debug name atts xdft ydft fdft in
@@ -214,7 +214,7 @@ let draw vb debug conn name grdft (atts, groups) =
   let grpnum = List.length groups in
   let evolnum = List.length evols in
   let prjnum = if grpnum = 0 then evolnum else grpnum in
-  let y_max = ymax evols in
+  let y_max = Helper.set_ymax atts (Helper.set_ymin atts (ymax_f evols)) in
   let ynodata = if snd y_max > 10.0 then 1 else 0 in
     prerr_endline ("Drawing "^gname);
     draw_header outch (float_of_int evolnum) y_max grinfo prjnum evols;

@@ -45,6 +45,7 @@ type attr =
   | XLegend of string
   | XMin of float
   | YMin of float
+  | YMax of float
   | YAxis of string
   | YLegend of string
   | YLegendFactor of string
