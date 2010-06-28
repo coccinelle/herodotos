@@ -220,4 +220,5 @@ graph gr/avg-ages.jgr {
  ylegend = "Years"
  size = 3 1
  sql = SELECT * FROM "Avg age" WHERE NOT standardized_name = 'Real';
+// sql = SELECT * FROM "Avg age" WHERE standardized_name != 'Real';
 }
