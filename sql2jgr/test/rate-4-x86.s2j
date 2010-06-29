@@ -1,5 +1,6 @@
-pattern FALSE { color = 1 0 0 }
-pattern TRUE  { color = 0 1 0 }
+pattern FALSE  { color = 1 0   0 }
+pattern TRUE   { color = 0 1   0 }
+pattern ALLYES { color = 1 .69 0 }
 
 #define RATE_DEF_CURVE(ver, curve_name, patt2, def) \
   curve pattern def {                               \
@@ -10,25 +11,27 @@ pattern TRUE  { color = 0 1 0 }
 	       AND def_compiled = def;              \
   }
 
+#define RATE_ALLYES_CURVE(ver, patt2)               \
+  curve pattern ALLYES {                            \
+   legend = "All yes"                               \
+   sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386_allyes \
+         WHERE standardized_name = patt2            \
+	       AND version_name = ver               \
+	       AND allyes_compiled = TRUE;          \
+  }
+
 #define RATE_DEF_GRP(ver, patt, patt2)         \
  group patt {          		               \
   RATE_DEF_CURVE(ver, "Default", patt2, TRUE ) \
   RATE_DEF_CURVE(ver, "Non dft", patt2, FALSE) \
  }
 
-#define RATE_DEF(ver)   \
-  RATE_DEF_GRP(ver, "Block"    , 'Block'    ) \
-  RATE_DEF_GRP(ver, "Null"     , 'Null'     ) \
-  RATE_DEF_GRP(ver, "Var"      , 'Var'      ) \
-  RATE_DEF_GRP(ver, "Lock"     , 'Lock'     ) \
-  RATE_DEF_GRP(ver, "Intr"     , 'Intr'     ) \
-  RATE_DEF_GRP(ver, "LockIntr" , 'LockIntr' ) \
-  RATE_DEF_GRP(ver, "Free"     , 'Free'     ) \
-  RATE_DEF_GRP(ver, "Size"     , 'Size'     )
-
-//  RATE_DEF_GRP(ver, "Float"    , 'Float'    ) \
-//  RATE_DEF_GRP(ver, "INull"    , 'INull'    ) \
-//  RATE_DEF_GRP(ver, "Range"    , 'Range'    ) \
+#define RATE_ALL_GRP(ver, patt, patt2)         \
+ group patt {          		               \
+  RATE_DEF_CURVE(ver, "Default", patt2, TRUE ) \
+  RATE_ALLYES_CURVE(ver, patt2)                \
+  RATE_DEF_CURVE(ver, "Non dft", patt2, FALSE) \
+ }
 
 graph gr/rate-4-241-x86.jgr {
  xaxis = groups
@@ -47,7 +50,15 @@ pts 2 0.006
 
 "
 
- RATE_DEF('linux-2.4.1')
+  RATE_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
+  RATE_DEF_GRP('linux-2.4.1', "Null"     , 'Null'     ) \
+  RATE_DEF_GRP('linux-2.4.1', "Var"      , 'Var'      ) \
+  RATE_DEF_GRP('linux-2.4.1', "Lock"     , 'Lock'     ) \
+  RATE_DEF_GRP('linux-2.4.1', "Intr"     , 'Intr'     ) \
+  RATE_DEF_GRP('linux-2.4.1', "LockIntr" , 'LockIntr' ) \
+  RATE_DEF_GRP('linux-2.4.1', "Free"     , 'Free'     ) \
+  RATE_DEF_GRP('linux-2.4.1', "Size"     , 'Size'     )
+
 }
 
 graph gr/rate-4-2633-x86.jgr {
@@ -56,15 +67,27 @@ graph gr/rate-4-2633-x86.jgr {
  ymax = 0.0125
  legend = "off
 
-newstring fontsize 6 x 7 y 0.008 hjl vjb : Part of defconfig
+newstring fontsize 6 x 16 y 0.01 hjl vjb : Part of defconfig
 newcurve marktype box linetype none color 0. 1. 0.  marksize 0.6
-pts 6 0.008
+pts 15 0.0102
 
-newstring fontsize 6 x 7 y 0.006 hjl vjb : Not part of defconfig
+newstring fontsize 6 x 16 y 0.008 hjl vjb : Part of allyesconfig
+newcurve marktype box linetype none color 1. 0.69 0.  marksize 0.6
+pts 15 0.0082
+
+newstring fontsize 6 x 16 y 0.006 hjl vjb : Part of manual configuration
 newcurve marktype box linetype none color 1. 0. 0.  marksize 0.6
-pts 6 0.006
+pts 15 0.0062
 
 "
 
- RATE_DEF('linux-2.6.33')
+  RATE_ALL_GRP('linux-2.6.33', "Block"    , 'Block'    ) \
+  RATE_ALL_GRP('linux-2.6.33', "Null"     , 'Null'     ) \
+  RATE_ALL_GRP('linux-2.6.33', "Var"      , 'Var'      ) \
+  RATE_ALL_GRP('linux-2.6.33', "Lock"     , 'Lock'     ) \
+  RATE_ALL_GRP('linux-2.6.33', "Intr"     , 'Intr'     ) \
+  RATE_ALL_GRP('linux-2.6.33', "LockIntr" , 'LockIntr' ) \
+  RATE_ALL_GRP('linux-2.6.33', "Free"     , 'Free'     ) \
+  RATE_ALL_GRP('linux-2.6.33', "Size"     , 'Size'     )
+
 }
