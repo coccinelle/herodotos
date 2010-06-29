@@ -27,6 +27,7 @@ graph gr/count-per-dir-4-241.jgr {
  xaxis = groups
  size = 3 1
  legend = "defaults x 63 y 45 fontsize 8"
+ ymax = 217
 
  DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
  DIR_GRP('linux-2.4.1', "Arch"   , 'arch')
@@ -39,6 +40,7 @@ graph gr/count-per-dir-4-260.jgr {
  xaxis = groups
  size = 3 1
  legend = "off"
+ ymax = 217
 
  DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
  DIR_GRP('linux-2.6.0', "Sound"  , 'sound')
@@ -52,6 +54,7 @@ graph gr/count-per-dir-4-2612.jgr {
  xaxis = groups
  size = 3 1
  legend = "off"
+ ymax = 217
 
  DIR_GRP('linux-2.6.12', "Drivers", 'drivers')
  DIR_GRP('linux-2.6.12', "Sound"  , 'sound')
@@ -65,6 +68,7 @@ graph gr/count-per-dir-4-2633.jgr {
  xaxis = groups
  size = 3 1
  legend = "off"
+ ymax = 217
 
  DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
  DIR_GRP('linux-2.6.33', "Staging", 'staging')
