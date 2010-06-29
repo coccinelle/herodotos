@@ -37,13 +37,13 @@ graph gr/rate-4-241-x86.jgr {
  ymax = 0.0125
  legend = "off
 
-newstring fontsize 6 x 3 y 0.005 hjl vjb : Part of defconfig
+newstring fontsize 6 x 3 y 0.008 hjl vjb : Part of defconfig
 newcurve marktype box linetype none color 0. 1. 0.  marksize 0.6
-pts 2 0.005
+pts 2 0.008
 
-newstring fontsize 6 x 3 y 0.004 hjl vjb : Not part of defconfig
+newstring fontsize 6 x 3 y 0.006 hjl vjb : Not part of defconfig
 newcurve marktype box linetype none color 1. 0. 0.  marksize 0.6
-pts 2 0.004
+pts 2 0.006
 
 "
 
