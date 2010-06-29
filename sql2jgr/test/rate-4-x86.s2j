@@ -34,7 +34,7 @@ graph gr/rate-4-241-x86.jgr {
  xaxis = groups
  size = 3 1
  //"defaults x 63 y 45 fontsize 8"
- ymax = 0.0215
+ ymax = 0.0125
  legend = "off
 
 newstring fontsize 6 x 3 y 0.005 hjl vjb : Part of defconfig
@@ -53,7 +53,7 @@ pts 2 0.004
 graph gr/rate-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
- ymax = 0.0215
+ ymax = 0.0125
  legend = "off
 
 newstring fontsize 6 x 7 y 0.008 hjl vjb : Part of defconfig

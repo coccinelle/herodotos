@@ -27,7 +27,7 @@ graph gr/rate-per-dir-4-241.jgr {
  xaxis = groups
  size = 3 1
  legend = "off" //"defaults x 63 y 45 fontsize 8"
- ymax = 0.014
+ ymax = 0.046
 
  RATE_DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
  RATE_DIR_GRP('linux-2.4.1', "Arch"   , 'arch')
@@ -40,7 +40,7 @@ graph gr/rate-per-dir-4-260.jgr {
  xaxis = groups
  size = 3 1
  legend = "off"
- ymax = 0.014
+ ymax = 0.046
 
  RATE_DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
  RATE_DIR_GRP('linux-2.6.0', "Sound"  , 'sound')
@@ -54,7 +54,7 @@ graph gr/rate-per-dir-4-2612.jgr {
  xaxis = groups
  size = 3 1
  legend = "off"
- ymax = 0.014
+ ymax = 0.046
 
  RATE_DIR_GRP('linux-2.6.12', "Drivers", 'drivers')
  RATE_DIR_GRP('linux-2.6.12', "Sound"  , 'sound')
@@ -68,7 +68,7 @@ graph gr/rate-per-dir-4-2633.jgr {
  xaxis = groups
  size = 3 1
  legend = "off"
- ymax = 0.014
+ ymax = 0.046
 
  RATE_DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
  RATE_DIR_GRP('linux-2.6.33', "Staging", 'staging')
