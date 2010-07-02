@@ -1,0 +1,74 @@
+pattern Linux {
+ marktype = none
+ color = 0 0 0
+}
+
+pattern Drivers {
+ color = 1 0 0
+}
+
+pattern Staging {
+ color = 0 0 0
+}
+
+pattern Sound   {
+ color = 0 0 1
+}
+
+pattern Arch    {
+ color = 0 1 1
+}
+
+pattern FS      {
+ color = 0 1 0
+}
+
+pattern Net     {
+ color = 1 1 0
+}
+
+pattern	Other   {
+ color = 1 0 1
+}
+
+/*
+
+#define DENSITY_CURVE(prj, dir)                           \
+ curve pattern prj {				          \
+   sql = SELECT version_name, release_date, fault_density \
+       	 	FROM density_per_dir                      \
+		WHERE osdi_dirname = dir                  \
+		ORDER BY release_date;                    \
+ }
+*/
+
+graph gr/density.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 1.5
+ legend = "off"
+ ylegend = "Faults per 1k LOC"
+
+ curve pattern Linux {				          \
+   sql = SELECT r.version_name, r.release_date,           \
+       1000*count(report_id)::float/locc::float as fault_density \
+FROM "Reports info" r, versions \
+WHERE versions.version_name = r.version_name \
+AND versions.main = 2 \
+AND versions.major = 6 \
+GROUP BY r.version_name , r.release_date , versions.locc \
+ORDER BY r.release_date; \
+ }
+
+/*
+ DENSITY_CURVE(Drivers, 'drivers')
+ DENSITY_CURVE(Staging, 'staging')
+ DENSITY_CURVE(Sound  , 'sound'  )
+ DENSITY_CURVE(Arch   , 'arch'   )
+ DENSITY_CURVE(FS     , 'fs'     )
+ DENSITY_CURVE(Net    , 'net'    )
+ DENSITY_CURVE(Other  , 'other'  )
+*/
+
+}

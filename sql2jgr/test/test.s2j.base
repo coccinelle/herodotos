@@ -213,6 +213,8 @@ graph gr/count.jgr {
 
 #include "rate-4-x86.s2j"
 
+#include "density.s2j"
+
 graph gr/avg-ages.jgr {
  xaxis = groups
  legend = "off"
