@@ -17,7 +17,7 @@
 
 %token EOF
 %token TNEQ TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS
-%token TLCB TRCB TLPAR TRPAR TLT TGT TSC TCOLON
+%token TLCB TRCB TLPAR TRPAR TLT TGT TSC TCOLON TDCOLON
 %token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE
 %token TPREFIX TPROJECTS TWEBSITE TFLAGS TCPUCORE TSQL TDBCONN
 %token TSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT
@@ -82,6 +82,7 @@ attr:
 | TYLEGEND       TEQUAL l=TSTRING2Q                  { Ast_config.YLegend(to_jgraph_fmt l)}
 | TYLEGENDFACTOR TEQUAL f=TId                      { Ast_config.YLegendFactor(f)}
 | TLINESTYLE     TEQUAL s=TId                      { Ast_config.LineType(s)}
+| TMARKTYPE      TEQUAL TNONE                      { Ast_config.MarkType("none")}
 | TMARKTYPE      TEQUAL m=TId                      { Ast_config.MarkType(m)}
 | TMARKSIZE      TEQUAL v=float                    { Ast_config.MarkSize(v)}
 | TXAXIS         TEQUAL t=TId                      { Ast_config.XAxis(t)}
@@ -224,6 +225,7 @@ sql_tok:
   | TEQUAL                        { "="  }
   | TLPAR                         { "("  }
   | TRPAR                         { ")"  }
+  | TDCOLON                       { "::" }
   | TCOLON                        { ":"  }
   | TLT                           { "<"  }
   | TGT                           { ">"  }

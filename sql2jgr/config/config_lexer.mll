@@ -98,6 +98,7 @@ rule token = parse
   | "true"                    { P.TBOOL(true)    }
   | "false"                   { P.TBOOL(false)   }
 (*  | ":="                      { P.TCOLEQ } *)
+  | "::"                      { P.TDCOLON        }
   | ":"                       { P.TCOLON         }
   | '-'                       { P.TMINUS }
   | '+'                       { P.TPLUS  }
