@@ -18,6 +18,7 @@ let options = [
   "-h", Arg.Set help, " Display this list of options";
   "-help", Arg.Set help, " Display this list of options";
   "--help", Arg.Set help, " Display this list of options";
+  "--notes", Arg.Set notes,  " For notes SQL request";
   "--prefix", Arg.Set_string prefix, "path prefix of the source directories (test)";
   "--profile", Arg.Unit (fun () -> prerr_endline "*** PROFLING ENABLED ***";
 			   Debug.profile := Debug.PALL), " gather timing information about the main functions";
