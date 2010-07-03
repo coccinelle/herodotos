@@ -8,6 +8,7 @@ let version = ref false
 let verbose1 = ref false
 let verbose2 = ref false
 let verbose3 = ref false
+let graphs = ref false
 let png = ref false
 let pdf = ref true
 let web = ref false
@@ -21,6 +22,7 @@ let options = [
   "-c", Arg.Set_string configfile, "file Configuration file";
   "--config", Arg.Set_string configfile, "file Configuration file";
   "--debug", Arg.Set Misc.debug, " Debug mode";
+  "--graphs", Arg.Set graphs, " List graphs";
   "-h", Arg.Set help, " Display this list of options";
   "-help", Arg.Set help, " Display this list of options";
   "--help", Arg.Set help, " Display this list of options";
@@ -54,12 +56,18 @@ let main aligned =
 	      prerr_endline ("\nTODO: PLACE LONGHELP HERE\n")
 	  )
 	else
-	  (
-	    print_endline ("sql2jgr version "^ Global.version);
-	    prerr_endline ("Processing "^ !configfile);
-	    Engine.run !verbose1 !verbose2 !verbose3 !configfile !pdf !png !web !freearg;
-	    prerr_newline ()
-	  )
+	  if !graphs then
+	    (
+	      ignore(Config.parse_config !configfile);
+	      Setup.GphTbl.iter (fun name _ -> print_endline name) Setup.graphs
+	    )
+	  else
+	    (
+	      print_endline ("sql2jgr version "^ Global.version);
+	      prerr_endline ("Processing "^ !configfile);
+	      Engine.run !verbose1 !verbose2 !verbose3 !configfile !pdf !png !web !freearg;
+	      prerr_newline ()
+	    )
       end
     else
       Arg.usage aligned usage_msg
