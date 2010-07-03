@@ -8,12 +8,18 @@ SUBCONF=count-per-dir.s2j    \
 
 SQL2JGR=sql2jgr.opt
 #FLAGS?=-vvv --debug --profile
+GRAPHS=$(shell ../$(SQL2JGR) -c $(CONF) --graphs | xargs)
+
+.PHONY: all clean $(GRAPHS)
 
 all: $(CONF)
 	../$(SQL2JGR) -c $^ $(FLAGS)
 
 gr/db-orig.pdf: $(CONF)
 	../$(SQL2JGR) -c $^ $(FLAGS) $(@:%.pdf=%.jgr)
+
+$(GRAPHS): $(CONF)
+	../$(SQL2JGR) -c $^ $(FLAGS) $@
 
 $(CONF): $(CONF).base $(SUBCONF)
 	 cpp -P -undef -w $(@:%=%.base) > $@
