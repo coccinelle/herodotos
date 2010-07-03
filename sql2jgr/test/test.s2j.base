@@ -210,6 +210,7 @@ graph gr/count.jgr {
 #include "count-per-dir.s2j"
 
 #include "rate-per-dir.s2j"
+#include "cmp-rate-per-dir.s2j"
 
 #include "rate-4-x86.s2j"
 

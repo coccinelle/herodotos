@@ -1,0 +1,84 @@
+#if 1
+#define CMP_RATE_YMAX
+#else
+#define CMP_RATE_YMAX ymax = XX
+#endif
+
+#define CMP_RATE_DIR_CURVE(ver, patt, patt2, dir) \
+  curve pattern patt {              \
+   sql = SELECT standardized_name, rate FROM osdi_cmp_rate_by_directory_and_error_name \
+         WHERE standardized_name = patt2 AND dirname = dir          \
+	       AND version_name = ver; \
+  }
+
+#define CMP_RATE_DIR_GRP(ver, dir, dir2)   \
+ group dir {          		  \
+  CMP_RATE_DIR_CURVE(ver, Block, 'Block', dir2) \
+  CMP_RATE_DIR_CURVE(ver, Null , 'Null' , dir2) \
+  CMP_RATE_DIR_CURVE(ver, Var  , 'Var'  , dir2) \
+  CMP_RATE_DIR_CURVE(ver, INull, 'INull', dir2) \
+  CMP_RATE_DIR_CURVE(ver, Range, 'Range', dir2) \
+  CMP_RATE_DIR_CURVE(ver, Lock , 'Lock' , dir2) \
+  CMP_RATE_DIR_CURVE(ver, Intr , 'Intr' , dir2) \
+  CMP_RATE_DIR_CURVE(ver, LockIntr , 'LockIntr' , dir2) \
+  CMP_RATE_DIR_CURVE(ver, Free , 'Free' , dir2) \
+  CMP_RATE_DIR_CURVE(ver, Float, 'Float', dir2) \
+  CMP_RATE_DIR_CURVE(ver, Size , 'Size' , dir2) \
+ }
+//  CMP_RATE_DIR_CURVE(ver, Real , 'Real' , dir2) \
+//  CMP_RATE_DIR_CURVE(ver, Param, 'Param', dir2) \
+
+graph gr/cmp-rate-per-dir-4-241.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off" //"defaults x 63 y 45 fontsize 8"
+ CMP_RATE_YMAX
+
+ CMP_RATE_DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
+ CMP_RATE_DIR_GRP('linux-2.4.1', "Arch"   , 'arch')
+ CMP_RATE_DIR_GRP('linux-2.4.1', "FS"     , 'fs')
+ CMP_RATE_DIR_GRP('linux-2.4.1', "Net"    , 'net')
+ CMP_RATE_DIR_GRP('linux-2.4.1', "Other"  , 'other')
+}
+
+graph gr/cmp-rate-per-dir-4-260.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off"
+ CMP_RATE_YMAX
+
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Sound"  , 'sound')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Arch"   , 'arch')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "FS"     , 'fs')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Net"    , 'net')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Other"  , 'other')
+}
+
+graph gr/cmp-rate-per-dir-4-2612.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off"
+ CMP_RATE_YMAX
+
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Drivers", 'drivers')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Sound"  , 'sound')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Arch"   , 'arch')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "FS"     , 'fs')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Net"    , 'net')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Other"  , 'other')
+}
+
+graph gr/cmp-rate-per-dir-4-2633.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off"
+
+ CMP_RATE_DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
+ CMP_RATE_DIR_GRP('linux-2.6.33', "Staging", 'staging')
+ CMP_RATE_DIR_GRP('linux-2.6.33', "Sound"  , 'sound')
+ CMP_RATE_DIR_GRP('linux-2.6.33', "Arch"   , 'arch')
+ CMP_RATE_DIR_GRP('linux-2.6.33', "FS"     , 'fs')
+ CMP_RATE_DIR_GRP('linux-2.6.33', "Net"    , 'net')
+ CMP_RATE_DIR_GRP('linux-2.6.33', "Other"  , 'other')
+}
