@@ -13,7 +13,6 @@
 
 #define CMP_RATE_DIR_GRP(ver, dir, dir2)   \
  group dir {          		  \
-  CMP_RATE_DIR_CURVE(ver, Block, 'Block', dir2) \
   CMP_RATE_DIR_CURVE(ver, Null , 'Null' , dir2) \
   CMP_RATE_DIR_CURVE(ver, Var  , 'Var'  , dir2) \
   CMP_RATE_DIR_CURVE(ver, INull, 'INull', dir2) \
@@ -25,6 +24,7 @@
   CMP_RATE_DIR_CURVE(ver, Float, 'Float', dir2) \
   CMP_RATE_DIR_CURVE(ver, Size , 'Size' , dir2) \
  }
+//  CMP_RATE_DIR_CURVE(ver, Block, 'Block', dir2) \
 //  CMP_RATE_DIR_CURVE(ver, Real , 'Real' , dir2) \
 //  CMP_RATE_DIR_CURVE(ver, Param, 'Param', dir2) \
 
