@@ -193,7 +193,7 @@ let draw_curve ch msg prjnum ynodata idx (_, linetype, color, _, marksize, (_,la
 			(match dopt with
 			     None ->
 			       Printf.fprintf ch "newstring fontsize 4 rotate 90";
-			       Printf.fprintf ch " x % 2.2f y %d hjl vjc : No data\n"
+			       Printf.fprintf ch " x % 2.2f y % 2.2f hjl vjc : No data\n"
 				 ((float_of_int idx) +. 0.5) ynodata
 			   | Some d ->
 			       let pos = Printf.sprintf "% 2.2f % 4f" ((float_of_int idx) +. 0.5) d in
@@ -215,7 +215,15 @@ let draw vb debug conn name grdft (atts, groups) =
   let evolnum = List.length evols in
   let prjnum = if grpnum = 0 then evolnum else grpnum in
   let y_max = Helper.set_ymax atts (Helper.set_ymin atts (ymax_f evols)) in
-  let ynodata = if snd y_max > 10.0 then 1 else 0 in
+  let ynodata =
+    let ymax = snd y_max in
+      if ymax > 10.0 then
+	if ymax > 100.0 then
+	  1.0
+	else
+	  0.1
+      else 0.0
+  in
     prerr_endline ("Drawing "^gname);
     draw_header outch (float_of_int evolnum) y_max grinfo prjnum evols;
     ignore(List.fold_left (draw_curve outch msg prjnum ynodata) 0 evols);
