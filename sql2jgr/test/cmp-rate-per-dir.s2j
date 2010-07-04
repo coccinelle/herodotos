@@ -1,7 +1,7 @@
-#if 1
+#if 0
 #define CMP_RATE_YMAX
 #else
-#define CMP_RATE_YMAX ymax = 15
+#define CMP_RATE_YMAX ymax = 14.41
 #endif
 
 #define CMP_RATE_DIR_CURVE(ver, patt, patt2, dir) \
