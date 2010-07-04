@@ -10,10 +10,12 @@ SQL2JGR=sql2jgr.opt
 #FLAGS?=-vvv --debug --profile
 GRAPHS=$(shell ../$(SQL2JGR) -c $(CONF) --graphs | xargs)
 
-.PHONY: all clean $(GRAPHS)
+.PHONY: all clean graphs $(GRAPHS)
 
 all: $(CONF)
 	../$(SQL2JGR) -c $^ $(FLAGS)
+
+graphs: $(GRAPHS)
 
 gr/db-orig.pdf: $(CONF)
 	../$(SQL2JGR) -c $^ $(FLAGS) $(@:%.pdf=%.jgr)
