@@ -39,7 +39,7 @@ let make_svg () =
 	    prerr_endline ("Generation of all SVG - OK")
 	| _         -> prerr_endline ("Generation of all SVG - KO")
 
-let gen_graph v1 v2 conn pdf png web name graph =
+let gen_graph v1 v2 conn eps pdf png web name graph =
   let (atts, subgraph) = graph in
     if v1 then print_endline ("Graph "^name);
     let jgrname =
@@ -72,18 +72,19 @@ let gen_graph v1 v2 conn pdf png web name graph =
 	      end
 	  with Failed -> ()
       else
-	let epsname = Str.replace_first (Str.regexp_string ".jgr")".eps" jgrname in
-	  try
-	    make_eps jgrname epsname;
-	  with Failed -> ()
-
-let gen_graph_nofail v1 v2 conn pdf png web name graph =
+	if eps then
+	  let epsname = Str.replace_first (Str.regexp_string ".jgr")".eps" jgrname in
+	    try
+	      make_eps jgrname epsname;
+	    with Failed -> ()
+	  
+let gen_graph_nofail v1 v2 conn eps pdf png web name graph =
   Debug.profile_code "Engine.gen_graph_nofail"
     (fun () ->
        try
 	 try
 	   try
-	     gen_graph v1 v2 conn pdf png web name graph
+	     gen_graph v1 v2 conn eps pdf png web name graph
 	   with Unimplemented msg
 	     | Defects.Unsupported msg
 	     | Config.Misconfiguration msg ->
@@ -98,14 +99,14 @@ let gen_graph_nofail v1 v2 conn pdf png web name graph =
 	 prerr_endline "Skiping graph..."
     )
 
-let gen_graphs v1 v2 v3 config conn pdf png web conn freearg =
+let gen_graphs v1 v2 v3 config conn eps pdf png web conn freearg =
   if web || png then Misc.create_dir v2 !Setup.websitedir;
   (
     if freearg = "" then
-      Setup.GphTbl.iter (gen_graph_nofail v1 v2 conn pdf png web) Setup.graphs
+      Setup.GphTbl.iter (gen_graph_nofail v1 v2 conn eps pdf png web) Setup.graphs
     else
       try
-	gen_graph_nofail v1 v2 conn pdf png web freearg (Setup.GphTbl.find Setup.graphs freearg)
+	gen_graph_nofail v1 v2 conn eps pdf png web freearg (Setup.GphTbl.find Setup.graphs freearg)
       with Not_found ->
 	prerr_endline ("No graph named "^ freearg^" found!\nCheck "^config^" to fix the error.")
   );
@@ -117,7 +118,7 @@ let gen_graphs v1 v2 v3 config conn pdf png web conn freearg =
       else prerr_endline ("*** WARNING *** Refreshed of a single graph. NOT refreshing the HTML pages!")
     )
 
-let run v1 v2 v3 config pdf png web freearg =
+let run v1 v2 v3 config eps pdf png web freearg =
   begin
     ignore(Config.parse_config config);
     if v1 then prerr_endline "Config parsing OK!";
@@ -128,7 +129,7 @@ let run v1 v2 v3 config pdf png web freearg =
     try
       let conn = Database.open_db v1 !Setup.dbconn in
 	if v1 then prerr_endline "Connection - OK !";
-	gen_graphs v1 v2 v3 config conn pdf png web conn freearg;
+	gen_graphs v1 v2 v3 config conn eps pdf png web conn freearg;
 	if v1 then prerr_endline "Disconnecting...";
 	Database.close_db conn;
 	if v1 then prerr_endline "Done."

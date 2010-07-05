@@ -9,6 +9,7 @@ let verbose1 = ref false
 let verbose2 = ref false
 let verbose3 = ref false
 let graphs = ref false
+let eps = ref true
 let png = ref false
 let pdf = ref true
 let web = ref false
@@ -28,6 +29,7 @@ let options = [
   "--help", Arg.Set help, " Display this list of options";
   "--longhelp", Arg.Set longhelp, " Display this list of options and the supported graph types";
   "--eps", Arg.Clear pdf, " disable the (default) generation of PDF with 'epstopdf'";
+  "--jgr", Arg.Unit (fun _ ->  pdf:= false; eps:=false), " disable the (default) generation of EPS and PDF";
   "--png", Arg.Set png, " enable the generation of png images (in default mode)";
   "--profile", Arg.Unit (fun () -> prerr_endline "*** PROFILING ENABLED ***";
 			   Debug.profile := Debug.PALL), " gather timing information about the main functions";
@@ -65,7 +67,7 @@ let main aligned =
 	    (
 	      print_endline ("sql2jgr version "^ Global.version);
 	      prerr_endline ("Processing "^ !configfile);
-	      Engine.run !verbose1 !verbose2 !verbose3 !configfile !pdf !png !web !freearg;
+	      Engine.run !verbose1 !verbose2 !verbose3 !configfile !eps !pdf !png !web !freearg;
 	      prerr_newline ()
 	    )
       end
