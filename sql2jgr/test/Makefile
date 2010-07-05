@@ -13,7 +13,7 @@ GRAPHS=$(shell ../$(SQL2JGR) -c $(CONF) --graphs | xargs)
 .PHONY: all clean graphs $(GRAPHS)
 
 all: $(CONF)
-	../$(SQL2JGR) -c $^ $(FLAGS)
+	../$(SQL2JGR) -c $^ --jgr $(FLAGS)
 
 graphs: $(GRAPHS)
 
@@ -21,7 +21,7 @@ gr/db-orig.pdf: $(CONF)
 	../$(SQL2JGR) -c $^ $(FLAGS) $(@:%.pdf=%.jgr)
 
 $(GRAPHS): $(CONF)
-	../$(SQL2JGR) -c $^ $(FLAGS) $@
+	../$(SQL2JGR) -c $^ $(FLAGS) --jgr $@
 
 $(CONF): $(CONF).base $(SUBCONF)
 	 cpp -P -undef -w $(@:%=%.base) > $@
