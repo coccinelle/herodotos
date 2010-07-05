@@ -57,6 +57,7 @@ FROM "Reports info" r, versions \
 WHERE versions.version_name = r.version_name \
 AND versions.main = 2 \
 AND versions.major = 6 \
+AND r.standardized_name != 'Null' \
 GROUP BY r.version_name , r.release_date , versions.locc \
 ORDER BY r.release_date; \
  }
