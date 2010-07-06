@@ -46,20 +46,36 @@ graph gr/density.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 1.5
- legend = "off"
+ size = 3 1
+ legend = "defaults x 250 y 0.1"
  ylegend = "Faults per 1k LOC"
 
- curve pattern Linux {				          \
-   sql = SELECT r.version_name, r.release_date,           \
-       1000*count(report_id)::float/locc::float as fault_density \
-FROM "Reports info" r, versions \
-WHERE versions.version_name = r.version_name \
-AND versions.main = 2 \
-AND versions.major = 6 \
-AND r.standardized_name != 'Null' \
-GROUP BY r.version_name , r.release_date , versions.locc \
-ORDER BY r.release_date; \
+ curve pattern Staging {
+   color = 1 0 0
+   marktype = none
+   legend = "Without staging"
+   sql = SELECT r.version_name, r.release_date,
+       1000*count(report_id)::float/locc::float as fault_density
+FROM "Reports info" r, versions
+WHERE versions.version_name = r.version_name
+AND versions.main = 2
+AND versions.major = 6
+AND r.standardized_name != 'Null'
+AND r.osdi_dirname != 'staging'
+GROUP BY r.version_name , r.release_date , versions.locc
+ORDER BY r.release_date;
+ }
+
+ curve pattern Linux {
+   sql = SELECT r.version_name, r.release_date,
+       1000*count(report_id)::float/locc::float as fault_density
+FROM "Reports info" r, versions
+WHERE versions.version_name = r.version_name
+AND versions.main = 2
+AND versions.major = 6
+AND r.standardized_name != 'Null'
+GROUP BY r.version_name , r.release_date , versions.locc
+ORDER BY r.release_date;
  }
 
 /*
