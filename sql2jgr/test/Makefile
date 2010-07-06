@@ -8,7 +8,7 @@ SUBCONF=count-per-dir.s2j    \
 
 SQL2JGR=sql2jgr.opt
 #FLAGS?=-vvv --debug --profile
-GRAPHS=$(shell ../$(SQL2JGR) -c $(CONF) --graphs | xargs)
+GRAPHS=$(shell ../$(SQL2JGR) -c $(CONF) --graphs 2> /dev/null | xargs)
 
 .PHONY: all clean graphs $(GRAPHS)
 
