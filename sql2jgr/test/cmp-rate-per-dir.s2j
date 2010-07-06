@@ -73,6 +73,7 @@ graph gr/cmp-rate-per-dir-4-2633.jgr {
  xaxis = groups
  size = 3 1
  legend = "off"
+ CMP_RATE_YMAX
 
  CMP_RATE_DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
  CMP_RATE_DIR_GRP('linux-2.6.33', "Staging", 'staging')

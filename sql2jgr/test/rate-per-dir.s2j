@@ -1,8 +1,4 @@
-#if 1
-#define RATE_YMAX
-#else
-#define RATE_YMAX ymax = 0.046
-#endif
+#define RATE_YMAX ymax = 0.0301
 
 #define RATE_DIR_CURVE(ver, patt, patt2, dir) \
   curve pattern patt {              \
@@ -16,23 +12,18 @@
   RATE_DIR_CURVE(ver, Block, 'Block', dir2) \
   RATE_DIR_CURVE(ver, Null , 'Null' , dir2) \
   RATE_DIR_CURVE(ver, Var  , 'Var'  , dir2) \
-  RATE_DIR_CURVE(ver, INull, 'INull', dir2) \
-  RATE_DIR_CURVE(ver, Range, 'Range', dir2) \
   RATE_DIR_CURVE(ver, Lock , 'Lock' , dir2) \
   RATE_DIR_CURVE(ver, Intr , 'Intr' , dir2) \
   RATE_DIR_CURVE(ver, LockIntr , 'LockIntr' , dir2) \
   RATE_DIR_CURVE(ver, Free , 'Free' , dir2) \
-  RATE_DIR_CURVE(ver, Float, 'Float', dir2) \
   RATE_DIR_CURVE(ver, Size , 'Size' , dir2) \
  }
-//  RATE_DIR_CURVE(ver, Real , 'Real' , dir2) \
-//  RATE_DIR_CURVE(ver, Param, 'Param', dir2) \
 
 graph gr/rate-per-dir-4-241.jgr {
  xaxis = groups
  size = 3 1
- legend = "off" //"defaults x 63 y 45 fontsize 8"
- RATE_YMAX
+ legend = "defaults fontsize 6"
+// RATE_YMAX
 
  RATE_DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
  RATE_DIR_GRP('linux-2.4.1', "Arch"   , 'arch')

@@ -124,33 +124,14 @@ graph gr/count-evol-dec.jgr {
  COUNT_CURVE(Param, 'Param')
 }
 
-/*
-graph gr/count-evol.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 3 1.5
-
- COUNT_CURVE(Block, 'Block')
-// COUNT_CURVE(Null , 'Null' )
- COUNT_CURVE(Var  , 'Var'  )
-// COUNT_CURVE(INull, 'INull')
- COUNT_CURVE(Range, 'Range')
- COUNT_CURVE(Intr , 'Intr' )
- COUNT_CURVE(LockIntr , 'LockIntr' )
- COUNT_CURVE(Free , 'Free' )
- COUNT_CURVE(Float, 'Float')
-// COUNT_CURVE(Real , 'Real' )
- COUNT_CURVE(Param, 'Param')
- COUNT_CURVE(Size , 'Size' )
-}
-*/
-
 graph gr/count-evol-inull.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 1.5
+ size = 3 0.5
+ ymax = 400
+// legend = "defaults x 250 y 100"
+ legend = "off"
 
  COUNT_CURVE(INull, 'INull')
 }
