@@ -1,3 +1,5 @@
+#define RATEx86_YMAX ymax = 0.04
+
 pattern FALSE  { color = 1 0   0 }
 pattern TRUE   { color = 0 1   0 }
 pattern ALLYES { color = 1 .69 0 }
@@ -37,8 +39,8 @@ graph gr/rate-4-241-x86.jgr {
  xaxis = groups
  size = 3 1
  //"defaults x 63 y 45 fontsize 8"
- ymax = 0.0125
  legend = "off"
+ RATEx86_YMAX
 
   RATE_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
   RATE_DEF_GRP('linux-2.4.1', "Null"     , 'Null'     ) \
@@ -54,20 +56,20 @@ graph gr/rate-4-241-x86.jgr {
 graph gr/rate-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
- ymax = 0.0125
+ RATEx86_YMAX
  legend = "off
 
-newstring fontsize 6 x 16 y 0.01 hjl vjb : Part of defconfig
+newstring fontsize 6 x 16 y 0.035 hjl vjb : Part of defconfig
 newcurve marktype box linetype none color 0. 1. 0.  marksize 0.6
-pts 15 0.0102
+pts 15 0.0355
 
-newstring fontsize 6 x 16 y 0.008 hjl vjb : Part of allyesconfig
+newstring fontsize 6 x 16 y 0.025 hjl vjb : Part of allyesconfig
 newcurve marktype box linetype none color 1. 0.69 0.  marksize 0.6
-pts 15 0.0082
+pts 15 0.0255
 
-newstring fontsize 6 x 16 y 0.006 hjl vjb : Part of remaining code
+newstring fontsize 6 x 16 y 0.015 hjl vjb : Part of remaining code
 newcurve marktype box linetype none color 1. 0. 0.  marksize 0.6
-pts 15 0.0062
+pts 15 0.0155
 
 "
 
