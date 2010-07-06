@@ -77,6 +77,7 @@ let gen_graph v1 v2 conn eps pdf png web name graph =
 	    try
 	      make_eps jgrname epsname;
 	    with Failed -> ()
+	else prerr_string ("Generation of "^jgrname^" - OK")
 	  
 let gen_graph_nofail v1 v2 conn eps pdf png web name graph =
   Debug.profile_code "Engine.gen_graph_nofail"
