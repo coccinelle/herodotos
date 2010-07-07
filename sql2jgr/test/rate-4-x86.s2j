@@ -22,25 +22,21 @@ pattern ALLYES { color = 1 .69 0 }
 #define RATE_ALL_GRP(ver, patt, patt2)         \
  group patt {          		               \
   curve pattern TRUE {                         \
-   legend = "Default"                          \
    sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386 \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
 	       AND def_compiled = TRUE;        \
   }                                            \
   curve pattern ALLYES {                       \
-   legend = "All yes"                          \
    sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386_allyes \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
 	       AND allyes_compiled = TRUE;     \
   }                                            \
-  curve pattern FALSE                          \
-   legend = "Other"                            \
-   sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386 \
+  curve pattern FALSE {                        \
+   sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386_allyes \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
-	       AND def_compiled = FALSE;       \
 	       AND allyes_compiled = FALSE;    \
   }                                            \
  }
