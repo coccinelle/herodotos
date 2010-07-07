@@ -1,0 +1,99 @@
+
+#if 1
+#define COUNTx86_YMAX
+#else
+#define COUNTx86_YMAX ymax = 0.04
+#endif
+
+// Patterns TRUE, FALSE, ALLYES are
+// defined in rate.
+
+#define COUNT_DEF_CURVE(ver, curve_name, patt2, def) \
+  curve pattern def {                               \
+   legend = curve_name                              \
+   sql = SELECT r.standardized_name, sum(r.number_of_reports) AS count \
+       FROM files f, file_names fn, rates r			       \
+       WHERE r.standardized_name = patt2                               \
+       AND f.file_name::text = fn.file_name::text		       \
+       AND r.file_id = f.file_id				       \
+       AND f.version_name = ver					       \
+       AND def_compiled = def                                          \
+       GROUP BY f.version_name, r.standardized_name, f.def_compiled;   \
+  }
+
+#define COUNT_DEF_GRP(ver, patt, patt2)         \
+ group patt {          		               \
+  COUNT_DEF_CURVE(ver, "Part of default configuration (358 files)", patt2, TRUE ) \
+  COUNT_DEF_CURVE(ver, "Part of remaining code (6 422 files)", patt2, FALSE) \
+ }
+
+#define COUNT_ALL_GRP(ver, patt, patt2)        \
+ group patt {          		               \
+  curve pattern TRUE {                         \
+   legend = "Part of defconfig (1 685 files)"  \
+   sql = SELECT r.standardized_name, sum(r.number_of_reports) AS count \
+       FROM files f, file_names fn, rates r			       \
+       WHERE r.standardized_name = patt2                               \
+       AND f.file_name::text = fn.file_name::text		       \
+       AND r.file_id = f.file_id				       \
+       AND f.version_name = ver					       \
+       AND def_compiled = TRUE                                         \
+       GROUP BY f.version_name, r.standardized_name, f.def_compiled;   \
+  }                                                                    \
+  curve pattern ALLYES {                                               \
+   legend = "Part of allyesconfig (6 826 files)"                       \
+   sql = SELECT r.standardized_name, sum(r.number_of_reports) AS count \
+       FROM files f, file_names fn, rates r			       \
+       WHERE r.standardized_name = patt2                               \
+       AND f.file_name::text = fn.file_name::text		       \
+       AND r.file_id = f.file_id				       \
+       AND f.version_name = ver					       \
+       AND allyes_compiled = TRUE                                      \
+       GROUP BY f.version_name, r.standardized_name, allyes_compiled;  \
+  }                                                                    \
+  curve pattern FALSE {                                                \
+   legend = "Part of remaining code (18 807 files)"                    \
+   sql = SELECT r.standardized_name, sum(r.number_of_reports) AS count \
+       FROM files f, file_names fn, rates r			       \
+       WHERE r.standardized_name = patt2                               \
+       AND f.file_name::text = fn.file_name::text		       \
+       AND r.file_id = f.file_id				       \
+       AND f.version_name = ver					       \
+       AND allyes_compiled = FALSE                                     \
+       GROUP BY f.version_name, r.standardized_name, allyes_compiled;  \
+  }                                                                    \
+ }
+
+graph gr/count-4-241-x86.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "defaults fontsize 6 x 8 y 60"
+ COUNTx86_YMAX
+
+  COUNT_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
+  COUNT_DEF_GRP('linux-2.4.1', "Null"     , 'Null'     ) \
+  COUNT_DEF_GRP('linux-2.4.1', "Var"      , 'Var'      ) \
+  COUNT_DEF_GRP('linux-2.4.1', "Lock"     , 'Lock'     ) \
+  COUNT_DEF_GRP('linux-2.4.1', "Intr"     , 'Intr'     ) \
+  COUNT_DEF_GRP('linux-2.4.1', "LockIntr" , 'LockIntr' ) \
+  COUNT_DEF_GRP('linux-2.4.1', "Free"     , 'Free'     ) \
+  COUNT_DEF_GRP('linux-2.4.1', "Size"     , 'Size'     )
+
+}
+
+graph gr/count-4-2633-x86.jgr {
+ xaxis = groups
+ size = 3 1
+ COUNTx86_YMAX
+ legend = "defaults fontsize 6 x 12 y 70"
+
+  COUNT_ALL_GRP('linux-2.6.33', "Block"    , 'Block'    ) \
+  COUNT_ALL_GRP('linux-2.6.33', "Null"     , 'Null'     ) \
+  COUNT_ALL_GRP('linux-2.6.33', "Var"      , 'Var'      ) \
+  COUNT_ALL_GRP('linux-2.6.33', "Lock"     , 'Lock'     ) \
+  COUNT_ALL_GRP('linux-2.6.33', "Intr"     , 'Intr'     ) \
+  COUNT_ALL_GRP('linux-2.6.33', "LockIntr" , 'LockIntr' ) \
+  COUNT_ALL_GRP('linux-2.6.33', "Free"     , 'Free'     ) \
+  COUNT_ALL_GRP('linux-2.6.33', "Size"     , 'Size'     )
+
+}
