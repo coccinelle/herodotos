@@ -65,6 +65,7 @@ let build_graph vb1 vb2 name atts conn =
 let build_stat_of vb1 vb2 name singleprj conn scmfeature grpname atts curve =
   let linetype = "linetype none" in
   let (prjopt, pattopt, catts, pos) = curve in
+  let legend  = Graph.get_label curve "" in
 (*   let patt = match pattopt with None -> "" | Some v -> v in *)
   let color   = if singleprj then
     let newcurve = (None, pattopt,[], pos) in
@@ -89,7 +90,8 @@ let build_stat_of vb1 vb2 name singleprj conn scmfeature grpname atts curve =
       let (label, v) = List.hd data in
 	(label, Helper.wrap_single v)
   in
-    (emptyarr, linetype, color, "", marksize, (grplabel, label), query, values)
+  let curve_label = if legend = "" then label else legend in
+    (emptyarr, linetype, color, "", marksize, (grplabel, curve_label), query, values)
 
 let build_stat vb debug name conn scmfeature groups atts =
   let singleprj = if List.length groups = 1 then true else false in
