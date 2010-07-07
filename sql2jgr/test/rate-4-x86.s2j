@@ -69,15 +69,15 @@ graph gr/rate-4-2633-x86.jgr {
  RATEx86_YMAX
  legend = "off
 
-newstring fontsize 6 x 16 y 0.035 hjl vjb : Part of defconfig
+newstring fontsize 6 x 16 y 0.035 hjl vjb : Part of defconfig (1 685 files)
 newcurve marktype box linetype none color 0. 1. 0.  marksize 0.6
 pts 15 0.0355
 
-newstring fontsize 6 x 16 y 0.025 hjl vjb : Part of allyesconfig
+newstring fontsize 6 x 16 y 0.025 hjl vjb : Part of allyesconfig (6 826 files)
 newcurve marktype box linetype none color 1. 0.69 0.  marksize 0.6
 pts 15 0.0255
 
-newstring fontsize 6 x 16 y 0.015 hjl vjb : Part of remaining code
+newstring fontsize 6 x 16 y 0.015 hjl vjb : Part of remaining code (18 807 files)
 newcurve marktype box linetype none color 1. 0. 0.  marksize 0.6
 pts 15 0.0155
 
