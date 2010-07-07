@@ -1,4 +1,9 @@
+
+#if 1
+#define RATEx86_YMAX
+#else
 #define RATEx86_YMAX ymax = 0.04
+#endif
 
 pattern FALSE  { color = 1 0   0 }
 pattern TRUE   { color = 0 1   0 }
@@ -15,25 +20,28 @@ pattern ALLYES { color = 1 .69 0 }
 
 #define RATE_DEF_GRP(ver, patt, patt2)         \
  group patt {          		               \
-  RATE_DEF_CURVE(ver, "Default", patt2, TRUE ) \
-  RATE_DEF_CURVE(ver, "Non dft", patt2, FALSE) \
+  RATE_DEF_CURVE(ver, "Part of default configuration (358 files)", patt2, TRUE ) \
+  RATE_DEF_CURVE(ver, "Part of remaining code (6 422 files)", patt2, FALSE) \
  }
 
 #define RATE_ALL_GRP(ver, patt, patt2)         \
  group patt {          		               \
   curve pattern TRUE {                         \
+   legend = "Part of defconfig (1 685 files)"  \
    sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386 \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
 	       AND def_compiled = TRUE;        \
   }                                            \
   curve pattern ALLYES {                       \
+   legend = "Part of allyesconfig (6 826 files)" \
    sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386_allyes \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
 	       AND allyes_compiled = TRUE;     \
   }                                            \
   curve pattern FALSE {                        \
+   legend = "Part of remaining code (18 807 files)" \
    sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386_allyes \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
@@ -44,8 +52,7 @@ pattern ALLYES { color = 1 .69 0 }
 graph gr/rate-4-241-x86.jgr {
  xaxis = groups
  size = 3 1
- //"defaults x 63 y 45 fontsize 8"
- legend = "off"
+ legend = "defaults fontsize 6 x 8 y 0.02"
  RATEx86_YMAX
 
   RATE_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
@@ -63,21 +70,7 @@ graph gr/rate-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
  RATEx86_YMAX
- legend = "off
-
-newstring fontsize 6 x 16 y 0.035 hjl vjb : Part of defconfig (1 685 files)
-newcurve marktype box linetype none color 0. 1. 0.  marksize 0.6
-pts 15 0.0355
-
-newstring fontsize 6 x 16 y 0.025 hjl vjb : Part of allyesconfig (6 826 files)
-newcurve marktype box linetype none color 1. 0.69 0.  marksize 0.6
-pts 15 0.0255
-
-newstring fontsize 6 x 16 y 0.015 hjl vjb : Part of remaining code (18 807 files)
-newcurve marktype box linetype none color 1. 0. 0.  marksize 0.6
-pts 15 0.0155
-
-"
+ legend = "defaults fontsize 6 x 12 y 0.012"
 
   RATE_ALL_GRP('linux-2.6.33', "Block"    , 'Block'    ) \
   RATE_ALL_GRP('linux-2.6.33', "Null"     , 'Null'     ) \
