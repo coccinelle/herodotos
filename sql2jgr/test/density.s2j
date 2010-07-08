@@ -7,12 +7,6 @@ pattern Drivers {
  color = 1 0 0
 }
 
-pattern Staging_ {
- color = 0 0 0
- vmin = "linux-2.6.27"
- prune = true
-}
-
 pattern Staging {
  color = 0 0 0
 }
@@ -30,11 +24,12 @@ pattern FS      {
 }
 
 pattern Net     {
- color = 1 1 0
+ color = 1 0.69 0
 }
 
 pattern	Other   {
  color = 1 0 1
+ marktype = triangle
 }
 
 graph gr/density.jgr {
@@ -54,27 +49,10 @@ WHERE versions.version_name = r.version_name
 AND versions.main = 2
 AND versions.major = 6
 AND r.standardized_name != 'Null'
+AND r.status = 'BUG'
 GROUP BY r.version_name , r.release_date , versions.locc
 ORDER BY r.release_date;
  }
-
-/*
- curve pattern Staging_ {
-   color = 1 0 0
-   marktype = none
-   legend = "Without faults in staging"
-   sql = SELECT r.version_name, r.release_date,
-       1000*count(report_id)::float/locc::float as fault_density
-FROM "Reports info" r, versions
-WHERE versions.version_name = r.version_name
-AND versions.main = 2
-AND versions.major = 6
-AND r.standardized_name != 'Null'
-AND r.osdi_dirname != 'staging'
-GROUP BY r.version_name , r.release_date , versions.locc
-ORDER BY r.release_date;
- }
-*/
 }
 
 #define FLT_RATE_KIND(patt, patt2)                      \
