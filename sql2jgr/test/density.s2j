@@ -42,7 +42,8 @@ graph gr/density.jgr {
  yaxis = user
  project = Linux
  size = 3 0.7
- legend = "defaults x 250 y 0.1"
+// legend = "defaults x 200 y 0.1"
+ legend = "off"
  ylegend = "Faults\nper 1k LOC"
 
  curve pattern Linux {
@@ -57,10 +58,11 @@ GROUP BY r.version_name , r.release_date , versions.locc
 ORDER BY r.release_date;
  }
 
+/*
  curve pattern Staging_ {
    color = 1 0 0
    marktype = none
-   legend = "Without staging"
+   legend = "Without faults in staging"
    sql = SELECT r.version_name, r.release_date,
        1000*count(report_id)::float/locc::float as fault_density
 FROM "Reports info" r, versions
@@ -72,7 +74,7 @@ AND r.osdi_dirname != 'staging'
 GROUP BY r.version_name , r.release_date , versions.locc
 ORDER BY r.release_date;
  }
-
+*/
 }
 
 #define FLT_RATE_KIND(patt, patt2)                      \
