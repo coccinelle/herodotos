@@ -1,0 +1,212 @@
+pattern v2.6.0 {
+ color = 1 0 0
+ marktype = none
+}
+pattern v2.6.1 {
+ color = 1 0 0
+ marktype = none
+}
+pattern v2.6.2 {
+ color = 1 0 0
+ marktype = none
+}
+pattern v2.6.3 {
+ color = 1 0 0
+ marktype = none
+}
+pattern v2.6.4 {
+ color = 1 0 0
+ marktype = none
+}
+pattern v2.6.5 {
+ color = 1 0 0
+ marktype = none
+}
+pattern v2.6.6 {
+ color = 1 0 0
+ marktype = none
+}
+pattern v2.6.7 {
+ color = 1 0 0
+ marktype = none
+}
+pattern v2.6.8 {
+ color = 1 0 0
+ marktype = none
+}
+pattern v2.6.9 {
+ color = 1 0 0
+ marktype = none
+}
+
+pattern v2.6.10{
+ color = 1 0.69 0
+ marktype = none
+}
+pattern v2.6.11{
+ color = 1 0.69 0
+ marktype = none
+}
+pattern v2.6.12{
+ color = 1 0.69 0
+ marktype = none
+}
+pattern v2.6.13{
+ color = 1 0.69 0
+ marktype = none
+}
+pattern v2.6.14{
+ color = 1 0.69 0
+ marktype = none
+}
+pattern v2.6.15{
+ color = 1 0.69 0
+ marktype = none
+}
+pattern v2.6.16{
+ color = 1 0.69 0
+ marktype = none
+}
+pattern v2.6.17{
+ color = 1 0.69 0
+ marktype = none
+}
+pattern v2.6.18{
+ color = 1 0.69 0
+ marktype = none
+}
+pattern v2.6.19{
+ color = 1 0.69 0
+ marktype = none
+}
+
+pattern v2.6.20{
+ color = 0 0 1
+ marktype = none
+}
+pattern v2.6.21{
+ color = 0 0 1
+ marktype = none
+}
+pattern v2.6.22{
+ color = 0 0 1
+ marktype = none
+}
+pattern v2.6.23{
+ color = 0 0 1
+ marktype = none
+}
+pattern v2.6.24{
+ color = 0 0 1
+ marktype = none
+}
+pattern v2.6.25{
+ color = 0 0 1
+ marktype = none
+}
+pattern v2.6.26{
+ color = 0 0 1
+ marktype = none
+}
+pattern v2.6.27{
+ color = 0 0 1
+ marktype = none
+}
+pattern v2.6.28{
+ color = 0 0 1
+ marktype = none
+}
+pattern v2.6.29{
+ color = 0 0 1
+ marktype = none
+}
+
+pattern v2.6.30{
+ color = 0 1 0
+ marktype = none
+}
+pattern v2.6.31{
+ color = 0 1 0
+ marktype = none
+}
+pattern v2.6.32{
+ color = 0 1 0
+ marktype = none
+}
+pattern v2.6.33{
+ color = 0 1 0
+ marktype = none
+}
+
+#define ACROSS_CURVE(patt, vers)          \
+ curve pattern patt {                     \
+   sql = SELECT "version_name",           \
+          "release_date",		  \
+          sum("number_of_bugs")		  \
+   FROM faults_across_releases            \
+   WHERE "for_version_name" = vers        \
+   AND release_date >= '2003-12-18'	  \
+   AND standardized_name != 'Null'	  \
+   GROUP BY "version_name","release_date" \
+   ORDER BY release_date;                 \
+ }
+
+graph gr/lifetime_across.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 3.5
+ legend = "defaults fontsize 6"
+ ylegend = "Number of faults"
+
+ curve pattern Linux {
+  legend = "Total"
+  color = 0 0 0
+   sql = SELECT r.version_name, r.release_date,
+       count(report_id)
+FROM "Reports info" r, versions
+WHERE versions.version_name = r.version_name
+AND versions.main = 2
+AND versions.major = 6
+AND r.standardized_name != 'Null'
+AND r.status = 'BUG'
+GROUP BY r.version_name , r.release_date
+ORDER BY r.release_date;
+ }
+
+ACROSS_CURVE(v2.6.0 , 'linux-2.6.0' )
+ACROSS_CURVE(v2.6.1 , 'linux-2.6.1' )
+ACROSS_CURVE(v2.6.2 , 'linux-2.6.2' )
+ACROSS_CURVE(v2.6.3 , 'linux-2.6.3' )
+ACROSS_CURVE(v2.6.4 , 'linux-2.6.4' )
+ACROSS_CURVE(v2.6.5 , 'linux-2.6.5' )
+ACROSS_CURVE(v2.6.6 , 'linux-2.6.6' )
+ACROSS_CURVE(v2.6.7 , 'linux-2.6.7' )
+ACROSS_CURVE(v2.6.8 , 'linux-2.6.8' )
+ACROSS_CURVE(v2.6.9 , 'linux-2.6.9' )
+ACROSS_CURVE(v2.6.10, 'linux-2.6.10')
+ACROSS_CURVE(v2.6.11, 'linux-2.6.11')
+ACROSS_CURVE(v2.6.12, 'linux-2.6.12')
+ACROSS_CURVE(v2.6.13, 'linux-2.6.13')
+ACROSS_CURVE(v2.6.14, 'linux-2.6.14')
+ACROSS_CURVE(v2.6.15, 'linux-2.6.15')
+ACROSS_CURVE(v2.6.16, 'linux-2.6.16')
+ACROSS_CURVE(v2.6.17, 'linux-2.6.17')
+ACROSS_CURVE(v2.6.18, 'linux-2.6.18')
+ACROSS_CURVE(v2.6.19, 'linux-2.6.19')
+ACROSS_CURVE(v2.6.20, 'linux-2.6.20')
+ACROSS_CURVE(v2.6.21, 'linux-2.6.21')
+ACROSS_CURVE(v2.6.22, 'linux-2.6.22')
+ACROSS_CURVE(v2.6.23, 'linux-2.6.23')
+ACROSS_CURVE(v2.6.24, 'linux-2.6.24')
+ACROSS_CURVE(v2.6.25, 'linux-2.6.25')
+ACROSS_CURVE(v2.6.26, 'linux-2.6.26')
+ACROSS_CURVE(v2.6.27, 'linux-2.6.27')
+ACROSS_CURVE(v2.6.28, 'linux-2.6.28')
+ACROSS_CURVE(v2.6.29, 'linux-2.6.29')
+ACROSS_CURVE(v2.6.30, 'linux-2.6.30')
+ACROSS_CURVE(v2.6.31, 'linux-2.6.31')
+ACROSS_CURVE(v2.6.32, 'linux-2.6.32')
+ACROSS_CURVE(v2.6.33, 'linux-2.6.33')
+
+}
