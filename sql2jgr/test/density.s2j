@@ -7,10 +7,14 @@ pattern Drivers {
  color = 1 0 0
 }
 
-pattern Staging {
+pattern Staging_ {
  color = 0 0 0
  vmin = "linux-2.6.27"
  prune = true
+}
+
+pattern Staging {
+ color = 0 0 0
 }
 
 pattern Sound   {
@@ -53,7 +57,7 @@ GROUP BY r.version_name , r.release_date , versions.locc
 ORDER BY r.release_date;
  }
 
- curve pattern Staging {
+ curve pattern Staging_ {
    color = 1 0 0
    marktype = none
    legend = "Without staging"
@@ -69,4 +73,59 @@ GROUP BY r.version_name , r.release_date , versions.locc
 ORDER BY r.release_date;
  }
 
+}
+
+#define FLT_RATE_KIND(patt, patt2)                      \
+ curve pattern patt {				        \
+   sql = SELECT r.version_name, r.release_date,         \
+       	 	sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
+       	 	FROM rates_per_dir r                    \
+       	 	WHERE r.standardized_name = patt2       \
+		AND r.release_date > '2002-01-01'       \
+		GROUP BY r.version_name, r.release_date \
+		ORDER BY r.release_date;                \
+ }
+
+graph gr/rate-evol-per-kind.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 1.5
+
+ FLT_RATE_KIND(Block, 'Block')
+ FLT_RATE_KIND(Var  , 'Var'  )
+ FLT_RATE_KIND(Lock , 'Lock' )
+ FLT_RATE_KIND(Intr , 'Intr' )
+ FLT_RATE_KIND(LockIntr , 'LockIntr' )
+ FLT_RATE_KIND(Free , 'Free' )
+ FLT_RATE_KIND(Param, 'Param')
+ FLT_RATE_KIND(Size , 'Size' )
+}
+
+
+#define FLT_RATE_DIR(patt, patt2)                       \
+ curve pattern patt {				        \
+   sql = SELECT r.version_name, r.release_date,         \
+       	 	sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
+       	 	FROM rates_per_dir r                    \
+       	 	WHERE r.osdi_dirname = patt2            \
+		AND r.release_date > '2002-01-01'       \
+		AND r.standardized_name != 'Null'       \
+		GROUP BY r.version_name, r.release_date \
+		ORDER BY r.release_date;                \
+ }
+
+graph gr/rate-evol-per-dir.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 1.5
+
+ FLT_RATE_DIR(Drivers, 'drivers')
+ FLT_RATE_DIR(Staging, 'staging')
+ FLT_RATE_DIR(Sound  , 'sound'  )
+ FLT_RATE_DIR(Arch   , 'arch'   )
+ FLT_RATE_DIR(FS     , 'fs'     )
+ FLT_RATE_DIR(Net    , 'net'    )
+ FLT_RATE_DIR(Other  , 'other'  )
 }
