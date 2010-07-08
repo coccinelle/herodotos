@@ -16,7 +16,7 @@
 // TCOLEQ TLAB TRAB
 
 %token EOF
-%token TNEQ TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS
+%token TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS
 %token TLCB TRCB TLPAR TRPAR TLT TGT TSC TCOLON TDCOLON
 %token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE
 %token TPREFIX TPROJECTS TWEBSITE TFLAGS TCPUCORE TSQL TDBCONN
@@ -27,6 +27,7 @@
 %token TFILE TFILENAME TRATIO TGROUP TINFO TSIZE TVMIN TPRUNE TAUTHOR
 %token<int> TInt
 %token<float> TFloat
+%token<string> TSQLOP
 %token<string> TId
 %token<string> TSTRING2Q
 %token<string> TSTRING1Q
@@ -221,7 +222,7 @@ sql_tok:
   | TSTAR                         { "*"  }
   | TSLASH                        { "/"  }
   | TCOMMA                        { ","  }
-  | TNEQ                          { "!=" }
+  | s=TSQLOP                      { s    }
   | TEQUAL                        { "="  }
   | TLPAR                         { "("  }
   | TRPAR                         { ")"  }

@@ -106,7 +106,11 @@ rule token = parse
   | '/'                       { P.TSLASH }
   | ','                       { P.TCOMMA }
   | ' '                       { token lexbuf }
-  | "!="                      { P.TNEQ   }
+  | "!="                      { P.TSQLOP(tok lexbuf)   }
+  | "<>"                      { P.TSQLOP(tok lexbuf)   }
+  | "<="                      { P.TSQLOP(tok lexbuf)   }
+  | ">="                      { P.TSQLOP(tok lexbuf)   }
+  | "."                       { P.TSQLOP(tok lexbuf)   }
   | '='                       { P.TEQUAL }
   | '('                       { P.TLPAR }
   | ')'                       { P.TRPAR }
