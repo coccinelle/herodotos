@@ -9,6 +9,8 @@ pattern Drivers {
 
 pattern Staging {
  color = 0 0 0
+ vmin = "linux-2.6.27"
+ prune = true
 }
 
 pattern Sound   {
