@@ -31,17 +31,6 @@ pattern	Other   {
  color = 1 0 1
 }
 
-/*
-
-#define DENSITY_CURVE(prj, dir)                           \
- curve pattern prj {				          \
-   sql = SELECT version_name, release_date, fault_density \
-       	 	FROM density_per_dir                      \
-		WHERE osdi_dirname = dir                  \
-		ORDER BY release_date;                    \
- }
-*/
-
 graph gr/density.jgr {
  xaxis = date
  yaxis = user
@@ -49,6 +38,18 @@ graph gr/density.jgr {
  size = 3 1
  legend = "defaults x 250 y 0.1"
  ylegend = "Faults per 1k LOC"
+
+ curve pattern Linux {
+   sql = SELECT r.version_name, r.release_date,
+       1000*count(report_id)::float/locc::float as fault_density
+FROM "Reports info" r, versions
+WHERE versions.version_name = r.version_name
+AND versions.main = 2
+AND versions.major = 6
+AND r.standardized_name != 'Null'
+GROUP BY r.version_name , r.release_date , versions.locc
+ORDER BY r.release_date;
+ }
 
  curve pattern Staging {
    color = 1 0 0
@@ -65,27 +66,5 @@ AND r.osdi_dirname != 'staging'
 GROUP BY r.version_name , r.release_date , versions.locc
 ORDER BY r.release_date;
  }
-
- curve pattern Linux {
-   sql = SELECT r.version_name, r.release_date,
-       1000*count(report_id)::float/locc::float as fault_density
-FROM "Reports info" r, versions
-WHERE versions.version_name = r.version_name
-AND versions.main = 2
-AND versions.major = 6
-AND r.standardized_name != 'Null'
-GROUP BY r.version_name , r.release_date , versions.locc
-ORDER BY r.release_date;
- }
-
-/*
- DENSITY_CURVE(Drivers, 'drivers')
- DENSITY_CURVE(Staging, 'staging')
- DENSITY_CURVE(Sound  , 'sound'  )
- DENSITY_CURVE(Arch   , 'arch'   )
- DENSITY_CURVE(FS     , 'fs'     )
- DENSITY_CURVE(Net    , 'net'    )
- DENSITY_CURVE(Other  , 'other'  )
-*/
 
 }
