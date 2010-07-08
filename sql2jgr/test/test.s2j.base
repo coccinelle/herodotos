@@ -237,3 +237,5 @@ graph gr/avg-ages.jgr {
  sql = SELECT * FROM "Avg age" WHERE NOT standardized_name = 'Real';
 // sql = SELECT * FROM "Avg age" WHERE standardized_name != 'Real';
 }
+
+#include "across.s2j"
