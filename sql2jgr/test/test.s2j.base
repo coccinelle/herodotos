@@ -103,6 +103,7 @@ graph gr/count-evol-inc.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
+ ymax = 70
 
  COUNT_CURVE(Lock , 'Lock' )
  COUNT_CURVE(LockIntr , 'LockIntr' )
@@ -115,6 +116,7 @@ graph gr/count-evol-dec.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
+ ymax = 70
 
  COUNT_CURVE(Block, 'Block')
  COUNT_CURVE(Var  , 'Var'  )
