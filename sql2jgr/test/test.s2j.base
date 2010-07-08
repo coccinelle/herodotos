@@ -50,42 +50,55 @@ project Linux {
 
 pattern Block {
  color = 0 1 0
+ marktype = circle
 }
 pattern Null {
  color = 0 .5 0
+ marktype = none
 }
 pattern Var {
  color = 0 1 .5
+ marktype = box
 }
 pattern INull {
  color = 1 0 0
+ marktype = diamond
 }
 pattern Range {
  color = 0 0 0
+ marktype = triangle
 }
 pattern Lock {
  color = .5 0 1
+ marktype = x
 }
 pattern Intr {
  color = 0 .5 1
+ marktype = cross
 }
 pattern LockIntr {
  color = .5 .5 1
+ marktype = circle
 }
 pattern Free {
  color = .5 0 0
+ marktype = box
 }
 pattern Float {
  color = 0 1 1
+ marktype = diamond
 }
 pattern Real {
  color = 0 0 .5
+ marktype = none
 }
 pattern Param {
  color = 0 0 1
+ marktype = none
 }
 pattern Size {
  color = .5 0 .5
+ marktype = triangle
 }
 
 #define COUNT_CURVE(patt, patt2)                       \
