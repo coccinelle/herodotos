@@ -130,8 +130,6 @@ graph gr/count-evol-inull.jgr {
  project = Linux
  size = 3 0.5
  ymax = 400
-// legend = "defaults x 250 y 100"
- legend = "off"
 
  COUNT_CURVE(INull, 'INull')
 }
