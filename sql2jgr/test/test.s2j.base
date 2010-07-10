@@ -228,14 +228,6 @@ graph gr/orig-pct-2_6_33.jgr {
 
 #include "density.s2j"
 
-graph gr/avg-ages.jgr {
- xaxis = groups
- legend = "off"
- factor = 365.25
- ylegend = "Years"
- size = 3 1
- sql = SELECT * FROM "Avg age" WHERE NOT standardized_name = 'Real';
-// sql = SELECT * FROM "Avg age" WHERE standardized_name != 'Real';
-}
-
 #include "across.s2j"
+
+#include "avg-ages.s2j"

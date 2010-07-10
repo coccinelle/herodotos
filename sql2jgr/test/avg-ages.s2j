@@ -1,0 +1,85 @@
+
+graph gr/avg-ages.jgr {
+ xaxis = groups
+ legend = "off"
+ factor = 365.25
+ ylegend = "Years"
+ size = 3 1
+ sql = SELECT ages.standardized_name,
+              ceil(avg(ages."age in days"))
+       FROM "Bug ages" ages, standardized_names
+       WHERE standardized_names.standardized_name = ages.standardized_name
+       AND ages.standardized_name != 'Real'
+       GROUP BY ages.standardized_name, standardized_names.order
+       ORDER BY standardized_names.order;
+}
+
+#define AVG_AGE_DIR(dir, patt, dir2)             \
+ group dir {                                     \
+ curve pattern patt {                            \
+ sql = SELECT osdi_dirname,		         \
+              ceil(avg("age in days")) / 365.25	 \
+       FROM "Bug ages"			         \
+       WHERE standardized_name != 'Real'         \
+       AND osdi_dirname = dir2		         \
+       GROUP BY osdi_dirname;                    \
+ }                                               \
+ }
+
+graph gr/avg-ages-per-dir.jgr {
+ xaxis = groups
+ legend = "off"
+ factor = 365.25
+ ylegend = "Years"
+ size = 3 1
+
+ AVG_AGE_DIR("Drivers",Drivers, 'drivers')
+ AVG_AGE_DIR("Staging",Staging, 'staging')
+ AVG_AGE_DIR("Sound"  ,Sound  , 'sound'  )
+ AVG_AGE_DIR("Arch"   ,Arch   , 'arch'   )
+ AVG_AGE_DIR("FS"     ,FS     , 'fs'     )
+ AVG_AGE_DIR("Net"    ,Net    , 'net'    )
+ AVG_AGE_DIR("Other"  ,Other  , 'other'  )
+}
+
+#define AVG_AGE_CURVE(patt, patt2, dir) \
+  curve pattern patt {                                                     \
+   sql = SELECT ages.standardized_name,                                    \
+              ceil(avg(ages."age in days")) / 365 AS avg_age_in_years      \
+       FROM "Bug ages" ages               				   \
+       WHERE osdi_dirname = dir                                            \
+       AND ages.standardized_name = patt2				   \
+       GROUP BY ages.standardized_name;                         	   \
+  }
+
+#define AVG_AGE(dir, dir2)            \
+ group dir {          		      \
+  AVG_AGE_CURVE(Block, 'Block', dir2) \
+  AVG_AGE_CURVE(Null , 'Null' , dir2) \
+  AVG_AGE_CURVE(Var  , 'Var'  , dir2) \
+  AVG_AGE_CURVE(INull, 'INull', dir2) \
+  AVG_AGE_CURVE(Range, 'Range', dir2) \
+  AVG_AGE_CURVE(Lock , 'Lock' , dir2) \
+  AVG_AGE_CURVE(Intr , 'Intr' , dir2) \
+  AVG_AGE_CURVE(LockIntr , 'LockIntr' , dir2) \
+  AVG_AGE_CURVE(Free , 'Free' , dir2) \
+  AVG_AGE_CURVE(Float, 'Float', dir2) \
+  AVG_AGE_CURVE(Size , 'Size' , dir2) \
+ }
+
+graph gr/avg-ages-per-dir-and-cat.jgr {
+ xaxis = groups
+ legend = "off"
+ factor = 365.25
+ ylegend = "Years"
+ size = 3 1
+
+ AVG_AGE("Drivers", 'drivers')
+ AVG_AGE("Staging", 'staging')
+ AVG_AGE("Sound"  , 'sound')
+ AVG_AGE("Arch"   , 'arch')
+ AVG_AGE("FS"     , 'fs')
+ AVG_AGE("Net"    , 'net')
+ AVG_AGE("Other"  , 'other')
+
+}
