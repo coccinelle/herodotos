@@ -198,8 +198,15 @@ let draw_curve ch msg prjnum ynodata idx (_, linetype, color, _, marksize, (_,la
 			       Printf.fprintf ch " x % 2.2f y % 2.2f hjl vjc : No data\n"
 				 ((float_of_int idx) +. 0.5) ynodata
 			   | Some d ->
-			       let pos = Printf.sprintf "% 2.2f % 4f" ((float_of_int idx) +. 0.5) d in
-				 Printf.fprintf ch "%s\n" pos
+			       if d = 0.0 then
+				 (
+				   Printf.fprintf ch "newstring fontsize 4 rotate 90";
+				   Printf.fprintf ch " x % 2.2f y % 2.2f hjl vjc : Zero\n"
+				     ((float_of_int idx) +. 0.5) ynodata
+				 )
+			       else
+				 let pos = Printf.sprintf "% 2.2f % 4f" ((float_of_int idx) +. 0.5) d in
+				   Printf.fprintf ch "%s\n" pos
 			)
 		    | Helper.Duple _ -> failwith "Unsupported feature: duple with group"
 	       ) data;
