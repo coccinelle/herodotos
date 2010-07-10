@@ -213,10 +213,11 @@ sql:
  sql=list(sql_tok) TSC               { (String.concat " " sql) ^ ";"}
 
 sql_tok:
-    e=gid                         { e               }
-  | c=TInt                        { string_of_int c }
-  | s=TSTRING2Q                   { "\""^s^"\""     }
-  | s=TSTRING1Q                   { "'"^s^"'"       }
+    e=gid                         { e                 }
+  | c=TInt                        { string_of_int c   }
+  | f=TFloat                      { string_of_float f }
+  | s=TSTRING2Q                   { "\""^s^"\""       }
+  | s=TSTRING1Q                   { "'"^s^"'"         }
   | TMINUS                        { "-"  }
   | TPLUS                         { "+"  }
   | TSTAR                         { "*"  }
