@@ -44,12 +44,14 @@ graph gr/avg-ages-per-dir.jgr {
 
 #define AVG_AGE_CURVE(patt, patt2, dir) \
   curve pattern patt {                                                     \
-   sql = SELECT ages.standardized_name,                                    \
-              ceil(avg(ages."age in days")) / 365 AS avg_age_in_years      \
+   sql = SELECT patt2,                                                     \
+              COALESCE(                                                    \
+		(SELECT ceil(avg(ages."age in days")) / 365                \
        FROM "Bug ages" ages               				   \
        WHERE osdi_dirname = dir                                            \
        AND ages.standardized_name = patt2				   \
-       GROUP BY ages.standardized_name;                         	   \
+       GROUP BY ages.standardized_name                          	   \
+		),0) AS avg_age_in_years;                                  \
   }
 
 #define AVG_AGE(dir, dir2)            \
