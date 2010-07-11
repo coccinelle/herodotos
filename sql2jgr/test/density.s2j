@@ -39,7 +39,7 @@ graph gr/density.jgr {
  size = 3 0.7
 // legend = "defaults x 200 y 0.1"
  legend = "off"
- ylegend = "Faults\nper 1k LOC"
+// ylegend = "Faults\nper 1k LOC"
 
  curve pattern Linux {
    sql = SELECT r.version_name, r.release_date,
