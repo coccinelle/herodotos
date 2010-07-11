@@ -27,7 +27,7 @@
 graph gr/count-per-dir-4-241.jgr {
  xaxis = groups
  size = 3 1
- legend = "defaults x 63 y 45 fontsize 8"
+ legend = "defaults fontsize 6"
  DIR_YMAX
 
  DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
@@ -40,7 +40,7 @@ graph gr/count-per-dir-4-241.jgr {
 graph gr/count-per-dir-4-260.jgr {
  xaxis = groups
  size = 3 1
- legend = "off"
+ legend = "defaults fontsize 6"
  DIR_YMAX
 
  DIR_GRP('linux-2.6.0', "Drivers", 'drivers')

@@ -101,6 +101,25 @@ pattern Size {
  marktype = triangle
 }
 
+graph gr/count-evol.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 0.7
+ legend = "off"
+ ymax = 600
+
+ curve pattern Linux {
+   sql = SELECT version_name, release_date, sum(data) as data
+       	 	FROM "Count evol"
+       	 	WHERE release_date > '2002-01-01'
+		AND standardized_name != 'Null'
+		GROUP BY version_name, release_date
+		ORDER BY release_date;
+ }
+
+}
+
 #define COUNT_CURVE(patt, patt2)                       \
  curve pattern patt {				       \
    sql = SELECT version_name, release_date, sum(data) as data       \

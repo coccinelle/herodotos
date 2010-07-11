@@ -35,7 +35,7 @@ graph gr/rate-per-dir-4-241.jgr {
 graph gr/rate-per-dir-4-260.jgr {
  xaxis = groups
  size = 3 1
- legend = "off"
+ legend = "defaults fontsize 6"
  RATE_YMAX
 
  RATE_DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
