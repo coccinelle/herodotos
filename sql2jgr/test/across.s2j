@@ -146,7 +146,6 @@ pattern v2.6.33{
    FROM faults_across_releases            \
    WHERE "for_version_name" = vers        \
    AND release_date >= '2003-12-18'	  \
-   AND standardized_name != 'Null'	  \
    GROUP BY "version_name","release_date" \
    ORDER BY release_date;                 \
  }
@@ -168,7 +167,6 @@ FROM "Reports info" r, versions
 WHERE versions.version_name = r.version_name
 AND versions.main = 2
 AND versions.major = 6
-AND r.standardized_name != 'Null'
 AND r.status = 'BUG'
 GROUP BY r.version_name , r.release_date
 ORDER BY r.release_date;

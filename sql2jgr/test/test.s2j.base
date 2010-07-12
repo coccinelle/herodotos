@@ -107,13 +107,12 @@ graph gr/count-evol.jgr {
  project = Linux
  size = 3 0.7
  legend = "off"
- ymax = 600
+ ymax = 800
 
  curve pattern Linux {
    sql = SELECT version_name, release_date, sum(data) as data
        	 	FROM "Count evol"
        	 	WHERE release_date > '2002-01-01'
-		AND standardized_name != 'Null'
 		GROUP BY version_name, release_date
 		ORDER BY release_date;
  }
@@ -166,6 +165,7 @@ graph gr/count-evol-inull.jgr {
  ymax = 400
 
  COUNT_CURVE(INull, 'INull')
+ COUNT_CURVE(Null , 'Null')
 }
 
 #define ORIG_CURVE(patt, patt2)                        \
@@ -185,7 +185,7 @@ graph gr/orig-2_6_33.jgr {
  ylegend = "Number of bugs"
 
  ORIG_CURVE(Block, 'Block')
-// ORIG_CURVE(Null , 'Null' )
+ ORIG_CURVE(Null , 'Null' )
  ORIG_CURVE(Var  , 'Var'  )
  ORIG_CURVE(INull, 'INull')
  ORIG_CURVE(Range, 'Range')
@@ -223,7 +223,7 @@ graph gr/orig-pct-2_6_33.jgr {
  ylegend = "Percentage of bugs still in 2.6.33"
 
  ORIG_CURVE_PCT(Block, 'Block')
-// ORIG_CURVE_PCT(Null , 'Null' )
+ ORIG_CURVE_PCT(Null , 'Null' )
  ORIG_CURVE_PCT(Var  , 'Var'  )
  ORIG_CURVE_PCT(INull, 'INull')
  ORIG_CURVE_PCT(Range, 'Range')
