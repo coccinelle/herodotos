@@ -11,10 +11,9 @@
 #define COUNT_DEF_CURVE(ver, curve_name, patt2, def) \
   curve pattern def {                               \
    legend = curve_name                              \
-   sql = SELECT r.standardized_name, sum(r.number_of_reports) AS count \
-       FROM files f, file_names fn, rates r			       \
+   sql = SELECT r.standardized_name, count(correlation_id) AS count    \
+       FROM files f, "Reports info" r    			       \
        WHERE r.standardized_name = patt2                               \
-       AND f.file_name::text = fn.file_name::text		       \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
        AND def_compiled = def                                          \
@@ -31,10 +30,9 @@
  group patt {          		               \
   curve pattern TRUE {                         \
    legend = "Part of defconfig (1 685 files)"  \
-   sql = SELECT r.standardized_name, sum(r.number_of_reports) AS count \
-       FROM files f, file_names fn, rates r			       \
+   sql = SELECT r.standardized_name, count(correlation_id) AS count    \
+       FROM files f, "Reports info" r     			       \
        WHERE r.standardized_name = patt2                               \
-       AND f.file_name::text = fn.file_name::text		       \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
        AND def_compiled = TRUE                                         \
@@ -42,10 +40,9 @@
   }                                                                    \
   curve pattern ALLYES {                                               \
    legend = "Part of allyesconfig (6 826 files)"                       \
-   sql = SELECT r.standardized_name, sum(r.number_of_reports) AS count \
-       FROM files f, file_names fn, rates r			       \
+   sql = SELECT r.standardized_name, count(correlation_id) AS count    \
+       FROM files f, "Reports info" r			               \
        WHERE r.standardized_name = patt2                               \
-       AND f.file_name::text = fn.file_name::text		       \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
        AND allyes_compiled = TRUE                                      \
@@ -53,10 +50,9 @@
   }                                                                    \
   curve pattern FALSE {                                                \
    legend = "Part of remaining code (18 807 files)"                    \
-   sql = SELECT r.standardized_name, sum(r.number_of_reports) AS count \
-       FROM files f, file_names fn, rates r			       \
+   sql = SELECT r.standardized_name, count(correlation_id) AS count    \
+       FROM files f, "Reports info" r			               \
        WHERE r.standardized_name = patt2                               \
-       AND f.file_name::text = fn.file_name::text		       \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
        AND allyes_compiled = FALSE                                     \
