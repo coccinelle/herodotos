@@ -104,7 +104,7 @@ graph gr/count-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
  COUNTx86_YMAX
- legend = "defaults fontsize 6 x 12 y 70"
+ legend = "defaults fontsize 6 x 14 y 225"
 
   COUNT_ALL_GRP('linux-2.6.33', "Block"    , 'Block'    ) \
   COUNT_ALL_GRP('linux-2.6.33', "Null"     , 'Null'     ) \
