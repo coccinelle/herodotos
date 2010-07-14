@@ -32,6 +32,12 @@ pattern	Other   {
  marktype = triangle
 }
 
+pattern	Average   {
+ color = 0 0 0
+ marktype = none
+ linestyle = dotted
+}
+
 graph gr/density.jgr {
  xaxis = date
  yaxis = user
@@ -53,6 +59,16 @@ ORDER BY r.release_date;
  }
 }
 
+#define FLT_AVG_RATE                                    \
+ curve pattern Average {				\
+   sql = SELECT r.version_name, r.release_date,         \
+       	 	sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
+       	 	FROM rates_per_dir r                    \
+       	 	WHERE r.release_date > '2002-01-01'     \
+		GROUP BY r.version_name, r.release_date \
+		ORDER BY r.release_date;                \
+ }
+
 #define FLT_RATE_KIND(patt, patt2)                      \
  curve pattern patt {				        \
    sql = SELECT r.version_name, r.release_date,         \
@@ -69,6 +85,8 @@ graph gr/rate-evol-per-kind.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
+
+ FLT_AVG_RATE
 
  FLT_RATE_KIND(Block, 'Block')
  FLT_RATE_KIND(Null , 'Null' )
@@ -98,6 +116,8 @@ graph gr/rate-evol-per-dir.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
+
+ FLT_AVG_RATE
 
  FLT_RATE_DIR(Drivers, 'drivers')
  FLT_RATE_DIR(Staging, 'staging')
