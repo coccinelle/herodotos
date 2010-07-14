@@ -11,13 +11,18 @@
 #define COUNT_DEF_CURVE(ver, curve_name, patt2, def) \
   curve pattern def {                               \
    legend = curve_name                              \
-   sql = SELECT r.standardized_name, count(correlation_id) AS count    \
+   sql = SELECT patt2, COALESCE(t.count, 0 )        \
+       FROM standardized_names s                    \
+       LEFT JOIN                                    \
+       (SELECT r.standardized_name, count(correlation_id) AS count     \
        FROM files f, "Reports info" r    			       \
        WHERE r.standardized_name = patt2                               \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
        AND def_compiled = def                                          \
-       GROUP BY f.version_name, r.standardized_name, f.def_compiled;   \
+       GROUP BY f.version_name, r.standardized_name, f.def_compiled) AS t   \
+       ON t.standardized_name = s.standardized_name                    \
+       WHERE s.standardized_name = patt2;                              \
   }
 
 #define COUNT_DEF_GRP(ver, patt, patt2)         \
@@ -30,40 +35,55 @@
  group patt {          		               \
   curve pattern TRUE {                         \
    legend = "Part of defconfig (1 685 files)"  \
-   sql = SELECT r.standardized_name, count(correlation_id) AS count    \
+   sql =  SELECT patt2, COALESCE(t.count, 0 )        \
+       FROM standardized_names s                    \
+       LEFT JOIN                                    \
+       (SELECT r.standardized_name, count(correlation_id) AS count    \
        FROM files f, "Reports info" r     			       \
        WHERE r.standardized_name = patt2                               \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
        AND def_compiled = TRUE                                         \
-       GROUP BY f.version_name, r.standardized_name, f.def_compiled;   \
+       GROUP BY f.version_name, r.standardized_name, f.def_compiled) AS t \
+       ON t.standardized_name = s.standardized_name                    \
+       WHERE s.standardized_name = patt2;                              \
   }                                                                    \
   curve pattern ALLYES {                                               \
    legend = "Part of allyesconfig (6 826 files)"                       \
-   sql = SELECT r.standardized_name, count(correlation_id) AS count    \
+   sql = SELECT patt2, COALESCE(t.count, 0 )        \
+       FROM standardized_names s                    \
+       LEFT JOIN                                    \
+       ( SELECT r.standardized_name, count(correlation_id) AS count    \
        FROM files f, "Reports info" r			               \
        WHERE r.standardized_name = patt2                               \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
        AND allyes_compiled = TRUE                                      \
-       GROUP BY f.version_name, r.standardized_name, allyes_compiled;  \
+       GROUP BY f.version_name, r.standardized_name, allyes_compiled) AS t  \
+       ON t.standardized_name = s.standardized_name                    \
+       WHERE s.standardized_name = patt2;                              \
   }                                                                    \
   curve pattern FALSE {                                                \
    legend = "Part of remaining code (18 807 files)"                    \
-   sql = SELECT r.standardized_name, count(correlation_id) AS count    \
+   sql = SELECT patt2, COALESCE(t.count, 0 )        \
+       FROM standardized_names s                    \
+       LEFT JOIN                                    \
+       ( SELECT r.standardized_name, count(correlation_id) AS count    \
        FROM files f, "Reports info" r			               \
        WHERE r.standardized_name = patt2                               \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
        AND allyes_compiled = FALSE                                     \
-       GROUP BY f.version_name, r.standardized_name, allyes_compiled;  \
+       GROUP BY f.version_name, r.standardized_name, allyes_compiled) AS t  \
+       ON t.standardized_name = s.standardized_name                    \
+       WHERE s.standardized_name = patt2;                              \
   }                                                                    \
  }
 
 graph gr/count-4-241-x86.jgr {
  xaxis = groups
  size = 3 1
- legend = "defaults fontsize 6 x 8 y 60"
+ legend = "defaults fontsize 6 x 10 y 150"
  COUNTx86_YMAX
 
   COUNT_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
