@@ -1,7 +1,14 @@
 
 graph gr/avg-ages.jgr {
  xaxis = groups
- legend = "off"
+ legend = "off 
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   1.63
+ 11  1.63
+
+"
  factor = 365.25
  ylegend = "Years"
  size = 3 1
@@ -28,7 +35,14 @@ graph gr/avg-ages.jgr {
 
 graph gr/avg-ages-per-dir.jgr {
  xaxis = groups
- legend = "off"
+ legend = "off 
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   1.63
+ 7   1.63
+
+ "
  factor = 365.25
  ylegend = "Years"
  size = 3 1
@@ -71,7 +85,14 @@ graph gr/avg-ages-per-dir.jgr {
 
 graph gr/avg-ages-per-dir-and-cat.jgr {
  xaxis = groups
- legend = "off"
+ legend = "off 
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   1.63
+ 77  1.63
+
+"
  factor = 365.25
  ylegend = "Years"
  size = 3 1

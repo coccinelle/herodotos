@@ -35,7 +35,15 @@ graph gr/rate-per-dir-4-241.jgr {
 graph gr/rate-per-dir-4-260.jgr {
  xaxis = groups
  size = 3 1
- legend = "defaults fontsize 6"
+ legend = "defaults fontsize 6
+
+ newcurve marktype none linetype dotted color 0 0 0
+ label : Average
+ pts
+ 0   0.00641
+ 77  0.00641
+
+"
  RATE_YMAX
 
  RATE_DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
@@ -49,7 +57,14 @@ graph gr/rate-per-dir-4-260.jgr {
 graph gr/rate-per-dir-4-2612.jgr {
  xaxis = groups
  size = 3 1
- legend = "off"
+ legend = "off
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   0.00507
+ 77  0.00507
+
+"
  RATE_YMAX
 
  RATE_DIR_GRP('linux-2.6.12', "Drivers", 'drivers')
@@ -63,7 +78,14 @@ graph gr/rate-per-dir-4-2612.jgr {
 graph gr/rate-per-dir-4-2633.jgr {
  xaxis = groups
  size = 3 1
- legend = "off"
+ legend = "off
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   0.00364
+ 77  0.00364
+
+"
  RATE_YMAX
 
  RATE_DIR_GRP('linux-2.6.33', "Drivers", 'drivers')

@@ -70,7 +70,15 @@ graph gr/rate-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
  RATEx86_YMAX
- legend = "defaults fontsize 6 x 12 y 0.012"
+ legend = "defaults fontsize 6 x 12 y 0.012
+
+ newcurve marktype none linetype dotted color 0 0 0
+ label : Average
+ pts
+ 0   0.00364
+ 77  0.00364
+
+"
 
   RATE_ALL_GRP('linux-2.6.33', "Block"    , 'Block'    ) \
   RATE_ALL_GRP('linux-2.6.33', "Null"     , 'Null'     ) \
