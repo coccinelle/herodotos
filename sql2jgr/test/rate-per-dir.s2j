@@ -41,7 +41,7 @@ graph gr/rate-per-dir-4-260.jgr {
  label : Average
  pts
  0   0.00641
- 77  0.00641
+ 66  0.00641
 
 "
  RATE_YMAX
@@ -62,7 +62,7 @@ graph gr/rate-per-dir-4-2612.jgr {
  newcurve marktype none linetype dotted color 0 0 0
  pts
  0   0.00507
- 77  0.00507
+ 66  0.00507
 
 "
  RATE_YMAX
