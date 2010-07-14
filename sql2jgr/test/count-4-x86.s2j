@@ -73,10 +73,13 @@ graph gr/count-4-241-x86.jgr {
   COUNT_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
   COUNT_DEF_GRP('linux-2.4.1', "Null"     , 'Null'     ) \
   COUNT_DEF_GRP('linux-2.4.1', "Var"      , 'Var'      ) \
+  COUNT_DEF_GRP('linux-2.4.1', "INull"    , 'INull'    ) \
+  COUNT_DEF_GRP('linux-2.4.1', "Range"    , 'Range'    ) \
   COUNT_DEF_GRP('linux-2.4.1', "Lock"     , 'Lock'     ) \
   COUNT_DEF_GRP('linux-2.4.1', "Intr"     , 'Intr'     ) \
   COUNT_DEF_GRP('linux-2.4.1', "LockIntr" , 'LockIntr' ) \
   COUNT_DEF_GRP('linux-2.4.1', "Free"     , 'Free'     ) \
+  COUNT_DEF_GRP('linux-2.4.1', "Float"    , 'Float'    ) \
   COUNT_DEF_GRP('linux-2.4.1', "Size"     , 'Size'     )
 
 }
@@ -90,10 +93,13 @@ graph gr/count-4-2633-x86.jgr {
   COUNT_ALL_GRP('linux-2.6.33', "Block"    , 'Block'    ) \
   COUNT_ALL_GRP('linux-2.6.33', "Null"     , 'Null'     ) \
   COUNT_ALL_GRP('linux-2.6.33', "Var"      , 'Var'      ) \
+  COUNT_ALL_GRP('linux-2.6.33', "INull"    , 'INull'    ) \
+  COUNT_ALL_GRP('linux-2.6.33', "Range"    , 'Range'    ) \
   COUNT_ALL_GRP('linux-2.6.33', "Lock"     , 'Lock'     ) \
   COUNT_ALL_GRP('linux-2.6.33', "Intr"     , 'Intr'     ) \
   COUNT_ALL_GRP('linux-2.6.33', "LockIntr" , 'LockIntr' ) \
   COUNT_ALL_GRP('linux-2.6.33', "Free"     , 'Free'     ) \
+  COUNT_ALL_GRP('linux-2.6.33', "Float"    , 'Float'    ) \
   COUNT_ALL_GRP('linux-2.6.33', "Size"     , 'Size'     )
 
 }
