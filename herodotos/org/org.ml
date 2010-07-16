@@ -312,23 +312,6 @@ let find_all_org_w_status org orgs =
   Used to group similar main entries
   Sub-items are regrouped.
 *)
-let rec filter_orgs orgs =
-  match orgs with
-      []       -> []
-    | hd::tail ->
-	let t2 = filter_orgs tail in
-	let tomerge = find_all_org_w_status hd tail in
-	  if tomerge = [] then
-	    hd::t2
-	  else
-	    let subtomerge =
-	      List.flatten (List.map
-			      (fun (_, _, _, _, _, _, _, _, _, _, sub) -> sub)
-			      tomerge)
-	    in
-	    let t3 = List.filter (fun e -> not (List.mem e tomerge)) t2 in
-	    let (l, s, r, f, v, pos, face, t, h, n, sub) = hd in
-	      (l, s, r, f, v, pos, face, t, h, n, sub@subtomerge)::t3
 
 let update_list orglist org =
   let tomerge = find_all_org_w_status org orglist in
@@ -343,6 +326,13 @@ let update_list orglist org =
       let newlist = List.filter (fun e -> not (List.mem e tomerge)) orglist in
       let (l, s, r, f, v, pos, face, t, h, n, sub) = org in
 	(l, s, r, f, v, pos, face, t, h, n, sub@subtomerge)::newlist
+
+let rec filter_orgs orgs =
+  match orgs with
+      []       -> []
+    | hd::tail ->
+	let t2 = filter_orgs tail in
+	  update_list t2 hd
 
 let flat_org prefix depth raw_org : Ast_org.bug =
   let Ast_org.Org(lvl, s, r, link, sub) = raw_org in
