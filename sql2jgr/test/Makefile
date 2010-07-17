@@ -7,7 +7,8 @@ SUBCONF=count-per-dir.s2j    \
 	density.s2j          \
 	cmp-rate-per-dir.s2j \
 	across.s2j           \
-	avg-ages.s2j
+	avg-ages.s2j         \
+	annexes.s2j
 
 SQL2JGR=sql2jgr.opt
 #FLAGS?=-vvv --debug --profile

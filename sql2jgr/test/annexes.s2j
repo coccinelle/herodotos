@@ -1,0 +1,34 @@
+
+#define CNT_CRV_FILE(patt, patt2)                      \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, pts        \
+       	 	FROM osdi_count_evol_agg_kind          \
+       	 	WHERE standardized_name = patt2        \
+		AND release_date > '2002-01-01'        \
+		ORDER BY release_date;                 \
+ }
+
+graph gr/count-evol-per-file.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 0.7
+ legend = "off"
+// ymax = 800
+
+ footer = "include count-evol-per-file.annot"
+
+ CNT_CRV_FILE(Block, 'Block')
+ CNT_CRV_FILE(Null , 'Null')
+ CNT_CRV_FILE(Var  , 'Var'  )
+ CNT_CRV_FILE(IsNull, 'IsNull')
+ CNT_CRV_FILE(NullRef, 'NullRef')
+ CNT_CRV_FILE(Range, 'Range')
+ CNT_CRV_FILE(Lock , 'Lock' )
+ CNT_CRV_FILE(Intr , 'Intr' )
+ CNT_CRV_FILE(LockIntr , 'LockIntr' )
+ CNT_CRV_FILE(Free , 'Free' )
+ CNT_CRV_FILE(Float, 'Float')
+ CNT_CRV_FILE(Size , 'Size' )
+
+}
