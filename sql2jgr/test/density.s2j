@@ -64,7 +64,7 @@ ORDER BY r.release_date;
 #define FLT_AVG_RATE                                    \
  curve pattern Average {				\
    sql = SELECT r.version_name, r.release_date,         \
-       	 	sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
+       	 	100 * sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
        	 	FROM rates_per_dir r                    \
        	 	WHERE r.release_date > '2002-01-01'     \
 		GROUP BY r.version_name, r.release_date \
@@ -74,7 +74,7 @@ ORDER BY r.release_date;
 #define FLT_RATE_KIND(patt, patt2)                      \
  curve pattern patt {				        \
    sql = SELECT r.version_name, r.release_date,         \
-       	 	sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
+       	 	100 * sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
        	 	FROM rates_per_dir r                    \
        	 	WHERE r.standardized_name = patt2       \
 		AND r.release_date > '2002-01-01'       \
@@ -108,7 +108,7 @@ graph gr/rate-evol-per-kind.jgr {
 #define FLT_RATE_DIR(patt, patt2)                       \
  curve pattern patt {				        \
    sql = SELECT r.version_name, r.release_date,         \
-       	 	sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
+       	 	100 * sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
        	 	FROM rates_per_dir r                    \
        	 	WHERE r.osdi_dirname = patt2            \
 		AND r.release_date > '2002-01-01'       \

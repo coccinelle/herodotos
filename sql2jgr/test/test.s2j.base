@@ -171,6 +171,8 @@ graph gr/count-evol-inull.jgr {
  size = 3 0.5
  ymax = 400
 
+ footer = "include count-evol.annot"
+
  COUNT_CURVE(NullRef, 'NullRef')
  COUNT_CURVE(Null , 'Null')
 }
