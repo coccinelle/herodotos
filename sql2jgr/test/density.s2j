@@ -43,10 +43,11 @@ graph gr/density.jgr {
  yaxis = user
  project = Linux
  size = 3 0.7
- legend = "off"
- ymax = 0.2
+ legend = "off
 
- footer = "include density.annot"
+include density.annot
+"
+ ymax = 0.2
 
  curve pattern Linux {
    sql = SELECT r.version_name, r.release_date,
@@ -88,7 +89,10 @@ graph gr/rate-evol-per-kind.jgr {
  project = Linux
  size = 3 1.5
 
- footer = "include rate.annot"
+ legend = "defaults
+
+include rate.annot
+"
 
  FLT_AVG_RATE
 
@@ -124,7 +128,10 @@ graph gr/rate-evol-per-dir.jgr {
  project = Linux
  size = 3 1.5
 
- footer = "include rate.annot"
+ legend = "defaults
+
+include rate.annot
+"
 
  FLT_AVG_RATE
 
@@ -154,7 +161,10 @@ graph gr/count-evol-per-dir.jgr {
  project = Linux
  size = 3 1.5
 
- footer = "include count-evol.annot"
+ legend = "defaults
+
+include count-evol.annot
+"
 
  FLT_COUNT_DIR(Drivers, 'drivers')
  FLT_COUNT_DIR(Staging, 'staging')

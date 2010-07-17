@@ -110,10 +110,11 @@ graph gr/count-evol.jgr {
  yaxis = user
  project = Linux
  size = 3 0.7
- legend = "off"
- ymax = 800
+ legend = "off
 
- footer = "include count-evol.annot"
+include count-evol.annot
+"
+ ymax = 800
 
  curve pattern Linux {
    sql = SELECT version_name, release_date, sum(data) as data
@@ -142,7 +143,10 @@ graph gr/count-evol-inc.jgr {
  size = 3 1.5
  ymax = 70
 
- footer = "include count-evol-70.annot"
+ legend = "defaults
+
+include count-evol-70.annot
+"
 
  COUNT_CURVE(IsNull, 'IsNull')
  COUNT_CURVE(Lock , 'Lock' )
@@ -158,7 +162,10 @@ graph gr/count-evol-dec.jgr {
  size = 3 1.5
  ymax = 70
 
- footer = "include count-evol-70.annot"
+ legend = "defaults
+
+include count-evol-70.annot
+"
 
  COUNT_CURVE(Block, 'Block')
  COUNT_CURVE(Var  , 'Var'  )
@@ -175,7 +182,10 @@ graph gr/count-evol-inull.jgr {
  size = 3 0.5
  ymax = 400
 
- footer = "include count-evol.annot"
+ legend = "defaults
+
+include count-evol.annot
+"
 
  COUNT_CURVE(NullRef, 'NullRef')
  COUNT_CURVE(Null , 'Null')
