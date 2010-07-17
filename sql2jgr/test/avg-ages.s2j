@@ -3,10 +3,7 @@ graph gr/avg-ages.jgr {
  xaxis = groups
  legend = "off
 
- newcurve marktype none linetype dotted color 0 0 0
- pts
- 0   1.63
- 12  1.63
+shell : ./get_avg.sh 12 avg_age.data
 
 "
  factor = 365.25
@@ -37,10 +34,7 @@ graph gr/avg-ages-per-dir.jgr {
  xaxis = groups
  legend = "off
 
- newcurve marktype none linetype dotted color 0 0 0
- pts
- 0   1.63
- 7   1.63
+shell : ./get_avg.sh 7 avg_age.data
 
  "
  factor = 365.25
@@ -88,10 +82,7 @@ graph gr/avg-ages-per-dir-and-cat.jgr {
  xaxis = groups
  legend = "off
 
- newcurve marktype none linetype dotted color 0 0 0
- pts
- 0   1.63
- 84  1.63
+shell : ./get_avg.sh 84 avg_age.data
 
 "
  factor = 365.25

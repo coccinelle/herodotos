@@ -27,11 +27,7 @@ graph gr/rate-per-dir-4-241.jgr {
  size = 3 1
  legend = "defaults fontsize 6
 
- newcurve marktype none linetype dotted color 0 0 0
- label : Average
- pts
- 0   0.795
- 55  0.795
+shell : ./get_avg.sh 55 avg_rate_241.data
 
 "
 // RATE_YMAX
@@ -48,11 +44,7 @@ graph gr/rate-per-dir-4-260.jgr {
  size = 3 1
  legend = "defaults fontsize 6
 
- newcurve marktype none linetype dotted color 0 0 0
- label : Average
- pts
- 0   0.641
- 66  0.641
+shell : ./get_avg.sh 66 avg_rate_260.data
 
 "
  RATE_YMAX
@@ -70,10 +62,7 @@ graph gr/rate-per-dir-4-2612.jgr {
  size = 3 1
  legend = "off
 
- newcurve marktype none linetype dotted color 0 0 0
- pts
- 0   0.507
- 66  0.507
+shell : ./get_avg.sh 66 avg_rate_2612.data
 
 "
  RATE_YMAX
@@ -91,16 +80,13 @@ graph gr/rate-per-dir-4-2633.jgr {
  size = 3 1
  legend = "off
 
- newcurve marktype none linetype dotted color 0 0 0
- pts
- 0   0.364
- 77  0.364
+shell : ./get_avg.sh 77 avg_rate_2633.data
 
 "
  RATE_YMAX
 
- RATE_DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
  RATE_DIR_GRP('linux-2.6.33', "Staging", 'staging')
+ RATE_DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
  RATE_DIR_GRP('linux-2.6.33', "Sound"  , 'sound')
  RATE_DIR_GRP('linux-2.6.33', "Arch"   , 'arch')
  RATE_DIR_GRP('linux-2.6.33', "FS"     , 'fs')
