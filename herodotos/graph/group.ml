@@ -138,6 +138,6 @@ let draw vb debug name grdft (atts, groups) allbugs =
     prerr_endline ("Drawing "^gname);
     draw_header outch (xmax (Array.of_list []) evols) (ymax evols) grinfo prjnum groups;
     ignore(List.fold_left (draw_curve outch msg prjnum) 0 evols);
-    Printf.fprintf outch "%s" (Graph.get_footer atts);
+    Printf.fprintf outch "%s\n" (Graph.get_footer atts);
     close_out outch;
     gname

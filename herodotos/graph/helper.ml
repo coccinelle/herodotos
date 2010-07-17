@@ -748,7 +748,7 @@ let draw vb debug name grdft (atts, curves) allbugs =
 	   List.iter (draw_vmin outch ymax) vmins;
 	   mark_zero_once := false;
 	   List.iter (draw_curve outch msg (Config.get_abs_days_of mindate)) (List.rev evols);
-	   Printf.fprintf outch "%s" (Graph.get_footer atts);
+	   Printf.fprintf outch "%s\n" (Graph.get_footer atts);
 	   close_out outch;
 	   gname
     )
