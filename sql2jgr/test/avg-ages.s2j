@@ -14,6 +14,7 @@ shell : ./get_avg.sh 12 avg_age.data
        FROM "Bug ages" ages, standardized_names
        WHERE standardized_names.standardized_name = ages.standardized_name
        AND ages.standardized_name != 'Real'
+       AND ages.osdi_dirname != 'staging'
        GROUP BY ages.standardized_name, standardized_names.order
        ORDER BY standardized_names.order;
 }
@@ -34,15 +35,15 @@ graph gr/avg-ages-per-dir.jgr {
  xaxis = groups
  legend = "off
 
-shell : ./get_avg.sh 7 avg_age.data
+shell : ./get_avg.sh 6 avg_age.data
 
  "
  factor = 365.25
  ylegend = "Years"
  size = 3 1
 
+// AVG_AGE_DIR("Staging",Staging, 'staging')
  AVG_AGE_DIR("Drivers",Drivers, 'drivers')
- AVG_AGE_DIR("Staging",Staging, 'staging')
  AVG_AGE_DIR("Sound"  ,Sound  , 'sound'  )
  AVG_AGE_DIR("Arch"   ,Arch   , 'arch'   )
  AVG_AGE_DIR("FS"     ,FS     , 'fs'     )
@@ -82,15 +83,15 @@ graph gr/avg-ages-per-dir-and-cat.jgr {
  xaxis = groups
  legend = "off
 
-shell : ./get_avg.sh 84 avg_age.data
+shell : ./get_avg.sh 72 avg_age.data
 
 "
  factor = 365.25
  ylegend = "Years"
  size = 3 1
 
+// AVG_AGE("Staging", 'staging')
  AVG_AGE("Drivers", 'drivers')
- AVG_AGE("Staging", 'staging')
  AVG_AGE("Sound"  , 'sound')
  AVG_AGE("Arch"   , 'arch')
  AVG_AGE("FS"     , 'fs')
