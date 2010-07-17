@@ -112,7 +112,7 @@ graph gr/count-evol.jgr {
  size = 3 0.7
  legend = "off
 
-include count-evol.annot
+include lifetime_across.annot
 "
  ymax = 800
 
