@@ -117,6 +117,7 @@ include count-evol.annot
  ymax = 800
 
  curve pattern Linux {
+   marktype = x
    sql = SELECT version_name, release_date, sum(data) as data
        	 	FROM "Count evol"
        	 	WHERE release_date > '2002-01-01'

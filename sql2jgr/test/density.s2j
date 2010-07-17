@@ -50,14 +50,13 @@ include density.annot
  ymax = 0.2
 
  curve pattern Linux {
+   marktype = x
    sql = SELECT r.version_name, r.release_date,
        1000*count(report_id)::float/locc::float as fault_density
 FROM "Faults info" r, versions
-WHERE versions.version_name = r.version_name
-AND versions.main = 2
-AND versions.major = 6
-AND r.status = 'BUG'
-GROUP BY r.version_name , r.release_date , versions.locc
+WHERE r.release_date > '2002-01-01'
+AND versions.version_name = r.version_name
+GROUP BY r.version_name , r.release_date , locc
 ORDER BY r.release_date;
  }
 }
