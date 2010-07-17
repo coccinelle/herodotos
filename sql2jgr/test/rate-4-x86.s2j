@@ -52,12 +52,15 @@ pattern ALLYES { color = 1 .69 0 }
 graph gr/rate-4-241-x86.jgr {
  xaxis = groups
  size = 3 1
- legend = "defaults fontsize 6 x 8 y 0.02"
+ legend = "defaults fontsize 6 x 10 y 0.02"
  RATEx86_YMAX
 
   RATE_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
   RATE_DEF_GRP('linux-2.4.1', "Null"     , 'Null'     ) \
   RATE_DEF_GRP('linux-2.4.1', "Var"      , 'Var'      ) \
+  RATE_DEF_GRP('linux-2.4.1', "IsNull"   , 'IsNull'   ) \
+  RATE_DEF_GRP('linux-2.4.1', "NullRef"  , 'NullRef'  ) \
+  RATE_DEF_GRP('linux-2.4.1', "Range"    , 'Range'    ) \
   RATE_DEF_GRP('linux-2.4.1', "Lock"     , 'Lock'     ) \
   RATE_DEF_GRP('linux-2.4.1', "Intr"     , 'Intr'     ) \
   RATE_DEF_GRP('linux-2.4.1', "LockIntr" , 'LockIntr' ) \
@@ -70,19 +73,22 @@ graph gr/rate-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
  RATEx86_YMAX
- legend = "defaults fontsize 6 x 14 y 0.010
+ legend = "off (* defaults fontsize 6 x 14 y 0.010 *)
 
  newcurve marktype none linetype dotted color 0 0 0
  label : Average
  pts
  0   0.00364
- 24  0.00364
+ 33  0.00364
 
 "
 
   RATE_ALL_GRP('linux-2.6.33', "Block"    , 'Block'    ) \
   RATE_ALL_GRP('linux-2.6.33', "Null"     , 'Null'     ) \
   RATE_ALL_GRP('linux-2.6.33', "Var"      , 'Var'      ) \
+  RATE_ALL_GRP('linux-2.6.33', "IsNull"   , 'IsNull'   ) \
+  RATE_ALL_GRP('linux-2.6.33', "NullRef"  , 'NullRef'  ) \
+  RATE_ALL_GRP('linux-2.6.33', "Range"    , 'Range'    ) \
   RATE_ALL_GRP('linux-2.6.33', "Lock"     , 'Lock'     ) \
   RATE_ALL_GRP('linux-2.6.33', "Intr"     , 'Intr'     ) \
   RATE_ALL_GRP('linux-2.6.33', "LockIntr" , 'LockIntr' ) \

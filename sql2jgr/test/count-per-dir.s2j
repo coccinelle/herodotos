@@ -12,11 +12,12 @@
   DIR_CURVE(ver, Block, 'Block', dir2) \
   DIR_CURVE(ver, Null , 'Null' , dir2) \
   DIR_CURVE(ver, Var  , 'Var'  , dir2) \
-  DIR_CURVE(ver, INull, 'INull', dir2) \
+  DIR_CURVE(ver, IsNull, 'IsNull', dir2) \
+  DIR_CURVE(ver, NullRef, 'NullRef', dir2) \
   DIR_CURVE(ver, Range, 'Range', dir2) \
   DIR_CURVE(ver, Lock , 'Lock' , dir2) \
   DIR_CURVE(ver, Intr , 'Intr' , dir2) \
-  DIR_CURVE(ver, LockIntr , 'LockIntr' , dir2) \
+  DIR_CURVE(ver, LockIntr, 'LockIntr' , dir2) \
   DIR_CURVE(ver, Free , 'Free' , dir2) \
   DIR_CURVE(ver, Float, 'Float', dir2) \
   DIR_CURVE(ver, Size , 'Size' , dir2) \

@@ -16,6 +16,9 @@
   CMP_RATE_DIR_CURVE(ver, Block, 'Block', dir2) \
   CMP_RATE_DIR_CURVE(ver, Null , 'Null' , dir2) \
   CMP_RATE_DIR_CURVE(ver, Var  , 'Var'  , dir2) \
+  CMP_RATE_DIR_CURVE(ver, IsNull , 'IsNull' , dir2) \
+  CMP_RATE_DIR_CURVE(ver, NullRef , 'NullRef' , dir2) \
+  CMP_RATE_DIR_CURVE(ver, Range, 'Range', dir2) \
   CMP_RATE_DIR_CURVE(ver, Lock , 'Lock' , dir2) \
   CMP_RATE_DIR_CURVE(ver, Intr , 'Intr' , dir2) \
   CMP_RATE_DIR_CURVE(ver, LockIntr , 'LockIntr' , dir2) \
@@ -23,7 +26,6 @@
   CMP_RATE_DIR_CURVE(ver, Size , 'Size' , dir2) \
  }
 //  CMP_RATE_DIR_CURVE(ver, INull, 'INull', dir2) \
-//  CMP_RATE_DIR_CURVE(ver, Range, 'Range', dir2) \
 //  CMP_RATE_DIR_CURVE(ver, Float, 'Float', dir2) \
 //  CMP_RATE_DIR_CURVE(ver, Real , 'Real' , dir2) \
 //  CMP_RATE_DIR_CURVE(ver, Param, 'Param', dir2) \
@@ -31,7 +33,13 @@
 graph gr/cmp-rate-per-dir-4-241.jgr {
  xaxis = groups
  size = 3 1
- legend = "defaults fontsize 6"
+ legend = "defaults fontsize 6
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   1
+ 55  1
+"
  CMP_RATE_YMAX
 
  CMP_RATE_DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
@@ -44,7 +52,13 @@ graph gr/cmp-rate-per-dir-4-241.jgr {
 graph gr/cmp-rate-per-dir-4-260.jgr {
  xaxis = groups
  size = 3 1
- legend = "defaults fontsize 6"
+ legend = "defaults fontsize 6
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   1
+ 66  1
+"
  CMP_RATE_YMAX
 
  CMP_RATE_DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
@@ -58,7 +72,13 @@ graph gr/cmp-rate-per-dir-4-260.jgr {
 graph gr/cmp-rate-per-dir-4-2612.jgr {
  xaxis = groups
  size = 3 1
- legend = "off"
+ legend = "off
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   1
+ 66  1
+"
  CMP_RATE_YMAX
 
  CMP_RATE_DIR_GRP('linux-2.6.12', "Drivers", 'drivers')
@@ -72,7 +92,13 @@ graph gr/cmp-rate-per-dir-4-2612.jgr {
 graph gr/cmp-rate-per-dir-4-2633.jgr {
  xaxis = groups
  size = 3 1
- legend = "off"
+ legend = "off
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   1
+ 77  1
+"
  CMP_RATE_YMAX
 
  CMP_RATE_DIR_GRP('linux-2.6.33', "Drivers", 'drivers')

@@ -60,9 +60,13 @@ pattern Var {
  color = 0 1 .5
  marktype = box
 }
-pattern INull {
- color = 1 0 0
+pattern IsNull {
+ color = 1 0.69 0
  marktype = diamond
+}
+pattern NullRef {
+ color = 1 0 0
+ marktype = x
 }
 pattern Range {
  color = 0 0 0
@@ -136,6 +140,7 @@ graph gr/count-evol-inc.jgr {
  size = 3 1.5
  ymax = 70
 
+ COUNT_CURVE(IsNull, 'IsNull')
  COUNT_CURVE(Lock , 'Lock' )
  COUNT_CURVE(LockIntr , 'LockIntr' )
  COUNT_CURVE(Float, 'Float')
@@ -164,7 +169,7 @@ graph gr/count-evol-inull.jgr {
  size = 3 0.5
  ymax = 400
 
- COUNT_CURVE(INull, 'INull')
+ COUNT_CURVE(NullRef, 'NullRef')
  COUNT_CURVE(Null , 'Null')
 }
 
@@ -187,7 +192,8 @@ graph gr/orig-2_6_33.jgr {
  ORIG_CURVE(Block, 'Block')
  ORIG_CURVE(Null , 'Null' )
  ORIG_CURVE(Var  , 'Var'  )
- ORIG_CURVE(INull, 'INull')
+ ORIG_CURVE(IsNull, 'IsNull')
+ ORIG_CURVE(NullRef, 'NullRef')
  ORIG_CURVE(Range, 'Range')
  ORIG_CURVE(Lock , 'Lock' )
  ORIG_CURVE(Intr , 'Intr' )
@@ -225,7 +231,8 @@ graph gr/orig-pct-2_6_33.jgr {
  ORIG_CURVE_PCT(Block, 'Block')
  ORIG_CURVE_PCT(Null , 'Null' )
  ORIG_CURVE_PCT(Var  , 'Var'  )
- ORIG_CURVE_PCT(INull, 'INull')
+ ORIG_CURVE_PCT(IsNull, 'IsNull')
+ ORIG_CURVE_PCT(NullRef, 'NullRef')
  ORIG_CURVE_PCT(Range, 'Range')
  ORIG_CURVE_PCT(Lock , 'Lock' )
  ORIG_CURVE_PCT(Intr , 'Intr' )

@@ -1,12 +1,12 @@
 
 graph gr/avg-ages.jgr {
  xaxis = groups
- legend = "off 
+ legend = "off
 
  newcurve marktype none linetype dotted color 0 0 0
  pts
  0   1.63
- 11  1.63
+ 12  1.63
 
 "
  factor = 365.25
@@ -35,7 +35,7 @@ graph gr/avg-ages.jgr {
 
 graph gr/avg-ages-per-dir.jgr {
  xaxis = groups
- legend = "off 
+ legend = "off
 
  newcurve marktype none linetype dotted color 0 0 0
  pts
@@ -73,7 +73,8 @@ graph gr/avg-ages-per-dir.jgr {
   AVG_AGE_CURVE(Block, 'Block', dir2) \
   AVG_AGE_CURVE(Null , 'Null' , dir2) \
   AVG_AGE_CURVE(Var  , 'Var'  , dir2) \
-  AVG_AGE_CURVE(INull, 'INull', dir2) \
+  AVG_AGE_CURVE(IsNull, 'IsNull', dir2) \
+  AVG_AGE_CURVE(NullRef, 'NullRef', dir2) \
   AVG_AGE_CURVE(Range, 'Range', dir2) \
   AVG_AGE_CURVE(Lock , 'Lock' , dir2) \
   AVG_AGE_CURVE(Intr , 'Intr' , dir2) \
@@ -85,12 +86,12 @@ graph gr/avg-ages-per-dir.jgr {
 
 graph gr/avg-ages-per-dir-and-cat.jgr {
  xaxis = groups
- legend = "off 
+ legend = "off
 
  newcurve marktype none linetype dotted color 0 0 0
  pts
  0   1.63
- 77  1.63
+ 84  1.63
 
 "
  factor = 365.25

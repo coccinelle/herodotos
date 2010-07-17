@@ -83,13 +83,14 @@
 graph gr/count-4-241-x86.jgr {
  xaxis = groups
  size = 3 1
- legend = "defaults fontsize 6 x 10 y 150"
+ legend = "defaults fontsize 6 x 12 y 150"
  COUNTx86_YMAX
 
   COUNT_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
   COUNT_DEF_GRP('linux-2.4.1', "Null"     , 'Null'     ) \
   COUNT_DEF_GRP('linux-2.4.1', "Var"      , 'Var'      ) \
-  COUNT_DEF_GRP('linux-2.4.1', "INull"    , 'INull'    ) \
+  COUNT_DEF_GRP('linux-2.4.1', "IsNull"   , 'IsNull'   ) \
+  COUNT_DEF_GRP('linux-2.4.1', "NullRef"  , 'NullRef'  ) \
   COUNT_DEF_GRP('linux-2.4.1', "Range"    , 'Range'    ) \
   COUNT_DEF_GRP('linux-2.4.1', "Lock"     , 'Lock'     ) \
   COUNT_DEF_GRP('linux-2.4.1', "Intr"     , 'Intr'     ) \
@@ -104,12 +105,21 @@ graph gr/count-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
  COUNTx86_YMAX
- legend = "defaults fontsize 6 x 14 y 225"
+ legend = "defaults fontsize 6 x 16 y 200
+
+  (* defaults fontsize 6 x 12 y 300
+
+  newcurve marktype none linetype dotted color 0 0 0
+   label : Average
+   *)
+
+  "
 
   COUNT_ALL_GRP('linux-2.6.33', "Block"    , 'Block'    ) \
   COUNT_ALL_GRP('linux-2.6.33', "Null"     , 'Null'     ) \
   COUNT_ALL_GRP('linux-2.6.33', "Var"      , 'Var'      ) \
-  COUNT_ALL_GRP('linux-2.6.33', "INull"    , 'INull'    ) \
+  COUNT_ALL_GRP('linux-2.6.33', "IsNull"   , 'IsNull'   ) \
+  COUNT_ALL_GRP('linux-2.6.33', "NullRef"  , 'NullRef'  ) \
   COUNT_ALL_GRP('linux-2.6.33', "Range"    , 'Range'    ) \
   COUNT_ALL_GRP('linux-2.6.33', "Lock"     , 'Lock'     ) \
   COUNT_ALL_GRP('linux-2.6.33', "Intr"     , 'Intr'     ) \
