@@ -26,6 +26,7 @@ type attr =
   | File of string option
   | Filename of bool
   | Flags of string
+  | Footer of string
   | Format of string
   | Info of bool
   | Legend of string

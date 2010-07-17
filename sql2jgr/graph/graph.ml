@@ -371,3 +371,16 @@ let get_factor verbose g atts dft =
     if verbose then
       prerr_endline ("Factor of "^g^" is not defined. Assuming \""^ string_of_float dft^"\"");
     dft
+
+let get_footer atts =
+  try
+    match
+      List.find (fun x ->
+		   match x with
+		       Ast_config.Footer _ -> true
+		     | _ -> false
+		) atts
+    with
+	Ast_config.Footer mt -> mt
+      | _ -> raise Unrecoverable
+  with _ -> ""

@@ -23,7 +23,7 @@
 %token TSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT
 %token TLEGEND TXLEGEND TXMIN TYMIN TYMAX TXAXIS TYAXIS
 %token TYLEGEND TYLEGENDFACTOR TFACTOR
-%token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR
+%token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR TFOOTER
 %token TFILE TFILENAME TRATIO TGROUP TINFO TSIZE TVMIN TPRUNE TAUTHOR
 %token<int> TInt
 %token<float> TFloat
@@ -76,6 +76,7 @@ attr:
     { if f = "" then Ast_config.File(None) else Ast_config.File(Some f) }
 | TFILE          TEQUAL TNONE                      { Ast_config.File(None)}
 | TFILENAME      TEQUAL b=TBOOL                    { Ast_config.Filename(b)}
+| TFOOTER        TEQUAL l=TSTRING2Q                { Ast_config.Footer(l)}
 | TFORMAT        TEQUAL dft=TId                    { Ast_config.Format(dft) }
 | TINFO          TEQUAL b=TBOOL                    { Ast_config.Info(b)}
 | TLEGEND        TEQUAL l=TSTRING2Q                  { Ast_config.Legend(l)}

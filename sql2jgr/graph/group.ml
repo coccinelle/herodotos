@@ -236,5 +236,6 @@ let draw vb debug conn name grdft (atts, groups) =
     prerr_endline ("Drawing "^gname);
     draw_header outch (float_of_int evolnum) y_max grinfo prjnum evols;
     ignore(List.fold_left (draw_curve outch msg prjnum ynodata) 0 evols);
+    Printf.fprintf outch "%s\n" (Graph.get_footer atts);
     close_out outch;
     gname

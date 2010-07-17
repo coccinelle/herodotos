@@ -62,6 +62,7 @@ rule token = parse
   | "file"                    { P.TFILE          }
   | "filename"                { P.TFILENAME      }
   | "flags"                   { P.TFLAGS         }
+  | "footer"                  { P.TFOOTER        }
   | "format"                  { P.TFORMAT        }
   | "graph"                   { P.TGRAPH         }
   | "group"                   { P.TGROUP         }
