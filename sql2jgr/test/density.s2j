@@ -46,6 +46,8 @@ graph gr/density.jgr {
  legend = "off"
  ymax = 0.2
 
+ footer = "include density.annot"
+
  curve pattern Linux {
    sql = SELECT r.version_name, r.release_date,
        1000*count(report_id)::float/locc::float as fault_density

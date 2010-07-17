@@ -113,6 +113,8 @@ graph gr/count-evol.jgr {
  legend = "off"
  ymax = 800
 
+ footer = "include count-evol.annot"
+
  curve pattern Linux {
    sql = SELECT version_name, release_date, sum(data) as data
        	 	FROM "Count evol"
