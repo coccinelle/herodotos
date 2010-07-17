@@ -15,7 +15,7 @@
        FROM standardized_names s                    \
        LEFT JOIN                                    \
        (SELECT r.standardized_name, count(correlation_id) AS count     \
-       FROM files f, "Reports info" r    			       \
+       FROM files f, "Faults info" r    			       \
        WHERE r.standardized_name = patt2                               \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
@@ -39,7 +39,7 @@
        FROM standardized_names s                    \
        LEFT JOIN                                    \
        (SELECT r.standardized_name, count(correlation_id) AS count    \
-       FROM files f, "Reports info" r     			       \
+       FROM files f, "Faults info" r     			       \
        WHERE r.standardized_name = patt2                               \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
@@ -54,7 +54,7 @@
        FROM standardized_names s                    \
        LEFT JOIN                                    \
        ( SELECT r.standardized_name, count(correlation_id) AS count    \
-       FROM files f, "Reports info" r			               \
+       FROM files f, "Faults info" r			               \
        WHERE r.standardized_name = patt2                               \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \
@@ -69,7 +69,7 @@
        FROM standardized_names s                    \
        LEFT JOIN                                    \
        ( SELECT r.standardized_name, count(correlation_id) AS count    \
-       FROM files f, "Reports info" r			               \
+       FROM files f, "Faults info" r			               \
        WHERE r.standardized_name = patt2                               \
        AND r.file_id = f.file_id				       \
        AND f.version_name = ver					       \

@@ -51,7 +51,7 @@ graph gr/density.jgr {
  curve pattern Linux {
    sql = SELECT r.version_name, r.release_date,
        1000*count(report_id)::float/locc::float as fault_density
-FROM "Reports info" r, versions
+FROM "Faults info" r, versions
 WHERE versions.version_name = r.version_name
 AND versions.main = 2
 AND versions.major = 6
@@ -88,6 +88,8 @@ graph gr/rate-evol-per-kind.jgr {
  project = Linux
  size = 3 1.5
 
+ footer = "include rate.annot"
+
  FLT_AVG_RATE
 
  FLT_RATE_KIND(Block, 'Block')
@@ -122,6 +124,8 @@ graph gr/rate-evol-per-dir.jgr {
  project = Linux
  size = 3 1.5
 
+ footer = "include rate.annot"
+
  FLT_AVG_RATE
 
  FLT_RATE_DIR(Drivers, 'drivers')
@@ -133,11 +137,11 @@ graph gr/rate-evol-per-dir.jgr {
  FLT_RATE_DIR(Other  , 'other'  )
 }
 
-#define FLT_COUNT_DIR(patt, patt2)                       \
+#define FLT_COUNT_DIR(patt, patt2)                      \
  curve pattern patt {				        \
    sql = SELECT r.version_name, r.release_date,         \
-       	 	count(r.report_id) AS count \
-       	 	FROM "Reports info" r                    \
+       	 	count(r.report_id) AS count             \
+       	 	FROM "Faults info" r                    \
        	 	WHERE r.osdi_dirname = patt2            \
 		AND r.release_date > '2002-01-01'       \
 		GROUP BY r.version_name, r.release_date \
@@ -149,6 +153,8 @@ graph gr/count-evol-per-dir.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
+
+ footer = "include count-evol.annot"
 
  FLT_COUNT_DIR(Drivers, 'drivers')
  FLT_COUNT_DIR(Staging, 'staging')

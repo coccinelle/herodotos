@@ -142,6 +142,8 @@ graph gr/count-evol-inc.jgr {
  size = 3 1.5
  ymax = 70
 
+ footer = "include count-evol-70.annot"
+
  COUNT_CURVE(IsNull, 'IsNull')
  COUNT_CURVE(Lock , 'Lock' )
  COUNT_CURVE(LockIntr , 'LockIntr' )
@@ -155,6 +157,8 @@ graph gr/count-evol-dec.jgr {
  project = Linux
  size = 3 1.5
  ymax = 70
+
+ footer = "include count-evol-70.annot"
 
  COUNT_CURVE(Block, 'Block')
  COUNT_CURVE(Var  , 'Var'  )

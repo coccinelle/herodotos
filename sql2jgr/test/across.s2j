@@ -145,7 +145,7 @@ pattern v2.6.33{
           sum("number_of_bugs")		  \
    FROM faults_across_releases            \
    WHERE "for_version_name" = vers        \
-   AND release_date >= '2003-12-18'	  \
+   AND release_date > '2002-01-01'	  \
    GROUP BY "version_name","release_date" \
    ORDER BY release_date;                 \
  }
@@ -155,7 +155,11 @@ graph gr/lifetime_across.jgr {
  yaxis = user
  project = Linux
  size = 3 3.5
- legend = "defaults fontsize 6"
+ legend = "defaults fontsize 6
+
+ include lifetime_across.annot
+
+ "
  ylegend = "Number of faults"
 
  curve pattern Linux {
@@ -163,11 +167,8 @@ graph gr/lifetime_across.jgr {
   color = 0 0 0
    sql = SELECT r.version_name, r.release_date,
        count(report_id)
-FROM "Reports info" r, versions
-WHERE versions.version_name = r.version_name
-AND versions.main = 2
-AND versions.major = 6
-AND r.status = 'BUG'
+FROM "Faults info" r
+WHERE r.release_date > '2002-01-01'
 GROUP BY r.version_name , r.release_date
 ORDER BY r.release_date;
  }
