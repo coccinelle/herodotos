@@ -90,7 +90,7 @@ graph gr/rate-evol-per-kind.jgr {
 
  legend = "defaults
 
-include rate.annot
+include rate-kind.annot
 "
 
  FLT_AVG_RATE
@@ -129,7 +129,7 @@ graph gr/rate-evol-per-dir.jgr {
 
  legend = "defaults
 
-include rate.annot
+include rate-dir.annot
 "
 
  FLT_AVG_RATE

@@ -185,7 +185,7 @@ graph gr/count-evol-inull.jgr {
 
  legend = "defaults
 
-include count-evol.annot
+include count-evol-400.annot
 "
 
  COUNT_CURVE(NullRef, 'NullRef')
