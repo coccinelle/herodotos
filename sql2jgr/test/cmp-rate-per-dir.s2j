@@ -101,8 +101,8 @@ graph gr/cmp-rate-per-dir-4-2633.jgr {
 "
  CMP_RATE_YMAX
 
- CMP_RATE_DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
  CMP_RATE_DIR_GRP('linux-2.6.33', "Staging", 'staging')
+ CMP_RATE_DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
  CMP_RATE_DIR_GRP('linux-2.6.33', "Sound"  , 'sound')
  CMP_RATE_DIR_GRP('linux-2.6.33', "Arch"   , 'arch')
  CMP_RATE_DIR_GRP('linux-2.6.33', "FS"     , 'fs')

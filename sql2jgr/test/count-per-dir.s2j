@@ -72,8 +72,8 @@ graph gr/count-per-dir-4-2633.jgr {
  legend = "off"
  DIR_YMAX
 
- DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
  DIR_GRP('linux-2.6.33', "Staging", 'staging')
+ DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
  DIR_GRP('linux-2.6.33', "Sound"  , 'sound')
  DIR_GRP('linux-2.6.33', "Arch"   , 'arch')
  DIR_GRP('linux-2.6.33', "FS"     , 'fs')
