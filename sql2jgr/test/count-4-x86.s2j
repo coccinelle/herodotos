@@ -105,13 +105,7 @@ graph gr/count-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
  COUNTx86_YMAX
- legend = "defaults fontsize 6 x 16 y 200
-
-  (* defaults fontsize 6 x 12 y 300
-
-  newcurve marktype none linetype dotted color 0 0 0
-   label : Average
-   *)
+ legend = "defaults fontsize 6 x 18 y 100
 
   "
 
