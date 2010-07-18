@@ -14,8 +14,8 @@
   RATE_DIR_CURVE(ver, Var  , 'Var'  , dir2) \
   RATE_DIR_CURVE(ver, IsNull , 'IsNull' , dir2) \
   RATE_DIR_CURVE(ver, NullRef , 'NullRef' , dir2) \
-  RATE_DIR_CURVE(ver, Lock , 'Lock' , dir2) \
   RATE_DIR_CURVE(ver, Range , 'Range' , dir2) \
+  RATE_DIR_CURVE(ver, Lock , 'Lock' , dir2) \
   RATE_DIR_CURVE(ver, Intr , 'Intr' , dir2) \
   RATE_DIR_CURVE(ver, LockIntr , 'LockIntr' , dir2) \
   RATE_DIR_CURVE(ver, Free , 'Free' , dir2) \
