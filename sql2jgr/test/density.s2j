@@ -4,26 +4,32 @@ pattern Linux {
 }
 
 pattern Drivers {
+ marktype = circle
  color = 1 0 0
 }
 
 pattern Staging {
+ marktype = box
  color = 0 0 0
 }
 
 pattern Sound   {
+ marktype = diamond
  color = 0 0 1
 }
 
 pattern Arch    {
+ marktype = triangle
  color = 0 1 1
 }
 
 pattern FS      {
+ marktype = x
  color = 0 1 0
 }
 
 pattern Net     {
+ marktype = cross
  color = 1 0.69 0
 }
 
