@@ -139,7 +139,7 @@ pattern Free {
  marktype = box
 }
 pattern Float {
- color = 0 1 1
+ color = 1 0 1
  marktype = diamond
 }
 pattern Real {
