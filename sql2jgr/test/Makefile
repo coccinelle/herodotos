@@ -32,7 +32,3 @@ $(CONF): $(CONF).base $(SUBCONF)
 
 clean:
 	rm -f *~
-
-annexes.s2j:
-	touch $@
-

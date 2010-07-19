@@ -1,0 +1,148 @@
+
+#define CNT_CRV_FILE_DIR(patt, patt2)                  \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, sum(pts)   \
+       	 	FROM osdi_count_evol_agg_kind          \
+       	 	WHERE osdi_dirname = patt2             \
+		AND release_date > '2002-01-01'        \
+		GROUP BY version_name,                 \
+		      release_date,                    \
+		      osdi_dirname                     \
+		ORDER BY release_date;                 \
+ }
+
+graph gr/count-evol-agg-file-dir.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 2
+
+ legend = "defaults
+
+include count-evol-per-dir.annot
+"
+
+ CNT_CRV_FILE_DIR(Staging, 'staging')
+ CNT_CRV_FILE_DIR(Drivers, 'drivers')
+ CNT_CRV_FILE_DIR(Sound  , 'sound')
+ CNT_CRV_FILE_DIR(Arch   , 'arch')
+ CNT_CRV_FILE_DIR(FS     , 'fs')
+ CNT_CRV_FILE_DIR(Net    , 'net')
+ CNT_CRV_FILE_DIR(Other  , 'other')
+}
+
+#define CNT_CRV_FILE_KIND(patt, patt2)                 \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, sum(pts)   \
+       	 	FROM osdi_count_evol_agg_kind          \
+       	 	WHERE standardized_name = patt2        \
+		AND release_date > '2002-01-01'        \
+		GROUP BY version_name,                 \
+		      release_date,                    \
+		      standardized_name                \
+		ORDER BY release_date;                 \
+ }
+
+graph gr/count-evol-agg-file-kind.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 2
+
+ legend = "defaults
+
+include count-evol-per-file.annot
+"
+
+ CNT_CRV_FILE_KIND(Block, 'Block')
+// CNT_CRV_FILE_KIND(Null , 'Null')
+ CNT_CRV_FILE_KIND(Var  , 'Var'  )
+ CNT_CRV_FILE_KIND(IsNull, 'IsNull')
+// CNT_CRV_FILE_KIND(NullRef, 'NullRef')
+ CNT_CRV_FILE_KIND(Range, 'Range')
+ CNT_CRV_FILE_KIND(Lock , 'Lock' )
+ CNT_CRV_FILE_KIND(Intr , 'Intr' )
+ CNT_CRV_FILE_KIND(LockIntr , 'LockIntr' )
+ CNT_CRV_FILE_KIND(Free , 'Free' )
+ CNT_CRV_FILE_KIND(Float, 'Float')
+ CNT_CRV_FILE_KIND(Size , 'Size' )
+
+}
+
+
+#define CNT_NOTES(patt, patt2)                         \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, count(*)   \
+       	 	FROM "Notes info"                      \
+       	 	WHERE standardized_name = patt2        \
+		AND release_date > '2002-01-01'        \
+		GROUP BY version_name,                 \
+		      release_date,                    \
+		      standardized_name                \
+		ORDER BY release_date;                 \
+ }
+
+graph gr/notes-evol-kind.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 2
+ legend = "defaults"
+ ylegend = "# of notes"
+
+ footer = ""
+
+ CNT_NOTES(Block, 'Block')
+ CNT_NOTES(Null , 'Null')
+ CNT_NOTES(Var  , 'Var'  )
+ CNT_NOTES(IsNull, 'IsNull')
+ CNT_NOTES(NullRef, 'NullRef')
+ CNT_NOTES(Range, 'Range')
+ CNT_NOTES(Lock , 'Lock' )
+ CNT_NOTES(Intr , 'Intr' )
+ CNT_NOTES(LockIntr , 'LockIntr' )
+ CNT_NOTES(Free , 'Free' )
+ CNT_NOTES(Float, 'Float')
+ CNT_NOTES(Size , 'Size' )
+
+}
+
+#define FLT_FILE_DIR(patt, patt2)                  \
+ curve pattern patt {				       \
+   sql = SELECT r.version_name, r.release_date, count(r.report_id) / a.pts AS count             \
+       	 	FROM "Faults info" r,                    \
+		     (SELECT release_date,               \
+			     sum(pts) as pts             \
+		     FROM osdi_count_evol_agg_kind       \
+		     WHERE osdi_dirname = patt2          \
+		     GROUP BY release_date               \
+		     )  AS a                             \
+       	 	WHERE r.osdi_dirname = patt2             \
+		AND r.release_date > '2002-01-01'        \
+		AND r.release_date = a.release_date	 \
+		GROUP BY r.version_name,                 \
+		      r.release_date,                    \
+		      a.pts				 \
+		ORDER BY r.release_date;                 \
+ }
+
+graph gr/flt_file-evol-dir.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 2
+ ymin = 0.8
+
+ legend = "defaults
+
+include rate-2.annot
+"
+
+ FLT_FILE_DIR(Staging, 'staging')
+ FLT_FILE_DIR(Drivers, 'drivers')
+ FLT_FILE_DIR(Sound  , 'sound')
+ FLT_FILE_DIR(Arch   , 'arch')
+ FLT_FILE_DIR(FS     , 'fs')
+ FLT_FILE_DIR(Net    , 'net')
+ FLT_FILE_DIR(Other  , 'other')
+}
