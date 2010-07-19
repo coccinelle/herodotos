@@ -148,8 +148,19 @@ include notes-evol-kind.annot
  CNT_NOTES_KIND(Block, 'Block')
  CNT_NOTES_KIND(Null , 'Null')
  CNT_NOTES_KIND(Var  , 'Var'  )
- CNT_NOTES_KIND(IsNull, 'IsNull')
- CNT_NOTES_KIND(NullRef, 'NullRef')
+
+ curve pattern IsNull {
+   legend = "IsNull / NullRef"
+   sql = SELECT version_name, release_date, count(*)
+       	 	FROM "Notes info"
+       	 	WHERE standardized_name = 'IsNull'
+		AND release_date > '2002-01-01'
+		GROUP BY version_name,
+		      release_date,
+		      standardized_name
+		ORDER BY release_date;
+ }
+
  CNT_NOTES_KIND(Range, 'Range')
  CNT_NOTES_KIND(Lock , 'Lock' )
  CNT_NOTES_KIND(Intr , 'Intr' )
