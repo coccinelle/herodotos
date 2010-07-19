@@ -15,7 +15,7 @@ graph gr/count-evol-agg-file-dir.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 2
+ size = 3 1.5
 
  legend = "defaults
 
@@ -47,7 +47,7 @@ graph gr/count-evol-agg-file-kind.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 2
+ size = 3 1.5
 
  legend = "defaults
 
@@ -86,9 +86,8 @@ graph gr/notes-evol-kind.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 2
+ size = 3 1.5
  legend = "defaults"
- ylegend = "# of notes"
 
  footer = ""
 
