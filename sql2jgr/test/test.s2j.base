@@ -149,7 +149,6 @@ graph gr/count-evol-inc.jgr {
 include count-evol-70.annot
 "
 
- COUNT_CURVE(IsNull, 'IsNull')
  COUNT_CURVE(Lock , 'Lock' )
  COUNT_CURVE(LockIntr , 'LockIntr' )
  COUNT_CURVE(Float, 'Float')
@@ -170,6 +169,7 @@ include count-evol-70.annot
 
  COUNT_CURVE(Block, 'Block')
  COUNT_CURVE(Var  , 'Var'  )
+ COUNT_CURVE(IsNull, 'IsNull')
  COUNT_CURVE(Range, 'Range')
  COUNT_CURVE(Intr , 'Intr' )
  COUNT_CURVE(Free , 'Free' )
