@@ -104,7 +104,7 @@ pattern Block {
 }
 pattern Null {
  color = 0 .5 0
- marktype = circle
+ marktype = cross
 }
 pattern Var {
  color = 0 1 .5
