@@ -103,7 +103,7 @@ pattern Block {
  marktype = circle
 }
 pattern Null {
- color = 0 .5 0
+ color = 1 0 1
  marktype = cross
 }
 pattern Var {
@@ -139,7 +139,7 @@ pattern Free {
  marktype = box
 }
 pattern Float {
- color = 1 0 1
+ color =  0.5 0
  marktype = diamond
 }
 pattern Real {
