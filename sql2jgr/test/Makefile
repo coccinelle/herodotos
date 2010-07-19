@@ -21,6 +21,9 @@ all: $(CONF)
 
 graphs: $(GRAPHS)
 
+list:
+	../$(SQL2JGR) -c $(CONF) --graphs
+
 gr/db-orig.pdf: $(CONF)
 	../$(SQL2JGR) -c $^ $(FLAGS) $(@:%.pdf=%.jgr)
 
