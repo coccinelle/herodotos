@@ -48,13 +48,63 @@ project Linux {
 
 #include "subdir.s2j"
 
+/* **********  DIRECTORIES  ******************* */
+
+pattern Linux {
+ marktype = none
+ color = 0 0 0
+}
+
+pattern Drivers {
+ marktype = circle
+ color = 1 0 0
+}
+
+pattern Staging {
+ marktype = box
+ color = 0 0 0
+}
+
+pattern Sound   {
+ marktype = diamond
+ color = 0 0 1
+}
+
+pattern Arch    {
+ marktype = triangle
+ color = 0 1 1
+}
+
+pattern FS      {
+ marktype = x
+ color = 0 1 0
+}
+
+pattern Net     {
+ marktype = cross
+ color = 1 0.69 0
+}
+
+pattern	Other   {
+ color = 1 0 1
+ marktype = triangle
+}
+
+pattern	Average   {
+ color = 0 0 0
+ marktype = none
+ linestyle = dotted
+}
+
+/* ***********  CHECKERS  ********************* */
+
 pattern Block {
  color = 0 1 0
  marktype = circle
 }
 pattern Null {
  color = 0 .5 0
- marktype = triangle
+ marktype = circle
 }
 pattern Var {
  color = 0 1 .5
@@ -66,7 +116,7 @@ pattern IsNull {
 }
 pattern NullRef {
  color = 1 0 0
- marktype = x
+ marktype = diamond
 }
 pattern Range {
  color = 0 0 0
@@ -82,7 +132,7 @@ pattern Intr {
 }
 pattern LockIntr {
  color = .5 .5 1
- marktype = circle
+ marktype = x
 }
 pattern Free {
  color = .5 0 0
@@ -101,9 +151,11 @@ pattern Param {
  marktype = none
 }
 pattern Size {
- color = .5 0 .5
+ color = 0 1 1
  marktype = triangle
 }
+
+/* ******************************************** */
 
 graph gr/count-evol.jgr {
  xaxis = date

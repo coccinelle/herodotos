@@ -91,7 +91,39 @@ include count-evol-null.annot
 }
 
 
-#define CNT_NOTES(patt, patt2)                         \
+#define CNT_NOTES_DIR(patt, patt2)                     \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, count(*)   \
+       	 	FROM "Notes info"                      \
+       	 	WHERE osdi_dirname = patt2             \
+		AND release_date > '2002-01-01'        \
+		GROUP BY version_name,                 \
+		      release_date,                    \
+		      osdi_dirname                     \
+		ORDER BY release_date;                 \
+ }
+
+graph gr/notes-evol-dir.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 1.5
+ legend = "defaults
+
+include notes-evol-dir.annot
+"
+
+ CNT_NOTES_DIR(Staging, 'staging')
+ CNT_NOTES_DIR(Drivers, 'drivers')
+ CNT_NOTES_DIR(Sound  , 'sound')
+ CNT_NOTES_DIR(Arch   , 'arch')
+ CNT_NOTES_DIR(FS     , 'fs')
+ CNT_NOTES_DIR(Net    , 'net')
+ CNT_NOTES_DIR(Other  , 'other')
+
+}
+
+#define CNT_NOTES_KIND(patt, patt2)                    \
  curve pattern patt {				       \
    sql = SELECT version_name, release_date, count(*)   \
        	 	FROM "Notes info"                      \
@@ -108,22 +140,23 @@ graph gr/notes-evol-kind.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
- legend = "defaults"
+ legend = "defaults
 
- footer = ""
+include notes-evol-kind.annot
+"
 
- CNT_NOTES(Block, 'Block')
- CNT_NOTES(Null , 'Null')
- CNT_NOTES(Var  , 'Var'  )
- CNT_NOTES(IsNull, 'IsNull')
- CNT_NOTES(NullRef, 'NullRef')
- CNT_NOTES(Range, 'Range')
- CNT_NOTES(Lock , 'Lock' )
- CNT_NOTES(Intr , 'Intr' )
- CNT_NOTES(LockIntr , 'LockIntr' )
- CNT_NOTES(Free , 'Free' )
- CNT_NOTES(Float, 'Float')
- CNT_NOTES(Size , 'Size' )
+ CNT_NOTES_KIND(Block, 'Block')
+ CNT_NOTES_KIND(Null , 'Null')
+ CNT_NOTES_KIND(Var  , 'Var'  )
+ CNT_NOTES_KIND(IsNull, 'IsNull')
+ CNT_NOTES_KIND(NullRef, 'NullRef')
+ CNT_NOTES_KIND(Range, 'Range')
+ CNT_NOTES_KIND(Lock , 'Lock' )
+ CNT_NOTES_KIND(Intr , 'Intr' )
+ CNT_NOTES_KIND(LockIntr , 'LockIntr' )
+ CNT_NOTES_KIND(Free , 'Free' )
+ CNT_NOTES_KIND(Float, 'Float')
+ CNT_NOTES_KIND(Size , 'Size' )
 
 }
 
@@ -150,7 +183,7 @@ graph gr/flt_file-evol-dir.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 2
+ size = 3 1.5
  ymin = 0.8
 
  legend = "defaults
