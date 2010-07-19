@@ -171,6 +171,30 @@ include notes-evol-kind.annot
 
 }
 
+graph gr/notes-evol.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 0.7
+ ymin = 0.025
+ legend = "off
+
+include notes-evol.annot
+"
+ curve pattern Linux {
+   marktype = x
+   sql = SELECT n.version_name, n.release_date, count(n.*)::float / locc::float
+       	 	FROM "Notes info" n, versions v
+       	 	WHERE n.release_date > '2002-01-01'
+		AND n.release_date = v.release_date
+		GROUP BY n.version_name,
+		      n.release_date,
+		      locc
+		ORDER BY n.release_date;
+ }
+
+}
+
 #define FLT_FILE_DIR(patt, patt2)                  \
  curve pattern patt {				       \
    sql = SELECT r.version_name, r.release_date, count(r.report_id) / a.pts AS count             \
