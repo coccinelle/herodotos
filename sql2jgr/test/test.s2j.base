@@ -195,7 +195,7 @@ graph gr/count-evol-inc.jgr {
  project = Linux
  size = 3 1.5
  ymax = 70
-
+ ylegend = "Number of faults"
  legend = "defaults
 
 include count-evol-70.annot
@@ -213,6 +213,7 @@ graph gr/count-evol-dec.jgr {
  project = Linux
  size = 3 1.5
  ymax = 70
+ ylegend = "Number of faults"
 
  legend = "defaults
 
@@ -234,6 +235,7 @@ graph gr/count-evol-inull.jgr {
  project = Linux
  size = 3 0.5
  ymax = 400
+ ylegend = "Number of faults"
 
  legend = "defaults
 

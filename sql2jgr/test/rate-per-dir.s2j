@@ -25,6 +25,7 @@
 graph gr/rate-per-dir-4-241.jgr {
  xaxis = groups
  size = 3 1
+ ylegend = "Number of faults"
  legend = "defaults fontsize 6
 
 shell : ./get_avg.sh 55 avg_rate_241.data
