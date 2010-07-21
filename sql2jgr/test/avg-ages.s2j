@@ -93,7 +93,7 @@ footer = "
 newgraph
  xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
  yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
-legend defaults fontsize 6 x 24 y 150
+legend defaults fontsize 6 x 24 y 175
 
 newcurve marktype xbar linetype none color 0. 1. 0.  marksize 0.6  label : Block
 newcurve marktype xbar linetype none color 1. 0. 1.  marksize 0.6  label : Null
@@ -105,7 +105,7 @@ newcurve marktype xbar linetype none color 0. 0. 0.  marksize 0.6  label : Range
 newgraph
  xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
  yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
-legend defaults fontsize 6 x 38 y 150
+legend defaults fontsize 6 x 38 y 175
 
 newcurve marktype xbar linetype none color 0.5 0. 1.  marksize 0.6  label : Lock
 newcurve marktype xbar linetype none color 0. 0.5 1.  marksize 0.6  label : Intr
