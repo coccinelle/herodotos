@@ -137,3 +137,49 @@ graph gr/cmp-rate-per-dir-4-2633.jgr {
  CMP_RATE_DIR_GRP('linux-2.6.33', "Other"  , 'other')
 }
 */
+
+#define CMP_RATE_DIR_EVOL(patt, dir) \
+  curve pattern patt {                                              \
+   sql = SELECT v.version_name,					    \
+       	 	v.release_date,					    \
+		(reps_dir::float / notes_dir::float)		    \
+		/ (reps_other::float / notes_other::float) AS rate  \
+	FROM versions v,					    \
+               (SELECT rd.version_name,				    \
+                  sum(rd.number_of_reports) AS reps_dir,	    \
+                  sum(rd.number_of_notes)   AS notes_dir	    \
+               FROM  rates rd					    \
+               WHERE rd.osdi_dirname = 'drivers'		    \
+               AND rd.version_name = 'linux-2.4.1'		    \
+	       GROUP BY  rd.version_name) AS rd,		    \
+               (SELECT ro.version_name,				    \
+                  sum(ro.number_of_reports) AS reps_other,	    \
+                  sum(ro.number_of_notes) AS notes_other	    \
+               FROM  rates ro					    \
+               WHERE ro.osdi_dirname != 'drivers'		    \
+               AND ro.version_name = 'linux-2.4.1'		    \
+	       GROUP BY  ro.version_name) AS ro			    \
+    WHERE v.version_name = rd.version_name			    \
+    AND v.version_name = ro.version_name			    \
+    AND v.version_name = 'linux-2.4.1'				    \
+    ORDER BY v.release_date;                                        \
+  }
+
+graph gr/cmp-rate-per-dir.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts  0     1           2407  1
+"
+ CMP_RATE_YMAX
+
+ CMP_RATE_DIR_EVOL(Staging, 'staging')
+ CMP_RATE_DIR_EVOL(Drivers, 'drivers')
+ CMP_RATE_DIR_EVOL(Sound  , 'sound')
+ CMP_RATE_DIR_EVOL(Arch   , 'arch')
+ CMP_RATE_DIR_EVOL(FS     , 'fs')
+ CMP_RATE_DIR_EVOL(Net    , 'net')
+ CMP_RATE_DIR_EVOL(Other  , 'other')
+}
