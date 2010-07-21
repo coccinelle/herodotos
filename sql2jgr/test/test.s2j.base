@@ -253,6 +253,7 @@ include count-evol-400.annot
 		ORDER BY release_date;                 \
  }
 
+/*
 graph gr/orig-2_6_33.jgr {
  xaxis = date
  yaxis = user
@@ -275,6 +276,7 @@ graph gr/orig-2_6_33.jgr {
  ORIG_CURVE(Param, 'Param')
  ORIG_CURVE(Size , 'Size' )
 }
+*/
 
 #define ORIG_CURVE_PCT(patt, patt2)                    \
  curve pattern patt {				       \
