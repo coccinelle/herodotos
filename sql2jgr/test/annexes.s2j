@@ -248,7 +248,11 @@ graph gr/faults_churn.jgr {
  size = 3 1.5
  ylegend = "Faults per file churn"
 
- legend = "defaults"
+ legend = "off
+
+ include churn.annot
+
+"
 
  curve pattern Linux {
    sql = SELECT version_name,
