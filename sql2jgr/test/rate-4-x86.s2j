@@ -12,7 +12,7 @@ pattern ALLYES { color = 1 .69 0 }
 #define RATE_DEF_CURVE(ver, curve_name, patt2, def) \
   curve pattern def {                               \
    legend = curve_name                              \
-   sql = SELECT standardized_name, 100 * rate FROM osdi_rate_by_error_name_4_x386 \
+   sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386 \
          WHERE standardized_name = patt2            \
 	       AND version_name = ver               \
 	       AND def_compiled = def;              \
@@ -28,21 +28,21 @@ pattern ALLYES { color = 1 .69 0 }
  group patt {          		               \
   curve pattern TRUE {                         \
    legend = "Part of defconfig"  \
-   sql = SELECT standardized_name, 100 * rate FROM osdi_rate_by_error_name_4_x386 \
+   sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386 \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
 	       AND def_compiled = TRUE;        \
   }                                            \
   curve pattern ALLYES {                       \
    legend = "Part of allyesconfig" \
-   sql = SELECT standardized_name, 100 * rate FROM osdi_rate_by_error_name_4_x386_allyes \
+   sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386_allyes \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
 	       AND allyes_compiled = TRUE;     \
   }                                            \
   curve pattern FALSE {                        \
    legend = "Part of remaining code" \
-   sql = SELECT standardized_name, 100 * rate FROM osdi_rate_by_error_name_4_x386_allyes \
+   sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386_allyes \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
 	       AND allyes_compiled = FALSE;    \
