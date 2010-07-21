@@ -195,6 +195,7 @@ let draw v1 v2 name (atts, curves) allbugs =
 
 		  prerr_endline ("Drawing "^gname);
 		  draw_graph verbose outch varray bugs xaxis xlegend ylegend notexistcolor cleancolor defectcolor size;
+		  Printf.fprintf outch "%s\n" (Graph.get_footer atts);
 		  close_out outch;
 		  gname
 	      with Not_found ->
