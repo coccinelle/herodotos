@@ -47,6 +47,7 @@ graph gr/rate-evol-per-kind.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
+ ylegend = "% of faulty notes"
 
  legend = "defaults
 
@@ -86,6 +87,7 @@ graph gr/rate-evol-per-dir.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
+ ylegend = "% of faulty notes"
 
  legend = "defaults
 

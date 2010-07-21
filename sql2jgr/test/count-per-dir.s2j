@@ -7,7 +7,7 @@
 	       AND version_name = ver; \
   }
 
-#define DIR_GRP(ver, dir, dir2)   \
+#define DIR_GRP_241(ver, dir, dir2)   \
  group dir {          		  \
   DIR_CURVE(ver, Block, 'Block', dir2) \
   DIR_CURVE(ver, Null , 'Null' , dir2) \
@@ -24,6 +24,21 @@
  }
 //  DIR_CURVE(ver, Real , 'Real' , dir2) \
 //  DIR_CURVE(ver, Param, 'Param', dir2) \
+
+#define DIR_GRP(ver, dir, dir2)   \
+ group dir {          		  \
+  DIR_CURVE(ver, Block, 'Block', dir2) \
+  DIR_CURVE(ver, Null , 'Null' , dir2) \
+  DIR_CURVE(ver, Var  , 'Var'  , dir2) \
+  DIR_CURVE(ver, IsNull, 'IsNull', dir2) \
+  DIR_CURVE(ver, Range, 'Range', dir2) \
+  DIR_CURVE(ver, Lock , 'Lock' , dir2) \
+  DIR_CURVE(ver, Intr , 'Intr' , dir2) \
+  DIR_CURVE(ver, LockIntr, 'LockIntr' , dir2) \
+  DIR_CURVE(ver, Free , 'Free' , dir2) \
+  DIR_CURVE(ver, Float, 'Float', dir2) \
+  DIR_CURVE(ver, Size , 'Size' , dir2) \
+ }
 
 graph gr/count-per-dir-4-241.jgr {
  xaxis = groups
@@ -58,13 +73,14 @@ newcurve marktype xbar linetype none color 0. 1. 1.  marksize 0.6  label : Size
 
  DIR_YMAX
 
- DIR_GRP('linux-2.4.1', "Drivers", 'drivers')
- DIR_GRP('linux-2.4.1', "Arch"   , 'arch')
- DIR_GRP('linux-2.4.1', "FS"     , 'fs')
- DIR_GRP('linux-2.4.1', "Net"    , 'net')
- DIR_GRP('linux-2.4.1', "Other"  , 'other')
+ DIR_GRP_241('linux-2.4.1', "Drivers", 'drivers')
+ DIR_GRP_241('linux-2.4.1', "Arch"   , 'arch')
+ DIR_GRP_241('linux-2.4.1', "FS"     , 'fs')
+ DIR_GRP_241('linux-2.4.1', "Net"    , 'net')
+ DIR_GRP_241('linux-2.4.1', "Other"  , 'other')
 }
 
+/*
 graph gr/count-per-dir-4-260.jgr {
  xaxis = groups
  size = 3 1
@@ -92,6 +108,7 @@ graph gr/count-per-dir-4-2612.jgr {
  DIR_GRP('linux-2.6.12', "Net"    , 'net')
  DIR_GRP('linux-2.6.12', "Other"  , 'other')
 }
+*/
 
 graph gr/count-per-dir-4-2633.jgr {
  xaxis = groups
