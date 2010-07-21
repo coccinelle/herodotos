@@ -109,6 +109,7 @@ graph gr/notes-evol-dir.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
+ ylegend = "Number of notes"
  legend = "defaults
 
 include notes-evol-dir.annot
@@ -141,6 +142,7 @@ graph gr/notes-evol-kind.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
+ ylegend = "Number of notes"
  legend = "defaults
 
 include notes-evol-kind.annot
