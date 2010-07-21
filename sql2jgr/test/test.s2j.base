@@ -162,6 +162,7 @@ graph gr/count-evol.jgr {
  yaxis = user
  project = Linux
  size = 3 0.7
+ ylegend = "# of faults"
  legend = "off
 
 include lifetime_across.annot
