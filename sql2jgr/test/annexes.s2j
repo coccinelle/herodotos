@@ -22,7 +22,7 @@ graph gr/count-evol-agg-file-dir.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
-
+ ylegend = "Number of files"
  legend = "defaults
 
 include count-evol-per-dir.annot
@@ -55,6 +55,7 @@ graph gr/count-evol-agg-file-kind.jgr {
  project = Linux
  size = 3 1.5
 
+ ylegend = "Number of files"
  legend = "defaults
 
 include count-evol-per-file.annot
