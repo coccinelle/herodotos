@@ -54,6 +54,7 @@ graph gr/rate-4-241-x86.jgr {
  xaxis = groups
  size = 3 1
  legend = "defaults fontsize 6 x 10 y 0.02"
+ ylegend = "Fault rate percentage"
  RATEx86_YMAX
 
   RATE_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
@@ -75,6 +76,7 @@ graph gr/rate-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
  RATEx86_YMAX
+ ylegend = "Fault rate percentage"
  legend = "off (* defaults fontsize 6 x 14 y 0.010 *)
 
 shell : ./get_avg.sh 33 avg_rate_2633.data
