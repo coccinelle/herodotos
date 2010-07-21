@@ -82,7 +82,7 @@ graph gr/count-evol-agg-file-null.jgr {
  yaxis = user
  project = Linux
  size = 3 0.5
-
+ ylegend = "# of files"
  legend = "defaults
 
 include count-evol-null.annot
