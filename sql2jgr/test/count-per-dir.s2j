@@ -43,6 +43,7 @@
 graph gr/count-per-dir-4-241.jgr {
  xaxis = groups
  size = 3 1
+ ylegend = "Number of faults"
  legend = "defaults fontsize 6"
 
 footer = "
