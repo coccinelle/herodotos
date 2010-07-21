@@ -154,7 +154,7 @@ graph gr/lifetime_across.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 3.5
+ size = 3 3
  legend = "defaults fontsize 6
 
  include lifetime_across.annot
