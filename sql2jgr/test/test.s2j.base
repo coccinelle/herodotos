@@ -172,7 +172,7 @@ include lifetime_across.annot
    marktype = x
    sql = SELECT version_name, release_date, sum(data) as data
        	 	FROM "Count evol"
-       	 	WHERE release_date > '2002-01-01'
+       	 	WHERE release_date >= '2003-12-18'
 		GROUP BY version_name, release_date
 		ORDER BY release_date;
  }
@@ -184,7 +184,7 @@ include lifetime_across.annot
    sql = SELECT version_name, release_date, sum(data) as data       \
        	 	FROM "Count evol"                      \
        	 	WHERE standardized_name = patt2        \
-		AND release_date > '2002-01-01'        \
+		AND release_date >= '2003-12-18'       \
 		GROUP BY version_name, release_date    \
 		ORDER BY release_date;                 \
  }

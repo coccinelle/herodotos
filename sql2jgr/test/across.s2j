@@ -145,7 +145,7 @@ pattern v2.6.33{
           sum("number_of_bugs")		  \
    FROM faults_across_releases            \
    WHERE "for_version_name" = vers        \
-   AND release_date > '2002-01-01'	  \
+   AND release_date >= '2003-12-18'	  \
    GROUP BY "version_name","release_date" \
    ORDER BY release_date;                 \
  }
@@ -168,7 +168,7 @@ graph gr/lifetime_across.jgr {
    sql = SELECT r.version_name, r.release_date,
        count(report_id)
 FROM "Faults info" r
-WHERE r.release_date > '2002-01-01'
+WHERE r.release_date >= '2003-12-18'
 GROUP BY r.version_name , r.release_date
 ORDER BY r.release_date;
  }

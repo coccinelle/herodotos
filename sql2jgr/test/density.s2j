@@ -14,7 +14,7 @@ include density.annot
    sql = SELECT r.version_name, r.release_date,
        1000*count(report_id)::float/locc::float as fault_density
 FROM "Faults info" r, versions
-WHERE r.release_date > '2002-01-01'
+WHERE r.release_date >= '2003-12-18'
 AND versions.version_name = r.version_name
 GROUP BY r.version_name , r.release_date , locc
 ORDER BY r.release_date;
@@ -26,7 +26,7 @@ ORDER BY r.release_date;
    sql = SELECT r.version_name, r.release_date,         \
        	 	100 * sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
        	 	FROM rates_per_dir r                    \
-       	 	WHERE r.release_date > '2002-01-01'     \
+       	 	WHERE r.release_date >= '2003-12-18'    \
 		GROUP BY r.version_name, r.release_date \
 		ORDER BY r.release_date;                \
  }
@@ -37,7 +37,7 @@ ORDER BY r.release_date;
        	 	100 * sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
        	 	FROM rates_per_dir r                    \
        	 	WHERE r.standardized_name = patt2       \
-		AND r.release_date > '2002-01-01'       \
+		AND r.release_date >= '2003-12-18'      \
 		GROUP BY r.version_name, r.release_date \
 		ORDER BY r.release_date;                \
  }
@@ -77,7 +77,7 @@ include rate-kind.annot
        	 	100 * sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
        	 	FROM rates_per_dir r                    \
        	 	WHERE r.osdi_dirname = patt2            \
-		AND r.release_date > '2002-01-01'       \
+		AND r.release_date >= '2003-12-18'      \
 		GROUP BY r.version_name, r.release_date \
 		ORDER BY r.release_date;                \
  }
@@ -111,7 +111,7 @@ include rate-dir.annot
        	 	count(r.report_id) AS count             \
        	 	FROM "Faults info" r                    \
        	 	WHERE r.osdi_dirname = patt2            \
-		AND r.release_date > '2002-01-01'       \
+		AND r.release_date >= '2003-12-18'      \
 		GROUP BY r.version_name, r.release_date \
 		ORDER BY r.release_date;                \
  }

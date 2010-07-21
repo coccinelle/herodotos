@@ -7,7 +7,7 @@
 			     file_id		       \
 		      FROM "Faults info"	       \
 		      WHERE osdi_dirname = patt2       \
-		      AND release_date > '2002-01-01'  \
+		      AND release_date >= '2003-12-18' \
 		      GROUP BY version_name,           \
 		      	    release_date,              \
 		      	    file_id                    \
@@ -42,7 +42,7 @@ include count-evol-per-dir.annot
    sql = SELECT version_name, release_date, sum(pts)   \
        	 	FROM osdi_count_evol_agg_kind          \
        	 	WHERE standardized_name = patt2        \
-		AND release_date > '2002-01-01'        \
+		AND release_date >= '2003-12-18'       \
 		GROUP BY version_name,                 \
 		      release_date,                    \
 		      standardized_name                \
@@ -96,7 +96,7 @@ include count-evol-null.annot
    sql = SELECT version_name, release_date, count(*)   \
        	 	FROM "Notes info"                      \
        	 	WHERE osdi_dirname = patt2             \
-		AND release_date > '2002-01-01'        \
+		AND release_date >= '2003-12-18'       \
 		GROUP BY version_name,                 \
 		      release_date,                    \
 		      osdi_dirname                     \
@@ -128,7 +128,7 @@ include notes-evol-dir.annot
    sql = SELECT version_name, release_date, count(*)   \
        	 	FROM "Notes info"                      \
        	 	WHERE standardized_name = patt2        \
-		AND release_date > '2002-01-01'        \
+		AND release_date >= '2003-12-18'       \
 		GROUP BY version_name,                 \
 		      release_date,                    \
 		      standardized_name                \
@@ -154,7 +154,7 @@ include notes-evol-kind.annot
    sql = SELECT version_name, release_date, count(*)
        	 	FROM "Notes info"
        	 	WHERE standardized_name = 'IsNull'
-		AND release_date > '2002-01-01'
+		AND release_date >= '2003-12-18'
 		GROUP BY version_name,
 		      release_date,
 		      standardized_name
@@ -185,7 +185,7 @@ include notes-evol.annot
    marktype = x
    sql = SELECT n.version_name, n.release_date, count(n.*)::float / locc::float
        	 	FROM "Notes info" n, versions v
-       	 	WHERE n.release_date > '2002-01-01'
+       	 	WHERE n.release_date >= '2003-12-18'
 		AND n.release_date = v.release_date
 		GROUP BY n.version_name,
 		      n.release_date,
@@ -206,7 +206,7 @@ include notes-evol.annot
 		     GROUP BY release_date               \
 		     )  AS a                             \
        	 	WHERE r.osdi_dirname = patt2             \
-		AND r.release_date > '2002-01-01'        \
+		AND r.release_date >= '2003-12-18'       \
 		AND r.release_date = a.release_date	 \
 		GROUP BY r.version_name,                 \
 		      r.release_date,                    \
