@@ -3,18 +3,21 @@ graph gr/birth-and-death.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 1.5
+ size = 3 1
  ylegend = "Number of faults"
- ymin = -200
- legend = "defaults x 50 y -150
+// ymin = -200
+ legend = "defaults x 50 y 150
  
  newcurve marktype none linetype dotted color 0 0 0
  pts
  0     0
  2407  0
+
+ include birth-and-death.annot
  "
 
  curve pattern Birth {
+   legend = "Introduction"
    sql = SELECT v.version_name, v.release_date, COALESCE(birth,0) as data
        	 	FROM versions v
 		LEFT OUTER JOIN
@@ -29,8 +32,9 @@ graph gr/birth-and-death.jgr {
 		ORDER BY release_date;
  }
  curve pattern Death {
+   legend = "Elimination"
    sql = SELECT v.version_name, v.release_date,
-                COALESCE(-d.death,0)
+                COALESCE(d.death,0)
 		FROM versions v
 		LEFT OUTER JOIN
 		     (SELECT max AS release_date,
