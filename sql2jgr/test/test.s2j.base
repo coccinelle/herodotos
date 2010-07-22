@@ -302,7 +302,7 @@ graph gr/orig-pct-2_6_33.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
- ylegend = "Percentage of bugs still in 2.6.33"
+ ylegend = "Percentage of faults still in 2.6.33"
 
  ORIG_CURVE_PCT(Block, 'Block')
  ORIG_CURVE_PCT(Null , 'Null' )
