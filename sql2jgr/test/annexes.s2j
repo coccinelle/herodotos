@@ -241,25 +241,3 @@ include rate-2.annot
  FLT_FILE_DIR(Other  , 'other')
 }
 
-graph gr/faults_churn.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 3 1.5
- ylegend = "Faults per file churn"
-
- legend = "off
-
- include churn.annot
-
-"
-
- curve pattern Linux {
-   sql = SELECT version_name,
-       	 	release_date,
-		rate
-       FROM faults_per_churn
-       WHERE release_date >= '2004-01-09'
-       ORDER BY release_date;
- }
-}
