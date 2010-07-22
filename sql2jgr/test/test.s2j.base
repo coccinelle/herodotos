@@ -157,6 +157,18 @@ pattern Size {
 
 /* ******************************************** */
 
+pattern Birth {
+ color = 1 0 0
+ marktype = x
+}
+
+pattern Death {
+ color = 0 1 0
+ marktype = cross
+}
+
+/* ******************************************** */
+
 graph gr/count-evol.jgr {
  xaxis = date
  yaxis = user
@@ -333,5 +345,7 @@ graph gr/orig-pct-2_6_33.jgr {
 #include "across.s2j"
 
 #include "avg-ages.s2j"
+
+#include "lifecycle.s2j"
 
 #include "annexes.s2j"

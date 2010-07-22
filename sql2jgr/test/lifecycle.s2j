@@ -1,0 +1,43 @@
+
+graph gr/birth-and-death.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 1.5
+ ylegend = "Number of faults"
+ ymin = -200
+ legend = "defaults x 50 y -150
+ 
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0     0
+ 2407  0
+ "
+
+ curve pattern Birth {
+   sql = SELECT v.version_name, v.release_date, COALESCE(birth,0) as data
+       	 	FROM versions v
+		LEFT OUTER JOIN
+		     (SELECT version_name,
+		     	     count(*) as birth
+		       FROM "Birth of reports"
+		       WHERE status = 'BUG'
+		     GROUP BY version_name
+		) AS b
+		ON v.version_name = b.version_name
+       	 	WHERE release_date >= '2004-01-09'
+		ORDER BY release_date;
+ }
+ curve pattern Death {
+   sql = SELECT v.version_name, v.release_date,
+                COALESCE(-d.death,0)
+		FROM versions v
+		LEFT OUTER JOIN
+		     (SELECT max AS release_date,
+		             count(*) AS death
+	              FROM report_ages GROUP BY max) as d
+		ON v.release_date = d.release_date
+		WHERE v.release_date >= '2004-01-09'
+		ORDER BY v.release_date;
+ }
+}
