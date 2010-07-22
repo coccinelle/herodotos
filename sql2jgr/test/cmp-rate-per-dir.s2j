@@ -144,25 +144,23 @@ graph gr/cmp-rate-per-dir-4-2633.jgr {
    sql = SELECT v.version_name,					    \
        	 	v.release_date,					    \
 		(reps_dir::float / notes_dir::float)		    \
-		/ (reps_other::float / notes_other::float) AS rate  \
+		/ NULLIF((reps_other::float / notes_other::float),0) AS rate  \
 	FROM versions v,					    \
                (SELECT rd.version_name,				    \
                   sum(rd.number_of_reports) AS reps_dir,	    \
                   sum(rd.number_of_notes)   AS notes_dir	    \
                FROM  rates rd					    \
-               WHERE rd.osdi_dirname = 'drivers'		    \
-               AND rd.version_name = 'linux-2.4.1'		    \
+               WHERE rd.osdi_dirname = dir		            \
 	       GROUP BY  rd.version_name) AS rd,		    \
                (SELECT ro.version_name,				    \
                   sum(ro.number_of_reports) AS reps_other,	    \
                   sum(ro.number_of_notes) AS notes_other	    \
                FROM  rates ro					    \
-               WHERE ro.osdi_dirname != 'drivers'		    \
-               AND ro.version_name = 'linux-2.4.1'		    \
+               WHERE ro.osdi_dirname != dir         		    \
 	       GROUP BY  ro.version_name) AS ro			    \
     WHERE v.version_name = rd.version_name			    \
     AND v.version_name = ro.version_name			    \
-    AND v.version_name = 'linux-2.4.1'				    \
+    AND v.release_date >= '2003-12-18'                              \
     ORDER BY v.release_date;                                        \
   }
 
