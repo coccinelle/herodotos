@@ -97,8 +97,8 @@ include rate-dir.annot
 
  FLT_AVG_RATE
 
- FLT_RATE_DIR(Drivers, 'drivers')
  FLT_RATE_DIR(Staging, 'staging')
+ FLT_RATE_DIR(Drivers, 'drivers')
  FLT_RATE_DIR(Sound  , 'sound'  )
  FLT_RATE_DIR(Arch   , 'arch'   )
  FLT_RATE_DIR(FS     , 'fs'     )
@@ -128,8 +128,8 @@ graph gr/count-evol-per-dir.jgr {
 include count-evol.annot
 "
 
- FLT_COUNT_DIR(Drivers, 'drivers')
  FLT_COUNT_DIR(Staging, 'staging')
+ FLT_COUNT_DIR(Drivers, 'drivers')
  FLT_COUNT_DIR(Sound  , 'sound'  )
  FLT_COUNT_DIR(Arch   , 'arch'   )
  FLT_COUNT_DIR(FS     , 'fs'     )
