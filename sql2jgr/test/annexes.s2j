@@ -88,8 +88,8 @@ graph gr/count-evol-agg-file-null.jgr {
 include count-evol-null.annot
 "
 
- CNT_CRV_FILE_KIND(Null , 'Null')
  CNT_CRV_FILE_KIND(NullRef, 'NullRef')
+ CNT_CRV_FILE_KIND(Null , 'Null')
 
 }
 
