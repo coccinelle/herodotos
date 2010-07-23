@@ -160,7 +160,7 @@ graph gr/lifetime_across.jgr {
  include lifetime_across.annot
 
  "
- ylegend = "Number of faults"
+ ylegend = "# of faults"
 
  curve pattern Linux {
   legend = "Total"

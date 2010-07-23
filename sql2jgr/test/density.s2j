@@ -122,7 +122,7 @@ graph gr/count-evol-per-dir.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
- ylegend = "Number of faults"
+ ylegend = "# of faults"
  legend = "defaults
 
 include count-evol.annot

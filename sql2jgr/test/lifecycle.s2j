@@ -4,10 +4,9 @@ graph gr/birth-and-death.jgr {
  yaxis = user
  project = Linux
  size = 3 1
- ylegend = "Number of faults"
-// ymin = -200
+ ylegend = "# of faults"
  legend = "defaults x 50 y 150
- 
+
  newcurve marktype none linetype dotted color 0 0 0
  pts
  0     0
