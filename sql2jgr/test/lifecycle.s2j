@@ -16,6 +16,19 @@ graph gr/birth-and-death.jgr {
  include birth-and-death.annot
  "
 
+ curve pattern Death {
+   legend = "Elimination"
+   sql = SELECT v.version_name, v.release_date,
+                COALESCE(d.death,0)
+		FROM versions v
+		LEFT OUTER JOIN
+		     (SELECT max AS release_date,
+		             count(*) AS death
+	              FROM report_ages GROUP BY max) as d
+		ON v.release_date = d.release_date
+		WHERE v.release_date >= '2004-01-09'
+		ORDER BY v.release_date;
+ }
  curve pattern Birth {
    legend = "Introduction"
    sql = SELECT v.version_name, v.release_date, COALESCE(birth,0) as data
@@ -30,18 +43,5 @@ graph gr/birth-and-death.jgr {
 		ON v.version_name = b.version_name
        	 	WHERE release_date >= '2004-01-09'
 		ORDER BY release_date;
- }
- curve pattern Death {
-   legend = "Elimination"
-   sql = SELECT v.version_name, v.release_date,
-                COALESCE(d.death,0)
-		FROM versions v
-		LEFT OUTER JOIN
-		     (SELECT max AS release_date,
-		             count(*) AS death
-	              FROM report_ages GROUP BY max) as d
-		ON v.release_date = d.release_date
-		WHERE v.release_date >= '2004-01-09'
-		ORDER BY v.release_date;
  }
 }
