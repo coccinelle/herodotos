@@ -28,7 +28,7 @@ shell : ./get_avg.sh 12 avg_age.data
        FROM "Bug ages"			         \
        WHERE standardized_name != 'Real'         \
        AND osdi_dirname = dir2		         \
-       AND ages.min >= '2003-12-18'              \
+       AND min >= '2003-12-18'                   \
        GROUP BY osdi_dirname;                    \
  }                                               \
  }
