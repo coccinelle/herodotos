@@ -34,7 +34,7 @@ graph gr/cmp-rate-per-dir-4-241.jgr {
  xaxis = groups
  size = 3 1
  ylegend = "Relative fault rate"
- legend = "defaults fontsize 6
+ legend = "off (* defaults fontsize 6 *)
 
  newcurve marktype none linetype dotted color 0 0 0
  pts
