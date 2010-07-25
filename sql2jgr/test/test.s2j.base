@@ -291,7 +291,6 @@ graph gr/orig-2_6_33.jgr {
  ORIG_CURVE(Param, 'Param')
  ORIG_CURVE(Size , 'Size' )
 }
-*/
 
 #define ORIG_CURVE_PCT(patt, patt2)                    \
  curve pattern patt {				       \
@@ -331,6 +330,7 @@ graph gr/orig-pct-2_6_33.jgr {
  ORIG_CURVE_PCT(Param, 'Param')
  ORIG_CURVE_PCT(Size , 'Size' )
 }
+*/
 
 #include "count-per-dir.s2j"
 
