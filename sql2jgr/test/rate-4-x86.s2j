@@ -77,7 +77,7 @@ graph gr/rate-4-2633-x86.jgr {
  size = 3 1
  RATEx86_YMAX
  ylegend = "% of faulty notes"
- legend = "off (* defaults fontsize 6 x 14 y 0.010 *)
+ legend = "defaults fontsize 6 x 17 y 1.2
 
 shell : ./get_avg.sh 33 avg_rate_2633.data
 
