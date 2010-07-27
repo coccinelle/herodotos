@@ -159,12 +159,12 @@ pattern Size {
 
 pattern Birth {
  color = 1 0 0
- marktype = x
+ marktype = "triangle mrotate -90"
 }
 
 pattern Death {
  color = 0 1 0
- marktype = circle
+ marktype = x
 }
 
 /* ******************************************** */
