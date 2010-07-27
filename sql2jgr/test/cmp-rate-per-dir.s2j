@@ -137,7 +137,6 @@ graph gr/cmp-rate-per-dir-4-2633.jgr {
  CMP_RATE_DIR_GRP('linux-2.6.33', "Net"    , 'net')
  CMP_RATE_DIR_GRP('linux-2.6.33', "Other"  , 'other')
 }
-*/
 
 #define CMP_RATE_DIR_EVOL(patt, dir) \
   curve pattern patt {                                              \
@@ -182,3 +181,4 @@ graph gr/cmp-rate-per-dir.jgr {
  CMP_RATE_DIR_EVOL(Net    , 'net')
  CMP_RATE_DIR_EVOL(Other  , 'other')
 }
+*/
