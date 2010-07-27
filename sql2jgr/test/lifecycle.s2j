@@ -5,7 +5,7 @@ graph gr/birth-and-death.jgr {
  project = Linux
  size = 3 1
  ylegend = "# of faults"
- legend = "defaults x 50 y 150
+ legend = "defaults x 50 y 150 fontsize 8
 
  newcurve marktype none linetype dotted color 0 0 0
  pts
