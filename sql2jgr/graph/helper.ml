@@ -645,8 +645,8 @@ let draw_header ch xdftmin xdftmax ymax (size, xaxis, legend, xlabel, ylabel, yl
 newgraph
 xaxis min %02f max %02f size %02.2f label fontsize 11 : %s
 no_auto_hash_labels no_auto_hash_marks
-(* hash_labels rotate 45 vjc hjr *)
-hash_labels fontsize 6 rotate -45 vjc hjl
+(* hash_labels fontsize 6 rotate -45 vjc hjl *)
+hash_labels fontsize 6 vjc hjl
 draw_hash_labels
 %s
 %s
