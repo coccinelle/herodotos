@@ -3,7 +3,7 @@ graph gr/density.jgr {
  yaxis = user
  project = Linux
  size = 3 0.7
- ylegend = "Faults per 1KLOC"
+ ylegend = "Faults\nper 1KLOC"
  legend = "off
 
 include density.annot
