@@ -116,6 +116,7 @@ graph gr/cmp-rate-per-dir-4-2612.jgr {
  CMP_RATE_DIR_GRP('linux-2.6.12', "Net"    , 'net')
  CMP_RATE_DIR_GRP('linux-2.6.12', "Other"  , 'other')
 }
+*/
 
 graph gr/cmp-rate-per-dir-4-2633.jgr {
  xaxis = groups
@@ -138,6 +139,7 @@ graph gr/cmp-rate-per-dir-4-2633.jgr {
  CMP_RATE_DIR_GRP('linux-2.6.33', "Other"  , 'other')
 }
 
+/*
 #define CMP_RATE_DIR_EVOL(patt, dir) \
   curve pattern patt {                                              \
    sql = SELECT v.version_name,					    \
