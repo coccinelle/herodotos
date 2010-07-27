@@ -56,7 +56,7 @@ pattern Linux {
 }
 
 pattern Drivers {
- marktype = circle
+ marktype = "circle fill 1"
  color = 1 0 0
 }
 
@@ -87,7 +87,7 @@ pattern Net     {
 
 pattern	Other   {
  color = 1 0 1
- marktype = triangle
+ marktype = "triangle fill 1"
 }
 
 pattern	Average   {
@@ -164,7 +164,7 @@ pattern Birth {
 
 pattern Death {
  color = 0 1 0
- marktype = cross
+ marktype = circle
 }
 
 /* ******************************************** */
