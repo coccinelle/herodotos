@@ -109,7 +109,6 @@ graph gr/count-per-dir-4-2612.jgr {
  DIR_GRP('linux-2.6.12', "Net"    , 'net')
  DIR_GRP('linux-2.6.12', "Other"  , 'other')
 }
-*/
 
 graph gr/count-per-dir-4-2633.jgr {
  xaxis = groups
@@ -125,3 +124,4 @@ graph gr/count-per-dir-4-2633.jgr {
  DIR_GRP('linux-2.6.33', "Net"    , 'net')
  DIR_GRP('linux-2.6.33', "Other"  , 'other')
 }
+*/
