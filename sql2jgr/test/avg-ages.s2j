@@ -1,4 +1,4 @@
-
+/*
 graph gr/avg-ages.jgr {
  xaxis = groups
  legend = "off
@@ -19,6 +19,7 @@ shell : ./get_avg.sh 12 avg_age.data
        GROUP BY ages.standardized_name, standardized_names.order
        ORDER BY standardized_names.order;
 }
+*/
 
 #define AVG_AGE_DIR(dir, patt, dir2)             \
  group dir {                                     \
