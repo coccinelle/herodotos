@@ -37,7 +37,6 @@ include count-evol-per-dir.annot
  CNT_CRV_FILE_DIR(Net    , 'net')
  CNT_CRV_FILE_DIR(Other  , 'other')
 }
-*/
 
 #define CNT_CRV_FILE_KIND(patt, patt2)                 \
  curve pattern patt {				       \
@@ -126,6 +125,7 @@ include notes-evol-dir.annot
  CNT_NOTES_DIR(Other  , 'other')
 
 }
+*/
 
 #define CNT_NOTES_KIND(patt, patt2)                    \
  curve pattern patt {				       \
@@ -176,6 +176,7 @@ include notes-evol-kind.annot
 
 }
 
+/*
 graph gr/notes-evol.jgr {
  xaxis = date
  yaxis = user
@@ -199,6 +200,7 @@ include notes-evol.annot
  }
 
 }
+*/
 
 #define FLT_FILE_DIR(patt, patt2)                  \
  curve pattern patt {				       \

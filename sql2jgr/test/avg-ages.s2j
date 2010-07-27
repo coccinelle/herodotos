@@ -55,6 +55,7 @@ shell : ./get_avg.sh 6 avg_age.data
  AVG_AGE_DIR("Other"  ,Other  , 'other'  )
 }
 
+/*
 #define AVG_AGE_CURVE(patt, patt2, dir) \
   curve pattern patt {                                                     \
    sql = SELECT patt2,                                                     \
@@ -130,3 +131,4 @@ newcurve marktype xbar linetype none color 0. 1. 1.  marksize 0.6  label : Size
 
 }
 
+*/

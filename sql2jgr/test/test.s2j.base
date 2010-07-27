@@ -338,7 +338,7 @@ graph gr/orig-pct-2_6_33.jgr {
 #include "cmp-rate-per-dir.s2j"
 
 #include "rate-4-x86.s2j"
-#include "count-4-x86.s2j"
+//#include "count-4-x86.s2j"
 
 #include "density.s2j"
 
