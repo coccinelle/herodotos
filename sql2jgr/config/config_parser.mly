@@ -86,6 +86,7 @@ attr:
 | TLINESTYLE     TEQUAL s=TId                      { Ast_config.LineType(s)}
 | TMARKTYPE      TEQUAL TNONE                      { Ast_config.MarkType("none")}
 | TMARKTYPE      TEQUAL m=TId                      { Ast_config.MarkType(m)}
+| TMARKTYPE      TEQUAL m=TSTRING2Q                { Ast_config.MarkType(m)}
 | TMARKSIZE      TEQUAL v=float                    { Ast_config.MarkSize(v)}
 | TXAXIS         TEQUAL t=TId                      { Ast_config.XAxis(t)}
 | TXMIN          TEQUAL v=float                    { Ast_config.XMin(v)}
