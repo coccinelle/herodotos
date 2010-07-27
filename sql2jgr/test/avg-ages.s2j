@@ -36,6 +36,7 @@ shell : ./get_avg.sh 12 avg_age.data
 
 graph gr/avg-ages-per-dir.jgr {
  xaxis = groups
+ xlabels = "fontsize 6 rotate -45 vjc hjl"
  legend = "off
 
 shell : ./get_avg.sh 6 avg_age.data
