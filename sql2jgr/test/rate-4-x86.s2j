@@ -36,7 +36,7 @@ pattern ALLYES { color = 1 .69 0 }
 
 #define RATE_ALL_GRP(ver, patt, patt2)         \
  group patt {          		               \
-  curve pattern ALLYES {                       \
+  curve pattern TRUE {                         \
    legend = "6 826 C files compiled by allyesconfig" \
    sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386_allyes \
          WHERE standardized_name = patt2       \
@@ -44,7 +44,7 @@ pattern ALLYES { color = 1 .69 0 }
 	       AND allyes_compiled = TRUE;     \
   }                                            \
   curve pattern FALSE {                        \
-   legend = "18 807 other C files" \
+   legend = "6 831 other C files" \
    sql = SELECT standardized_name, rate FROM osdi_rate_by_error_name_4_x386_allyes \
          WHERE standardized_name = patt2       \
 	       AND version_name = ver          \
@@ -81,7 +81,7 @@ graph gr/rate-4-2633-x86.jgr {
  RATEx86_YMAX
  xlabels = "fontsize 6 rotate -45 vjc hjl"
  ylegend = "% of faulty notes"
- legend = "defaults fontsize 6 x 17 y 1.2
+ legend = "defaults fontsize 6 x 10 y 1.2
 
 shell : ./get_avg.sh 22 avg_rate_2633.data
 

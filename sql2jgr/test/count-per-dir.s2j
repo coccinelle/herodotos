@@ -72,7 +72,7 @@ newcurve marktype xbar linetype none color 0. 0.5 0.  marksize 0.6  label : Floa
 newcurve marktype xbar linetype none color 0. 1. 1.  marksize 0.6  label : Size
 "
 
- DIR_YMAX
+  ymax = 170
 
  DIR_GRP_241('linux-2.4.1', "Drivers", 'drivers')
  DIR_GRP_241('linux-2.4.1', "Arch"   , 'arch')
