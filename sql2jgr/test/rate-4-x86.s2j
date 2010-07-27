@@ -1,10 +1,4 @@
 
-#if 1
-#define RATEx86_YMAX
-#else
-#define RATEx86_YMAX ymax = 4
-#endif
-
 pattern FALSE  { color = 1 0   0 }
 pattern TRUE   { color = 0 1   0 }
 pattern ALLYES { color = 1 .69 0 }
@@ -78,10 +72,9 @@ graph gr/rate-4-241-x86.jgr {
 graph gr/rate-4-2633-x86.jgr {
  xaxis = groups
  size = 3 1
- RATEx86_YMAX
  xlabels = "fontsize 6 rotate -45 vjc hjl"
  ylegend = "% of faulty notes"
- legend = "defaults fontsize 6 x 10 y 1.2
+ legend = "defaults fontsize 6 x 11 y 1.2 linelength 1
 
 shell : ./get_avg.sh 22 avg_rate_2633.data
 
