@@ -124,7 +124,7 @@ pattern Range {
 }
 pattern Lock {
  color = .5 0 1
- marktype = x
+ marktype = "circle fill 1"
 }
 pattern Intr {
  color = 0 .5 1
@@ -136,7 +136,7 @@ pattern LockIntr {
 }
 pattern Free {
  color = .5 0 0
- marktype = box
+ marktype = "box fill 1"	
 }
 pattern Float {
  color =  0 .5 0
