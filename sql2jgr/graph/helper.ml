@@ -620,14 +620,17 @@ let get_info debug name atts xdft ydft fdft =
        let legend  = Graph.get_legend debug name atts "" in
        let xlegend = Graph.get_xlegend debug name atts xdft in
        let ylegend = Graph.get_ylegend debug name atts ydft in
+(* alt x label:  hash_labels fontsize 6 rotate -45 vjc hjl *)
+       let xlabel = Graph.get_xlabel debug name atts "fontsize 6 vjc hjl" in
+       let ylabel = Graph.get_ylabel debug name atts "fontsize 8" in
        let ylegfactor = Graph.get_ylegendfactor debug name atts in
        let factor = Graph.get_factor debug name atts fdft in
-	 (size, xaxis, legend, xlegend, ylegend, ylegfactor, factor)
+	 (size, xaxis, legend, xlegend, ylegend, xlabel, ylabel, ylegfactor, factor)
     )
 
 (* Drawing functions *)
 
-let draw_header ch xdftmin xdftmax ymax (size, xaxis, legend, xlabel, ylabel, ylabfact, _) vlist =
+let draw_header ch xdftmin xdftmax ymax (size, xaxis, legend, xlabel, ylabel, xhash_label, yhash_label, ylabfact, _) vlist =
   let (xlegend, xmark, xmin, xmax) =
     match xaxis with
 	"version" -> (get_names_by_date vlist, get_mark_date vlist, xdftmin, xdftmax)
@@ -645,19 +648,20 @@ let draw_header ch xdftmin xdftmax ymax (size, xaxis, legend, xlabel, ylabel, yl
 newgraph
 xaxis min %02f max %02f size %02.2f label fontsize 11 : %s
 no_auto_hash_labels no_auto_hash_marks
-(* hash_labels fontsize 6 rotate -45 vjc hjl *)
-hash_labels fontsize 6 vjc hjl
+hash_labels %s
 draw_hash_labels
 %s
 %s
 
 yaxis min %02.4f max %02.4f size %02.2f label fontsize 9 : %s
-mhash 0 hash_labels fontsize 8
+mhash 0 hash_labels %s
 
 %s\n\n"
       xmin (xmax +. 1.0) gxsize xlabel
+      xhash_label
       xlegend xmark
       (fst ymax)(snd ymax) gysize ylabel
+      yhash_label
       legend
 
 let get_point v mindate d value =

@@ -43,6 +43,8 @@ type attr =
   | VMin of string
   | Version of int * version list
   | XAxis of string
+  | XLabel of string
+  | YLabel of string
   | XLegend of string
   | XMin of float
   | YMin of float

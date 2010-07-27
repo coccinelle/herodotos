@@ -140,7 +140,7 @@ let rec compute_marks xdftmax step =
     else
       ""
 
-let draw_header ch xdftmax ymax (size, xaxis, legend, xlabel, ylabel, ylabfact, _) step evols =
+let draw_header ch xdftmax ymax (size, xaxis, legend, xlabel, ylabel, xhash_label, yhash_label, ylabfact, _) step evols =
   let (xlegend, xmark, xmax) =
     match xaxis with
 	"groups" ->
@@ -158,18 +158,20 @@ let draw_header ch xdftmax ymax (size, xaxis, legend, xlabel, ylabel, ylabfact, 
 newgraph
 xaxis min 0 max %02.4f size %02.2f label fontsize 11 : %s
 no_auto_hash_labels no_auto_hash_marks
-hash_labels fontsize 6 rotate -45 vjb hjl
+hash_labels %s
 draw_hash_labels
 %s
 %s
 
 yaxis min %02.4f max %02.4f size %02.2f label fontsize 9 : %s
-mhash 1 hash_labels fontsize 8
+mhash 1 hash_labels %s
 
 %s\n\n"
       xmax gxsize xlabel
+      xhash_label
       xlegend xmark
       (fst ymax) (snd ymax) gysize ylabel
+      yhash_label
       legend
 
 let _labellist:string list ref = ref []

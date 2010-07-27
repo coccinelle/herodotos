@@ -22,7 +22,7 @@
 %token TPREFIX TPROJECTS TWEBSITE TFLAGS TCPUCORE TSQL TDBCONN
 %token TSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT
 %token TLEGEND TXLEGEND TXMIN TYMIN TYMAX TXAXIS TYAXIS
-%token TYLEGEND TYLEGENDFACTOR TFACTOR
+%token TYLEGEND TYLEGENDFACTOR TFACTOR TXLABELS TYLABELS
 %token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR TFOOTER
 %token TFILE TFILENAME TRATIO TGROUP TINFO TSIZE TVMIN TPRUNE TAUTHOR
 %token<int> TInt
@@ -79,9 +79,11 @@ attr:
 | TFOOTER        TEQUAL l=TSTRING2Q                { Ast_config.Footer(l)}
 | TFORMAT        TEQUAL dft=TId                    { Ast_config.Format(dft) }
 | TINFO          TEQUAL b=TBOOL                    { Ast_config.Info(b)}
-| TLEGEND        TEQUAL l=TSTRING2Q                  { Ast_config.Legend(l)}
-| TXLEGEND       TEQUAL l=TSTRING2Q                  { Ast_config.XLegend(to_jgraph_fmt l)}
-| TYLEGEND       TEQUAL l=TSTRING2Q                  { Ast_config.YLegend(to_jgraph_fmt l)}
+| TLEGEND        TEQUAL l=TSTRING2Q                { Ast_config.Legend(l)}
+| TXLABELS       TEQUAL l=TSTRING2Q                { Ast_config.XLabel(l)}
+| TYLABELS       TEQUAL l=TSTRING2Q                { Ast_config.YLabel(l)}
+| TXLEGEND       TEQUAL l=TSTRING2Q                { Ast_config.XLegend(to_jgraph_fmt l)}
+| TYLEGEND       TEQUAL l=TSTRING2Q                { Ast_config.YLegend(to_jgraph_fmt l)}
 | TYLEGENDFACTOR TEQUAL f=TId                      { Ast_config.YLegendFactor(f)}
 | TLINESTYLE     TEQUAL s=TId                      { Ast_config.LineType(s)}
 | TMARKTYPE      TEQUAL TNONE                      { Ast_config.MarkType("none")}

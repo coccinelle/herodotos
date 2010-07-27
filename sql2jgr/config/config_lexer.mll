@@ -88,6 +88,8 @@ rule token = parse
   | "versions"                { P.TVERSIONS      }
   | "vmin"                    { P.TVMIN          }
   | "website"                 { P.TWEBSITE       }
+  | "xlabels"                 { P.TXLABELS       }
+  | "ylabels"                 { P.TYLABELS       }
   | "xaxis"                   { P.TXAXIS         }
   | "xmin"                    { P.TXMIN          }
   | "ymin"                    { P.TYMIN          }

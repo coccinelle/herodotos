@@ -119,6 +119,38 @@ let get_xlegend verbose g atts dft =
       prerr_endline ("X legend of "^g^" is not defined. Assuming \""^dft^"\"");
     dft
 
+let get_xlabel verbose g atts dft =
+  try
+    match
+      List.find (fun x ->
+		   match x with
+		       Ast_config.XLabel _ -> true
+		     | _ -> false
+		) atts
+    with
+	Ast_config.XLabel v -> v
+      | _ -> raise Unrecoverable
+  with _ ->
+    if verbose then
+      prerr_endline ("X label of "^g^" is not defined. Assuming \""^dft^"\"");
+    dft
+
+let get_ylabel verbose g atts dft =
+  try
+    match
+      List.find (fun x ->
+		   match x with
+		       Ast_config.YLabel _ -> true
+		     | _ -> false
+		) atts
+    with
+	Ast_config.YLabel v -> v
+      | _ -> raise Unrecoverable
+  with _ ->
+    if verbose then
+      prerr_endline ("Y label of "^g^" is not defined. Assuming \""^dft^"\"");
+    dft
+
 let get_ylegend verbose g atts dft =
   try
     match
