@@ -93,3 +93,47 @@ shell : ./get_avg.sh 22 avg_rate_2633.data
   RATE_ALL_GRP('linux-2.6.33', "Size"     , 'Size'     )
 
 }
+
+
+#define RATE_NICO(ver, patt, patt2)         \
+ group patt {          		               \
+  curve pattern TRUE {                         \
+   legend = "6 826 .c files compiled by allyesconfig" \
+   sql = SELECT standardized_name, rate FROM nico_allyes \
+         WHERE standardized_name = patt2       \
+	       AND version_name = ver          \
+	       AND allyes_compiled = TRUE;     \
+  }                                            \
+  curve pattern FALSE {                        \
+   legend = "6 831 other .c files" \
+   sql = SELECT standardized_name, rate FROM nico_allyes \
+         WHERE standardized_name = patt2       \
+	       AND version_name = ver          \
+	       AND allyes_compiled = FALSE;    \
+  }                                            \
+ }
+
+graph gr/nico.jgr {
+ xaxis = groups
+ size = 3 1
+ xlabels = "fontsize 6 rotate -45 vjc hjl"
+ ylegend = "% of faulty notes"
+ legend = "defaults fontsize 6 x 11 y 1.2 linelength 1
+
+shell : ./get_avg.sh 22 avg_rate_2633.data
+
+"
+
+  RATE_NICO('linux-2.6.33', "Block"    , 'Block'    ) \
+  RATE_NICO('linux-2.6.33', "Null"     , 'Null'     ) \
+  RATE_NICO('linux-2.6.33', "Var"      , 'Var'      ) \
+  RATE_NICO('linux-2.6.33', "IsNull"   , 'IsNull'   ) \
+  RATE_NICO('linux-2.6.33', "NullRef"  , 'NullRef'  ) \
+  RATE_NICO('linux-2.6.33', "Range"    , 'Range'    ) \
+  RATE_NICO('linux-2.6.33', "Lock"     , 'Lock'     ) \
+  RATE_NICO('linux-2.6.33', "Intr"     , 'Intr'     ) \
+  RATE_NICO('linux-2.6.33', "LockIntr" , 'LockIntr' ) \
+  RATE_NICO('linux-2.6.33', "Free"     , 'Free'     ) \
+  RATE_NICO('linux-2.6.33', "Size"     , 'Size'     )
+
+}
