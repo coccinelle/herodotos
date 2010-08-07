@@ -6,7 +6,7 @@
 
 #define CMP_RATE_DIR_CURVE(ver, patt, patt2, dir) \
   curve pattern patt {              \
-   sql = SELECT standardized_name, rate FROM osdi_cmp_rate_by_directory_and_error_name \
+   sql = SELECT standardized_name, rate FROM study_cmp_rate_by_directory_and_error_name \
          WHERE standardized_name = patt2 AND dirname = dir          \
 	       AND version_name = ver; \
   }
@@ -177,13 +177,13 @@ newgraph
                   sum(rd.number_of_reports) AS reps_dir,	    \
                   sum(rd.number_of_notes)   AS notes_dir	    \
                FROM  rates rd					    \
-               WHERE rd.osdi_dirname = dir		            \
+               WHERE rd.study_dirname = dir		            \
 	       GROUP BY  rd.version_name) AS rd,		    \
                (SELECT ro.version_name,				    \
                   sum(ro.number_of_reports) AS reps_other,	    \
                   sum(ro.number_of_notes) AS notes_other	    \
                FROM  rates ro					    \
-               WHERE ro.osdi_dirname != dir         		    \
+               WHERE ro.study_dirname != dir         		    \
 	       GROUP BY  ro.version_name) AS ro			    \
     WHERE v.version_name = rd.version_name			    \
     AND v.version_name = ro.version_name			    \

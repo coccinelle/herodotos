@@ -2,7 +2,7 @@
 
 #define RATE_DIR_CURVE(ver, patt, patt2, dir) \
   curve pattern patt {              \
-   sql = SELECT standardized_name, 100 * rate FROM osdi_rate_by_directory_and_error_name \
+   sql = SELECT standardized_name, 100 * rate FROM study_rate_by_directory_and_error_name \
          WHERE standardized_name = patt2 AND dirname = dir          \
 	       AND version_name = ver; \
   }

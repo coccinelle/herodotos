@@ -6,7 +6,7 @@
 		     	     release_date,	       \
 			     file_id		       \
 		      FROM "Faults info"	       \
-		      WHERE osdi_dirname = patt2       \
+		      WHERE study_dirname = patt2       \
 		      AND release_date >= '2003-12-18' \
 		      GROUP BY version_name,           \
 		      	    release_date,              \
@@ -41,7 +41,7 @@ include count-evol-per-dir.annot
 #define CNT_CRV_FILE_KIND(patt, patt2)                 \
  curve pattern patt {				       \
    sql = SELECT version_name, release_date, sum(pts)   \
-       	 	FROM osdi_count_evol_agg_kind          \
+       	 	FROM study_count_evol_agg_kind          \
        	 	WHERE standardized_name = patt2        \
 		AND release_date >= '2003-12-18'       \
 		GROUP BY version_name,                 \
@@ -97,11 +97,11 @@ include count-evol-null.annot
  curve pattern patt {				       \
    sql = SELECT version_name, release_date, count(*)   \
        	 	FROM "Notes info"                      \
-       	 	WHERE osdi_dirname = patt2             \
+       	 	WHERE study_dirname = patt2             \
 		AND release_date >= '2003-12-18'       \
 		GROUP BY version_name,                 \
 		      release_date,                    \
-		      osdi_dirname                     \
+		      study_dirname                     \
 		ORDER BY release_date;                 \
  }
 
@@ -208,11 +208,11 @@ include notes-evol.annot
        	 	FROM "Faults info" r,                    \
 		     (SELECT release_date,               \
 			     sum(pts) as pts             \
-		     FROM osdi_count_evol_agg_kind       \
-		     WHERE osdi_dirname = patt2          \
+		     FROM study_count_evol_agg_kind       \
+		     WHERE study_dirname = patt2          \
 		     GROUP BY release_date               \
 		     )  AS a                             \
-       	 	WHERE r.osdi_dirname = patt2             \
+       	 	WHERE r.study_dirname = patt2             \
 		AND r.release_date >= '2003-12-18'       \
 		AND r.release_date = a.release_date	 \
 		GROUP BY r.version_name,                 \
