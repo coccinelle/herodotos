@@ -1,0 +1,27 @@
+UBUNTU=karmic lucid
+UBUNTURELEASE=$(UBUNTU:%=ubuntu-%)
+
+.PHONY:: ubuntu $(UBUNTURELEASE)
+
+ubuntu:
+	for r in $(UBUNTURELEASE); do $(MAKE) $$r ; done
+	@echo "\nYou can now build the Ubuntu source package with\n"
+	@echo "\tmake packsrc\n"
+
+#$(UBUNTURELEASE):
+#	debchange -c debian/changelog.karmic -D karmic -v $(VERSION)~$(@:ubuntu-%=%)~npalix1 "New release $(VERSION)"
+IDX?=1
+
+ubuntu-karmic:
+	debchange -c debian/changelog.karmic -D karmic -v $(VERSION)~910npalix$(IDX) "New release $(VERSION)"
+
+ubuntu-lucid:
+	debchange -c debian/changelog.lucid -D lucid -v $(VERSION)~1004npalix$(IDX) "New release $(VERSION)"
+
+ubuntu-maverik:
+	if [ ! -f debian/changelog.$(@:ubuntu-%=%) ] ; then \
+		debchange --create -c debian/changelog.$(@:ubuntu-%=%) -D UNRELEASED \
+			-v $(VERSION)~npalix$(IDX) "New release $(VERSION)" --package $(PRJNAME) ; \
+	else \
+		debchange -c debian/changelog.$(@:ubuntu-%=%) -D UNRELEASED -v $(VERSION)~npalix$(IDX) "New release $(VERSION)" ; \
+	fi

@@ -41,7 +41,7 @@ OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
 
 .PHONY:: all all.opt clean distclean debclean $(DEP)
 .PHONY:: depend install sudo_install deploy
-.PHONY:: docs test debian ubuntu
+.PHONY:: docs test debian debians
 
 all: init bytecode
 opt: all.opt
@@ -76,10 +76,10 @@ view:
 		done \
 	fi
 
-ubuntu debian:
+debian:
 	$(MAKE) -C debian
 
-ubuntus debians:
+debians:
 	$(MAKE) -C debian signed
 
 #########################
@@ -188,7 +188,7 @@ clean: localclean
 
 distclean: localclean
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
-	$(MAKE) -C $(MENHIR_PATH) $@
+	-$(MAKE) -C $(MENHIR_PATH) $@
 	$(MAKE) -C demo $@
 	if [ -d test ] ; \
 		then $(MAKE) -C test $@ ;fi
@@ -266,12 +266,14 @@ menhir:
 EXCL_SYNC=--exclude ".git"          \
 	--exclude ".gitignore"      \
 	--exclude "test"      \
-	--exclude "TODO"
+	--exclude "TODO"      \
+	--exclude "Makefile.dev"
 EXCLUDE=--exclude "tools"           \
 	--exclude $(PACKAGE)/debian
 
 prepack:
 	rsync -a $(EXCL_SYNC) . $(TMP)/$(PACKAGE)
+	$(MAKE) -C $(TMP)/$(PACKAGE) distclean
 	$(MAKE) -C $(TMP)/$(PACKAGE) licensify
 	echo "-include Makefile.local" > $(TMP)/$(PACKAGE)/demo/Makefile
 	rm -rf $(TMP)/$(PACKAGE)/tools
@@ -304,3 +306,5 @@ pack: prepack
 	tar cjvf $(TMP)/$(PACKAGE).tbz2 -C $(TMP) \
 		$(EXCLUDE) --exclude-vcs $(PACKAGE)
 	rm -rf  $(TMP)/$(PACKAGE)/
+
+-include Makefile.dev
