@@ -1,3 +1,9 @@
+herodotos (0.6.0rc4~910npalix1) karmic; urgency=low
+
+  * New release 0.6.0rc4
+
+ -- Nicolas Palix <npalix@diku.dk>  Mon, 23 Aug 2010 09:38:13 +0200
+
 herodotos (0.6.0rc3~910npalix1) karmic; urgency=low
 
   * Release candidate 3 for 0.6.0

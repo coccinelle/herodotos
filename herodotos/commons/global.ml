@@ -1,5 +1,5 @@
 
-let version="0.6.0rc3"
+let version="0.6.0rc4"
 
 let cocciext  = ".cocci"
 let origext   = ".orig.org"
