@@ -9,7 +9,7 @@ COMMON_CONFIG = --prefix=/usr
 ifeq ($(OCAML_HAVE_OCAMLOPT),yes)
 OCAMLRUN =
 CONFIG_FLAGS = $(COMMON_CONFIG) --opt
-MAKE_TGT = all.opt
+MAKE_TGT = opt
 else
 OCAMLRUN = ocaml-base-nox-$(OCAML_ABI)
 CONFIG_FLAGS = $(COMMON_CONFIG) --no-opt

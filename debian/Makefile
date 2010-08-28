@@ -10,5 +10,5 @@ karmic lucid:
 
 binary:
 	ln -f changelog.$(DISTRIB_CODENAME) changelog
-	debuild -uc -us
+	debuild -uc -us -d
 	rm -f changelog

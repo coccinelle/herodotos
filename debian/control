@@ -4,14 +4,14 @@ Priority: optional
 Maintainer: Nicolas Palix <npalix@diku.dk>
 Build-Depends: debhelper (>= 7), ocaml-nox (>= 3.11.0),
  menhir (>= 20090204.dfsg), libmenhir-ocaml-dev (>= 20090204.dfsg),
- ocaml-findlib, dh-ocaml, ocaml-best-compilers
-Standards-Version: 3.8.3
-Homepage: http://www.diku.dk/~npalix/herodotos/
+ ocaml-findlib, dh-ocaml, ocaml-best-compilers, libpostgresql-ocaml-dev
+Standards-Version: 3.8.4
+Homepage: http://coccinelle.lip6.fr/herodotos/
 
 Package: herodotos
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, ${F:OCamlRun}, diff (>= 2.8.1),
- jgraph (>= 83), ps2eps (>= 1.64)
+ jgraph (>= 83), ps2eps (>= 1.64), libpostgresql-ocaml
 Recommends: imagemagick, texlive-extra-utils (>= 2007.dfsg)
 Suggests: coccinelle
 Enhances: inkscape (>= 0.47)
