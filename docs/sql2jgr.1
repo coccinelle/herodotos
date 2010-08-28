@@ -1,0 +1,98 @@
+.\"  -*- nroff -*-
+.\" Please adjust this date whenever revising the manpage.
+.TH SQL2JGR 1 "August 28, 2010"
+
+.\" see http://www.fnal.gov/docs/products/ups/ReferenceManual/html/manpages.html
+.\" see http://www.linuxjournal.com/article/1158
+.\" see http://www.schweikhardt.net/man_page_howto.html
+.\" groff -Tascii -man ./sql2jgr.1 | more
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.\"
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics,
+.\" respectively. Also \fR for roman.
+.\" pad: src: deputy man page
+.SH NAME
+sql2jgr \- Extract data from a postgreSQL database and generate jgraph
+files to represent them.  It is part of the Herodotos tool suite.
+
+.SH SYNOPSIS
+.B sql2jgr
+.B -c
+.I <configfile>
+.RB [ --jgr ]
+.RB [ --eps ]
+.RB [ --png ]
+.RB [ -w | --web ]
+.RB [ -v | -vv | -vvv ]
+.\"
+.SH DESCRIPTION
+\fBsql2jgr\fP is a program to extract data from a postgreSQL database
+and generate jgraph files to represent them.
+
+.PP
+Further information about sql2jgr is available at
+\fBhttp://coccinelle.lip6.fr/herodotos/\fP.
+
+.SH OPTIONS
+Here is a summary of the most commonly used options:
+
+.TP
+.B -c \fI<configfile>\fP
+.TP
+.B --config \fI<configfile>\fP
+the Sql2jgr configuration file
+.TP
+.B --jgr
+only generate jgr files. Useful for further processing by other tools.
+.TP
+.B --eps
+only generate jgr and eps files (no PDF)
+.TP
+.B --png
+also generate png files
+.TP
+.B --web
+generate website
+.TP
+.B --longhelp
+see all the available options
+.TP
+.B -h, -help, --help
+show the list of options.
+.TP
+.B -v, -vv, -vvv
+set verbosity.
+
+.SH EXAMPLES
+
+  sql2jgr -c <hcl.file> --jgr
+.br
+  sql2jgr -c <hcl.file> --web
+
+.SH AUTHOR
+\fBsql2jgr\fP was written by Nicolas Palix <npalix@diku.dk>.
+.PP
+This manual page was written by Nicolas Palix <npalix@diku.dk>.
+
+.SH REPORTING BUGS
+Send a mail to <npalix@diku.dk>
+
+.SH COPYRIGHT
+Copyright 2009, 2010, University of Copenhagen DIKU and INRIA.
+sql2jgr is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, according to version 2 of the License.
+
+.SH SEE ALSO
+spatch(1), herodotos (1), org2sql (1)

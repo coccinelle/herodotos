@@ -10,10 +10,36 @@ all opt world depend distclean clean install uninstall:
 		$(MAKE) $@-l;      \
 	done
 
-all-l opt-l world-l depend-l install-l uninstall-l:
+##############################################################################
+# Top level targets
+##############################################################################
+
+-include herodotos/Makefile.config
+
+all-l opt-l world-l depend-l:
+
+install-l: check-config
+	mkdir -p $(DESTDIR)$(MANDIR)/man1
+	$(INSTALL_DATA) docs/herodotos.1 $(DESTDIR)$(MANDIR)/man1/
+	$(INSTALL_DATA) docs/org2sql.1 $(DESTDIR)$(MANDIR)/man1/
+	$(INSTALL_DATA) docs/sql2jgr.1 $(DESTDIR)$(MANDIR)/man1/
+
+uninstall-l: check-config
+	rm -f $(DESTDIR)$(MANDIR)/man1/herodotos.1
+	rm -f $(DESTDIR)$(MANDIR)/man1/org2sql.1
+	rm -f $(DESTDIR)$(MANDIR)/man1/sql2jgr.1
+	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(MANDIR)/man1
 
 distclean-l clean-l:
 	rm -f *~
+
+docs:
+	$(MAKE) -C docs/manual pdf
+
+check-config:
+	@if [ ! -f herodotos/Makefile.config ] ; then \
+		echo "\n\tRun ./configure first\n" \
+		exit 1 ; fi
 
 ##############################################################################
 # Package

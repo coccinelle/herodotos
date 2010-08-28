@@ -40,7 +40,7 @@ OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
 
 .PHONY:: all all.opt clean distclean debclean $(DEP)
 .PHONY:: depend install sudo_install deploy
-.PHONY:: docs test debian debians
+.PHONY:: test debian debians
 
 all: init bytecode
 opt: all.opt
@@ -52,9 +52,6 @@ bytecode: $(EXEC)
 native: $(EXEC).opt
 native-noopt: native
 	mv -f $(EXEC).opt $(EXEC)
-
-docs:
-	$(MAKE) -C docs/manual pdf
 
 test:
 	$(MAKE) -C test init
@@ -144,9 +141,7 @@ scripts/Makefile.inc: scripts/Makefile.inc.in Makefile.config
 
 install:
 	mkdir -p $(DESTDIR)$(BINDIR)
-	mkdir -p $(DESTDIR)$(MANDIR)/man1
 	mkdir -p $(DESTDIR)$(SHAREDIR)
-	$(INSTALL_DATA) docs/herodotos.1 $(DESTDIR)$(MANDIR)/man1/
 	$(INSTALL_DATA) scripts/Makefile.inc $(DESTDIR)$(SHAREDIR)
 	$(INSTALL_DATA) scripts/Makefile.images $(DESTDIR)$(SHAREDIR)
 	$(INSTALL_DATA) scripts/Makefile.prj $(DESTDIR)$(SHAREDIR)
@@ -155,7 +150,6 @@ install:
 
 uninstall:
 	rm -f $(DESTDIR)$(BINDIR)/$(TARGET) $(DESTDIR)$(BINDIR)/$(TARGET).opt
-	rm -f $(DESTDIR)$(MANDIR)/man1/herodotos.1
 	rm -f $(DESTDIR)$(SHAREDIR)/Makefile.*
 	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(SHAREDIR)
 
