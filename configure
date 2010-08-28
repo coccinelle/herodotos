@@ -1,10 +1,5 @@
 #!/bin/sh
 
-if [ "$PREFIX" = "" ]; then
-    echo "No prefix environnement variable defined"
-    echo "Assuming /usr/local..."
-else
-    echo "PREFIX=$PREFIX"
-fi
-
-make configure
+for d in herodotos org2sql sql2jgr; do
+    cd $d ; ./configure $* ; cd - 2> /dev/null;
+done

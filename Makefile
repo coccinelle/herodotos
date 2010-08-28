@@ -2,17 +2,12 @@ TARGET=herodotos
 PREFIX?=/usr/local
 SUBDIRS=herodotos org2sql sql2jgr
 
-.PHONY:: configure all opt world depend clean distclean push
+.PHONY:: all opt world depend clean distclean push
 
 all opt world depend distclean clean install uninstall:
 	for d in $(SUBDIRS); do    \
 		$(MAKE) -C $$d $@; \
 		$(MAKE) $@-l;      \
-	done
-
-configure:
-	for d in $(SUBDIRS); do \
-		cd $$d ; ./$@ --prefix=$(PREFIX) ; cd - 2> /dev/null;\
 	done
 
 all-l opt-l world-l depend-l install-l uninstall-l:

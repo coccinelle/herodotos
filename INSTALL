@@ -1,7 +1,7 @@
 
  ** INSTALL **
 
-	PREFIX=/usr ./configure
+	./configure --prefix=/usr
 	make
 	sudo make install
 
