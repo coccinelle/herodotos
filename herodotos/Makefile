@@ -2,7 +2,6 @@
 -include Makefile.config
 
 TARGET=herodotos
-DEPLOY=palace bossa
 
 SOURCES =
 SUBDIRS = commons exists hcl org diff scm graph html database engine
@@ -48,7 +47,7 @@ opt: all.opt
 all.opt: init native-noopt
 world: init bytecode native
 
-init: depend scripts/Makefile.inc
+init: check-config depend scripts/Makefile.inc
 bytecode: $(EXEC)
 native: $(EXEC).opt
 native-noopt: native
@@ -75,12 +74,6 @@ view:
 			$(PDFVIEWER) $$f & \
 		done \
 	fi
-
-debian:
-	$(MAKE) -C debian
-
-debians:
-	$(MAKE) -C debian signed
 
 #########################
 ## Dependencies        ##
@@ -146,15 +139,6 @@ $(DEP:%=%.opt):
 # don't remove DESTDIR, it can be set by package build system like ebuild
 # for staged installation.
 
-sudo_install: update
-	@echo "Installing on $(shell uname -n)"
-	sudo $(MAKE) install
-
-deploy: sudo_install
-	for h in $(DEPLOY); do \
-		ssh $$h -C "make -C build/herodotos sudo_install"; \
-	done
-
 scripts/Makefile.inc: scripts/Makefile.inc.in Makefile.config
 	sed "s|SHAREDIR|$(SHAREDIR)|" $@.in > $@
 
@@ -205,40 +189,10 @@ depend:
 
 -include .depend
 
-Makefile.config:
-	@echo "\n\tRun ./configure first\n"
-
-
-##############################################################################
-# Git Developer rules
-#
-#	git cvsimport -d :ext:topps:/var/cvs/cocci -C herodotos-git gengraph
-#
-##############################################################################
-gitupdate:
-	git cvsimport -p x -d :ext:topps:/var/cvs/cocci gengraph
-
-update:
-	cvs up && make world
-##############################################################################
-# Package
-#
-#	Calling "pack" should be enough. Source package will be build
-#	in .. directory
-#
-##############################################################################
-
--include /etc/lsb-release
-
-VERSION=$(shell cat commons/global.ml |grep "version\s*=" |perl -p -e 's/.*"(.*)".*/$$1/;')
-PKGVERSION=$(shell dpkg-parsechangelog -ldebian/changelog.$(DISTRIB_CODENAME) \
-	 | sed -n 's/^Version: \(.*\)/\1/p')
-TMP=/tmp
-PACKAGE=$(TARGET)-$(VERSION)
-
-version:
-	@echo "Herodotos version $(VERSION)"
-	@echo "Herodotos $(DISTRIB_ID) version $(PKGVERSION)"
+check-config:
+	@if [ ! -f Makefile.config ] ; then \
+		echo "\n\tRun ./configure first\n" \
+		exit 1 ; fi
 
 TOLICENSIFY=$(SUBDIRS) scripts #test
 
@@ -246,65 +200,6 @@ TOLICENSIFY=$(SUBDIRS) scripts #test
 # Automatically called by pack.
 #
 licensify:
-	ocaml str.cma tools/licensify.ml
-	set -e; for i in $(TOLICENSIFY); do cd $$i; ocaml str.cma ../tools/licensify.ml; cd -; done
-
-#
-# Pre-generate parsers with menhir
-# Note: This allows to remove the menhir dependency.
-#
-# This target is called by pack
-#
-menhir:
-	for i in `find -name "*.mly"` ; do \
-		make -C `dirname $$i` `basename $$i` ; \
-	done
-
-#
-# This target build a source tarball to distribute
-#
-EXCL_SYNC=--exclude ".git"          \
-	--exclude ".gitignore"      \
-	--exclude "test"      \
-	--exclude "TODO"      \
-	--exclude "Makefile.dev"
-EXCLUDE=--exclude "tools"           \
-	--exclude $(PACKAGE)/debian
-
-prepack:
-	rsync -a $(EXCL_SYNC) . $(TMP)/$(PACKAGE)
-	$(MAKE) -C $(TMP)/$(PACKAGE) distclean
-	$(MAKE) -C $(TMP)/$(PACKAGE) licensify
-	echo "-include Makefile.local" > $(TMP)/$(PACKAGE)/demo/Makefile
-	rm -rf $(TMP)/$(PACKAGE)/tools
-
-packsrc: prepack
-	$(MAKE) -C $(TMP)/$(PACKAGE)/debian lucid
-	$(MAKE) -C $(TMP)/$(PACKAGE)/debian karmic
-	$(MAKE) push
-	rm -rf  $(TMP)/$(PACKAGE)/
-
-push:
-	cd $(TMP)/ && for p in `ls $(TARGET)_$(VERSION)~*_source.changes`; do dput $(TARGET) $$p ; done
-	rm -rf $(TMP)/$(TARGET)_$(VERSION)~*_source.changes
-	rm -rf $(TMP)/$(TARGET)_$(VERSION)~*_source.$(TARGET).upload
-	rm -rf $(TMP)/$(TARGET)_$(VERSION)~*.dsc
-	rm -rf $(TMP)/$(TARGET)_$(VERSION)~*.tar.gz
-
-packbin: prepack
-	$(MAKE) -C $(TMP)/$(PACKAGE)/debian binary
-	rm -rf  $(TMP)/$(PACKAGE)/
-	rm -rf $(TMP)/$(TARGET)_$(VERSION)~*_source.build
-
-pack: prepack
-	cd $(TMP)/$(PACKAGE) && ./configure
-	$(MAKE) -C $(TMP)/$(PACKAGE) depend
-	$(MAKE) -C $(TMP)/$(PACKAGE) distclean
-	$(MAKE) -C $(TMP)/$(PACKAGE) menhir
-#	tar cjvf ../$(PACKAGE)-`date +%F`.tbz2 -C $(TMP) \
-#		$(EXCL_SRC) --exclude-vcs $(PACKAGE)
-	tar cjvf $(TMP)/$(PACKAGE).tbz2 -C $(TMP) \
-		$(EXCLUDE) --exclude-vcs $(PACKAGE)
-	rm -rf  $(TMP)/$(PACKAGE)/
-
--include Makefile.dev
+	ocaml str.cma ../tools/licensify.ml
+	set -e; for i in $(TOLICENSIFY); do cd $$i; \
+		ocaml str.cma ../../tools/licensify.ml; cd -; done

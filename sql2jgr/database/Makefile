@@ -1,4 +1,4 @@
-include ../Makefile.config
+-include ../Makefile.config
 
 OCAMLFIND=ocamlfind
 
@@ -53,8 +53,8 @@ $(OPTLIB): $(OPTOBJS)
 main: $(LIBS) $(OBJS)
 	$(OCAMLC) -o $(TARGET) $(LFLAGS) $^
 
-clean:
-	rm -rf $(OBJS) *~
+distclean clean:
+	rm -rf $(OBJS) .depend *~
 	rm -rf *.cm[aiox] *.cmxa *.a *.o *.annot
 
 depend:

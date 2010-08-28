@@ -11,3 +11,7 @@
    corresponding new files.
  - Rewrite Org parser.
  - Fix abscisse size for evolution curves.
+ - Provide Herodotos tool suite:
+   herodotos (for the correlation), org2sql
+   (to push correlated reports in a database),
+   and sql2jgr (to generate the graphs from a database)

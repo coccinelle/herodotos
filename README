@@ -2,9 +2,11 @@
  == Requirements ==
 
  * A org-mode capable matching tool
-	* For instance, Coccinelle (spatch)
+   * For instance, Coccinelle (spatch)
  * menhir, a O'Caml parser generator
-	* Only for building Herodotos
+   * Only for building Herodotos
+ * menhirlib, the menhir runtime library
+ * PostgreSQL-ocaml library
 
  For EPS generation
 ====================
@@ -24,5 +26,5 @@
 
  * Native version of spatch (spatch.opt)
 
- * Source code repositories should have been
-   indexed with glimpse (may improve spatch efficiency)
+ * Source code repositories can be indexed with glimpse
+   -> may improve spatch efficiency

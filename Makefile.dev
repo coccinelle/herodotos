@@ -1,7 +1,7 @@
 UBUNTU=karmic lucid
 UBUNTURELEASE=$(UBUNTU:%=ubuntu-%)
 
-.PHONY:: ubuntu $(UBUNTURELEASE)
+.PHONY:: git-push ubuntu $(UBUNTURELEASE)
 
 ubuntu:
 	for r in $(UBUNTURELEASE); do $(MAKE) $$r ; done
@@ -25,3 +25,13 @@ ubuntu-maverik:
 	else \
 		debchange -c debian/changelog.$(@:ubuntu-%=%) -D UNRELEASED -v $(VERSION)~npalix$(IDX) "New release $(VERSION)" ; \
 	fi
+
+git-push:
+	git push
+	git push forge
+
+debian:
+	$(MAKE) -C debian
+
+debians:
+	$(MAKE) -C debian signed

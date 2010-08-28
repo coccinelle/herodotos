@@ -46,7 +46,7 @@ opt: all.opt
 all.opt: init native-noopt
 world: init bytecode native
 
-init: depend
+init: check-config depend
 bytecode: $(EXEC)
 native: $(EXEC).opt
 native-noopt: native
@@ -78,7 +78,7 @@ test:
 	$(MAKE) -C test
 
 distclean clean:
-	rm -rf $(TARGET)
+	rm -rf $(EXEC) $(EXEC).opt
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 	rm -rf *.cm[aiox] *.a *.o *~
 	rm -rf .depend Makefile.config
@@ -102,8 +102,20 @@ depend:
 
 -include .depend
 
-Makefile.config:
-	@echo "\n\tRun ./configure first\n"
+TOLICENSIFY=$(SUBDIRS)
+
+#
+# Automatically called by pack.
+#
+licensify:
+	ocaml str.cma ../tools/licensify.ml
+	set -e; for i in $(TOLICENSIFY); do cd $$i; \
+		ocaml str.cma ../../tools/licensify.ml; cd -; done
+
+check-config:
+	@if [ ! -f Makefile.config ] ; then \
+		echo "\n\tRun ./configure first\n" \
+		exit 1 ; fi
 
 install:
 	if [ -f $(EXEC) ]; then $(INSTALL_PROGRAM) $(EXEC) $(DESTDIR)$(BINDIR); fi
