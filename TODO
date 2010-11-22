@@ -1,3 +1,40 @@
+====== Herodotos TODO ======
+
+  * Support non-Org mode input files (raw numbers)
+  * Compute statistics per sub-directories
+  * Support for a computing sub-language (to mix data before plotting)
+  * Remove Makefile.patchset (diff should be computed by Herodotos)
+  * Support project/pattern/graph in (any) order
+  * Use pattern name to name files (instead of the cocci file) -- partially done -- need more test
+  * Crash-course/Tuto online in HTML
+  * Support SCM other than Git
+  * Predefine some colors (see xcolor latex package for instance)
+  * Parallel (correlation and graph generation)
+  * Parse each bug report (per version)
+
+===== Graphs =====
+
+New kinds of curves:
+  * Defect density and density of new defects
+    * wrt code size
+    * wrt size of new code
+    * wrt the number of new files
+  * Age pyramid
+  * Median age
+
+NOTE: Most of these graphs, will be doable when a computing language will be available.
+
+===== Correlations =====
+
+  * Reorganize: From a 1-1 model to a 1-n model (This should limit user confusion.)
+  * Two levels of state
+    * Top level: Death (the defect disappear, there is no matching defect in version n+1)
+    * Sub level: Same/Unrelated (as currently done)
+  * Switch to death if ALL sub-level are unrelated
+  * Prune unrelated when top level is death
+  * Prune unrelated when a same is defined -> Possibly switch  the top level to SAME and keep only one sub Org link
+
+================================================================================
 
 Conversion Org mode -> HTML page (href link)
 
