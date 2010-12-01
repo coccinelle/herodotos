@@ -80,9 +80,7 @@ clean::
 distclean: clean
 	rm -f .depend
 
-beforedepend::
-
-.depend depend:: beforedepend
+.depend depend::
 	$(OCAMLDEP) *.mli *.ml    > .depend
 
 -include .depend
