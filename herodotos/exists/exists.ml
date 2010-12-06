@@ -3,6 +3,12 @@ open Lexing
 exception BadFormat
 exception Misconfiguration of string
 
+let str_lexeme lexeme =
+  match lexeme with
+      "\n" -> "\\n"
+    | "\r" -> "\\r"
+    | _    -> lexeme
+
 let parse_exist file =
   let in_ch = open_in file in
   let lexbuf = Lexing.from_channel in_ch  in
@@ -29,12 +35,18 @@ let parse_exist file =
 	      Ast.line  = pos.pos_lnum + 1;
 	      Ast.colfr = pos.pos_cnum - pos.pos_bol;
 	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
-	    ("Exist Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'");
+	    ("Exist Parser Error: unexpected token '"
+	     ^ (str_lexeme (Lexing.lexeme lexbuf)) ^"'");
 	  raise BadFormat
 
 let analyze_file prjdir file vers =
-  (* FIXME HACK for OSDI 2010 *)
-  let newfile = Str.replace_first (Str.regexp "^staging/") "drivers/staging/" file in
+  (* FIXME HACK to study staging *)
+  let newfile =
+    if !Global.hacks then
+      Str.replace_first (Str.regexp "^staging/") "drivers/staging/" file
+    else
+      file
+  in
   let absfile = prjdir ^ "/" ^ vers  ^ "/" ^ newfile in
     if Sys.file_exists absfile then
       Ast_exist.Size (Misc.size_of_file absfile)
@@ -81,7 +93,8 @@ let show_ver vlist vs =
 
 let convert_state s =
   match s with
-      Ast_exist.Size 0 -> false
+      Ast_exist.Empty  -> false
+    | Ast_exist.Size 0 -> false
     | Ast_exist.False  -> false
     | Ast_exist.Size _ -> true
     | Ast_exist.True   -> true
@@ -120,17 +133,19 @@ let print_to existfilepath ast =
     List.iter (fun v -> output_string ch (v^";")) versions;
     output_string ch "\n";
     List.iter (fun (f, states) ->
-		 output_string ch (f^";");
-		 let toks = List.map (fun s ->
-			      match s with
-				  Ast_exist.True ->
-				    "true"
-				| Ast_exist.False ->
-				    "false"
-				| Ast_exist.Size (i) ->
-				    string_of_int i
-				     ) states in
-		   output_string ch (String.concat ";" toks);
-		   output_string ch "\n"
-	      ) entries;
+      output_string ch (f^";");
+      let toks = List.map (fun s ->
+	match s with
+	    Ast_exist.True ->
+	      "true"
+	  | Ast_exist.False ->
+	    "false"
+	  | Ast_exist.Size (i) ->
+	    string_of_int i
+	  | Ast_exist.Empty ->
+	    ""
+      ) states in
+      output_string ch (String.concat ";" toks);
+      output_string ch "\n"
+    ) entries;
     close_out ch

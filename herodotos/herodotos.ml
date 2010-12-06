@@ -41,6 +41,7 @@ let options = [
   "--debug", Arg.Set Misc.debug, " Debug mode";
   "--erase", Arg.Set erase, " Erase some data";
   "--extract", Arg.Set_string extract, "version Gives the version to extract from a correlated report";
+  "--hacks", Arg.Set Global.hacks, " Enable hacks (to perform customized studies)";
   "-h", Arg.Set help, " Display this list of options";
   "-help", Arg.Set help, " Display this list of options";
   "--help", Arg.Set help, " Display this list of options";

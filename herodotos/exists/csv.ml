@@ -35,7 +35,8 @@ let parse_csv file =
 
 let int_of_state s =
   match s with
-    Ast_exist.True   -> raise BadFormat
+    Ast_exist.Empty  -> raise BadFormat
+  | Ast_exist.True   -> raise BadFormat
   | Ast_exist.False  -> raise BadFormat
   | Ast_exist.Size i -> i
 
