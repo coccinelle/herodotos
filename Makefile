@@ -98,8 +98,9 @@ prepack:
 	rm -rf $(TMP)/$(PACKAGE)/tools
 
 packsrc: prepack
-	$(MAKE) -C $(TMP)/$(PACKAGE)/debian lucid
 	$(MAKE) -C $(TMP)/$(PACKAGE)/debian karmic
+	$(MAKE) -C $(TMP)/$(PACKAGE)/debian lucid
+	$(MAKE) -C $(TMP)/$(PACKAGE)/debian maverick
 	$(MAKE) push
 	rm -rf  $(TMP)/$(PACKAGE)/
 
