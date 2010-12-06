@@ -1,4 +1,4 @@
-UBUNTU=karmic lucid
+UBUNTU=karmic lucid maverick
 UBUNTURELEASE=$(UBUNTU:%=ubuntu-%)
 
 .PHONY:: git-push ubuntu $(UBUNTURELEASE)
@@ -18,13 +18,13 @@ ubuntu-karmic:
 ubuntu-lucid:
 	debchange -c debian/changelog.lucid -D lucid -v $(VERSION)~1004npalix$(IDX) "New release $(VERSION)"
 
-ubuntu-maverik:
-	if [ ! -f debian/changelog.$(@:ubuntu-%=%) ] ; then \
-		debchange --create -c debian/changelog.$(@:ubuntu-%=%) -D UNRELEASED \
-			-v $(VERSION)~npalix$(IDX) "New release $(VERSION)" --package $(PRJNAME) ; \
-	else \
-		debchange -c debian/changelog.$(@:ubuntu-%=%) -D UNRELEASED -v $(VERSION)~npalix$(IDX) "New release $(VERSION)" ; \
-	fi
+ubuntu-maverick:
+	debchange -c debian/changelog.maverick -D maverick -v $(VERSION)~1010npalix$(IDX) "New release $(VERSION)"
+
+ubuntu-UNRELEASED:
+	debchange --create -c debian/changelog.$(@:ubuntu-%=%) -D UNRELEASED \
+		  -v $(VERSION)~npalix$(IDX) "New release $(VERSION)"        \
+		  --package $(TARGET)
 
 git-push:
 	git push
