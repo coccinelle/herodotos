@@ -2,14 +2,14 @@
 # but this may be the native one on some distro
 HERODOTOS=herodotos
 ifeq ($(D),1)
-FLAGS=--debug -v
+FLAGS=--debug -v $(HFLAGS)
 else ifeq ($(D),2)
-FLAGS=--debug -vv
+FLAGS=--debug -vv $(HFLAGS)
 else ifeq ($(D),3)
-FLAGS=--debug -vvv
+FLAGS=--debug -vvv $(HFLAGS)
 else
 HERODOTOS=herodotos.opt
-FLAGS=
+FLAGS=$(HFLAGS)
 endif
 
 CONF?=$(shell ls *.hc)
