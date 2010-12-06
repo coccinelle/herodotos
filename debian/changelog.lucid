@@ -1,3 +1,9 @@
+herodotos (0.6.0rc5~1004npalix1) lucid; urgency=low
+
+  * New release 0.6.0rc5
+
+ -- Nicolas Palix <nicolas.palix@gmail.com>  Mon, 06 Dec 2010 21:54:37 +0100
+
 herodotos (0.6.0rc4~1004npalix1) lucid; urgency=low
 
   * New release 0.6.0rc4
