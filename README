@@ -6,7 +6,7 @@
  * menhir, a O'Caml parser generator
    * Only for building Herodotos
  * menhirlib, the menhir runtime library
- * PostgreSQL-ocaml library
+ * PostgreSQL-ocaml library (libpostgresql-ocaml-dev)
 
  For EPS generation
 ====================
