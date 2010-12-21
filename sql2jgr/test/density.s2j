@@ -6,7 +6,7 @@ graph gr/density.jgr {
  ylegend = "Faults\nper 1KLOC"
  legend = "off
 
-include density.annot
+shell : cpp -P -undef -DYMAX=0.2 -DYMIN=0 base.annot
 "
  ymax = 0.2
 
@@ -58,7 +58,7 @@ graph gr/rate-evol-per-kind.jgr {
 
  legend = "defaults
 
-include rate-kind.annot
+shell : cpp -P -undef -DYMAX=1.65 -DYMIN=0 base.annot
 "
 
  FLT_AVG_RATE
@@ -102,7 +102,7 @@ graph gr/rate-evol-per-dir.jgr {
 
  legend = "defaults
 
-include rate-dir.annot
+shell : cpp -P -undef -DYMAX=1 -DYMIN=0 base.annot
 "
 
  FLT_AVG_RATE
@@ -138,7 +138,7 @@ graph gr/count-evol-per-dir.jgr {
  ylegend = "# of faults"
  legend = "defaults
 
-include count-evol.annot
+shell : cpp -P -undef -DYMAX=415 -DYMIN=0 base.annot
 "
 
  FLT_COUNT_DIR(Staging, 'staging')

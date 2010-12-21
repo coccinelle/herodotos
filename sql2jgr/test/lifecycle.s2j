@@ -13,7 +13,7 @@ graph gr/birth-and-death.jgr {
  0     0
  2407  0
 
- include birth-and-death.annot
+shell : cpp -P -undef -DYMAX=200 -DYMIN=0 base.annot
  "
 
  curve pattern Death {

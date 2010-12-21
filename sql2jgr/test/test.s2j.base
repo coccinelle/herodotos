@@ -182,7 +182,7 @@ graph gr/count-evol.jgr {
  ylegend = "# of faults"
  legend = "off
 
-include lifetime_across.annot
+shell : cpp -P -undef -DYMAX=742 -DYMIN=0 base.annot
 "
  ymax = 800
 
@@ -219,7 +219,7 @@ graph gr/count-evol-inc.jgr {
  ylegend = "# of faults"
  legend = "defaults
 
-include count-evol-70.annot
+shell : cpp -P -undef -DYMAX=68 -DYMIN=0 base.annot
 "
 
  COUNT_CURVE(Lock , 'Lock' )
@@ -238,7 +238,7 @@ graph gr/count-evol-dec.jgr {
 
  legend = "defaults
 
-include count-evol-70.annot
+shell : cpp -P -undef -DYMAX=68 -DYMIN=0 base.annot
 "
 
  COUNT_CURVE(BlockLock, 'BlockLock')
@@ -261,7 +261,7 @@ graph gr/count-evol-inull.jgr {
 
  legend = "defaults
 
-include count-evol-400.annot
+shell : cpp -P -undef -DYMAX=400 -DYMIN=0 base.annot
 "
 
  COUNT_CURVE(NullRef, 'NullRef')

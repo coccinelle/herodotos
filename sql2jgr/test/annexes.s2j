@@ -19,7 +19,7 @@ graph gr/notes-evol-kind.jgr {
  ylegend = "# of notes"
  legend = "defaults
 
-include notes-evol-kind.annot
+shell : cpp -P -undef -DYMAX=46100 -DYMIN=0 base.annot
 "
 
  CNT_NOTES_KIND(BlockLock, 'BlockLock')
@@ -81,7 +81,7 @@ graph gr/flt_file-evol-dir.jgr {
 
  legend = "defaults
 
-include rate-2.annot
+shell : cpp -P -undef -DYMAX=2.9 -DYMIN=0 base.annot
 "
 
  FLT_FILE_DIR(Staging, 'staging')

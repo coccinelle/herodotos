@@ -27,7 +27,7 @@ graph gr/count-evol-rcu.jgr {
  ylegend = "# of faults"
  legend = "defaults
 
-include count-evol-70.annot
+shell : cpp -P -undef -DYMAX=68 -DYMIN=0 base.annot
 "
 
  COUNT_CURVE(BlockRCU, 'BlockRCU' )
@@ -46,7 +46,7 @@ graph gr/rate-evol-per-kind-rcu.jgr {
 
  legend = "defaults
 
-include rate-kind.annot
+shell : cpp -P -undef -DYMAX=1.65 -DYMIN=0 base.annot
 "
 
  FLT_RATE_KIND(BlockRCU, 'BlockRCU')
@@ -188,7 +188,8 @@ graph gr/birth-and-death-rcu.jgr {
  0     0
  2407  0
 
-(* include birth-and-death.annot *)
+shell : cpp -P -undef -DYMAX=9 -DYMIN=0 base.annot
+
  "
 
  curve pattern Death {
