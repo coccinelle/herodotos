@@ -63,7 +63,8 @@ include rate-kind.annot
 
  FLT_AVG_RATE
 
- FLT_RATE_KIND(Block, 'Block')
+ FLT_RATE_KIND(BlockLock, 'BlockLock')
+ FLT_RATE_KIND(BlockIntr, 'BlockIntr')
  FLT_RATE_KIND(Null , 'Null' )
  FLT_RATE_KIND(Var  , 'Var'  )
  FLT_RATE_KIND(IsNull , 'IsNull' )

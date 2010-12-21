@@ -22,7 +22,8 @@ graph gr/notes-evol-kind.jgr {
 include notes-evol-kind.annot
 "
 
- CNT_NOTES_KIND(Block, 'Block')
+ CNT_NOTES_KIND(BlockLock, 'BlockLock')
+ CNT_NOTES_KIND(BlockIntr, 'BlockIntr')
  CNT_NOTES_KIND(Null , 'Null')
  CNT_NOTES_KIND(Var  , 'Var'  )
 

@@ -28,11 +28,12 @@ graph gr/rate-4-2633-x86.jgr {
  ylegend = "% of faulty notes"
  legend = "defaults fontsize 6 x 11 y 1.2 linelength 1
 
-shell : ./get_avg.sh 22 avg_rate_2633.data
+shell : ./get_avg.sh 24 avg_rate_2633.data
 
 "
 
-  RATE_ALL_GRP('linux-2.6.33', "Block"    , 'Block'    ) \
+  RATE_ALL_GRP('linux-2.6.33', "BlockLock", 'BlockLock') \
+  RATE_ALL_GRP('linux-2.6.33', "BlockIntr", 'BlockIntr') \
   RATE_ALL_GRP('linux-2.6.33', "Null"     , 'Null'     ) \
   RATE_ALL_GRP('linux-2.6.33', "Var"      , 'Var'      ) \
   RATE_ALL_GRP('linux-2.6.33', "IsNull"   , 'IsNull'   ) \

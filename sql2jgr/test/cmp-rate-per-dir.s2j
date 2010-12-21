@@ -13,7 +13,8 @@
 
 #define CMP_RATE_DIR_GRP(ver, dir, dir2)   \
  group dir {          		  \
-  CMP_RATE_DIR_CURVE(ver, Block, 'Block', dir2) \
+  CMP_RATE_DIR_CURVE(ver, BlockLock, 'BlockLock', dir2) \
+  CMP_RATE_DIR_CURVE(ver, BlockIntr, 'BlockIntr', dir2) \
   CMP_RATE_DIR_CURVE(ver, Null , 'Null' , dir2) \
   CMP_RATE_DIR_CURVE(ver, Var  , 'Var'  , dir2) \
   CMP_RATE_DIR_CURVE(ver, IsNull , 'IsNull' , dir2) \
@@ -48,7 +49,8 @@ newgraph
  yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
 legend defaults fontsize 6 x 24 y 150
 
-newcurve marktype xbar linetype none color 0. 1. 0.  marksize 0.6  label : Block
+newcurve marktype xbar linetype none color 0. 1. 0.  marksize 0.6  label : BlockLock
+newcurve marktype xbar linetype none color 0. 1. 0.  marksize 0.6  label : BlockIntr
 newcurve marktype xbar linetype none color 1. 0. 1.  marksize 0.6  label : Null
 newcurve marktype xbar linetype none color 0. 1. 0.5  marksize 0.6  label : Var
 newcurve marktype xbar linetype none color 1. 0.69 0.  marksize 0.6  label : IsNull
@@ -97,7 +99,8 @@ newgraph
  xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
   yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
   legend defaults fontsize 6 x 35 y 150
-  newcurve marktype xbar linetype none color 0. 1. 0. marksize 0.6 label : Block
+  newcurve marktype xbar linetype none color 0. 1. 0. marksize 0.6 label : BlockLock
+  newcurve marktype xbar linetype none color 0. 1. 0. marksize 0.6 label : BlockIntr
   newcurve marktype xbar linetype none color 1. 0. 1. marksize 0.6 label : Null
   newcurve marktype xbar linetype none color 0. 1. 0.5 marksize 0.6 label : Var
   newcurve marktype xbar linetype none color 1. 0.69 0. marksize 0.6 label : IsNull

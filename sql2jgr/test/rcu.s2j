@@ -11,6 +11,11 @@ pattern LockRCU {
  marktype = "circle fill 1"
 }
 
+pattern DerefRCU {
+ color = 1 0 0
+ marktype = "triangle fill 1"
+}
+
 /* ******************************************** */
 
 graph gr/count-evol-rcu.jgr {
@@ -27,6 +32,7 @@ include count-evol-70.annot
 
  COUNT_CURVE(BlockRCU, 'BlockRCU' )
  COUNT_CURVE(LockRCU , 'LockRCU' )
+ COUNT_CURVE(DerefRCU, 'DerefLockRCU' )
 }
 
 /* ******************************************** */
@@ -43,8 +49,9 @@ graph gr/rate-evol-per-kind-rcu.jgr {
 include rate-kind.annot
 "
 
- FLT_RATE_KIND(Block, 'Block')
- FLT_RATE_KIND(Lock , 'Lock' )
+ FLT_RATE_KIND(BlockRCU, 'BlockRCU')
+ FLT_RATE_KIND(LockRCU , 'LockRCU' )
+ FLT_RATE_KIND(DerefRCU, 'DerefRCU' )
 }
 
 #define FLT_COUNT_DIR_RCU(patt, patt2)                      \
@@ -89,7 +96,8 @@ graph gr/count-evol-per-dir-rcu.jgr {
               ceil(avg("age in days")) / 365.25	 \
        FROM "Bug ages"			         \
        WHERE (standardized_name = 'BlockRCU'     \
-       OR standardized_name = 'LockRCU')         \
+       OR standardized_name = 'LockRCU'          \
+       OR standardized_name = 'DerefRCU')        \
        AND study_dirname = dir2		         \
        AND min >= '2003-12-18'                   \
        GROUP BY study_dirname;                   \
@@ -122,7 +130,8 @@ graph gr/avg-ages-per-dir-rcu.jgr {
 #define CMP_RATE_DIR_GRP_RCU(ver, dir, dir2)   \
  group dir {          		  \
   CMP_RATE_DIR_CURVE(ver, BlockRCU, 'BlockRCU', dir2) \
-  CMP_RATE_DIR_CURVE(ver, LockRCU, 'LockRCU', dir2) \
+  CMP_RATE_DIR_CURVE(ver, LockRCU, 'LockRCU', dir2)   \
+  CMP_RATE_DIR_CURVE(ver, DerefRCU,'DerefRCU', dir2)  \
 }
 
 graph gr/cmp-rate-per-dir-4-2633-rcu.jgr {

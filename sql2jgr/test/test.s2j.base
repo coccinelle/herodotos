@@ -98,10 +98,15 @@ pattern	Average   {
 
 /* ***********  CHECKERS  ********************* */
 
-pattern Block {
+pattern BlockLock {
  color = 0 1 0
  marktype = circle
 }
+pattern BlockIntr {
+ color = 0 1 0
+ marktype = circle
+}
+
 pattern Null {
  color = 1 0 1
  marktype = cross
@@ -188,6 +193,7 @@ include lifetime_across.annot
        	 	WHERE release_date >= '2003-12-18'
 		AND standardized_name != 'BlockRCU'
 		AND standardized_name != 'LockRCU'
+		AND standardized_name != 'DerefRCU'
 		GROUP BY version_name, release_date
 		ORDER BY release_date;
  }
@@ -235,7 +241,8 @@ graph gr/count-evol-dec.jgr {
 include count-evol-70.annot
 "
 
- COUNT_CURVE(Block, 'Block')
+ COUNT_CURVE(BlockLock, 'BlockLock')
+ COUNT_CURVE(BlockIntr, 'BlockIntr')
  COUNT_CURVE(Var  , 'Var'  )
  COUNT_CURVE(IsNull, 'IsNull')
  COUNT_CURVE(Range, 'Range')
