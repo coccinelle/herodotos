@@ -1,25 +1,3 @@
-/*
-graph gr/avg-ages.jgr {
- xaxis = groups
- legend = "off
-
-shell : ./get_avg.sh 12 avg_age.data
-
-"
- factor = 365.25
- ylegend = "Years"
- size = 3 1
- sql = SELECT ages.standardized_name,
-              ceil(avg(ages."age in days"))
-       FROM "Bug ages" ages, standardized_names
-       WHERE standardized_names.standardized_name = ages.standardized_name
-       AND ages.standardized_name != 'Real'
-       AND ages.study_dirname != 'staging'
-       AND ages.min >= '2003-12-18'
-       GROUP BY ages.standardized_name, standardized_names.order
-       ORDER BY standardized_names.order;
-}
-*/
 
 #define AVG_AGE_DIR(dir, patt, dir2)             \
  group dir {                                     \
@@ -28,9 +6,12 @@ shell : ./get_avg.sh 12 avg_age.data
               ceil(avg("age in days")) / 365.25	 \
        FROM "Bug ages"			         \
        WHERE standardized_name != 'Real'         \
+       AND standardized_name != 'BlockRCU'       \
+       AND standardized_name != 'LockRCU'        \
+       AND standardized_name != 'DerefRCU'       \
        AND study_dirname = dir2		         \
        AND min >= '2003-12-18'                   \
-       GROUP BY study_dirname;                    \
+       GROUP BY study_dirname;                   \
  }                                               \
  }
 
@@ -54,81 +35,3 @@ shell : ./get_avg.sh 6 avg_age.data
  AVG_AGE_DIR("Net"    ,Net    , 'net'    )
  AVG_AGE_DIR("Other"  ,Other  , 'other'  )
 }
-
-/*
-#define AVG_AGE_CURVE(patt, patt2, dir) \
-  curve pattern patt {                                                     \
-   sql = SELECT patt2,                                                     \
-              COALESCE(                                                    \
-		(SELECT ceil(avg(ages."age in days")) / 365                \
-       FROM "Bug ages" ages               				   \
-       WHERE study_dirname = dir                                            \
-       AND ages.standardized_name = patt2				   \
-       AND ages.min >= '2003-12-18'                                        \
-       GROUP BY ages.standardized_name                          	   \
-		),0) AS avg_age_in_years;                                  \
-  }
-
-#define AVG_AGE(dir, dir2)            \
- group dir {          		      \
-  AVG_AGE_CURVE(Block, 'Block', dir2) \
-  AVG_AGE_CURVE(Null , 'Null' , dir2) \
-  AVG_AGE_CURVE(Var  , 'Var'  , dir2) \
-  AVG_AGE_CURVE(IsNull, 'IsNull', dir2) \
-  AVG_AGE_CURVE(NullRef, 'NullRef', dir2) \
-  AVG_AGE_CURVE(Range, 'Range', dir2) \
-  AVG_AGE_CURVE(Lock , 'Lock' , dir2) \
-  AVG_AGE_CURVE(Intr , 'Intr' , dir2) \
-  AVG_AGE_CURVE(LockIntr , 'LockIntr' , dir2) \
-  AVG_AGE_CURVE(Free , 'Free' , dir2) \
-  AVG_AGE_CURVE(Float, 'Float', dir2) \
-  AVG_AGE_CURVE(Size , 'Size' , dir2) \
- }
-
-graph gr/avg-ages-per-dir-and-cat.jgr {
- xaxis = groups
- legend = "defaults fontsize 6
-
-shell : ./get_avg.sh 72 avg_age.data
-
-"
- factor = 365.25
- ylegend = "Years"
- size = 3 1
-footer = "
-newgraph
- xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
- yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
-legend defaults fontsize 6 x 24 y 175
-
-newcurve marktype xbar linetype none color 0. 1. 0.  marksize 0.6  label : Block
-newcurve marktype xbar linetype none color 1. 0. 1.  marksize 0.6  label : Null
-newcurve marktype xbar linetype none color 0. 1. 0.5  marksize 0.6  label : Var
-newcurve marktype xbar linetype none color 1. 0.69 0.  marksize 0.6  label : IsNull
-newcurve marktype xbar linetype none color 1. 0. 0.  marksize 0.6  label : NullRef
-newcurve marktype xbar linetype none color 0. 0. 0.  marksize 0.6  label : Range
-
-newgraph
- xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
- yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
-legend defaults fontsize 6 x 38 y 175
-
-newcurve marktype xbar linetype none color 0.5 0. 1.  marksize 0.6  label : Lock
-newcurve marktype xbar linetype none color 0. 0.5 1.  marksize 0.6  label : Intr
-newcurve marktype xbar linetype none color 0.5 0.5 1.  marksize 0.6  label : LockIntr
-newcurve marktype xbar linetype none color 0.5 0. 0.  marksize 0.6  label : Free
-newcurve marktype xbar linetype none color 0. 0.5 0.  marksize 0.6  label : Float
-newcurve marktype xbar linetype none color 0. 1. 1.  marksize 0.6  label : Size
-"
-
-// AVG_AGE("Staging", 'staging')
- AVG_AGE("Drivers", 'drivers')
- AVG_AGE("Sound"  , 'sound')
- AVG_AGE("Arch"   , 'arch')
- AVG_AGE("FS"     , 'fs')
- AVG_AGE("Net"    , 'net')
- AVG_AGE("Other"  , 'other')
-
-}
-
-*/

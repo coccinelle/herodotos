@@ -1,132 +1,4 @@
 
-#define CNT_CRV_FILE_DIR(patt, patt2)                  \
- curve pattern patt {				       \
-   sql = SELECT version_name, release_date, count(file_id)   \
-       	 	FROM (SELECT version_name,             \
-		     	     release_date,	       \
-			     file_id		       \
-		      FROM "Faults info"	       \
-		      WHERE study_dirname = patt2       \
-		      AND release_date >= '2003-12-18' \
-		      GROUP BY version_name,           \
-		      	    release_date,              \
-		      	    file_id                    \
-		) AS agg                               \
-		GROUP BY version_name,                 \
-		      release_date                     \
-		ORDER BY release_date;                 \
- }
-
-/*
-graph gr/count-evol-agg-file-dir.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 3 1.5
- ylegend = "# of files"
- legend = "defaults
-
-include count-evol-per-dir.annot
-"
-
- CNT_CRV_FILE_DIR(Staging, 'staging')
- CNT_CRV_FILE_DIR(Drivers, 'drivers')
- CNT_CRV_FILE_DIR(Sound  , 'sound')
- CNT_CRV_FILE_DIR(Arch   , 'arch')
- CNT_CRV_FILE_DIR(FS     , 'fs')
- CNT_CRV_FILE_DIR(Net    , 'net')
- CNT_CRV_FILE_DIR(Other  , 'other')
-}
-
-#define CNT_CRV_FILE_KIND(patt, patt2)                 \
- curve pattern patt {				       \
-   sql = SELECT version_name, release_date, sum(pts)   \
-       	 	FROM study_count_evol_agg_kind          \
-       	 	WHERE standardized_name = patt2        \
-		AND release_date >= '2003-12-18'       \
-		GROUP BY version_name,                 \
-		      release_date,                    \
-		      standardized_name                \
-		ORDER BY release_date;                 \
- }
-
-graph gr/count-evol-agg-file-kind.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 3 1.5
-
- ylegend = "# of files"
- legend = "defaults
-
-include count-evol-per-file.annot
-"
-
- CNT_CRV_FILE_KIND(Block, 'Block')
- CNT_CRV_FILE_KIND(Var  , 'Var'  )
- CNT_CRV_FILE_KIND(IsNull, 'IsNull')
- CNT_CRV_FILE_KIND(Range, 'Range')
- CNT_CRV_FILE_KIND(Lock , 'Lock' )
- CNT_CRV_FILE_KIND(Intr , 'Intr' )
- CNT_CRV_FILE_KIND(LockIntr , 'LockIntr' )
- CNT_CRV_FILE_KIND(Free , 'Free' )
- CNT_CRV_FILE_KIND(Float, 'Float')
- CNT_CRV_FILE_KIND(Size , 'Size' )
-
-}
-
-
-graph gr/count-evol-agg-file-null.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 3 0.5
- ylegend = "# of files"
- legend = "defaults
-
-include count-evol-null.annot
-"
-
- CNT_CRV_FILE_KIND(NullRef, 'NullRef')
- CNT_CRV_FILE_KIND(Null , 'Null')
-
-}
-
-
-#define CNT_NOTES_DIR(patt, patt2)                     \
- curve pattern patt {				       \
-   sql = SELECT version_name, release_date, count(*)   \
-       	 	FROM "Notes info"                      \
-       	 	WHERE study_dirname = patt2             \
-		AND release_date >= '2003-12-18'       \
-		GROUP BY version_name,                 \
-		      release_date,                    \
-		      study_dirname                     \
-		ORDER BY release_date;                 \
- }
-
-graph gr/notes-evol-dir.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 3 1.5
- ylegend = "# of notes"
- legend = "defaults
-
-include notes-evol-dir.annot
-"
-
- CNT_NOTES_DIR(Staging, 'staging')
- CNT_NOTES_DIR(Drivers, 'drivers')
- CNT_NOTES_DIR(Sound  , 'sound')
- CNT_NOTES_DIR(Arch   , 'arch')
- CNT_NOTES_DIR(FS     , 'fs')
- CNT_NOTES_DIR(Net    , 'net')
- CNT_NOTES_DIR(Other  , 'other')
-
-}
-*/
-
 #define CNT_NOTES_KIND(patt, patt2)                    \
  curve pattern patt {				       \
    sql = SELECT version_name, release_date, count(*)   \
@@ -176,43 +48,20 @@ include notes-evol-kind.annot
 
 }
 
-/*
-graph gr/notes-evol.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 3 0.7
- ymin = 0.025
- legend = "off
-
-include notes-evol.annot
-"
- curve pattern Linux {
-   marktype = x
-   sql = SELECT n.version_name, n.release_date, count(n.*)::float / locc::float
-       	 	FROM "Notes info" n, versions v
-       	 	WHERE n.release_date >= '2003-12-18'
-		AND n.release_date = v.release_date
-		GROUP BY n.version_name,
-		      n.release_date,
-		      locc
-		ORDER BY n.release_date;
- }
-
-}
-*/
-
 #define FLT_FILE_DIR(patt, patt2)                  \
  curve pattern patt {				       \
    sql = SELECT r.version_name, r.release_date, count(r.report_id) / a.pts AS count             \
        	 	FROM "Faults info" r,                    \
 		     (SELECT release_date,               \
 			     sum(pts) as pts             \
-		     FROM study_count_evol_agg_kind       \
-		     WHERE study_dirname = patt2          \
+		     FROM study_count_evol_agg_kind      \
+		     WHERE study_dirname = patt2         \
 		     GROUP BY release_date               \
 		     )  AS a                             \
-       	 	WHERE r.study_dirname = patt2             \
+       	 	WHERE r.study_dirname = patt2            \
+		AND standardized_name != 'BlockRCU'      \
+		AND standardized_name != 'LockRCU'       \
+		AND standardized_name != 'DerefRCU'      \
 		AND r.release_date >= '2003-12-18'       \
 		AND r.release_date = a.release_date	 \
 		GROUP BY r.version_name,                 \

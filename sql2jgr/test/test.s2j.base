@@ -186,6 +186,8 @@ include lifetime_across.annot
    sql = SELECT version_name, release_date, sum(data) as data
        	 	FROM "Count evol"
        	 	WHERE release_date >= '2003-12-18'
+		AND standardized_name != 'BlockRCU'
+		AND standardized_name != 'LockRCU'
 		GROUP BY version_name, release_date
 		ORDER BY release_date;
  }
@@ -268,77 +270,11 @@ include count-evol-400.annot
 		ORDER BY release_date;                 \
  }
 
-/*
-graph gr/orig-2_6_33.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 1.5 1
- ylegend = "# of bugs"
-
- ORIG_CURVE(Block, 'Block')
- ORIG_CURVE(Null , 'Null' )
- ORIG_CURVE(Var  , 'Var'  )
- ORIG_CURVE(IsNull, 'IsNull')
- ORIG_CURVE(NullRef, 'NullRef')
- ORIG_CURVE(Range, 'Range')
- ORIG_CURVE(Lock , 'Lock' )
- ORIG_CURVE(Intr , 'Intr' )
- ORIG_CURVE(LockIntr , 'LockIntr' )
- ORIG_CURVE(Free , 'Free' )
- ORIG_CURVE(Float, 'Float')
-// ORIG_CURVE(Real , 'Real' )
- ORIG_CURVE(Param, 'Param')
- ORIG_CURVE(Size , 'Size' )
-}
-
-#define ORIG_CURVE_PCT(patt, patt2)                    \
- curve pattern patt {				       \
-   sql = SELECT version_name, release_date,            \
-       100 * number_of_bugs_already_present /          \
-            (SELECT number_of_bugs_already_present     \
-       	 	FROM "Origin of bugs"                  \
-       	 	WHERE standardized_name = patt2        \
-		AND for_version_name='linux-2.6.33'    \
-		AND version_name    ='linux-2.6.33'    \
-            )                                          \
-   	    FROM "Origin of bugs"                      \
-       	    WHERE standardized_name = patt2            \
-	    AND for_version_name='linux-2.6.33'        \
-	    ORDER BY release_date;                     \
- }
-
-graph gr/orig-pct-2_6_33.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 3 1.5
- ylegend = "Percentage of faults still in 2.6.33"
-
- ORIG_CURVE_PCT(Block, 'Block')
- ORIG_CURVE_PCT(Null , 'Null' )
- ORIG_CURVE_PCT(Var  , 'Var'  )
- ORIG_CURVE_PCT(IsNull, 'IsNull')
- ORIG_CURVE_PCT(NullRef, 'NullRef')
- ORIG_CURVE_PCT(Range, 'Range')
- ORIG_CURVE_PCT(Lock , 'Lock' )
- ORIG_CURVE_PCT(Intr , 'Intr' )
- ORIG_CURVE_PCT(LockIntr , 'LockIntr' )
- ORIG_CURVE_PCT(Free , 'Free' )
- ORIG_CURVE_PCT(Float, 'Float')
-// ORIG_CURVE_PCT(Real , 'Real' )
- ORIG_CURVE_PCT(Param, 'Param')
- ORIG_CURVE_PCT(Size , 'Size' )
-}
-*/
-
 #include "count-per-dir.s2j"
 
-//#include "rate-per-dir.s2j"
 #include "cmp-rate-per-dir.s2j"
 
 #include "rate-4-x86.s2j"
-//#include "count-4-x86.s2j"
 
 #include "density.s2j"
 
@@ -349,3 +285,5 @@ graph gr/orig-pct-2_6_33.jgr {
 #include "lifecycle.s2j"
 
 #include "annexes.s2j"
+
+#include "rcu.s2j"

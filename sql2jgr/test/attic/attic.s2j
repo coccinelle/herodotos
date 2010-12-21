@@ -1,0 +1,503 @@
+
+/*
+graph gr/orig-2_6_33.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 1.5 1
+ ylegend = "# of bugs"
+
+ ORIG_CURVE(Block, 'Block')
+ ORIG_CURVE(Null , 'Null' )
+ ORIG_CURVE(Var  , 'Var'  )
+ ORIG_CURVE(IsNull, 'IsNull')
+ ORIG_CURVE(NullRef, 'NullRef')
+ ORIG_CURVE(Range, 'Range')
+ ORIG_CURVE(Lock , 'Lock' )
+ ORIG_CURVE(Intr , 'Intr' )
+ ORIG_CURVE(LockIntr , 'LockIntr' )
+ ORIG_CURVE(Free , 'Free' )
+ ORIG_CURVE(Float, 'Float')
+// ORIG_CURVE(Real , 'Real' )
+ ORIG_CURVE(Param, 'Param')
+ ORIG_CURVE(Size , 'Size' )
+}
+
+#define ORIG_CURVE_PCT(patt, patt2)                    \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date,            \
+       100 * number_of_bugs_already_present /          \
+            (SELECT number_of_bugs_already_present     \
+       	 	FROM "Origin of bugs"                  \
+       	 	WHERE standardized_name = patt2        \
+		AND for_version_name='linux-2.6.33'    \
+		AND version_name    ='linux-2.6.33'    \
+            )                                          \
+   	    FROM "Origin of bugs"                      \
+       	    WHERE standardized_name = patt2            \
+	    AND for_version_name='linux-2.6.33'        \
+	    ORDER BY release_date;                     \
+ }
+
+graph gr/orig-pct-2_6_33.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 1.5
+ ylegend = "Percentage of faults still in 2.6.33"
+
+ ORIG_CURVE_PCT(Block, 'Block')
+ ORIG_CURVE_PCT(Null , 'Null' )
+ ORIG_CURVE_PCT(Var  , 'Var'  )
+ ORIG_CURVE_PCT(IsNull, 'IsNull')
+ ORIG_CURVE_PCT(NullRef, 'NullRef')
+ ORIG_CURVE_PCT(Range, 'Range')
+ ORIG_CURVE_PCT(Lock , 'Lock' )
+ ORIG_CURVE_PCT(Intr , 'Intr' )
+ ORIG_CURVE_PCT(LockIntr , 'LockIntr' )
+ ORIG_CURVE_PCT(Free , 'Free' )
+ ORIG_CURVE_PCT(Float, 'Float')
+// ORIG_CURVE_PCT(Real , 'Real' )
+ ORIG_CURVE_PCT(Param, 'Param')
+ ORIG_CURVE_PCT(Size , 'Size' )
+}
+*/
+
+/*
+graph gr/avg-ages.jgr {
+ xaxis = groups
+ legend = "off
+
+shell : ./get_avg.sh 12 avg_age.data
+
+"
+ factor = 365.25
+ ylegend = "Years"
+ size = 3 1
+ sql = SELECT ages.standardized_name,
+              ceil(avg(ages."age in days"))
+       FROM "Bug ages" ages, standardized_names
+       WHERE standardized_names.standardized_name = ages.standardized_name
+       AND ages.standardized_name != 'Real'
+       AND ages.study_dirname != 'staging'
+       AND ages.min >= '2003-12-18'
+       GROUP BY ages.standardized_name, standardized_names.order
+       ORDER BY standardized_names.order;
+}
+*/
+
+
+/*
+#define AVG_AGE_CURVE(patt, patt2, dir) \
+  curve pattern patt {                                                     \
+   sql = SELECT patt2,                                                     \
+              COALESCE(                                                    \
+		(SELECT ceil(avg(ages."age in days")) / 365                \
+       FROM "Bug ages" ages               				   \
+       WHERE study_dirname = dir                                            \
+       AND ages.standardized_name = patt2				   \
+       AND ages.min >= '2003-12-18'                                        \
+       GROUP BY ages.standardized_name                          	   \
+		),0) AS avg_age_in_years;                                  \
+  }
+
+#define AVG_AGE(dir, dir2)            \
+ group dir {          		      \
+  AVG_AGE_CURVE(Block, 'Block', dir2) \
+  AVG_AGE_CURVE(Null , 'Null' , dir2) \
+  AVG_AGE_CURVE(Var  , 'Var'  , dir2) \
+  AVG_AGE_CURVE(IsNull, 'IsNull', dir2) \
+  AVG_AGE_CURVE(NullRef, 'NullRef', dir2) \
+  AVG_AGE_CURVE(Range, 'Range', dir2) \
+  AVG_AGE_CURVE(Lock , 'Lock' , dir2) \
+  AVG_AGE_CURVE(Intr , 'Intr' , dir2) \
+  AVG_AGE_CURVE(LockIntr , 'LockIntr' , dir2) \
+  AVG_AGE_CURVE(Free , 'Free' , dir2) \
+  AVG_AGE_CURVE(Float, 'Float', dir2) \
+  AVG_AGE_CURVE(Size , 'Size' , dir2) \
+ }
+
+graph gr/avg-ages-per-dir-and-cat.jgr {
+ xaxis = groups
+ legend = "defaults fontsize 6
+
+shell : ./get_avg.sh 72 avg_age.data
+
+"
+ factor = 365.25
+ ylegend = "Years"
+ size = 3 1
+footer = "
+newgraph
+ xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
+ yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
+legend defaults fontsize 6 x 24 y 175
+
+newcurve marktype xbar linetype none color 0. 1. 0.  marksize 0.6  label : Block
+newcurve marktype xbar linetype none color 1. 0. 1.  marksize 0.6  label : Null
+newcurve marktype xbar linetype none color 0. 1. 0.5  marksize 0.6  label : Var
+newcurve marktype xbar linetype none color 1. 0.69 0.  marksize 0.6  label : IsNull
+newcurve marktype xbar linetype none color 1. 0. 0.  marksize 0.6  label : NullRef
+newcurve marktype xbar linetype none color 0. 0. 0.  marksize 0.6  label : Range
+
+newgraph
+ xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
+ yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
+legend defaults fontsize 6 x 38 y 175
+
+newcurve marktype xbar linetype none color 0.5 0. 1.  marksize 0.6  label : Lock
+newcurve marktype xbar linetype none color 0. 0.5 1.  marksize 0.6  label : Intr
+newcurve marktype xbar linetype none color 0.5 0.5 1.  marksize 0.6  label : LockIntr
+newcurve marktype xbar linetype none color 0.5 0. 0.  marksize 0.6  label : Free
+newcurve marktype xbar linetype none color 0. 0.5 0.  marksize 0.6  label : Float
+newcurve marktype xbar linetype none color 0. 1. 1.  marksize 0.6  label : Size
+"
+
+// AVG_AGE("Staging", 'staging')
+ AVG_AGE("Drivers", 'drivers')
+ AVG_AGE("Sound"  , 'sound')
+ AVG_AGE("Arch"   , 'arch')
+ AVG_AGE("FS"     , 'fs')
+ AVG_AGE("Net"    , 'net')
+ AVG_AGE("Other"  , 'other')
+
+}
+
+*/
+
+/*
+graph gr/cmp-rate-per-dir-4-260.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "defaults fontsize 6
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   1
+ 66  1
+"
+ CMP_RATE_YMAX
+
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Sound"  , 'sound')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Arch"   , 'arch')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "FS"     , 'fs')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Net"    , 'net')
+ CMP_RATE_DIR_GRP('linux-2.6.0', "Other"  , 'other')
+}
+
+graph gr/cmp-rate-per-dir-4-2612.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts
+ 0   1
+ 66  1
+"
+ CMP_RATE_YMAX
+
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Drivers", 'drivers')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Sound"  , 'sound')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Arch"   , 'arch')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "FS"     , 'fs')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Net"    , 'net')
+ CMP_RATE_DIR_GRP('linux-2.6.12', "Other"  , 'other')
+}
+*/
+
+/*
+#define CMP_RATE_DIR_EVOL(patt, dir) \
+  curve pattern patt {                                              \
+   sql = SELECT v.version_name,					    \
+       	 	v.release_date,					    \
+		(reps_dir::float / notes_dir::float)		    \
+		/ NULLIF((reps_other::float / notes_other::float),0) AS rate  \
+	FROM versions v,					    \
+               (SELECT rd.version_name,				    \
+                  sum(rd.number_of_reports) AS reps_dir,	    \
+                  sum(rd.number_of_notes)   AS notes_dir	    \
+               FROM  rates rd					    \
+               WHERE rd.study_dirname = dir		            \
+	       GROUP BY  rd.version_name) AS rd,		    \
+               (SELECT ro.version_name,				    \
+                  sum(ro.number_of_reports) AS reps_other,	    \
+                  sum(ro.number_of_notes) AS notes_other	    \
+               FROM  rates ro					    \
+               WHERE ro.study_dirname != dir         		    \
+	       GROUP BY  ro.version_name) AS ro			    \
+    WHERE v.version_name = rd.version_name			    \
+    AND v.version_name = ro.version_name			    \
+    AND v.release_date >= '2003-12-18'                              \
+    ORDER BY v.release_date;                                        \
+  }
+
+graph gr/cmp-rate-per-dir.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off
+
+ newcurve marktype none linetype dotted color 0 0 0
+ pts  0     1           2407  1
+"
+ CMP_RATE_YMAX
+
+ CMP_RATE_DIR_EVOL(Staging, 'staging')
+ CMP_RATE_DIR_EVOL(Drivers, 'drivers')
+ CMP_RATE_DIR_EVOL(Sound  , 'sound')
+ CMP_RATE_DIR_EVOL(Arch   , 'arch')
+ CMP_RATE_DIR_EVOL(FS     , 'fs')
+ CMP_RATE_DIR_EVOL(Net    , 'net')
+ CMP_RATE_DIR_EVOL(Other  , 'other')
+}
+*/
+
+/*
+graph gr/count-per-dir-4-260.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "defaults fontsize 6"
+ DIR_YMAX
+
+ DIR_GRP('linux-2.6.0', "Drivers", 'drivers')
+ DIR_GRP('linux-2.6.0', "Sound"  , 'sound')
+ DIR_GRP('linux-2.6.0', "Arch"   , 'arch')
+ DIR_GRP('linux-2.6.0', "FS"     , 'fs')
+ DIR_GRP('linux-2.6.0', "Net"    , 'net')
+ DIR_GRP('linux-2.6.0', "Other"  , 'other')
+}
+
+graph gr/count-per-dir-4-2612.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off"
+ DIR_YMAX
+
+ DIR_GRP('linux-2.6.12', "Drivers", 'drivers')
+ DIR_GRP('linux-2.6.12', "Sound"  , 'sound')
+ DIR_GRP('linux-2.6.12', "Arch"   , 'arch')
+ DIR_GRP('linux-2.6.12', "FS"     , 'fs')
+ DIR_GRP('linux-2.6.12', "Net"    , 'net')
+ DIR_GRP('linux-2.6.12', "Other"  , 'other')
+}
+
+graph gr/count-per-dir-4-2633.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "off"
+ DIR_YMAX
+
+ DIR_GRP('linux-2.6.33', "Staging", 'staging')
+ DIR_GRP('linux-2.6.33', "Drivers", 'drivers')
+ DIR_GRP('linux-2.6.33', "Sound"  , 'sound')
+ DIR_GRP('linux-2.6.33', "Arch"   , 'arch')
+ DIR_GRP('linux-2.6.33', "FS"     , 'fs')
+ DIR_GRP('linux-2.6.33', "Net"    , 'net')
+ DIR_GRP('linux-2.6.33', "Other"  , 'other')
+}
+*/
+
+/*
+
+#define RATE_DEF_CURVE(ver, curve_name, patt2, def) \
+  curve pattern def {                               \
+   legend = curve_name                              \
+   sql = SELECT standardized_name, rate FROM study_rate_by_error_name_4_x386 \
+         WHERE standardized_name = patt2            \
+	       AND version_name = ver               \
+	       AND def_compiled = def;              \
+  }
+
+#define RATE_DEF_GRP(ver, patt, patt2)         \
+ group patt {          		               \
+  RATE_DEF_CURVE(ver, "Part of default configuration (358 files)", patt2, TRUE ) \
+  RATE_DEF_CURVE(ver, "Part of remaining code (6 422 files)", patt2, FALSE) \
+ }
+
+/*
+  curve pattern TRUE {                         \
+   legend = "1 685 C files compiled by defconfig"  \
+   sql = SELECT standardized_name, rate FROM study_rate_by_error_name_4_x386 \
+         WHERE standardized_name = patt2       \
+	       AND version_name = ver          \
+	       AND def_compiled = TRUE;        \
+  }                                            \
+*/
+
+graph gr/rate-4-241-x86.jgr {
+ xaxis = groups
+ size = 3 1
+ legend = "defaults fontsize 6 x 10 y 0.02"
+ ylegend = "Fault rate percentage"
+ RATEx86_YMAX
+
+  RATE_DEF_GRP('linux-2.4.1', "Block"    , 'Block'    ) \
+  RATE_DEF_GRP('linux-2.4.1', "Null"     , 'Null'     ) \
+  RATE_DEF_GRP('linux-2.4.1', "Var"      , 'Var'      ) \
+  RATE_DEF_GRP('linux-2.4.1', "IsNull"   , 'IsNull'   ) \
+  RATE_DEF_GRP('linux-2.4.1', "NullRef"  , 'NullRef'  ) \
+  RATE_DEF_GRP('linux-2.4.1', "Range"    , 'Range'    ) \
+  RATE_DEF_GRP('linux-2.4.1', "Lock"     , 'Lock'     ) \
+  RATE_DEF_GRP('linux-2.4.1', "Intr"     , 'Intr'     ) \
+  RATE_DEF_GRP('linux-2.4.1', "LockIntr" , 'LockIntr' ) \
+  RATE_DEF_GRP('linux-2.4.1', "Free"     , 'Free'     ) \
+  RATE_DEF_GRP('linux-2.4.1', "Size"     , 'Size'     )
+
+}
+*/
+
+/*
+graph gr/count-evol-agg-file-dir.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 1.5
+ ylegend = "# of files"
+ legend = "defaults
+
+include count-evol-per-dir.annot
+"
+
+ CNT_CRV_FILE_DIR(Staging, 'staging')
+ CNT_CRV_FILE_DIR(Drivers, 'drivers')
+ CNT_CRV_FILE_DIR(Sound  , 'sound')
+ CNT_CRV_FILE_DIR(Arch   , 'arch')
+ CNT_CRV_FILE_DIR(FS     , 'fs')
+ CNT_CRV_FILE_DIR(Net    , 'net')
+ CNT_CRV_FILE_DIR(Other  , 'other')
+}
+
+#define CNT_CRV_FILE_KIND(patt, patt2)                 \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, sum(pts)   \
+       	 	FROM study_count_evol_agg_kind          \
+       	 	WHERE standardized_name = patt2        \
+		AND release_date >= '2003-12-18'       \
+		GROUP BY version_name,                 \
+		      release_date,                    \
+		      standardized_name                \
+		ORDER BY release_date;                 \
+ }
+
+graph gr/count-evol-agg-file-kind.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 1.5
+
+ ylegend = "# of files"
+ legend = "defaults
+
+include count-evol-per-file.annot
+"
+
+ CNT_CRV_FILE_KIND(Block, 'Block')
+ CNT_CRV_FILE_KIND(Var  , 'Var'  )
+ CNT_CRV_FILE_KIND(IsNull, 'IsNull')
+ CNT_CRV_FILE_KIND(Range, 'Range')
+ CNT_CRV_FILE_KIND(Lock , 'Lock' )
+ CNT_CRV_FILE_KIND(Intr , 'Intr' )
+ CNT_CRV_FILE_KIND(LockIntr , 'LockIntr' )
+ CNT_CRV_FILE_KIND(Free , 'Free' )
+ CNT_CRV_FILE_KIND(Float, 'Float')
+ CNT_CRV_FILE_KIND(Size , 'Size' )
+
+}
+
+
+graph gr/count-evol-agg-file-null.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 0.5
+ ylegend = "# of files"
+ legend = "defaults
+
+include count-evol-null.annot
+"
+
+ CNT_CRV_FILE_KIND(NullRef, 'NullRef')
+ CNT_CRV_FILE_KIND(Null , 'Null')
+
+}
+
+
+#define CNT_NOTES_DIR(patt, patt2)                     \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, count(*)   \
+       	 	FROM "Notes info"                      \
+       	 	WHERE study_dirname = patt2             \
+		AND release_date >= '2003-12-18'       \
+		GROUP BY version_name,                 \
+		      release_date,                    \
+		      study_dirname                     \
+		ORDER BY release_date;                 \
+ }
+
+graph gr/notes-evol-dir.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 1.5
+ ylegend = "# of notes"
+ legend = "defaults
+
+include notes-evol-dir.annot
+"
+
+ CNT_NOTES_DIR(Staging, 'staging')
+ CNT_NOTES_DIR(Drivers, 'drivers')
+ CNT_NOTES_DIR(Sound  , 'sound')
+ CNT_NOTES_DIR(Arch   , 'arch')
+ CNT_NOTES_DIR(FS     , 'fs')
+ CNT_NOTES_DIR(Net    , 'net')
+ CNT_NOTES_DIR(Other  , 'other')
+
+}
+*/
+/*
+
+#define CNT_CRV_FILE_DIR(patt, patt2)                  \
+ curve pattern patt {				       \
+   sql = SELECT version_name, release_date, count(file_id)   \
+       	 	FROM (SELECT version_name,             \
+		     	     release_date,	       \
+			     file_id		       \
+		      FROM "Faults info"	       \
+		      WHERE study_dirname = patt2       \
+		      AND release_date >= '2003-12-18' \
+		      GROUP BY version_name,           \
+		      	    release_date,              \
+		      	    file_id                    \
+		) AS agg                               \
+		GROUP BY version_name,                 \
+		      release_date                     \
+		ORDER BY release_date;                 \
+ }
+
+
+graph gr/notes-evol.jgr {
+ xaxis = date
+ yaxis = user
+ project = Linux
+ size = 3 0.7
+ ymin = 0.025
+ legend = "off
+
+include notes-evol.annot
+"
+ curve pattern Linux {
+   marktype = x
+   sql = SELECT n.version_name, n.release_date, count(n.*)::float / locc::float
+       	 	FROM "Notes info" n, versions v
+       	 	WHERE n.release_date >= '2003-12-18'
+		AND n.release_date = v.release_date
+		GROUP BY n.version_name,
+		      n.release_date,
+		      locc
+		ORDER BY n.release_date;
+ }
+
+}
+*/

@@ -16,6 +16,9 @@ include density.annot
        1000*count(report_id)::float/locc::float as fault_density
 FROM "Faults info" r, versions
 WHERE r.release_date >= '2003-12-18'
+AND r.standardized_name != 'BlockRCU'
+AND r.standardized_name != 'LockRCU'
+AND r.standardized_name != 'DerefRCU'
 AND versions.version_name = r.version_name
 GROUP BY r.version_name , r.release_date , locc
 ORDER BY r.release_date;
@@ -28,6 +31,9 @@ ORDER BY r.release_date;
        	 	100 * sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
        	 	FROM rates_per_dir r                    \
        	 	WHERE r.release_date >= '2003-12-18'    \
+		AND r.standardized_name != 'BlockRCU'   \
+		AND r.standardized_name != 'LockRCU'    \
+		AND r.standardized_name != 'DerefRCU'   \
 		GROUP BY r.version_name, r.release_date \
 		ORDER BY r.release_date;                \
  }
@@ -77,7 +83,10 @@ include rate-kind.annot
    sql = SELECT r.version_name, r.release_date,         \
        	 	100 * sum(r.number_of_reports) / sum(r.number_of_notes) AS rate \
        	 	FROM rates_per_dir r                    \
-       	 	WHERE r.study_dirname = patt2            \
+       	 	WHERE r.study_dirname = patt2           \
+		AND r.standardized_name != 'BlockRCU'   \
+		AND r.standardized_name != 'LockRCU'    \
+		AND r.standardized_name != 'DerefRCU'   \
 		AND r.release_date >= '2003-12-18'      \
 		GROUP BY r.version_name, r.release_date \
 		ORDER BY r.release_date;                \
@@ -111,7 +120,10 @@ include rate-dir.annot
    sql = SELECT r.version_name, r.release_date,         \
        	 	count(r.report_id) AS count             \
        	 	FROM "Faults info" r                    \
-       	 	WHERE r.study_dirname = patt2            \
+       	 	WHERE r.study_dirname = patt2           \
+		AND r.standardized_name != 'BlockRCU'   \
+		AND r.standardized_name != 'LockRCU'    \
+		AND r.standardized_name != 'DerefRCU'   \
 		AND r.release_date >= '2003-12-18'      \
 		GROUP BY r.version_name, r.release_date \
 		ORDER BY r.release_date;                \

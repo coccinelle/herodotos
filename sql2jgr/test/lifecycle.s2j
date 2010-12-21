@@ -24,7 +24,11 @@ graph gr/birth-and-death.jgr {
 		LEFT OUTER JOIN
 		     (SELECT max AS release_date,
 		             count(*) AS death
-	              FROM report_ages GROUP BY max) as d
+	              FROM report_ages
+		      WHERE standardized_name != 'BlockRCU'
+		      AND standardized_name != 'LockRCU'
+		      AND standardized_name != 'DerefRCU'
+		      GROUP BY max) as d
 		ON v.release_date = d.release_date
 		WHERE v.release_date >= '2004-01-09'
 		ORDER BY v.release_date;
@@ -38,7 +42,10 @@ graph gr/birth-and-death.jgr {
 		     	     count(*) as birth
 		       FROM "Birth of reports"
 		       WHERE status = 'BUG'
-		     GROUP BY version_name
+		       AND standardized_name != 'BlockRCU'
+		       AND standardized_name != 'LockRCU'
+		       AND standardized_name != 'DerefRCU'
+		       GROUP BY version_name
 		) AS b
 		ON v.version_name = b.version_name
        	 	WHERE release_date >= '2004-01-09'
