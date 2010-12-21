@@ -1,15 +1,16 @@
 CONF=test.s2j
 SUBCONF=count-per-dir.s2j    \
-	rate-per-dir.s2j     \
+	rcu.s2j              \
 	subdir.s2j           \
 	rate-4-x86.s2j       \
-	count-4-x86.s2j      \
 	density.s2j          \
 	cmp-rate-per-dir.s2j \
 	across.s2j           \
 	avg-ages.s2j         \
 	annexes.s2j          \
 	lifecycle.s2j
+#	rate-per-dir.s2j     \
+#	count-4-x86.s2j      \
 
 SQL2JGR=sql2jgr.opt
 #FLAGS?=-vvv --debug --profile
