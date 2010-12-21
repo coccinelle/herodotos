@@ -148,20 +148,6 @@ graph gr/cmp-rate-per-dir-4-2633-rcu.jgr {
 
 /* ******************************************** */
 
-graph gr/count-4-2633-x86.jgr {
- xaxis = groups
- size = 3 1
- COUNTx86_YMAX
- legend = "defaults fontsize 6 x 18 y 100
-
-  "
- ylegend = "# of faults"
-
-  COUNT_ALL_GRP('linux-2.6.33', "BlockRCU", 'BlockRCU') \
-  COUNT_ALL_GRP('linux-2.6.33', "LockRCU" , 'LockRCU' ) \
-
-}
-
 graph gr/rate-4-2633-x86-rcu.jgr {
  xaxis = groups
  size = 3 1
