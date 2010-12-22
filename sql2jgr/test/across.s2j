@@ -160,7 +160,7 @@ graph gr/lifetime_across.jgr {
  size = 3 3
  legend = "defaults fontsize 6
 
-shell : cpp -P -undef -DYMAX=742 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=755 -DYMIN=0 base.annot
 
  "
  ylegend = "# of faults"
