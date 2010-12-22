@@ -22,8 +22,18 @@ graph gr/notes-evol-kind.jgr {
 shell : cpp -P -undef -DYMAX=46100 -DYMIN=0 base.annot
 "
 
- CNT_NOTES_KIND(BlockLock, 'BlockLock')
- CNT_NOTES_KIND(BlockIntr, 'BlockIntr')
+ curve pattern BlockLock {
+   legend = "Block{Lock,Intr}"
+   sql = SELECT version_name, release_date, count(*)
+       	 	FROM "Notes info"
+       	 	WHERE standardized_name = 'BlockLock'
+		AND release_date >= '2003-12-18'
+		GROUP BY version_name,
+		      release_date,
+		      standardized_name
+		ORDER BY release_date;
+ }
+
  CNT_NOTES_KIND(Null , 'Null')
  CNT_NOTES_KIND(Var  , 'Var'  )
 

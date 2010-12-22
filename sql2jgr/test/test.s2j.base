@@ -104,7 +104,8 @@ pattern BlockLock {
 }
 pattern BlockIntr {
  color = 0 1 0
- marktype = circle
+ marktype = "circle fill 1"
+ //"pattern stripe 45"
 }
 
 pattern Null {
@@ -114,6 +115,7 @@ pattern Null {
 pattern Var {
  color = 0 1 .5
  marktype = box
+ //"pattern stripe 45"
 }
 pattern IsNull {
  color = 1 0.69 0
@@ -122,6 +124,7 @@ pattern IsNull {
 pattern NullRef {
  color = 1 0 0
  marktype = diamond
+ //"pattern stripe -45"
 }
 pattern Range {
  color = 0 0 0
@@ -182,7 +185,7 @@ graph gr/count-evol.jgr {
  ylegend = "# of faults"
  legend = "off
 
-shell : cpp -P -undef -DYMAX=742 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=790 -DYMIN=0 base.annot
 "
  ymax = 800
 
@@ -215,11 +218,11 @@ graph gr/count-evol-inc.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
- ymax = 70
+ ymax = 75
  ylegend = "# of faults"
  legend = "defaults
 
-shell : cpp -P -undef -DYMAX=68 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=73 -DYMIN=0 base.annot
 "
 
  COUNT_CURVE(Lock , 'Lock' )
@@ -233,12 +236,12 @@ graph gr/count-evol-dec.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
- ymax = 70
+ ymax = 75
  ylegend = "# of faults"
 
  legend = "defaults
 
-shell : cpp -P -undef -DYMAX=68 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=73 -DYMIN=0 base.annot
 "
 
  COUNT_CURVE(BlockLock, 'BlockLock')
