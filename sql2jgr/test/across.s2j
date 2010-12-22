@@ -146,9 +146,9 @@ pattern v2.6.33{
    FROM faults_across_releases            \
    WHERE "for_version_name" = vers        \
    AND release_date >= '2003-12-18'	  \
-   AND (standardized_name != 'BlockRCU'	  \
-   OR standardized_name != 'LockRCU'	  \
-   OR standardized_name != 'DerefRCU')	  \
+   AND standardized_name != 'BlockRCU'	  \
+   AND standardized_name != 'LockRCU'	  \
+   AND standardized_name != 'DerefRCU'	  \
    GROUP BY "version_name","release_date" \
    ORDER BY release_date;                 \
  }
@@ -172,9 +172,9 @@ shell : cpp -P -undef -DYMAX=755 -DYMIN=0 base.annot
        count(report_id)
 FROM "Faults info" r
 WHERE r.release_date >= '2003-12-18'
-AND (standardized_name != 'BlockRCU'
-OR standardized_name != 'LockRCU'
-OR standardized_name != 'DerefRCU')
+AND standardized_name != 'BlockRCU'
+AND standardized_name != 'LockRCU'
+AND standardized_name != 'DerefRCU'
 GROUP BY r.version_name , r.release_date
 ORDER BY r.release_date;
  }
