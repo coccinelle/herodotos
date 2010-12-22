@@ -49,24 +49,24 @@ newgraph
  yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
 legend defaults fontsize 6 x 24 y 150
 
-newcurve marktype xbar linetype none color 0. 1. 0.  marksize 0.6  label : BlockLock
-newcurve marktype xbar linetype none color 0. 1. 0.  marksize 0.6  pattern stripe 45 label : BlockIntr
-newcurve marktype xbar linetype none color 1. 0. 1.  marksize 0.6  label : Null
-newcurve marktype xbar linetype none color 0. 1. 0.5  marksize 0.6 pattern stripe -45 label : Var
-newcurve marktype xbar linetype none color 1. 0.69 0.  marksize 0.6  label : IsNull
-newcurve marktype xbar linetype none color 1. 0. 0.  marksize 0.6  pattern stripe 45 label : NullRef
+newcurve marktype xbar linetype none color 0. 1. 0.  marksize 2  label : BlockLock
+newcurve marktype xbar linetype none color 0. 1. 0.  marksize 2  pattern stripe 45 label : BlockIntr
+newcurve marktype xbar linetype none color 1. 0. 1.  marksize 2  label : Null
+newcurve marktype xbar linetype none color 0. 1. 0.5  marksize 2 pattern stripe -45 label : Var
+newcurve marktype xbar linetype none color 1. 0.69 0.  marksize 2  label : IsNull
+newcurve marktype xbar linetype none color 1. 0. 0.  marksize 2  pattern stripe 45 label : NullRef
 
 newgraph
  xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
  yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
 legend defaults fontsize 6 x 38 y 150
 
-newcurve marktype xbar linetype none color 0. 0. 0.  marksize 0.6  label : Range
-newcurve marktype xbar linetype none color 0.5 0. 1.  marksize 0.6  label : Lock
-newcurve marktype xbar linetype none color 0. 0.5 1.  marksize 0.6  label : Intr
-newcurve marktype xbar linetype none color 0.5 0.5 1.  marksize 0.6  label : LockIntr
-newcurve marktype xbar linetype none color 0.5 0. 0.  marksize 0.6  label : Free
-newcurve marktype xbar linetype none color 0. 1. 1.  marksize 0.6  label : Size
+newcurve marktype xbar linetype none color 0. 0. 0.  marksize 2  label : Range
+newcurve marktype xbar linetype none color 0.5 0. 1.  marksize 2  label : Lock
+newcurve marktype xbar linetype none color 0. 0.5 1.  marksize 2  label : Intr
+newcurve marktype xbar linetype none color 0.5 0.5 1.  marksize 2  label : LockIntr
+newcurve marktype xbar linetype none color 0.5 0. 0.  marksize 2  label : Free
+newcurve marktype xbar linetype none color 0. 1. 1.  marksize 2  label : Size
 "
 
  CMP_RATE_YMAX
@@ -99,22 +99,22 @@ newgraph
  xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
   yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
   legend defaults fontsize 6 x 35 y 150
-  newcurve marktype xbar linetype none color 0. 1. 0. marksize 0.6 label : BlockLock
-  newcurve marktype xbar linetype none color 0. 1. 0. marksize 0.6 pattern stripe 45 label : BlockIntr
-  newcurve marktype xbar linetype none color 1. 0. 1. marksize 0.6 label : Null
-  newcurve marktype xbar linetype none color 0. 1. 0.5 marksize 0.6 pattern stripe -45 label : Var
-  newcurve marktype xbar linetype none color 1. 0.69 0. marksize 0.6 label : IsNull
-  newcurve marktype xbar linetype none color 1. 0. 0. marksize 0.6 pattern stripe 45 label : NullRef
+  newcurve marktype xbar linetype none color 0. 1. 0. marksize 2 label : BlockLock
+  newcurve marktype xbar linetype none color 0. 1. 0. marksize 2 pattern stripe 45 label : BlockIntr
+  newcurve marktype xbar linetype none color 1. 0. 1. marksize 2 label : Null
+  newcurve marktype xbar linetype none color 0. 1. 0.5 marksize 2 pattern stripe -45 label : Var
+  newcurve marktype xbar linetype none color 1. 0.69 0. marksize 2 label : IsNull
+  newcurve marktype xbar linetype none color 1. 0. 0. marksize 2 pattern stripe 45 label : NullRef
 newgraph
   xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
   yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
   legend defaults fontsize 6 x 45 y 150
-  newcurve marktype xbar linetype none color 0. 0. 0. marksize 0.6 label : Range
-  newcurve marktype xbar linetype none color 0.5 0. 1. marksize 0.6 label : Lock
-  newcurve marktype xbar linetype none color 0. 0.5 1. marksize 0.6 label : Intr
-  newcurve marktype xbar linetype none color 0.5 0.5 1. marksize 0.6 label : LockIntr
-  newcurve marktype xbar linetype none color 0.5 0. 0. marksize 0.6 label : Free
-  newcurve marktype xbar linetype none color 0. 1. 1. marksize 0.6 label : Size
+  newcurve marktype xbar linetype none color 0. 0. 0. marksize 2 label : Range
+  newcurve marktype xbar linetype none color 0.5 0. 1. marksize 2 label : Lock
+  newcurve marktype xbar linetype none color 0. 0.5 1. marksize 2 label : Intr
+  newcurve marktype xbar linetype none color 0.5 0.5 1. marksize 2 label : LockIntr
+  newcurve marktype xbar linetype none color 0.5 0. 0. marksize 2 label : Free
+  newcurve marktype xbar linetype none color 0. 1. 1. marksize 2 label : Size
     "
 
  CMP_RATE_DIR_GRP('linux-2.6.33', "Staging", 'staging')
