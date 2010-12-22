@@ -23,11 +23,11 @@ graph gr/count-evol-rcu.jgr {
  yaxis = user
  project = Linux
  size = 3 1.5
- ymax = 70
+ ymax = 10
  ylegend = "# of faults"
- legend = "defaults
+ legend = "defaults x 14
 
-shell : cpp -P -undef -DYMAX=68 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=10 -DYMIN=0 base.annot
 "
 
  COUNT_CURVE(BlockRCU, 'BlockRCU' )
@@ -39,14 +39,14 @@ shell : cpp -P -undef -DYMAX=68 -DYMIN=0 base.annot
 
 graph gr/rate-evol-per-kind-rcu.jgr {
  xaxis = date
- yaxis = user
+ yaxis = user	
  project = Linux
  size = 3 1.5
  ylegend = "% of faulty notes"
 
- legend = "defaults
+ legend = "defaults x 14
 
-shell : cpp -P -undef -DYMAX=1.65 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=0.45 -DYMIN=0 base.annot
 "
 
  FLT_RATE_KIND(BlockRCU, 'BlockRCU')
@@ -74,7 +74,7 @@ graph gr/count-evol-per-dir-rcu.jgr {
  project = Linux
  size = 3 1.5
  ylegend = "# of faults"
- legend = "defaults
+ legend = "defaults x 14
 
 "
 
@@ -117,42 +117,12 @@ graph gr/avg-ages-per-dir-rcu.jgr {
  size = 3 1
 
 // AVG_AGE_DIR_RCU("Staging",Staging, 'staging')
- AVG_AGE_DIR_RCU("Drivers",Drivers, 'drivers')
- AVG_AGE_DIR_RCU("Sound"  ,Sound  , 'sound'  )
- AVG_AGE_DIR_RCU("Arch"   ,Arch   , 'arch'   )
- AVG_AGE_DIR_RCU("FS"     ,FS     , 'fs'     )
+// AVG_AGE_DIR_RCU("Drivers",Drivers, 'drivers')
+// AVG_AGE_DIR_RCU("Sound"  ,Sound  , 'sound'  )
+// AVG_AGE_DIR_RCU("Arch"   ,Arch   , 'arch'   )
+// AVG_AGE_DIR_RCU("FS"     ,FS     , 'fs'     )
  AVG_AGE_DIR_RCU("Net"    ,Net    , 'net'    )
  AVG_AGE_DIR_RCU("Other"  ,Other  , 'other'  )
-}
-
-/* ******************************************** */
-
-#define CMP_RATE_DIR_GRP_RCU(ver, dir, dir2)   \
- group dir {          		  \
-  CMP_RATE_DIR_CURVE(ver, BlockRCU, 'BlockRCU', dir2) \
-  CMP_RATE_DIR_CURVE(ver, LockRCU, 'LockRCU', dir2)   \
-  CMP_RATE_DIR_CURVE(ver, DerefRCU,'DerefRCU', dir2)  \
-}
-
-graph gr/cmp-rate-per-dir-4-2633-rcu.jgr {
- xaxis = groups
- size = 3 1
- legend = "off
-
- newcurve marktype none linetype dotted color 0 0 0
- pts
- 0   1
- 14  1
-"
- ymax = 8
-
- CMP_RATE_DIR_GRP_RCU('linux-2.6.33', "Staging", 'staging')
- CMP_RATE_DIR_GRP_RCU('linux-2.6.33', "Drivers", 'drivers')
- CMP_RATE_DIR_GRP_RCU('linux-2.6.33', "Sound"  , 'sound')
- CMP_RATE_DIR_GRP_RCU('linux-2.6.33', "Arch"   , 'arch')
- CMP_RATE_DIR_GRP_RCU('linux-2.6.33', "FS"     , 'fs')
- CMP_RATE_DIR_GRP_RCU('linux-2.6.33', "Net"    , 'net')
- CMP_RATE_DIR_GRP_RCU('linux-2.6.33', "Other"  , 'other')
 }
 
 /* ******************************************** */
@@ -162,7 +132,7 @@ graph gr/rate-4-2633-x86-rcu.jgr {
  size = 3 1
  xlabels = "fontsize 6 rotate -45 vjc hjl"
  ylegend = "% of faulty notes"
- legend = "defaults fontsize 6 x 11 y 1.2 linelength 1
+ legend = "defaults fontsize 6 x 2 linelength 1
 
 "
 
@@ -181,7 +151,7 @@ graph gr/birth-and-death-rcu.jgr {
  size = 3 1
  ylegend = "# of faults"
  ylabels = "fontsize 7"
- legend = "defaults x 50 y 150 fontsize 7
+ legend = "defaults x 400 y 5 fontsize 7
 
  newcurve marktype none linetype dotted color 0 0 0
  pts
