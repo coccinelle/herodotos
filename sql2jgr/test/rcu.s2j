@@ -136,6 +136,7 @@ graph gr/count-evol-per-dir-rcu.jgr {
  ylegend = "# of faults"
  legend = "defaults x 14
 
+shell : cpp -P -undef -DYMAX=9 -DYMIN=0 base.annot
 "
 
  FLT_COUNT_DIR_RCU(Staging, 'staging')
