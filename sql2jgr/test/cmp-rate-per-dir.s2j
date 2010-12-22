@@ -108,7 +108,7 @@ newgraph
 newgraph
   xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3
   yaxis no_auto_hash_labels no_auto_hash_marks min 0 max 235 size 1
-  legend defaults fontsize 6 x 45 y 150
+  legend defaults fontsize 6 x 50 y 150
   newcurve marktype xbar linetype none color 0. 0. 0. marksize 2 label : Range
   newcurve marktype xbar linetype none color 0.5 0. 1. marksize 2 label : Lock
   newcurve marktype xbar linetype none color 0. 0.5 1. marksize 2 label : Intr
