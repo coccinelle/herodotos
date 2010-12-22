@@ -102,7 +102,7 @@ graph gr/rate-evol-per-dir.jgr {
 
  legend = "defaults
 
-shell : cpp -P -undef -DYMAX=0.75 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=0.85 -DYMIN=0 base.annot
 "
 
  FLT_AVG_RATE
@@ -138,7 +138,7 @@ graph gr/count-evol-per-dir.jgr {
  ylegend = "# of faults"
  legend = "defaults
 
-shell : cpp -P -undef -DYMAX=440 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=500 -DYMIN=0 base.annot
 "
 
  FLT_COUNT_DIR(Staging, 'staging')

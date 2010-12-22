@@ -1,7 +1,7 @@
 #if 0
 #define CMP_RATE_YMAX
 #else
-#define CMP_RATE_YMAX ymax = 14.41
+#define CMP_RATE_YMAX ymax = 10
 #endif
 
 #define CMP_RATE_DIR_CURVE(ver, patt, patt2, dir) \
@@ -93,7 +93,7 @@ graph gr/cmp-rate-per-dir-4-2633.jgr {
 footer = "
 
 newstring fontsize 6 x 31 y 8 hjl vjt : 33.31
-
+newstring fontsize 6 x 38 y 8 hjl vjt : 19.48
 
 newgraph
  xaxis no_auto_hash_labels no_auto_hash_marks min 0 max 60 size 3

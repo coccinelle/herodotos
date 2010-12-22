@@ -91,7 +91,7 @@ graph gr/flt_file-evol-dir.jgr {
 
  legend = "defaults
 
-shell : cpp -P -undef -DYMAX=2.9 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=2.9 -DYMIN=0.8 base.annot
 "
 
  FLT_FILE_DIR(Staging, 'staging')
