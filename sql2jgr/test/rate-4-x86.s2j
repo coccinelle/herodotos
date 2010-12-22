@@ -26,7 +26,7 @@ graph gr/rate-4-2633-x86.jgr {
  size = 3 1
  xlabels = "fontsize 6 rotate -45 vjc hjl"
  ylegend = "% of faulty notes"
- legend = "defaults fontsize 6 x 11 y 1.2 linelength 1
+ legend = "defaults fontsize 6 x 12 y 1.2 linelength 1
 
 shell : ./get_avg.sh 24 avg_rate_2633.data
 
