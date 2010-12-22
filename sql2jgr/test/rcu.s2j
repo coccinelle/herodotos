@@ -134,9 +134,10 @@ graph gr/count-evol-per-dir-rcu.jgr {
  project = Linux
  size = 3 1.5
  ylegend = "# of faults"
+ ymax = 10
  legend = "defaults x 14
 
-shell : cpp -P -undef -DYMAX=9 -DYMIN=0 base.annot
+shell : cpp -P -undef -DYMAX=9.5 -DYMIN=0 base.annot
 "
 
  FLT_COUNT_DIR_RCU(Staging, 'staging')
