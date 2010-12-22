@@ -22,10 +22,10 @@ graph gr/count-evol-rcu.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 1.5
+ size = 3 1
  ymax = 10
  ylegend = "# of faults"
- legend = "defaults x 14
+ legend = "defaults
 
 shell : cpp -P -undef -DYMAX=10 -DYMIN=0 base.annot
 "
@@ -41,15 +41,14 @@ graph gr/count-evol-lock-vs-lock-rcu.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 1.5
+ size = 3 1
  ymax = 85
  ylegend = "# of faults"
- legend = "defaults x 1200 y 30
+ legend = "defaults
 
 shell : cpp -P -undef -DYMAX=83 -DYMIN=0 base.annot
 "
 
- COUNT_CURVE(LockRCU , 'LockRCU' )
  curve pattern Lock {				 
    legend = "Lock / LockIntr"      
    sql = SELECT version_name, release_date, sum(data) as data
@@ -60,6 +59,7 @@ shell : cpp -P -undef -DYMAX=83 -DYMIN=0 base.annot
 		GROUP BY version_name, release_date
 		ORDER BY release_date;
  }
+ COUNT_CURVE(LockRCU , 'LockRCU' )
 }
 
 
@@ -69,14 +69,13 @@ graph gr/notes-evol-rcu.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 1.5
+ size = 3 1
  ylegend = "# of notes"
  legend = "defaults
 
 shell : cpp -P -undef -DYMAX=28000 -DYMIN=0 base.annot
 "
 
- CNT_NOTES_KIND(LockRCU , 'LockRCU' )
  curve pattern Lock {
    legend = "Lock / LockIntr"
    sql = SELECT version_name, release_date, sum(notes)
@@ -93,26 +92,10 @@ shell : cpp -P -undef -DYMAX=28000 -DYMIN=0 base.annot
 		      release_date
 		ORDER BY release_date;
  }
+ CNT_NOTES_KIND(LockRCU , 'LockRCU' )
 }
 
 /* ******************************************** */
-
-graph gr/rate-evol-per-kind-rcu.jgr {
- xaxis = date
- yaxis = user	
- project = Linux
- size = 3 1.5
- ylegend = "% of faulty notes"
-
- legend = "defaults x 14
-
-shell : cpp -P -undef -DYMAX=0.45 -DYMIN=0 base.annot
-"
-
- FLT_RATE_KIND(BlockRCU, 'BlockRCU')
- FLT_RATE_KIND(LockRCU , 'LockRCU' )
- FLT_RATE_KIND(DerefRCU, 'DerefRCU' )
-}
 
 #define FLT_COUNT_DIR_RCU(patt, patt2)                      \
  curve pattern patt {				        \
@@ -132,10 +115,10 @@ graph gr/count-evol-per-dir-rcu.jgr {
  xaxis = date
  yaxis = user
  project = Linux
- size = 3 1.5
+ size = 3 1
  ylegend = "# of faults"
  ymax = 10
- legend = "defaults x 14
+ legend = "defaults
 
 shell : cpp -P -undef -DYMAX=9.5 -DYMIN=0 base.annot
 "
@@ -147,118 +130,6 @@ shell : cpp -P -undef -DYMAX=9.5 -DYMIN=0 base.annot
  FLT_COUNT_DIR_RCU(FS     , 'fs'     )
  FLT_COUNT_DIR_RCU(Net    , 'net'    )
  FLT_COUNT_DIR_RCU(Other  , 'other'  )
-}
-
-/* ******************************************** */
-
-#define AVG_AGE_DIR_RCU(dir, patt, dir2)         \
- group dir {                                     \
- curve pattern patt {                            \
- sql = SELECT study_dirname,		         \
-              ceil(avg("age in days")) / 365.25	 \
-       FROM "Bug ages"			         \
-       WHERE (standardized_name = 'BlockRCU'     \
-       OR standardized_name = 'LockRCU'          \
-       OR standardized_name = 'DerefRCU')        \
-       AND study_dirname = dir2		         \
-       AND min >= '2003-12-18'                   \
-       GROUP BY study_dirname;                   \
- }                                               \
- }
-
-graph gr/avg-ages-per-dir-rcu.jgr {
- xaxis = groups
-// xlabels = "fontsize 6 rotate -45 vjc hjl"
- legend = "off
-
-(* shell : ./get_avg.sh 6 avg_age.data *)
-
- "
- factor = 365.25
- ylegend = "Years"
- size = 3 1
-
-// AVG_AGE_DIR_RCU("Staging",Staging, 'staging')
-// AVG_AGE_DIR_RCU("Drivers",Drivers, 'drivers')
-// AVG_AGE_DIR_RCU("Sound"  ,Sound  , 'sound'  )
-// AVG_AGE_DIR_RCU("Arch"   ,Arch   , 'arch'   )
-// AVG_AGE_DIR_RCU("FS"     ,FS     , 'fs'     )
- AVG_AGE_DIR_RCU("Net"    ,Net    , 'net'    )
- AVG_AGE_DIR_RCU("Other"  ,Other  , 'other'  )
-}
-
-/* ******************************************** */
-
-graph gr/rate-4-2633-x86-rcu.jgr {
- xaxis = groups
- size = 3 1
- xlabels = "fontsize 6 rotate -45 vjc hjl"
- ylegend = "% of faulty notes"
- legend = "defaults fontsize 6 x 2 linelength 1
-
-"
-
-  RATE_ALL_GRP('linux-2.6.33', "BlockRCU", 'BlockRCU') \
-  RATE_ALL_GRP('linux-2.6.33', "LockRCU" , 'LockRCU' ) \
-  RATE_ALL_GRP('linux-2.6.33', "DerefRCU", 'DerefRCU') \
-
-}
-
-/* ******************************************** */
-
-graph gr/birth-and-death-rcu.jgr {
- xaxis = date
- yaxis = user
- project = Linux
- size = 3 1
- ylegend = "# of faults"
- ylabels = "fontsize 7"
- legend = "defaults x 400 y 5 fontsize 7
-
- newcurve marktype none linetype dotted color 0 0 0
- pts
- 0     0
- 2407  0
-
-shell : cpp -P -undef -DYMAX=9 -DYMIN=0 base.annot
-
- "
-
- curve pattern Death {
-   legend = "Elimination"
-   sql = SELECT v.version_name, v.release_date,
-                COALESCE(d.death,0)
-		FROM versions v
-		LEFT OUTER JOIN
-		     (SELECT max AS release_date,
-		             count(*) AS death
-	              FROM report_ages
-		      WHERE standardized_name = 'BlockRCU'
-		      OR standardized_name = 'LockRCU'
-		      OR standardized_name = 'DerefRCU'
-		      GROUP BY max) as d
-		ON v.release_date = d.release_date
-		WHERE v.release_date >= '2004-01-09'
-		ORDER BY v.release_date;
- }
- curve pattern Birth {
-   legend = "Introduction"
-   sql = SELECT v.version_name, v.release_date, COALESCE(birth,0) as data
-       	 	FROM versions v
-		LEFT OUTER JOIN
-		     (SELECT version_name,
-		     	     count(*) as birth
-		       FROM "Birth of reports"
-		       WHERE status = 'BUG'
-		       AND (standardized_name = 'BlockRCU'
-		       OR standardized_name = 'LockRCU'
-		       OR standardized_name = 'DerefRCU')
-		       GROUP BY version_name
-		) AS b
-		ON v.version_name = b.version_name
-       	 	WHERE release_date >= '2004-01-09'
-		ORDER BY release_date;
- }
 }
 
 /* ******************************************** */
