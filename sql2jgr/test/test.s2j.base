@@ -136,7 +136,7 @@ pattern Lock {
 }
 pattern Intr {
  color = 0 .5 1
- marktype = cross
+ marktype = "triangle fill 1"
 }
 pattern LockIntr {
  color = .5 .5 1
