@@ -127,7 +127,7 @@ let correl_patt_prj v1 v2 v3 bugfile_ext =
 	  prerr_endline ("*** NO CORREL *** "^ orgfile)
     else
       if Config.get_format patt = Ast_config.Org then
-	prerr_endline ("*** SKIP *** "^ orgfile)
+	prerr_endline ("*** SKIP (NOT FOUND) *** "^ orgfile)
 
 let correl_patt_prj_nofail v1 v2 v3 file =
   try
