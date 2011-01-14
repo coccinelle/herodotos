@@ -62,16 +62,17 @@ let string_of_char c = String.make 1 c
   and the remaining path as the relative file name.
 *)
 let strip_prefix prefix path =
-	try
-  let p2 = Str.replace_first (Str.regexp_string prefix) "" path in
-  let re = Str.regexp "^\\([^/]+\\)/\\(.*\\)$" in
+  try
+    let pre = prefix in (* TODO: Check for trailing '/' and add it if needed *)
+    let p2 = Str.replace_first (Str.regexp_string prefix) "" path in
+    let re = Str.regexp "^\\([^/]+\\)/\\(.*\\)$" in
     ignore(Str.string_match re p2 0);
     let ver = Str.matched_group 1 p2 in
     let file = Str.matched_group 2 p2 in
-      (ver, file)
-      with Invalid_argument _ ->
-      	raise (Strip ("Pb stripping \""^ prefix ^ "\" in \"" ^ path^"\""^
-		"\n\tCheck you have a trailing '/'."))
+    (ver, file)
+  with Invalid_argument _ ->
+    raise (Strip ("Pb stripping \""^ prefix ^ "\" in \"" ^ path^"\""^
+		     "\n\tCheck you have a trailing '/'."))
 
 
 (*
