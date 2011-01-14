@@ -451,19 +451,23 @@ let show_correlation verbose correl =
 let sort_bug bug1 bug2 =
   let (l1, s1, r1, f1, v1, pos1, _, t1, _, _, sub1) = bug1 in
   let (l2, s2, r2, f2, v2, pos2, _, t2, _, _, sub2) = bug2 in
-  let dv = compare v1 v2 in
-    if dv <> 0 then
-      dv
+  let dt = compare t1 t2 in
+  if dt <> 0 then
+    dt
+  else
+    let df = compare f1 f2 in
+    if df <> 0 then
+      df
     else
-      let df = compare f1 f2 in
-	if df <> 0 then
-	  df
+      let dv = compare v1 v2 in
+      if dv <> 0 then
+	dv
+      else
+	let dpos = compare pos1 pos2 in
+	if dpos <> 0 then
+	  dpos
 	else
-	  let dpos = compare pos1 pos2 in
-	    if dpos <> 0 then
-	      dpos
-	    else
-	      compare bug1 bug2
+	  compare bug1 bug2
 
 let sort bugarray =
   Array.iter
