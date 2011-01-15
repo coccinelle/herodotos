@@ -721,7 +721,7 @@ let draw_curve ch msg mindate ((vlist, linetype, color, marktype, marksize, labe
 						 ) vlist);
        in
        let (pts, cplx) = List.split cplxduple in
-       let label = if label = "" then label else " label : "^label in
+       let label = if label = "" then label else " label : "^label  ^ " " in
 	 if (String.concat "" cplx) <> "" then
 	   (
 	     mark_zero ch mindate vlist;
