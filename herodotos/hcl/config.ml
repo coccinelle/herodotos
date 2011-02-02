@@ -807,11 +807,20 @@ let get_rgb_color verbose g gatts curve =
 	      raise (Misconfigurationat ("Project "^p^" is not defined.", pos))
 		  end
 	  | Some p, Some d ->  (* Prj and Defect are both set ! Pick prj. We are likely in the group graph *)
-	      (*
+	    let prj_count = List.length (List.filter (fun p -> match p with Ast_config.DftProject _ -> true | _ -> false) gatts) in
+	    let pat_count = List.length (List.filter (fun p -> match p with Ast_config.DftPattern _ -> true | _ -> false) gatts) in
+	    (match (prj_count, pat_count) with
+		(0, 0) ->
+		  raise (Misconfigurationat ("In graph "^g^", color is not defined for the curve with "^p^" and "^d^".", pos))
+	      | (0, _) ->
+		let dftatts = Setup.DftTbl.find Setup.smatchs d in
+		get_rgb_in_atts dftatts
+	      | (_, 0) ->
 		let dftatts = snd (Setup.PrjTbl.find Setup.projects p) in
 		get_rgb_in_atts dftatts
-	      *)
-	      raise (Misconfigurationat ("In graph "^g^", color is not defined for the curve with "^p^" and "^d^".", pos))
+	      | (_,_) ->
+		raise (Misconfigurationat ("In graph "^g^", don't know which color do use for the curve with "^p^" and "^d^".", pos))
+	    )
 	  | None, None ->  (* Prj and Defect are both not set ! Pick dft *)
 	      raise (Misconfigurationat ("In graph "^g^", color is not defined.",pos))
       with Not_Found ->
