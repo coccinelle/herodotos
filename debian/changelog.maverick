@@ -1,3 +1,9 @@
+herodotos (0.6.1-rc1~1010npalix1) maverick; urgency=low
+
+  * New release 0.6.1-rc1
+
+ -- Nicolas Palix <nicolas.palix@gmail.com>  Wed, 02 Feb 2011 15:04:16 +0100
+
 herodotos (0.6.0release~1010npalix1) maverick; urgency=low
 
   * New release 0.6.0
