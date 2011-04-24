@@ -8,7 +8,7 @@ FLAGS=--debug -vv $(HFLAGS)
 else ifeq ($(D),3)
 FLAGS=--debug -vvv $(HFLAGS)
 else
-HERODOTOS=herodotos.opt
+HERODOTOS=$(shell which herodotos.opt herodotos | head -1)
 FLAGS=$(HFLAGS)
 endif
 
