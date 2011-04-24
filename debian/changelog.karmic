@@ -1,3 +1,9 @@
+herodotos (0.6.1-rc1~910npalix2) karmic; urgency=low
+
+  * New release 0.6.1-rc1
+
+ -- Nicolas Palix <nicolas.palix@gmail.com>  Sun, 24 Apr 2011 13:11:07 +0200
+
 herodotos (0.6.1-rc1~910npalix1) karmic; urgency=low
 
   * New release 0.6.1-rc1
