@@ -60,6 +60,11 @@ path_elt:
  |  TSLASH TCONFIG                   { "config"        }
  |  TSLASH e=TInt                    { string_of_int e }
  |  TSLASH e=TTEXT                   { e               }
+ |  TSLASH e=nonempty_list(split_path_elt) { String.concat "" e }
+
+split_path_elt:
+   e=TId                             {e}
+ | e=TEQUAL                          {"="}
 
 ol_option:
     TCOLON TCOLON TLINB TEQUAL v=TInt   { Ast_org.Line v }
