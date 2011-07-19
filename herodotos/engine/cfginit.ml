@@ -147,6 +147,48 @@ let erase_file v1 v2 prjs patts =
 	    ) patts;
     close_out depch
 
+(* Check if a project is correctly configured *)
+let check_prj vb p =
+  let prjdir = Config.get_prjdir p in
+  if prjdir = "" then prerr_endline ("*** WARNING *** project dir is not set for " ^ p);
+  let project = !Setup.projectsdir ^ prjdir in
+  let (depth, versions) = Config.get_versions p in
+  List.fold_left (fun l v ->
+    let prj = match Config.get_subdir p with
+	None     -> project ^ "/" ^ v
+      | Some dir -> project ^ "/" ^ v ^ "/" ^ dir
+    in
+    if not (Sys.file_exists prj) then
+      ("Unable to access " ^ prj)::l
+    else
+      (
+	if vb then
+	  prerr_endline (prj ^ " - OK");
+	l
+      )
+  ) [] versions
+
+(* Check if a pattern is correctly configured *)
+let check_pat vb d =
+  let coccifile = Config.get_coccifile d in
+  let cocci = !Setup.smatchdir ^"/" ^ coccifile in
+  if not (Sys.file_exists cocci) then
+    [("Unable to access " ^ cocci)]
+  else
+    (
+      if vb then
+	prerr_endline (cocci ^ " - OK");
+      []
+    )
+
+(* Check whether the setup is ok according to the configuration file  *)
+let check_setup vb prjs pats =
+  let err =
+    List.map (fun (p, _) -> check_prj vb p) prjs @
+      List.map (fun (p, _) -> check_pat vb p) pats
+  in
+  List.flatten err
+
 (* Prune redondant vers/prj/patt org target *)
 let compute_make_for_target (targetlist: (string * (string * (string * string) list)) list) target =
   (target, List.assoc target targetlist)
@@ -222,6 +264,16 @@ let init_env v1 v2 v3 configfile cvs =
   if v2 then prerr_endline "Config parsing OK!";
   if v1 then Config.show_config v2 v3;
   let (prjs, patts) = compute_makefile () in
-    gen_makefile v1 v2 prjs patts;
-    erase_file v1 v2 prjs patts;
-    if cvs then gen_cvsignore v1 prjs
+  let err = check_setup v1 prjs patts in
+  if err = [] then
+    (
+      gen_makefile v1 v2 prjs patts;
+      erase_file v1 v2 prjs patts;
+      if cvs then gen_cvsignore v1 prjs
+    )
+  else
+    (
+      prerr_endline " *** KNOWN PROBLEMS ***";
+	List.iter (fun msg -> prerr_endline msg) err;
+      prerr_endline " *** END OF REPORT ***"
+    )
