@@ -14,7 +14,7 @@ endif
 
 CONF?=$(shell ls *.hc)
 RESULTS=$(shell grep "results=" $(CONF) 2> /dev/null | sed "s|results=\"\([^\"]*\)\"|\1|" 2> /dev/null)
-PRJS=$(shell find $(RESULTS) -mindepth 1 -maxdepth 1 -type d 2> /dev/null | grep -v CVS | sed "s|$(RESULTS)||g" 2> /dev/null)
+PRJS=$(shell find $(RESULTS) -mindepth 1 -maxdepth 1 -type d 2> /dev/null | grep -v CVS | grep -v "\.svn" | sed "s|$(RESULTS)||g" 2> /dev/null)
 PROJECTS=$(PRJS:%=$(RESULTS)%)
 
 UPDATES=$(PRJS:%=update-%)
