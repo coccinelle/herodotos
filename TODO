@@ -3,14 +3,13 @@
   * Support non-Org mode input files (raw numbers)
   * Compute statistics per sub-directories
   * Support for a computing sub-language (to mix data before plotting)
-  * Remove Makefile.patchset (diff should be computed by Herodotos)
   * Support project/pattern/graph in (any) order
   * Use pattern name to name files (instead of the cocci file) -- partially done -- need more test
   * Crash-course/Tuto online in HTML
   * Support SCM other than Git
   * Predefine some colors (see xcolor latex package for instance)
-  * Parallel (correlation and graph generation)
   * Parse each bug report (per version)
+  * Check that source code directories and pattern files are available
 
 ===== Graphs =====
 
@@ -39,39 +38,8 @@ NOTE: Most of these graphs, will be doable when a computing language will be ava
 Conversion Org mode -> HTML page (href link)
 
 Mettre les .cocci en dépendance des commandes findcmd.
-Parser CSV pour les .orig.org
 Better parsing of org - per version (already sorted)
 Compression (avec option "compress", cat + compression, parse + decompression)
-
-Optional:
-Statistiques sur le merge entre edit et new
-
- - Calculer les stat par repertoire (donnÃ©en argument)
-
-Projet
-  - Dépôts (sources, tgz, SCM)
-
-Semantic match for sites
-  - related SM4B
-
-Descriptif des courbes
-  - code size (size)
-  - % de var. (relativesize)
-  - #, avg, RIP, born
-  - lifespan of every bug with details (single)
-  - lifespan of every bug (compact)
-  - # dans le tps (sum)
-  - % dans le tps par rapport à la taille du code (sizerelated)
-  - % dans le tps par rapport aux sites (siterelated)
-
-  - Evolution des new bugs with new files
-
-=> Liste des couples (SM4B, projet)
-=> associé une couleur & une forme à un couple
-
-Optional info:
-Min, Max, Interval, Mark
-
 
 =========================
 
@@ -101,13 +69,10 @@ Qualité du code nouveau.
 
 Application systématique des régles.
 
-
 ==========================
 
 Add "include <path>" directive.
 HTML template
-
-Generate the version file
 
 ==========================
 
@@ -135,20 +100,4 @@ Prune unrelated when a same is defined
 Occurrence identity
  - file, position, token
  - birth: when & where
-
-=========================
-Changelog structure if I use upstream
-instead of native.
-
-herodotos (0.5.4rc-0ubuntu1) lucid; urgency=low
-
-Changelog for multi-version
-Suffix by the following and replace X by the revision starting at 1:
-
-	~804npalixX  (Hardy)
-	~810npalixX  (Intrepid)
-	~904npalixX  (Jaunty)
-	~910npalixX  (Karmic)
-	~1004npalixX (Lucid)
-
 
