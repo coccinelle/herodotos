@@ -34,6 +34,7 @@ let get_all_bugset () =
     (graphs, List.flatten bugsets)
 
 let check_filter filter file =
+(* Check whether the filter is for a particular prj/patt pair *)
   filter = file
   || (let origfile = Filename.chop_suffix filter Global.origext in
       let new_filter = origfile ^ Global.bugext in
@@ -42,6 +43,9 @@ let check_filter filter file =
   || (let new_filter = filter ^ Global.bugext in
 	new_filter = file
      )
+(* It could also be a "generic" filter about a prj or a patt *)
+  ||
+    (Str.string_match (Str.regexp_string filter) file 0)
 
 let get_bugset filter : string list =
   let orgs =

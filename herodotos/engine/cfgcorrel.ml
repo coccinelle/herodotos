@@ -169,11 +169,11 @@ let dispatch_correl_job v1 v2 v3 cpucore (perr, pidlist) file =
   let pid = run_correl_job v1 v2 v3 file in
     (error, pid::newlist)
 
-let correl v1 v2 v3 configfile graph =
+let correl v1 v2 v3 configfile filter =
   ignore(Config.parse_config configfile);
   if v2 then prerr_endline "Config parsing OK!";
   if v1 then Config.show_config v2 v3;
-  let unorder_bugfiles = Cfghelper.get_bugset graph in
+  let unorder_bugfiles = Cfghelper.get_bugset filter in
   let size_of = List.map map_to_size unorder_bugfiles in
   let order = List.sort (fun a b -> -(compare (fst a) (fst b))) size_of in
     if v1 then List.iter (fun (s, n) -> prerr_endline (string_of_int s^ " "^n)) order;
