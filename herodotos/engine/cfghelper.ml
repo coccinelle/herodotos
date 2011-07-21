@@ -48,7 +48,11 @@ let check_filter filter file =
      )
 (* It could also be a "generic" filter about a prj or a patt *)
   ||
-    (Str.string_match (Str.regexp_string filter) file 0)
+  ( try
+     Str.search_forward (Str.regexp_string filter) file 0;
+       true;
+   with Not_found -> false
+  )
 
 let get_bugset filter : string list =
   let orgs =
