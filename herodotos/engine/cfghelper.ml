@@ -36,10 +36,13 @@ let get_all_bugset () =
 let check_filter filter file =
 (* Check whether the filter is for a particular prj/patt pair *)
   filter = file
-  || (let origfile = Filename.chop_suffix filter Global.origext in
+  || (
+    if Filename.check_suffix filter Global.origext then
+      let origfile = Filename.chop_suffix filter Global.origext in
       let new_filter = origfile ^ Global.bugext in
-	new_filter = file
-     )
+      new_filter = file
+    else false
+  )
   || (let new_filter = filter ^ Global.bugext in
 	new_filter = file
      )
