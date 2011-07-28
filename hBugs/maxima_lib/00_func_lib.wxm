@@ -1,0 +1,218 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 0.8.5 ] */
+
+/* [wxMaxima: comment start ]
+Functional Functions
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+filter(myp,l) := rreduce(lambda([x,y] , if myp(x)
+                                          then cons(x , y)
+                                          else y
+                                ), l , []
+                         );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+listsum(l) := rreduce(lambda([x,y], x + y) , l , 0);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+sumsecond(l) := listsum(map(second,l));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+mkFun(f,x) := block(local(d,z)
+                   , d : f
+                   , z : x
+                   , lambda([y], subst(y,z,d))
+                   );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+mkFun(x^2,x)(y+1);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Filters
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+isInRange(a,b) := lambda([v] , a < v and v < b);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+isReal(v) := if imagpart(v) = 0 then true else false;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+isDiff2Pos(f,x) := block(local(d)
+                        , d : diff(diff(f,x),x)
+                        , lambda([v], if subst(v,x,d) > 0 then true else false)
+                        );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Min function
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+diff_roots(f,g,c) := block(local(sol)
+                          , sol : allroots(float(taylor(diff(f,g),g,c,20)))
+                          , map(lambda([v], subst(v , g)) , sol)
+                          );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+min_value_in_list(f,l) := rreduce(lambda([x,m] , if length(m) = 0
+                                                  then [x]
+                                                  else block(local(v)
+                                                            , v : f(x) - f(m[1])
+                                                            , if v = 0
+                                                               then cons(x,m)
+                                                               else if v < 0
+                                                                     then [x]
+                                                                     else  m
+                                                            )
+                                        )
+                                 , l
+                                 , []
+                                 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+min_value_in_list(lambda([x],x^2),[-2,-1,1,2]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+min_value(f,g,c) := block( local(l1,l2)
+                         , l1 : diff_roots(f,g,c)
+                         , l2 : filter(isReal,l1)
+                         , min_value_in_list(mkFun(f,g),l2)
+                         );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+min_value_range(f,g,c,a,b) := block( local(l1,l2,l3)
+                                   , l1 : diff_roots(f,g,c)
+                                   , l2 : filter(isReal,l1)
+                                   , l3 : filter(isInRange(a,b),l2)
+                                   , min_value_in_list(mkFun(f,g) , l3)
+                                   ) ;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+min_value((y+1)^2+x^2,x,0);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Definition of the Chi Square fonction
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+chi_square_m(oi,ei) := (oi - ei)^2 / ei;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Take a list of [Oi, Ei] and compute Chi^2
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+chi_square(l) := listsum(map(lambda([x], chi_square_m(first(x),second(x))),l));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+chi_square([[1,1]]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Logarithmic series distribution
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+pblog(g,k) := (-1 * g ^ k) / (log(1 - g) * k);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+pblog(0.5,2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+A table is a list of [ k, f ]
+  where "k" is the number of bugs (like in p)
+  and "f" the number of files with k bugs
+
+For example [[1,10],[2,7]] which means that
+  there is 10 files with 1 bug and 7 files with 2 bugs
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: comment start ]
+Transform a table into the corresponding list of [Oi , Ei]
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+pblog_pj_to_oi_ei(g,l) := map(lambda([x], [sumsecond(l) * pblog(g,first(x)) , second(x)]),l);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+pblog_pj_to_oi_ei(g,[[1,10],[2,3]]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Compute Chi^2 of a table
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+chi_square_of_table(g,l) := if g = und then und else chi_square(pblog_pj_to_oi_ei(g,l));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+chi_square_of_table(g,[[1,10],[2,3]]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Compute an approximation of the maximum lilelihood
+ of the parameter of p for the given table
+
+n is the depth of the taylor development
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+log_param_of_table(l) := block(local (x),
+  x: min_value_range(chi_square_of_table(g,l),g,0.5,0,1),
+  if length (x) = 0 then [und] else x);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+log_param_of_table([[1,10],[2,3]]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Compute expected table
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+pblog_expected_table(sigma,table) := if sigma = und
+                                      then und
+                                      else
+                                        block(local(n,f)
+                                        , n : sumsecond(table)
+                                        , f(l) := [ first(l) , n * pblog(sigma,first(l))]
+                                        , map(f,table)
+                                        );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+pblog_expected_table(0.504,[[1,10],[2,3]]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+degree_of_freedom(l) := listsum(map(lambda([x],1),l)) - 1;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+p_value_chi_square(chisq,df) := if chisq = und then und else float(gamma_incomplete_regularized(df/2 , chisq/2));
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

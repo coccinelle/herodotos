@@ -1,0 +1,31 @@
+Name:                hBugs
+Version:             0.1
+Synopsis:            Bug Table Generetor
+Description:         Bug Table Generetor
+License:             GPL
+License-file:        LICENSE
+Author:              Christophe Calvès
+Maintainer:          Christophe Calvès <christophe.calves@lip6.fr>
+Build-Type:          Simple
+Cabal-Version:       >= 1.6
+category:            REGAL Tool
+data-files:          maxima_lib/*.wxm
+extra-source-files:  src/Bugs.hs,
+                     src/Config.hs,
+                     src/Options.hs,
+                     src/Psql.hs,
+                     src/SQL.hs,
+                     src/Utils.hs,
+                     src/WXMaxima.hs
+
+Executable hBugs
+  Main-is:           hBugs.hs
+  hs-source-dirs:    src
+
+  Build-Depends:     base,
+                     parsec >= 3.0.1,
+                     mtl,
+                     process,
+                     unix,
+                     haskell98,
+                     regex-compat

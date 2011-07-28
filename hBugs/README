@@ -1,0 +1,25 @@
+
+ ** INSTALL **
+
+ ghc > 6.10
+ cabal
+ parsec >= 3.0.1
+ mtl
+
+ maxima
+ wxmaxima
+
+
+ ** Under Ubuntu **
+
+ Required packages:
+	- wxmaxima
+	- ghc6
+	- cabal-install
+	- libghc6-parsec3-dev
+	- libghc6-mtl-dev
+	- libghc6-regex-compat-dev
+
+ Optional packages:
+	- haskell-mode
+	- maxima-emacs
