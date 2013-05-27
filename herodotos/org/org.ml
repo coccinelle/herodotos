@@ -274,6 +274,13 @@ let parse_org v file : Ast_org.orgs =
 	 []
     )
 
+(*  *)
+let rec parse_orgs v files=
+  match files with
+    |[]->[]
+    |file::file_list->(parse_org v file)::(parse_orgs v file_list)
+
+
 let get_string_pos (line, cb, ce) =
   let sline = string_of_int line in
   let scb = string_of_int cb in
@@ -500,3 +507,10 @@ let length bugarray =
 		) 0 flist
 	 )
     ) 0 bugarray
+
+(*retourne la liste des fichiers .org dans toutes les versions *)
+let rec orgfiles resultsdir pdir orgfile vlist indice=
+  if indice=(Array.length vlist) then []
+  else let (vname,i,tm,i2)=vlist.(indice) in
+       if Sys.file_exists (resultsdir^pdir^"/"^vname^"/"^orgfile) then (resultsdir^pdir^"/"^vname^"/"^orgfile)::(orgfiles resultsdir pdir orgfile vlist (indice+1))
+       else orgfiles resultsdir pdir orgfile vlist (indice+1)  

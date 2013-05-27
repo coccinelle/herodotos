@@ -46,39 +46,41 @@ let reparse_org tmpfile prefix depth vlist orgs =
     cleanorgs
 
 let correl_patt_prj v1 v2 v3 bugfile_ext =
-  let file = Filename.chop_suffix (Filename.basename bugfile_ext) Global.bugext in
-  let (p,patt) =
+  let file = Filename.chop_suffix (Filename.basename bugfile_ext) Global.bugext in(*file nom du fichier sans son chemin ni son  
+                                                                  suffixe ".new.org"  *)
+  let (p,patt) =                                                                                                                    
     (* TODO: Fixme. This may not work according to the names of the projects *)
-    match Str.split (Str.regexp_string Global.sep) file with
+    match Str.split (Str.regexp_string Global.sep) file with   (*liste de chaines composant le nom de base séparés par '_' *)
 	[] -> raise (Malformed ("Malformed bug filename: "^bugfile_ext))
-      | p::tail -> (p,String.concat Global.sep tail)
+      | p::tail -> (p,String.concat Global.sep tail) (*p 1er morceau du nom du fichier(=nom du projet), reste=pattern *)
   in
-  let pdir = Config.get_prjdir p in
-  let (depth, vlist) = Config.get_versinfos p in
-  let prefix = !Setup.projectsdir ^ pdir ^"/" in
+  let pdir = Config.get_prjdir p in (*pdir=répertoire contenant le projet ex:test  *)
+  let (depth, vlist) = Config.get_versinfos p in (* profondeur+tableau des versions ex:(ver0,ver1,ver2)*)
+  let prefix = !Setup.projectsdir ^ pdir ^"/" in  (*chemin complet du projet *)
   let bugfile = Filename.chop_suffix bugfile_ext Global.bugext in
   let orgfile    = bugfile ^ Global.origext in
   let correlfile = bugfile ^ Global.correlext in
   let difffile   = bugfile ^ Global.patchext in
   let editfile   = bugfile ^ Global.editext in
-    if Sys.file_exists orgfile && Config.get_format patt = Ast_config.Org then
-      let orgs = Org.format_orgs_to_arr prefix depth vlist (Org.parse_org false orgfile) in
+    if Config.get_format patt = Ast_config.Org then
 	if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
 	  begin
-	    let diffs  = Diff.get_diff v1 prefix vlist orgs orgfile difffile in
+            let listeOrigs=Org.orgfiles !Setup.resultsdir pdir (file^Global.origext) vlist 0 in 
+            let orgs1=Org.format_orgs_to_arr prefix depth vlist (List.flatten (Org.parse_orgs false listeOrigs )) in
+	    let diffs1=Diff.parse_diff v1 prefix difffile in
 	    let correl = List.rev (Org.parse_org false correlfile) in
-	      (*
+	    (* 
 		Compute correlation from correlation org file
 		then process defect report using correlation information
 	      *)
-	    let correl2 = Org.compute_correlation prefix depth correl in
+	    let correl2 = Org.compute_correlation prefix depth correl in  
 	    let annots =
  	      if Sys.file_exists bugfile_ext
 	      then Org.format_orgs_to_arr prefix depth vlist (Org.parse_org false bugfile_ext)
 	      else Org.emptyarray vlist
 	    in
 	    let strict = ((Config.get_correl_mode v1 patt) = Ast_config.Strict) in
-	    let ((count,new_bugs), orgs2) = Occ_correl.compute_org v3 strict prefix depth vlist diffs correl2 annots orgs in
+	    let ((count,new_bugs), orgs2) = Occ_correl.compute_org v3 strict prefix depth vlist diffs1 correl2 annots orgs1 in
 	    let todos = Correl.correlate v1 strict prefix vlist correlfile prefix correl2 orgs2 in
 	    let ccount =  List.length correl2 in
 	    let todostr =
@@ -86,7 +88,7 @@ let correl_patt_prj v1 v2 v3 bugfile_ext =
 	      then " *** "^correlfile^" ***"
 	      else ""
 	    in
-	    let msg = Printf.sprintf "%- 10s %- 16s\t% 5d / % 6d (% 5d TODO)%s" p patt ccount count todos todostr in
+	    let msg = Printf.sprintf "%- 10s %- 16s\t% 5d / % 6d (% 5d TODO)%s" p patt ccount count todos todostr  in
 	    let bug_msg =
 	      if new_bugs = 0
 	      then ""
@@ -94,12 +96,12 @@ let correl_patt_prj v1 v2 v3 bugfile_ext =
 	    in
 	      prerr_endline (msg^bug_msg); flush stderr;
 	      Org.show_correlation v3 correl2;
-	      Diff.show_diff v3 vlist diffs;
+	      Diff.show_diff v3 vlist diffs1;
 	      Org.show_org v2 prefix orgs2;
 	      if todos = 0 then
 		if not (Sys.file_exists bugfile_ext)
-		then (write_org bugfile_ext prefix orgs2;
-		      prerr_endline ("*** NEW FILE TO EDIT *** "^bugfile_ext))
+		then (write_org bugfile_ext prefix orgs2; 
+		      prerr_endline ("*** NEW FILE TO EDIT *** "^bugfile_ext))  
 		else
 		  let exist = Sys.file_exists editfile in
 		  let cleanorgs = reparse_org editfile prefix depth vlist orgs2 in
