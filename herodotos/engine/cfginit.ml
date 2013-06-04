@@ -1,5 +1,11 @@
 exception Misconfiguration of string
 
+
+let get_project_name expProject=match expProject with Ast_config.ExpProject p->p
+
+let get_pattern_name expPattern=match expPattern with Ast_config.ExpPattern p->p
+
+
 let gen_cvsignore_prj v1 (p, _) =
   let prjdir = Config.get_prjdir p in
   let (_, varr) = Config.get_versinfos p in
@@ -234,6 +240,26 @@ let comp_makefile_for_group atts group =
 	  List.map (fun prj -> (Some prj, Some patt,[],Misc.dummy_pos)) projects
 	in comp_makefile_for_curves atts dummy_curves
 
+
+(*equivalent for experiences *)
+let comp_makefile_for_exp experience=let (se1,se2)=experience in match se1 with
+                                           |Ast_config.ObjPatt patts->let lpatts=List.map(get_pattern_name) patts in
+                                                                      let Ast_config.ObjProj projs=se2 in
+                                                                      let lprojs=List.map(get_project_name) projs in
+                                                                      List.map(fun p->
+                                                                        Config.get_cmdList p lpatts) lprojs 
+                                           |Ast_config.ObjProj projs->let lprojs=List.map(get_project_name) projs in
+                                                                      let Ast_config.ObjPatt patts=se2 in
+                                                                      let lpatts=List.map(get_pattern_name) patts in
+                                                                      List.map(fun p->
+                                                                        Config.get_cmdList p lpatts) lprojs 
+
+let comp_makefile_for_experiences experience=List.flatten (comp_makefile_for_exp experience)
+
+
+
+
+
 let compute_makefile () =
   let cmdslist =  Setup.GphTbl.fold
     (fun name (atts, subgraph) cmds ->
@@ -249,6 +275,10 @@ let compute_makefile () =
 	       end
     ) Setup.graphs []
   in
+  let cmdslist_exp = Setup.ExpTbl.fold
+    (fun name_exp exp cmds-> (comp_makefile_for_experiences (Setup.ExpTbl.find Setup.experiences name_exp))::cmds)
+    Setup.experiences [] in
+  let cmdslist=cmdslist@cmdslist_exp in
   let cmds = List.flatten cmdslist in
   let prjpatt = fst (List.split (cmds)) in
   let (fullprjs, fullpatts) = List.split prjpatt in

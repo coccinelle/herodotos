@@ -60,3 +60,12 @@ type subgraph =
   | Groups of group list
 
 type gph = attr list * subgraph
+
+type expPattern = ExpPattern of string
+
+type expProject = ExpProject of string
+
+type studies = ObjPatt of expPattern list | ObjProj of expProject list
+ 
+type experience=studies * studies
+

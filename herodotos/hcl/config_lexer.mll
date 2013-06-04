@@ -57,6 +57,7 @@ rule token = parse
   | "data"                    { P.TDATA          }
   | "dir"                     { P.TDIR           }
   | "empty"                   { P.TEMPTY         }
+  | "experience"              { P.TEXPERIENCE    }
   | "factor"                  { P.TFACTOR        }
   | "file"                    { P.TFILE          }
   | "filename"                { P.TFILENAME      }
@@ -76,6 +77,7 @@ rule token = parse
   | "nooccurcolor"            { P.TCLEANCOLOR    }
   | "notexistcolor"           { P.TNOTEXISTCOLOR }
   | "occurcolor"              { P.TPATTERNCOLOR  }
+  | "on"                      { P.TON            }
   | "pattern"                 { P.TPATTERN       }
   | "patterns"                { P.TCOCCI         }
   | "prefix"                  { P.TPREFIX        }
@@ -91,6 +93,7 @@ rule token = parse
   | "versions"                { P.TVERSIONS      }
   | "vmin"                    { P.TVMIN          }
   | "website"                 { P.TWEBSITE       }
+  | "with"                    { P.TWITH          }
   | "xaxis"                   { P.TXAXIS         }
   | "xmin"                    { P.TXMIN          }
   | "xlegend"                 { P.TXLEGEND       }

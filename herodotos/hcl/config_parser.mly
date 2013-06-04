@@ -18,11 +18,11 @@
 %token EOF
 %token TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS
 %token TLCB TRCB TLPAR TRPAR
-%token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE
+%token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE TEXPERIENCE
 %token TPREFIX TCOCCI TPROJECTS TRESULTS TWEBSITE TFINDCMD TSPFLAGS TCPUCORE
 %token TFINDCHILD
 %token TSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT
-%token TLEGEND TXLEGEND TXMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR
+%token TLEGEND TXLEGEND TXMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR TON TWITH
 %token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR TFOOTER
 %token TFILE TFILENAME TRATIO TSORT TGROUP TINFO TSIZE TVMIN TPRUNE TAUTHOR
 %token<int> TInt
@@ -46,6 +46,7 @@ toplevel:
   gbattr  {}
 | project {}
 | pattern {}
+| experience {}
 | graph   {}
 
 project:
@@ -62,6 +63,40 @@ gbattr:
 | TSPFLAGS     TEQUAL f=TSTRING        { Setup.setSPFlags(f)}
 | TCPUCORE     TEQUAL c=TInt           { Setup.setCPUcore(c)}
 
+
+experience:
+   TEXPERIENCE name=TId descExperience=objects    {Setup.addExp name (descExperience)}  
+
+
+objects:
+ |TON TPATTERN name=TId patterns= list(patternobj) TWITH TPROJECT name2=TId projects= list(projectsub) 
+     {(Ast_config.ObjPatt((Ast_config.ExpPattern(name))::patterns),Ast_config.ObjProj((Ast_config.ExpProject(name2))::projects))}
+ |TON TPROJECT name=TId projects= list (projectobj) TWITH TPATTERN name2=TId patterns= list(patternsub) 
+     {(Ast_config.ObjProj((Ast_config.ExpProject(name))::projects),Ast_config.ObjPatt((Ast_config.ExpPattern(name2))::patterns))}
+
+patternobj:
+ TON TPATTERN name=TId {Ast_config.ExpPattern(name)}
+
+projectobj:
+ TON TPROJECT name=TId {Ast_config.ExpProject(name)}
+
+
+patternsub:
+ TWITH TPATTERN name=TId {Ast_config.ExpPattern(name)}
+ 
+
+ 
+ 
+projectsub: 
+ TWITH TPROJECT name=TId {Ast_config.ExpProject(name)}
+
+
+
+
+
+
+
+
 attr:
   TCOLOR         TEQUAL r=float v=float b=float    { Ast_config.Color(r,v,b) }
 | TCORREL        TEQUAL TNONE                      { Ast_config.Correl("none") }
@@ -70,7 +105,7 @@ attr:
 | TPATTERN       TEQUAL dft=TId                    { Ast_config.DftPattern(dft)}
 | TPATTERNCOLOR  TEQUAL r=float v=float b=float    { Ast_config.PatternColor(r,v,b)}
 | TDATA          TEQUAL e=expression               { Ast_config.Data(e)}
-| TDIR           TEQUAL d=path                     { Ast_config.Dir(d)}
+| TDIR           TEQUAL d=path                     { Setup.setDir d;Ast_config.Dir(d)}
 | TSUBDIR        TEQUAL d=path                     { Ast_config.SubDir(d)}
 | TFACTOR        TEQUAL f=float                    { Ast_config.Factor(f)}
 | TFILE          TEQUAL f=TSTRING
@@ -112,10 +147,14 @@ attrs:
   TLCB atts=list(attr) TRCB {atts}
 
 version:
-  TLPAR name=TSTRING TCOMMA d=date TCOMMA size=TInt TRPAR {
-    let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in
-      (count, (name, d, size))
+  TLPAR name=TSTRING TCOMMA d=date  size=suite TRPAR {
+    let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then let size=Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name) in
+      (count, (name, d, size)) else (count, (name, d, size))
   }
+
+suite:
+  |TCOMMA size=TInt {size}
+  | {0 }
 
 date:
   m=TInt TSLASH d=TInt TSLASH y=TInt
