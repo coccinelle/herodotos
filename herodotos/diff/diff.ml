@@ -256,9 +256,16 @@ let compute_new_pos_with_rec (diffs: Ast_diff.diffs) file ver pos : linepredicti
   with Not_found -> o_pos
 
 let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : lineprediction * int * int =
+  Debug.profile_code_silent "Diff.compute_new_pos_with_findhunk"
+    (fun () ->
   let (line, colb, cole) = pos in
     try
-      let hunks = List.assoc (ver, file) diffs in
+      let hunks =
+	Debug.profile_code_silent "Diff.compute_new_pos#List.assoc"
+	  (fun () ->
+	    List.assoc (ver, file) diffs
+	  )
+      in
       let newhunks = List.map
 	(fun p ->
 	   let ((bl,bsize),(al,asize)) = p in
@@ -298,14 +305,18 @@ let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : linepre
 	    *)
 	    (Cpl (al,al+asize-1),colb,cole)
     with Not_found -> (Sing line, colb, cole)
+    )
 
 let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : lineprediction * int * int =
+  Debug.profile_code_silent "Diff.compute_new_pos"
+    (fun () ->
   let my_compute_new_pos =
     if true then
       compute_new_pos_with_findhunk
     else
       compute_new_pos_with_rec
   in my_compute_new_pos diffs file ver pos
+    )
 
 let show_diff verbose vlist ast =
   if verbose then
