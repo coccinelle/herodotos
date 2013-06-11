@@ -266,7 +266,7 @@ let unique_file_list orgarray =
 	 Misc.unique_list file_list
     )
 
-let compute_org verbose strict prefix depth vlist diffs correl annots orgs :
+let compute_org verbose strict prefix depth vlist diffs correl (annots:Ast_org.orgarray) (orgs:Ast_org.orgarray) :
     (int * int) * ((Ast_diff.path * Ast_org.bugs list) list) =
   Debug.profile_code_silent "compute_org"
     (fun () ->

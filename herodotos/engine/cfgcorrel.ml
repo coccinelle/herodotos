@@ -71,9 +71,11 @@ let correl_patt_prj v1 v2 v3 bugfile_ext =
     if Config.get_format patt = Ast_config.Org then
 	if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
 	  begin
-            let listeOrigs=Org.orgfiles !Setup.resultsdir pdir (file^Global.origext) vlist 0 in (*liste des .orig.org ds versions*)
+            (*let listeOrigs=Org.orgfiles !Setup.resultsdir pdir (file^Global.origext) vlist 0 in (*liste des .orig.org ds versions*)
 	   (* let trace = List.iter (fun (numv,orgfile)->Printf.printf "Version :%d\t fich %s\n" numv orgfile) listeOrigs in*)
-            let orgs1:Ast_org.orgarray=Org.format_orgsList_to_arr prefix depth vlist (Org.parse_orgs false listeOrigs)  in
+            let orgs1:Ast_org.orgarray=Org.format_orgsList_to_arr prefix depth vlist (Org.parse_orgs false listeOrigs)  in*)
+            let orgs1 = (Org.build_org_arr prefix depth !Setup.resultsdir pdir (file^Global.origext) vlist ) in
+	    
 	    let diffs1=Diff.parse_diff v1 prefix difffile in
 	    let correl = List.rev (Org.parse_org false correlfile) in
 	    

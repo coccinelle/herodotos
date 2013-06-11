@@ -394,16 +394,16 @@ let rec get_versionsList prefix depth vlist orgsList:(int * Ast_org.orgs)list = 
 
 
 (*doit remplacer la fonction qu'elle précéde *)
-let flat_org_for_arrBis idx prefix depth vlist orgarray (raw_org:Ast_org.org) : unit =
+let flat_org_for_arrBis  prefix depth (flist,tbl) (raw_org:Ast_org.org)  =
   let org = flat_org prefix depth raw_org in (*:Ast_org.bug *)
   let (_, _, _, file, ver, _, _, _, _, _, _) = org in
-  let ((flist, tbl)) = Array.get orgarray idx in (*:(path list * table de hachage(path,bugs)) *)
   let (orglist:Ast_org.bug list) = try Hashtbl.find tbl file with _ -> [] in
   let newlist = update_list orglist org in
     Hashtbl.replace tbl file newlist;
     if not (List.mem file flist) then
-      Array.set orgarray idx (file::flist, tbl)
-
+       (file::flist, tbl)
+    else
+       (flist,tbl)
 
 let flat_org_for_arr prefix depth vlist orgarray (raw_org:Ast_org.org) : unit =
   let org = flat_org prefix depth raw_org in (*:Ast_org.bug *)
@@ -423,40 +423,49 @@ let format_orgs prefix depth orgs =
        filter_orgs flat_orgs_to_filter
     )
 
-let format_orgs_to_arr_aux prefix depth vlist orgs= 
+(*let format_orgs_to_arr_aux prefix depth vlist orgs= 
   let rec format_orgs_to_arr_ter prefix depth vlist orgs orgarray : Ast_org.orgarray = 
      match orgs with 
        []->orgarray
       |org::orglist->List.iter(flat_org_for_arr prefix depth vlist orgarray) org;
                      (format_orgs_to_arr_ter prefix depth vlist orglist orgarray)
   in format_orgs_to_arr_ter prefix depth vlist orgs (emptyarray vlist)
+*)
 
 
 
 
 
 
-
-let format_orgsList_to_arr prefix depth vlist (orgsList:(int*Ast_org.orgs) list) : Ast_org.orgarray =
+(*let format_orgsList_to_arr prefix depth vlist (orgsList:(int*Ast_org.orgs) list) : Ast_org.orgarray =
    Debug.profile_code_silent "format_orgs_to_arr" 
    (fun()-> let orgarray=emptyarray vlist in
-      List.iter(fun orgs->List.iter(fun org->flat_org_for_arrBis (fst orgs) prefix depth vlist orgarray org)(snd orgs))orgsList;
+      List.iter(fun orgs->List.iter(fun org->flat_org_for_arrBis (fst orgs) prefix depth orgarray org)(snd orgs))orgsList;
        orgarray
-    )
+    )*)
+
+
+let build_org_arr prefix depth resultsdir pdir orgfile vlist :Ast_org.orgarray =  
+  Array.map(fun vers -> let (vname,i,tm,i2) = vers in
+			
+                        let orgs=(parse_org false (resultsdir^pdir^"/"^vname^"/"^orgfile)) in
+                        
+                        List.fold_left(fun arrayelt org ->flat_org_for_arrBis  prefix depth arrayelt org)([],Hashtbl.create 97) orgs
+                         
+                        ) vlist
+
+
+  
 
 let format_orgs_to_arr prefix depth vlist (orgs:Ast_org.orgs ) : Ast_org.orgarray =
    Debug.profile_code_silent "format_orgs_to_arr" 
     (fun () -> let orgarray = emptyarray vlist in
-       let idx=get_versions prefix depth vlist orgs in
-       List.iter (flat_org_for_arrBis idx prefix depth vlist orgarray) orgs;
+       List.iter (flat_org_for_arr prefix depth vlist orgarray) orgs;
        orgarray
     )
 
-(*let format_orgs_list_to_arr_gen prefix depth vlist orgs_list orgarray = match orgs_list with
-                              []->orgarray
-                             |orgs::orgs_list_tail->begin
-  *)                                                    
-                                                      
+
+                                              
 
 
 let count = ref 0
@@ -603,9 +612,13 @@ let rec orgfiles resultsdir pdir orgfile vlist indice:(int*string) list =
   if indice=(Array.length vlist) then []
   else let (vname,i,tm,i2)=vlist.(indice) in
        if Sys.file_exists (resultsdir^pdir^"/"^vname^"/"^orgfile) then (indice,resultsdir^pdir^"/"^vname^"/"^orgfile)::(orgfiles resultsdir pdir orgfile vlist (indice+1))
-       else orgfiles resultsdir pdir orgfile vlist (indice+1)  
+       else raise (Error ("File "^resultsdir^pdir^"/"^vname^"/"^orgfile^" must have been deleted")) 
 
 
+(*nouvelle fonction pour remplacer orgfiles ci-dessus  *)
+
+
+                                  
      
 (* fonction trace à virer  *)
 let rec trace orgarray indice=
