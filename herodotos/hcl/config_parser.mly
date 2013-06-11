@@ -148,8 +148,11 @@ attrs:
 
 version:
   TLPAR name=TSTRING TCOMMA d=date  size=suite TRPAR {
-    let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then let size=Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name) in
-      (count, (name, d, size)) else (count, (name, d, size))
+    let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then let size=Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name) in 
+      let affiche_vers= Printf.printf"(\"%s\",%s,%d)\n" name (Misc.string_of_date d) size in
+      (count, (name, d, size)) else 
+        let affiche_vers = Printf.printf"(\"%s\",%s,%d)\n" name (Misc.string_of_date d) size in
+        (count, (name, d, size))
   }
 
 suite:
