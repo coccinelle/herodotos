@@ -6,7 +6,7 @@ import Control.Monad.State
 
 import Data.List
 import Utils
-import Directory
+import System.Directory
 
 
 -- Zipper On lists

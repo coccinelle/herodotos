@@ -27,5 +27,5 @@ Executable hBugs
                      mtl,
                      process,
                      unix,
-                     haskell98,
+                     directory,
                      regex-compat
