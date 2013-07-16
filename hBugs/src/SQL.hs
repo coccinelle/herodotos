@@ -35,7 +35,7 @@ select version_name , files.file_id, standardized_name as standardized_report_na
 -- SQL Functions
 
 -- Versions
-sql_versions         = "SELECT DISTINCT version_name FROM version_file_report ORDER BY version_name"
+sql_versions         = "SELECT version_name FROM versions"
 
 versions :: ([String] -> [String]) -> PsqlM [String]
 versions f = do s <- psqlCmd sql_versions
@@ -53,11 +53,11 @@ versionOrdering s1 s2 = compare (v2li s1) (v2li s2)
 -- Lines of Files Per Bugs
 
 sql_files_per_bug vs tp =
-   "SELECT number, COUNT(*) as files FROM (\
-\    SELECT file_id , COUNT(*) AS number FROM version_file_report\
+   "SELECT number_of_faults, COUNT(file_id) as faulty_files FROM (\
+\    SELECT file_id , COUNT(*) AS number_of_faults FROM full_bugs\
 \    WHERE version_name='" ++ vs ++ "' "
      ++ (whichBugs tp) ++ " GROUP BY file_id)\
-\  TableReponse GROUP BY number ORDER BY number"
+\  TableReponse GROUP BY number_of_faults ORDER BY number_of_faults"
 
 
 files_per_bug :: String -> BugSelect -> PsqlM (String, [(Integer, Integer)])
@@ -75,9 +75,9 @@ vrs2where  l = "WHERE " ++ (concat $ intersperse " or " $ map aux l)
     aux k = "version_name=\'" ++ k ++ "\'"
 
 
-sql_bugs vrs = "SELECT DISTINCT standardized_report_name FROM version_file_report "
+sql_bugs vrs = "SELECT standardized_name FROM bug_categories "
                ++ (vrs2where vrs)
-               ++ " ORDER BY standardized_report_name"
+               ++ " ORDER BY standardized_name"
 
 bugs :: ([String] -> [String]) -> PsqlM [String]
 bugs f = do psqlDebugLn $ "=> Gettings versions"
@@ -99,8 +99,8 @@ whichBugs (BugSelect i l) =
     print_op With    s1 s2 = s1 ++ " or "  ++ s2
     print_op Without s1 s2 = s1 ++ " and " ++ s2
 
-    print_type With    s = "standardized_report_name='"  ++ s ++ "'"
-    print_type Without s = "standardized_report_name!='" ++ s ++ "'"
+    print_type With    s = "standardized_name='"  ++ s ++ "'"
+    print_type Without s = "standardized_name!='" ++ s ++ "'"
 
 bugSelectName :: BugSelect -> String
 bugSelectName (BugSelect _ []) = ""
