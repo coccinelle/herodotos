@@ -10,12 +10,13 @@ import System.Process
 import System.IO
 
 -- Debug Messages ((un)comment to turn on/off)
-debug :: String -> IO ()
-debug   _ = return ()
---debug   s = putStr s >> hFlush stdout
+debug :: Bool -> String -> IO ()
+debug v s = if v
+            then putStr s >> hFlush stdout
+            else return ()
 
-debugLn :: String -> IO ()
-debugLn s = debug $ s ++ "\n"
+debugLn :: Bool -> String -> IO ()
+debugLn v s = debug v $ s ++ "\n"
 
 -- Does the Maybe is a Just?
 isJust :: Maybe t -> Bool
@@ -54,22 +55,22 @@ mapFilterEither f (x : l) = case f x of
                               _       ->     (mapFilterEither f l)
 
 
-hReadFull :: Handle -> IO [String]
-hReadFull h = do debug "=> Reading : "
-                 aux  h
+hReadFull :: Bool -> Handle -> IO [String]
+hReadFull v h = do debug v "=> Reading : "
+                   aux v h
   where
-    aux h = do debug "=> Testing EOF : "
-               iseof <- hIsEOF h
-               debugLn (show iseof)
-               if iseof
-                 then return []
-                 else do debug "=> Getting Line : "
-                         l <- hGetLine h
-                         debug (show l)
-                         if null l
-                           then return []
-                           else do q <- aux h
-                                   return $ l : q
+    aux v h = do debug v "=> Testing EOF : "
+                 iseof <- hIsEOF h
+                 debugLn v (show iseof)
+                 if iseof
+                   then return []
+                   else do debug v "=> Getting Line : "
+                           l <- hGetLine h
+                           debug v (show l)
+                           if null l
+                             then return []
+                             else do q <- aux v h
+                                     return $ l : q
 
 
 

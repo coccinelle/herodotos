@@ -37,9 +37,9 @@ select version_name , files.file_id, standardized_name as standardized_report_na
 -- Versions
 sql_versions         = "SELECT version_name FROM versions"
 
-versions :: ([String] -> [String]) -> PsqlM [String]
-versions f = do s <- psqlCmd sql_versions
-                return $ sortBy versionOrdering $ f $ readVersions s
+versions :: Bool -> ([String] -> [String]) -> PsqlM [String]
+versions vb f = do s <- psqlCmd vb sql_versions
+                   return $ sortBy versionOrdering $ f $ readVersions s
 
 versionOrdering :: String -> String -> Ordering
 versionOrdering s1 s2 = compare (v2li s1) (v2li s2)
@@ -60,11 +60,11 @@ sql_files_per_bug vs tp =
 \  TableReponse GROUP BY number_of_faults ORDER BY number_of_faults"
 
 
-files_per_bug :: String -> BugSelect -> PsqlM (String, [(Integer, Integer)])
-files_per_bug v bs = do let sql = sql_files_per_bug v bs
-	      	     	let _  = print sql
-	      	     	s <- psqlCmd sql
-                        return $ (sql, readBugLine s)
+files_per_bug :: Bool -> String -> BugSelect -> PsqlM (String, [(Integer, Integer)])
+files_per_bug vb v bs = do let sql = sql_files_per_bug v bs
+                           let _  = print sql
+                           s <- psqlCmd vb sql
+                           return $ (sql, readBugLine s)
 
 
 -- Bugs
@@ -79,16 +79,15 @@ sql_bugs vrs = "SELECT standardized_name FROM bug_categories "
                ++ (vrs2where vrs)
                ++ " ORDER BY standardized_name"
 
-bugs :: ([String] -> [String]) -> PsqlM [String]
-bugs f = do psqlDebugLn $ "=> Gettings versions"
-            vrs <- versions f
-            psqlDebugLn $ "=> Sending to psql: " ++ (sql_bugs vrs)
-            s <- psqlCmd $ sql_bugs vrs
-            return $ readBugs s
+bugs :: Bool -> ([String] -> [String]) -> PsqlM [String]
+bugs vb f = do psqlDebugLn vb "=> Gettings versions"
+               vrs <- versions vb f
+               psqlDebugLn vb $ "=> Sending to psql: " ++ (sql_bugs vrs)
+               s <- psqlCmd vb $ sql_bugs vrs
+               return $ readBugs s
 
 
 -- Bug Selection
-
 
 whichBugs :: BugSelect -> String
 whichBugs (BugSelect i l) =
@@ -169,10 +168,10 @@ readBugs :: [String] -> [String]
 readBugs str = mapFilterEither isBug str
 
 
-getTables :: BugSelect -> ([String] -> [String]) -> PsqlM [Entry]
-getTables bs f = runListT aux
+getTables :: Bool -> BugSelect -> ([String] -> [String]) -> PsqlM [Entry]
+getTables vb bs f = runListT aux
   where
-    aux = do v <- ListT $ versions f
-             (sql, l) <- lift $ files_per_bug v bs
+    aux = do v <- ListT $ versions vb f
+             (sql, l) <- lift $ files_per_bug vb v bs
              let vbs = v ++ (bugSelectName bs)
              return $ Entry vbs sql (normalizeName vbs) l

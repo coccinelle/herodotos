@@ -20,20 +20,20 @@ instance Monad PsqlM where
   (PsqlM m) >>= f = PsqlM $ m >>= (unPsqlM . f)
 
 
-psqlDebug   = PsqlM . lift . debug
-psqlDebugLn = PsqlM . lift . debugLn
+psqlDebug   v = PsqlM . lift . debug v
+psqlDebugLn v = PsqlM . lift . debugLn v
 
 
-psqlCmd :: String -> PsqlM [String]
-psqlCmd cmd = PsqlM $ do (hinput,houtput) <- get
-                         liftIO $ do debugLn $ "=> Putting : " ++ (cmd ++ ";")
-                                     hPutStr hinput (cmd ++ "\n")
-                                     debugLn $ "=> Flushing"
-                                     hFlush  hinput
-                                     s <- hReadFull houtput
-                                     debugLn $ "=> Got: "
-                                     mapM_ debugLn s
-                                     return s
+psqlCmd :: Bool -> String -> PsqlM [String]
+psqlCmd v cmd = PsqlM $ do (hinput,houtput) <- get
+                           liftIO $ do debugLn v $ "=> Putting : " ++ (cmd ++ ";")
+                                       hPutStr hinput (cmd ++ "\n")
+                                       debugLn v $ "=> Flushing"
+                                       hFlush  hinput
+                                       s <- hReadFull v houtput
+                                       debugLn v $ "=> Got: "
+                                       mapM_ (debugLn v) s
+                                       return s
 
 
 

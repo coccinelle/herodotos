@@ -30,9 +30,9 @@ mainT = catchError (do args <- liftIO $ getArgs
                        liftIO $ do case act of
                                      HelpMsg    -> putStrLn help_msg
                                      VersionMsg -> putStrLn version_msg
-                                     Versions   -> (runPsqlM' $ versions filter_version ) >>= mapM_ myput
-                                     Bugs       -> (runPsqlM' $ bugs     filter_version ) >>= mapM_ myput
-                                     Tables     -> do entries <- runPsqlM' $ getTables (bs env) filter_version
+                                     Versions   -> (runPsqlM' $ versions (verbose env) filter_version ) >>= mapM_ myput
+                                     Bugs       -> (runPsqlM' $ bugs     (verbose env) filter_version ) >>= mapM_ myput
+                                     Tables     -> do entries <- runPsqlM' $ getTables (verbose env) (bs env) filter_version
                                                       output_tables (output env) (libdir env) entries >>= myput
                                    myclose
                    )
