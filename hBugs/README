@@ -5,6 +5,7 @@
  cabal
  parsec >= 3.0.1
  mtl
+ system-filepath
 
  maxima
  wxmaxima
@@ -14,11 +15,12 @@
 
  Required packages:
 	- wxmaxima
-	- ghc6
+	- ghc
 	- cabal-install
-	- libghc6-parsec3-dev
-	- libghc6-mtl-dev
-	- libghc6-regex-compat-dev
+	- libghc-parsec3-dev
+	- libghc-mtl-dev
+	- libghc-regex-compat-dev
+	- libghc-system-filepath-dev
 
  Optional packages:
 	- haskell-mode
