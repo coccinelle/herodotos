@@ -134,7 +134,7 @@ pblog(g,k) := (-1 * g ^ k) / (log(1 - g) * k);
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
-pblog(0.5,2);
+pblog(1/2,2);
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: comment start ]
@@ -179,7 +179,7 @@ n is the depth of the taylor development
 
 /* [wxMaxima: input   start ] */
 log_param_of_table(l) := block(local (x),
-  x: min_value_range(chi_square_of_table(g,l),g,0.5,0,1),
+  x: min_value_range(chi_square_of_table(g,l),g,1/2,0,1),
   if length (x) = 0 then [und] else x);
 /* [wxMaxima: input   end   ] */
 
