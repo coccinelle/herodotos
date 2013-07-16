@@ -26,6 +26,7 @@ data HLTops = Psql         String
             | Kernel       String
             | Help
             | Version
+            | Debug
   deriving (Show,Eq,Ord,Read)
 
 options =
@@ -38,6 +39,7 @@ options =
   , Option ['h'] ["help"]    (NoArg  Help                        ) "Show this help message"
   , Option ['k'] ["kernel"]  (ReqArg Kernel       "REGEX"        ) "Kernel version to use"
   , Option ['v'] ["version"] (NoArg  Version                     ) "Show version message"
+  , Option []    ["debug"]   (NoArg  Debug                       ) "Show debugging messages"
   ]
   where
     bs w = BugSelectOpt . (BugSelect w) . (sepPred (== ','))
@@ -49,8 +51,8 @@ data HTLEnv = HTLEnv { psql     :: String ,
                        libdir   :: Maybe FilePath,
                        output   :: FilePath,
                        kernel   :: Maybe String,
-                       action   :: Maybe Action
-
+                       action   :: Maybe Action,
+                       verbose  :: Bool
                      }
   deriving (Eq,Show,Read,Ord)
 
@@ -62,6 +64,7 @@ defaultOps = HTLEnv ""                      -- psql
                     "-"                     -- output
                     Nothing                 -- kernel
                     Nothing                 -- action
+                    False                   -- debug
 
 
 modifyOps :: HTLEnv -> HLTops -> HTLEnv
@@ -73,6 +76,7 @@ modifyOps o (Output       f) = o { output   = f               }
 modifyOps o (Kernel       k) = o { kernel   = Just k          }
 modifyOps o (Help          ) = o { action   = Just HelpMsg    }
 modifyOps o (Version       ) = o { action   = Just VersionMsg }
+modifyOps o (Debug         ) = o { verbose  = True            }
 
 
 
