@@ -7,6 +7,7 @@ let longhelp = ref false
 let orgfile = ref ""
 let prefix = ref ""
 let extract = ref ""
+let version_incr = ref ""
 let version = ref false
 let verbose1 = ref false
 let verbose2 = ref false
@@ -23,9 +24,11 @@ let statcorrel = ref false
 let statfp = ref false
 let test = ref false
 let erase = ref false
+let preinit = ref false
 
 let sql = ref false
 let sqlnotes = ref false
+let sql_update = ref false
 
 let freearg = ref ""
 
@@ -48,6 +51,7 @@ let options = [
   "--init", Arg.Set init, " Initialize a tracking environment as defined in the configuration file";
   "--longhelp", Arg.Set longhelp, " Display this list of options and the supported graph types";
   "--parse_org", Arg.Set_string orgfile, "file path to an Org file to parse (test)";
+  "--preinit",Arg.Set preinit, " Compute code size";
   "--prefix", Arg.Set_string prefix, "path prefix of the source directories (test)";
   "--profile", Arg.Unit (fun () -> prerr_endline "*** PROFILING ENABLED ***";
 			   Debug.profile := Debug.PALL), " gather timing information about the main functions";
@@ -56,6 +60,7 @@ let options = [
 
   "--to-sql", Arg.Set sql, " Convert the parsed Org file to SQL (tables of errors)";
   "--to-sql-notes", Arg.Unit (fun () -> sqlnotes:=true;sql:=true), " Convert the parsed Org file to SQL (table of notes)";
+  "--to-sql-update",Arg.Tuple[Arg.Set sql_update;Arg.Set_string version_incr], " Update the database including new versions study results";
 
   "--stat", Arg.Set stat, " Compute statistics";
   "--statcorrel", Arg.Set statcorrel, " Compute statistics about correlations";
@@ -127,18 +132,20 @@ let main aligned =
 	else
 	  let anystat = !stat || !statfp || !statcorrel in
 	    if ((String.length !configfile) <> 0) then
-	      if !init && not !correl && not anystat && not !erase then
+	      if !init && not !correl && not anystat && not !erase && not !preinit then
 		Debug.profile_code "initialize env."
 		  (fun () -> Cfginit.init_env !verbose1 !verbose2 !verbose3 !configfile !cvs)
-	      else if not !init && !correl && not anystat && not !erase  then
+	      else if not !init && !correl && not anystat && not !erase && not !preinit then
 		Debug.profile_code "correlation"
 		  (fun () -> Cfgcorrel.correl !verbose1 !verbose2 !verbose3 !configfile !freearg)
-	      else if not !init && not !correl && anystat && not !erase then
+	      else if not !init && not !correl && anystat && not !erase && not !preinit then
 		Debug.profile_code "statistics"
 		  (fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg !statcorrel !statfp)
-	      else if not !init && not !correl && not anystat && !erase then
+	      else if not !init && not !correl && not anystat && !erase && not !preinit then
 		Debug.profile_code "erase env."
 		  (fun () -> Cfgerase.erase_env !verbose1 !verbose2 !verbose3 !configfile !freearg)
+	      else if not !init && not !correl && not anystat && not !erase && !preinit then
+		  Cfgpreinit.preinit !configfile 
 	      else
 		(
 		  print_endline ("Herodotos version "^ Global.version);
@@ -181,8 +188,10 @@ let main aligned =
 				 if !sqlnotes then
 				   Sql.print_orgs_as_notes stdout !prefix !orgfile formatted
 				 else
-				   Sql.print_orgs stdout !prefix !orgfile formatted
-			       else
+				     Sql.print_orgs stdout !prefix !orgfile formatted
+                               else if !sql_update then
+                                     Sql_update.print_orgs stdout !prefix !orgfile formatted !version_incr                                  
+ 			       else
 				 let filtered =
 				   if !extract = "" then formatted
 				   else Orgfilter.filter_version !extract !prefix formatted

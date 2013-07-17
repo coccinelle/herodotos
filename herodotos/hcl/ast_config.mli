@@ -48,6 +48,7 @@ type attr =
   | SPFlags of string
   | Size of float * float
   | Sort of bool
+  | Deposit of string
 
 type curve = string option * string option * attr list * Ast.pos
 

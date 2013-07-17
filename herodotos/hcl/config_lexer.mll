@@ -55,6 +55,7 @@ rule token = parse
   | "cpucore"                 { P.TCPUCORE       }
   | "curve"                   { P.TCURVE         }
   | "data"                    { P.TDATA          }
+  | "deposit"                 { P.TDEPOSIT       }
   | "dir"                     { P.TDIR           }
   | "empty"                   { P.TEMPTY         }
   | "experience"              { P.TEXPERIENCE    }
@@ -137,8 +138,8 @@ and string  = parse
          (match v with
          | 'n' -> ()  | 't' -> () | 'v'  -> ()  | 'b' -> () | 'r' -> ()
 	 | 'f' -> ()  | 'a' -> ()
-	 | '\\' -> () | '?' -> () | '\'' -> ()  | '"' -> ()
-         | 'e' -> ()
+	 | '\\' -> () | '?' -> () | '\'' -> ()  | '"' -> () | '(' -> ()
+         | '.' -> ()  | ')' -> () | 'e' -> ()  
          | '\n' -> set_newline lexbuf
          | _ -> lexerr "unrecognised symbol:" (tok lexbuf)
 	 );

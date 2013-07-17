@@ -7,8 +7,34 @@ exception Warning of string
 exception Misconfiguration of string
 exception Misconfigurationat of string * Ast.pos
 
+(*parse the .projects_configfile to recover each project versions *)  
+let parse_projects_versions versions_file =
+  try   
+    let in_ch = open_in versions_file in
+    let lexbuf = Lexing.from_channel in_ch in
+       Misc.init versions_file lexbuf;
+     let ast = Config_parser.parse_versions Config_lexer.token lexbuf in
+       close_in in_ch;
+       ast
+  with _->prerr_string ("File "^versions_file^" does not exit, run make preinit.\n")   
+
+(* checks versions already treated, in order to avoid computing date, size,... *)
+let parse_check_versions versions_file =
+  if Sys.file_exists versions_file then
+    begin
+      let in_ch = open_in versions_file in
+      let lexbuf = Lexing.from_channel in_ch in
+      Misc.init versions_file lexbuf;
+      let res =  Config_parser.declared_versions Config_lexer.token lexbuf in
+      close_in in_ch;
+      res;
+    end       
+  else
+    ()
+
 let parse_config file : unit =
-  let in_ch = open_in file in
+ parse_projects_versions (".projects_"^file);
+ let in_ch = open_in file in
   let lexbuf = Lexing.from_channel in_ch  in
   try
     Misc.init file lexbuf;
@@ -32,6 +58,15 @@ let parse_config file : unit =
 	      Ast.colfr = pos.pos_cnum - pos.pos_bol;
 	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
 	    ("Config Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
+
+let parse_preinit file:string = 
+  let in_ch = open_in file in
+  let lexbuf = Lexing.from_channel in_ch  in
+    Misc.init file lexbuf;    
+    let ast = Config_parser.preinit Config_lexer.token lexbuf in
+      close_in in_ch;
+      ast
+
 
 let get_abs_days_of tm =
   (* 60.0 (s) *. 60.0 (mn) *. 24.0  (h) = 86400.0 *)
