@@ -1,6 +1,19 @@
 exception Malformed of string
 
-(*retourne le nombre de TODO dans un channel *)
+
+
+let print_org org = let Ast_org.Org(i , status , text , link , orgs)= org in let (path,o,t) = link in
+                    Printf.printf "%d | %s | %s | %s | %s  \n" i (Org_helper.get_status status) text path t
+
+
+let print_bug bug = let (ind , status , tex , path , vname , pos , str , text , is_head , next , orgs) = bug in let (l,cb,ce) = pos in
+                    Printf.printf "%d | %s | %s | %s| %s | (%d,%d,%d) %s\n " ind (Org_helper.get_status status) tex path vname l cb ce text ;
+                    List.iter(fun o->print_org o) orgs
+ 
+
+let print_bugs2 bugs2 = List.iter(fun e->let (p,bl)=e in Printf.printf "PATH %s\n" p;List.iter(fun bugs-> List.iter(fun bug->print_bug bug )bugs)bl)bugs2
+
+
 let rec count_todo ch =
   try
     let line = input_line ch in
@@ -11,7 +24,6 @@ let rec count_todo ch =
 	count_todo ch
   with _ -> 0
 
-(* retourne le couple (#TODO,nom_fichier)*)
 let map_to_size bugfile_ext =
   let bugfile = Filename.chop_suffix bugfile_ext Global.bugext in
   let orgfile = bugfile ^ Global.origext in
@@ -23,7 +35,6 @@ let map_to_size bugfile_ext =
     else
 	(0, bugfile_ext)
 
-(*supprime le fichier editfile s'il existe *)
 let clean_file exist editfile =
   if Sys.file_exists editfile then
     begin
@@ -31,13 +42,11 @@ let clean_file exist editfile =
       Sys.remove editfile
     end
 
-(*écrit le rapport des bugs dans outputfile ex:Test_Error....org *)
 let write_org outputfile prefix orgs =
   let ch = open_out outputfile  in
     Org.print_bugs ch prefix orgs;
     close_out ch
 
-(* ???tableau de bugs  *)
 let reparse_org tmpfile prefix depth vlist orgs =
 (*   let toporgs = List.flatten (snd (List.split orgs)) in *)
 (*   let editorgs = List.map (Bugs.wrap_bugs prefix) toporgs in *)
@@ -50,19 +59,17 @@ let reparse_org tmpfile prefix depth vlist orgs =
     Org.sort cleanorgs;
     cleanorgs
 
-(* *)
 let correl_patt_prj v1 v2 v3 bugfile_ext =
-  let file = Filename.chop_suffix (Filename.basename bugfile_ext) Global.bugext in(*file nom du fichier sans son chemin ni son  
-                                                                  suffixe ".new.org"  *)
+  let file = Filename.chop_suffix (Filename.basename bugfile_ext) Global.bugext in
   let (p,patt) =                                                                                                                    
     (* TODO: Fixme. This may not work according to the names of the projects *)
-    match Str.split (Str.regexp_string Global.sep) file with   (*liste de chaines composant le nom de base séparés par '_' *)
+    match Str.split (Str.regexp_string Global.sep) file with  
 	[] -> raise (Malformed ("Malformed bug filename: "^bugfile_ext))
-      | p::tail -> (p,String.concat Global.sep tail) (*p 1er morceau du nom du fichier(=nom du projet), reste=pattern *)
+      | p::tail -> (p,String.concat Global.sep tail) 
   in
-  let pdir = Config.get_prjdir p in (*pdir=répertoire contenant le projet ex:test  *)
-  let (depth, vlist) = Config.get_versinfos p in (* profondeur+tableau des versions ex:(ver0,ver1,ver2)*)
-  let prefix = !Setup.projectsdir ^ pdir ^"/" in  (*chemin complet du projet *)
+  let pdir = Config.get_prjdir p in 
+  let (depth, vlist) = Config.get_versinfos p in
+  let prefix = !Setup.projectsdir ^ pdir ^"/" in  
   let bugfile = Filename.chop_suffix bugfile_ext Global.bugext in
   let orgfile    = bugfile ^ Global.origext in
   let correlfile = bugfile ^ Global.correlext in
@@ -71,12 +78,10 @@ let correl_patt_prj v1 v2 v3 bugfile_ext =
     if Config.get_format patt = Ast_config.Org then
 	if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
 	  begin
-            (*let listeOrigs=Org.orgfiles !Setup.resultsdir pdir (file^Global.origext) vlist 0 in (*liste des .orig.org ds versions*)
-	   (* let trace = List.iter (fun (numv,orgfile)->Printf.printf "Version :%d\t fich %s\n" numv orgfile) listeOrigs in*)
-            let orgs1:Ast_org.orgarray=Org.format_orgsList_to_arr prefix depth vlist (Org.parse_orgs false listeOrigs)  in*)
             let orgs1 = (Org.build_org_arr prefix depth !Setup.resultsdir pdir (file^Global.origext) vlist ) in
+            
 	    
-	    let diffs1=Diff.parse_diff v1 prefix difffile in
+	    let diffs1= Diff.get_diff v1 !Setup.resultsdir pdir prefix vlist orgs1 (file^Global.origext) difffile in (*Diff.parse_diff v1 prefix difffile in*)
 	    let correl = List.rev (Org.parse_org false correlfile) in
 	    
 	      (* 
@@ -90,7 +95,7 @@ let correl_patt_prj v1 v2 v3 bugfile_ext =
 	      else Org.emptyarray vlist
 	    in
 	    let strict = ((Config.get_correl_mode v1 patt) = Ast_config.Strict) in
-	    let ((count,new_bugs), orgs2) = Occ_correl.compute_org v3 strict prefix depth vlist diffs1 correl2 annots orgs1 in
+	    let ((count,new_bugs), orgs2) = Occ_correl.compute_org v3 strict prefix depth vlist diffs1 correl2 annots orgs1 in 
 	    let todos = Correl.correlate v1 strict prefix vlist correlfile prefix correl2 orgs2 in
 	    let ccount =  List.length correl2 in
 	    let todostr =
@@ -181,17 +186,15 @@ let dispatch_correl_job v1 v2 v3 cpucore (perr, pidlist) file:int*int list =
   let pid = run_correl_job v1 v2 v3 file in
     (error, pid::newlist)
 
-(*ou est-ce celle-là qui est appelée lors d'un make correl?? à priori c'est plutôt celle-là *)
 let correl v1 v2 v3 configfile filter =
   ignore(Config.parse_config configfile);
   if v2 then prerr_endline "Config parsing OK!";
   if v1 then Config.show_config v2 v3;
- (* let trace=Printf.printf "nombre d'exp= %d\n" (List.length (Cfghelper.get_bugset_exp filter)) in*)
   let unorder_bugfiles = (Cfghelper.get_bugset_gen filter) in
-  let size_of = List.map map_to_size unorder_bugfiles in   (*size_of: (#"TODO",nom_bugfile) list *)
+  let size_of = List.map map_to_size unorder_bugfiles in   
   let order = List.sort (fun a b -> -(compare (fst a) (fst b))) size_of in
     if v1 then List.iter (fun (s, n) -> prerr_endline (string_of_int s^ " "^n)) order;
-  let bugfiles = snd (List.split order) in (*list des bugfiles ordonnée par le #"TODO" *)
+  let bugfiles = snd (List.split order) in 
   let cpucore = Setup.getCPUcore () in
   let error =
     if cpucore = 1 then
@@ -215,3 +218,7 @@ let correl v1 v2 v3 configfile filter =
   in
     if error <> 0 then
       prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the correlation.")
+
+
+
+

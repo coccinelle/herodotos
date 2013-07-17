@@ -166,8 +166,8 @@ let gen_diff prefix vlist (orgarray: Ast_org.orgarray) : (string * string) list 
 			    ))
        ) [] orgarray
 
-let get_diff v prefix vlist (orgs: Ast_org.orgarray) orgfile file : Ast_diff.diffs =
-  let orgstat = (Unix.stat orgfile).Unix.st_ctime in
+let get_diff v resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile file : Ast_diff.diffs =
+  let orgstat = Misc.get_change_stat resultsdir pdir vlist orgfile (ref []) in
   let patchstat =
     if Sys.file_exists file
     then (Unix.stat file).Unix.st_ctime

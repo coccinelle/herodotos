@@ -9,9 +9,9 @@ let fast_bug prefix vlist bug =
   (l, s, r, f, v, pos, face, t, n, List.rev (enclose::(List.rev sub)))
 *)
 
-let fast_hash_bug prefix vlist (flist, tbl) =
+let fast_hash_bug prefix vlist (flist, tbl)=
   List.fold_left (fun head file ->
-		    let orglist = Hashtbl.find tbl file in
+		    let (orglist:Ast_org.bug list) = Hashtbl.find tbl file in
 		    let buglist = List.map (fast_bug prefix vlist) orglist in
 		      head@buglist
 		 ) [] flist
@@ -27,7 +27,7 @@ let may_have_changed strict prefix vlist bfl bug =
 	     && head.Ast_org.is_head = true
       ) bfl
 
-let find_disappeared strict prefix vlist orgs =
+let find_disappeared strict prefix vlist (orgs:Ast_org.bug list) =
   List.find_all (may_have_changed strict prefix vlist orgs) orgs
 
 let is_SAME_as_next_in_correl correl file ver pos =
