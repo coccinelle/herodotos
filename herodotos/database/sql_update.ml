@@ -63,6 +63,56 @@ create table reports (
 );
 *)
 
+
+(* remplacera la fonction qu'elle précéde *)
+let insert_report_orgs prefix bug version = 
+  let (_,_,_,path,vname,pos1,_,text,_,n,orgs) = bug in
+  let (line1, colb1, cole1) = pos1 in
+  let orgs_interest = Org.orgs_version prefix orgs version in
+  let reqs = ref "" in
+  let iter = 
+    List.iter(fun o ->let Ast_org.Org(l, s, r, link, sub) = o in
+      let (file, ver, pos2, face, t) = Org.flat_link prefix 1 link in
+      let text = Org.clean_link_text prefix ver file pos2 t in
+      let (line2, colb2, cole2) = pos2 in
+      let file_id = "get_file('"^ver^"', '"^prefix^ver^"/"^path^"')" in
+      let file_id_for_correl = "get_file('"^vname^"', '"^prefix^vname^"/"^file^"')" in
+      let fields = "correlation_id, file_id, line_no, column_start, column_end, text_link" in
+      let correlation_id = "get_corr_id("^file_id_for_correl^","^string_of_int line1^","^string_of_int colb1^")" in
+      let values = String.concat ", " 
+       [correlation_id;
+        file_id;
+        string_of_int line2;
+        string_of_int colb2;
+        string_of_int cole2;
+        s2s text]
+      in
+       reqs := !reqs ^ Printf.sprintf "INSERT INTO reports (%s)\n\tSELECT %s FROM correlation_idx;\n" fields values) orgs_interest in
+      !reqs
+
+let insert_report_single prefix bug version =
+  let (_,_,_,path,vname,pos1,_,text,_,n,orgs) = bug in  
+  let (line1, colb1, cole1) = pos1 in
+  let org = Org.org_version bug version in 
+  let Ast_org.Org(l, s, r, link, sub) = org in
+  let (file, ver, pos2, face, t) = Org.flat_link prefix 1 link in
+  let text = Org.clean_link_text prefix ver file pos2 t in
+  let (line2, colb2, cole2) = pos2 in
+  let file_id = "get_file('"^version^"', '"^prefix^version^"/"^path^"')" in
+  let file_id_for_correl = "get_file('"^vname^"', '"^prefix^ver^"/"^file^"')" in
+  let fields = "correlation_id, file_id, line_no, column_start, column_end, text_link" in
+  let correlation_id = "get_corr_id("^file_id_for_correl^","^string_of_int line1^","^string_of_int colb1^")" in
+  let values = String.concat ", " 
+     [correlation_id;
+      file_id;
+      string_of_int line2;
+      string_of_int colb2;
+      string_of_int cole2;
+      s2s text]
+  in
+    Printf.sprintf "INSERT INTO reports (%s)\n\tSELECT %s FROM correlation_idx;\n" fields values
+
+
 let insert_report prefix org =
   let Ast_org.Org(l, s, r, link, sub) = org in
   let (file, ver, pos, face, t) = Org.flat_link prefix 1 link in
@@ -112,7 +162,7 @@ let insert_correl_report prefix src patt (org:Ast_org.bug) =
       (String.concat "" annotselt)^
       "COMMIT;\n"
 
-let print_orgs ch prefix orgfile orgs =
+let print_orgs ch prefix orgfile (orgs:Ast_org.bug list) version =
   let basefile = Filename.basename orgfile in
   let file = Filename.chop_suffix basefile Global.bugext in
   let (p,patt) =
@@ -123,7 +173,16 @@ let print_orgs ch prefix orgfile orgs =
   in
     List.iter
       (fun o ->
-	 let orgstr = insert_correl_report prefix basefile patt o in
+	 let (_,_,_,_,vname,_,_,_,_,_,orgs) = o in 
+	 let orgstr =if ((Org.is_new o version) or (Org.is_more_recent_v vname version ) )then
+                       insert_correl_report prefix basefile patt o
+                     else
+                       try
+                         let org = Org.orgs_version prefix orgs version in
+                         insert_report_orgs prefix o version
+                           
+                       with _->""  
+                     in
 	   Printf.fprintf ch "%s" orgstr
       ) orgs
 

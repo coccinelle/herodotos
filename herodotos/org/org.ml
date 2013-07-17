@@ -8,18 +8,16 @@ let status = [Ast_org.BUG;
 	      Ast_org.FP;
 	      Ast_org.UNKNOWN;
 	      Ast_org.IGNORED]
-(*crée la chaine constituée des status ci-dessus séparés par des espaces *)
+
 let statuslist = String.concat " " (List.map Org_helper.get_status status)
 
-(*à quoi ça seeert???::dernière ligne .org *)
+
 let orgtail = "* org config\n\n#+SEQ_TODO: TODO | "^statuslist^"\n"
 
-(* crée un tableau de([],table de hashage) de mm taille que vlist *)
+
 let emptyarray vlist =
   Array.init (Array.length vlist) (fun _ -> ([], Hashtbl.create 97))
 
-(*ex: dans demo, prefix=/var/manseur/demo/herodotos/herodotos/demo/test/;v=ver1 *)
-(*triplet prefix-version/nom_fichier,[4 orgoptions ??],is_head-prefix-version/nom_fichier::line?? :type link  *)
 let make_orglink_of_bug prefix bug =
   let (_, _, _, f, v, (l,b,e), face, t, _, _) = bug in
     (
@@ -31,7 +29,6 @@ let make_orglink_of_bug prefix bug =
       t ^ Printf.sprintf " %s%s/%s::%d" prefix v f l
     )
 
-(*retourne la chaine correspondant à la "première "face de la liste ops *)
 let face_of ops =
   match List.find (fun x ->
 		     match x with
@@ -41,7 +38,7 @@ let face_of ops =
       Ast_org.Face f -> f
     | _ -> raise Unrecoverable
 
-(*retourne l'entier correspondant à la "première " line de la liste ops *)
+
 let line_of ops =
   match List.find (fun x ->
 		     match x with
@@ -51,7 +48,7 @@ let line_of ops =
       Ast_org.Line l -> l
     | _ -> raise Unrecoverable
 
-(*retourne l'entier correspondant à la "première " colB de la liste ops *)
+
 let start_of ops =
   match List.find (fun x ->
 		     match x with
@@ -61,7 +58,7 @@ let start_of ops =
       Ast_org.ColB b -> b
     | _ -> raise Unrecoverable
 
-(*retourne l'entier correspondant à la "première " colE de la liste ops *)
+
 let end_of ops =
   match List.find (fun x ->
 		     match x with
@@ -71,11 +68,11 @@ let end_of ops =
       Ast_org.ColE e -> e
     | _ -> raise Unrecoverable
 
-(*Crée le triplet (line,colB,colE) (par ex à partir de la liste créée par make_orglink_of_bug prefix ) *)
+
 let position ops =
   (line_of ops, start_of ops, end_of ops)
 
-(* ??? *)
+
 let clean_link_text prefix v f pos t =
   let (l,_,_) = pos in
   let endstr = Printf.sprintf "%s/%s::%d" v f l in
@@ -107,7 +104,7 @@ let make_orglinkbug w_freetext prefix bug =
 	  "[[view:%s%s/%s::face=%s::linb=%d::colb=%d::cole=%d][%s%s/%s::%d]]"
 	  prefix ver file face line cb ce prefix ver file line
 
-(*crée une chaine de level étoiles ici 1 ou 2 selon le level*)
+
 let rec make_star level =
   if level > 0 then
     if level = max_int then
@@ -116,7 +113,7 @@ let rec make_star level =
       "*" ^ make_star (level -1)
   else
     ""
-(*crée la chaine indiquant le bug avec la ligne,début et fin par ex dans les rapports d'erreurs.org  *)
+
 let make_link prefix link =
   let (p, ops, t) = link in
   let pos = position ops in
@@ -125,24 +122,24 @@ let make_link prefix link =
       Printf.sprintf "[[view:%s%s::face=%s::linb=%d::colb=%d::cole=%d][%s]]"
 	prefix p face line cb ce t
 
-(* produit une ligne d'un rapport d'erreurs .org *)
+
 let rec make_org prefix org =
   let Ast_org.Org(l, s, r, link, sub) = org in
   let head = String.concat " "
-    (List.filter (fun x -> x <> "")                (*retourne la liste des elts /="" on a par exp "* TODO ..." *)
-       [ make_star l ; Org_helper.get_status s ; r]) (*head:string *)
+    (List.filter (fun x -> x <> "")               
+       [ make_star l ; Org_helper.get_status s ; r]) 
   in
-  let head = Printf.sprintf "%s %s" head (make_link prefix link) in    (* ex "* TODO [link du bug] "*)
-  let tail = List.map (make_org prefix) sub in                         (* la mm chose pour les sub_items  sans le "* TODO"*)
+  let head = Printf.sprintf "%s %s" head (make_link prefix link) in    
+  let tail = List.map (make_org prefix) sub in                        
   let tailstring = String.concat "\n" tail in
-    head ^ if tailstring = "" then "" else "\n" ^ tailstring         (*ex "* TODO [link du bug]
-                                                                                  [link du bug]  "  *)
-(* produit une seule ligne du .new.org*)
+    head ^ if tailstring = "" then "" else "\n" ^ tailstring        
+                                                                               
+
 let make_flat_org prefix org =
-  let (l, s, r, file, ver, pos, face, t, _, _, sub) = org in  (*org est un buuuuug*)
+  let (l, s, r, file, ver, pos, face, t, _, _, sub) = org in 
   let head = String.concat " "
     (List.filter (fun x -> x <> "")
-       [ make_star l ; Org_helper.get_status s ; r]) (*head:string  *)
+       [ make_star l ; Org_helper.get_status s ; r]) 
   in
   let link = make_orglinkbug_freetext prefix org in
   let head = Printf.sprintf "%s %s" head link in
@@ -275,8 +272,8 @@ let parse_all_lines v file ch =
 	None     -> orgs
       | Some (_,org) -> [org]::orgs
 
-let parse_org v file : Ast_org.orgs =    (*file est dans le cas qui nous intéresse un correlfile *)
-  Debug.profile_code_silent "parse_org" (*d'après ce que j'ai compris, le résultat de Debug.pofile... fait que f() est exécutée *)
+let parse_org v file : Ast_org.orgs =    
+  Debug.profile_code_silent "parse_org"
     (fun () ->
        try
 	 let in_ch = if file <> "-" then open_in file else stdin in
@@ -287,25 +284,6 @@ let parse_org v file : Ast_org.orgs =    (*file est dans le cas qui nous intére
 	 prerr_endline ("*** WARNING *** "^msg);
 	 []
     )
-
-
-
-
-
-  
-
-
-
-
-
-
-(* à refaire; essayer éventuellement de paralléliser *)
-let rec parse_orgs v (files:(int*string) list)=
-  match files with
-    |[]->[]
-    |file::file_list->(fst file,parse_org v (snd file))::(parse_orgs v file_list)
-
-
 
 let get_string_pos (line, cb, ce) =
   let sline = string_of_int line in
@@ -378,24 +356,14 @@ let get_version_name file = let dirList = Str.split (Str.regexp "/") file in
                                    let vname = List.nth dirList (List.length dirList -2) in
                                    (vname,file) 
 
-(* début modif*)
+
 let get_version prefix depth vlist raw_org=
   let org = flat_org prefix depth raw_org in
   let (_, _, _, file, ver, _, _, _, _, _, _) = org in
   Misc.get_idx_of_version vlist ver
 
-let get_versions prefix depth vlist orgs=try get_version prefix depth vlist (List.hd orgs)
-                                         with _->0
-
-(* associates each orgs to its version *)
-let rec get_versionsList prefix depth vlist orgsList:(int * Ast_org.orgs)list = match orgsList with
-              []->[]
-             |orgs::orgsList_tail->(get_versions prefix depth vlist orgs,orgs )::(get_versionsList prefix depth vlist orgsList_tail)
-
-
-(*doit remplacer la fonction qu'elle précéde *)
 let flat_org_for_arrBis  prefix depth (flist,tbl) (raw_org:Ast_org.org)  =
-  let org = flat_org prefix depth raw_org in (*:Ast_org.bug *)
+  let org = flat_org prefix depth raw_org in 
   let (_, _, _, file, ver, _, _, _, _, _, _) = org in
   let (orglist:Ast_org.bug list) = try Hashtbl.find tbl file with _ -> [] in
   let newlist = update_list orglist org in
@@ -406,10 +374,10 @@ let flat_org_for_arrBis  prefix depth (flist,tbl) (raw_org:Ast_org.org)  =
        (flist,tbl)
 
 let flat_org_for_arr prefix depth vlist orgarray (raw_org:Ast_org.org) : unit =
-  let org = flat_org prefix depth raw_org in (*:Ast_org.bug *)
+  let org = flat_org prefix depth raw_org in 
   let (_, _, _, file, ver, _, _, _, _, _, _) = org in
   let idx = Misc.get_idx_of_version vlist ver in
-  let ((flist, tbl)) = Array.get orgarray idx in (*:(path list * table de hachage(path,bugs)) *)
+  let ((flist, tbl)) = Array.get orgarray idx in 
   let (orglist:Ast_org.bug list) = try Hashtbl.find tbl file with _ -> [] in
   let newlist = update_list orglist org in
     Hashtbl.replace tbl file newlist;
@@ -422,27 +390,6 @@ let format_orgs prefix depth orgs =
     (fun () -> let flat_orgs_to_filter = List.map (flat_org prefix depth) orgs in
        filter_orgs flat_orgs_to_filter
     )
-
-(*let format_orgs_to_arr_aux prefix depth vlist orgs= 
-  let rec format_orgs_to_arr_ter prefix depth vlist orgs orgarray : Ast_org.orgarray = 
-     match orgs with 
-       []->orgarray
-      |org::orglist->List.iter(flat_org_for_arr prefix depth vlist orgarray) org;
-                     (format_orgs_to_arr_ter prefix depth vlist orglist orgarray)
-  in format_orgs_to_arr_ter prefix depth vlist orgs (emptyarray vlist)
-*)
-
-
-
-
-
-
-(*let format_orgsList_to_arr prefix depth vlist (orgsList:(int*Ast_org.orgs) list) : Ast_org.orgarray =
-   Debug.profile_code_silent "format_orgs_to_arr" 
-   (fun()-> let orgarray=emptyarray vlist in
-      List.iter(fun orgs->List.iter(fun org->flat_org_for_arrBis (fst orgs) prefix depth orgarray org)(snd orgs))orgsList;
-       orgarray
-    )*)
 
 
 let build_org_arr prefix depth resultsdir pdir orgfile vlist :Ast_org.orgarray =  
@@ -470,7 +417,7 @@ let format_orgs_to_arr prefix depth vlist (orgs:Ast_org.orgs ) : Ast_org.orgarra
 
 let count = ref 0
 
-let show_org verbose prefix orgs =
+let show_org verbose prefix (orgs: (string*Ast_org.bugs  list)list) =
   count := 0;
   if verbose then
     begin
@@ -502,10 +449,10 @@ let print_orgs_raw ch prefix orgs =
     (fun o ->
        let orgstr = make_flat_org prefix o in
 	 Printf.fprintf ch "%s\n" orgstr
-    ) orgs; (*impression dans le channel de chacun des liens respectifs de chacun des bugs de orgs *)
+    ) orgs;
   Printf.fprintf ch "%s" orgtail (* *)
 
-(*?? crée une liste le links_bugs *)
+
 let print_bugs_raw ch prefix bugs =
   let bug = List.hd bugs in
     Printf.fprintf ch "%s\n" (make_flat_org prefix bug);
@@ -514,7 +461,7 @@ let print_bugs_raw ch prefix bugs =
 	 Printf.fprintf ch "** %s\n"
 	   (make_orglinkbug true prefix bug)
       ) bugs
-(*?? crée la chaine des link_bugs du fichier  prefix/path(present dans le lien de chaque org de la liste orgs) *)
+
 let print_bugs ch prefix orgs =
   List.iter (fun (_, bugslist) ->
 	       List.iter (print_bugs_raw ch prefix) bugslist
@@ -607,21 +554,50 @@ let length bugarray =
 	 )
     ) 0 bugarray
 
-(*retourne la liste des fichiers .org dans toutes les versions avec,pour chaque fichier, le numéro de version *)
-let rec orgfiles resultsdir pdir orgfile vlist indice:(int*string) list =
-  if indice=(Array.length vlist) then []
-  else let (vname,i,tm,i2)=vlist.(indice) in
-       if Sys.file_exists (resultsdir^pdir^"/"^vname^"/"^orgfile) then (indice,resultsdir^pdir^"/"^vname^"/"^orgfile)::(orgfiles resultsdir pdir orgfile vlist (indice+1))
-       else raise (Error ("File "^resultsdir^pdir^"/"^vname^"/"^orgfile^" must have been deleted")) 
+
+(*compare versions *)
+let num_version version = let vers_format = Str.regexp "[0-9].*" in
+                                            let length_vname = String.length version in
+                                            let posb = Str.search_forward vers_format version 0 in
+                                            let ver_nums = String.sub version posb (length_vname - posb) in
+                                            let numbers = Str.split (Str.regexp "\.") ver_nums in
+                                            List.map (fun s-> int_of_string s ) numbers 
 
 
-(*nouvelle fonction pour remplacer orgfiles ci-dessus  *)
+let rec is_more_recent lv1 lv2 = 
+                                       match lv1,lv2 with 
+                                        [],l2->false
+                                       |l1,[]->true
+                                       |p1::q1,p2::q2 ->begin
+                                                          if p1 > p2 then true
+                                                          else if p1 < p2 then false
+                                                          else (is_more_recent q1 q2)
+                                                        end
+                      
+let is_more_recent_v version1 version2 = is_more_recent (num_version version1) (num_version version2)
+                                                  
 
 
-                                  
-     
-(* fonction trace à virer  *)
-let rec trace orgarray indice=
-  if indice=(Array.length orgarray) then ()
-  else let (pathlist,reste)=orgarray.(indice) in
-       List.iter(fun elt->Printf.printf "%s\n" elt ) pathlist;(trace orgarray (indice+1))
+let is_new bug version = let (_,_,_,_,vn,_,_,_,_,_,_) = bug in vn = version
+
+(*returns bug's version corresponding to the given version *)
+let org_version bug version :Ast_org.org= let (_,_,_,_,_,_,_,_,_,_,orgs) = bug in
+                              let ver = Str.regexp (".*"^version^"/") in 
+                              List.find(fun org-> let Ast_org.Org(_,_,_,link,_)=org in
+                                                  let (path,_,_) = link in 
+                                                  Str.string_match ver path 0 )orgs
+
+
+let rec orgs_version prefix orgs version  = 
+                                       (*let ver = Str.regexp (".*"^version^"/") in*) 
+                                         match orgs with
+                                          []->[]
+                                         |Ast_org.Org(i,s,n,link,o)::orgstail-> let (path,_,_) = link in
+                                                                                let (file, ver, pos2, face, t) = flat_link prefix 1 link in
+                                                                                if(ver = version or (is_more_recent_v ver version)) then
+                                                                                  ((Ast_org.Org(i,s,n,link,o))::orgstail)
+                                                                                else
+                                                                                  ( orgs_version prefix orgstail version)
+
+
+(*-----------------------------------------------------------------------------------------------------------------------------------------------*)
