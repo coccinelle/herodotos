@@ -22,7 +22,7 @@ A HTML version of this documentation is available online at
 
   \begin{grammar}
     \RULE{config}
-    \CASE{\any{\NT{globattr}} \any{\NT{project}} \any{\NT{pattern}} \any{\NT{graph}}}
+    \CASE{\any{\NT{globattr}} \any{\NT{project}} \any{\NT{pattern}} \any{\NT{experience}} \any{\NT{graph}}}
 
     \RULE{globattr}
     \CASE{prefix = \NT{string} \ttmid~projects = \NT{string}}
@@ -38,6 +38,9 @@ A HTML version of this documentation is available online at
 
     \RULE{graph}
     \CASE{graph \NT{filepath} \ttlb \any{\NT{grphattr}} \any{\NT{curve}}\ttrb}
+
+    \RULE{experience}
+    \CASE{experience \NT{id} \NT{objects}}
   \end{grammar}
 
 \section{Common attributes}
@@ -57,7 +60,12 @@ A HTML version of this documentation is available online at
     \RULE{prjattr}
     \CASE{flags = \NT{string} \ttmid~dir = \NT{string}}
     \CASE{\NT{styleattr}}
-    \CASE{versions = \ttlb \ANY{(\NT{string},\NT{date},\NT{int})}\ttrb}
+    \CASE{versions =\ttlb\NT{deposit} \ANY{\NT{version}}\ttrb}
+    \CASE{deposit = \NT{string} versions = \NT{string}}
+
+    \RULE{deposit}
+    \CASE{deposit = \NT{string}}
+    \CASE{}
   \end{grammar}
 
 \section{Pattern attributes}
@@ -67,6 +75,22 @@ A HTML version of this documentation is available online at
     \RULE{patattr}
     \CASE{flags = \NT{string} \ttmid~file = \NT{string}}
     \CASE{\NT{styleattr}}
+  \end{grammar}
+
+\section{Versions rules}
+\label{sec:version-rules}
+
+  \begin{grammar}
+    \RULE{version}
+    \CASE{(\NT{string},\NT{date} \NT{size}}
+
+    \RULE{date}
+    \CASE{\NT{int}/\NT{int}/\NT{int}}
+    \CASE{}
+
+    \RULE{size}
+    \CASE{,\NT{int}}
+    \CASE{}
   \end{grammar}
 
 \section{Graphs rules}
@@ -105,6 +129,26 @@ A HTML version of this documentation is available online at
     \CASE{\NT{styleattr}}
   \end{grammar}
 
+\section{Experiences rules}
+\label{sec:experience-rules}
+
+  \begin{grammar}
+    \RULE{objects}
+    \CASE{on pattern \NT{id} \any{\NT{patternobj}} with project \NT{id} \any{\NT{projectsub}}}
+    \CASE{on project \NT{id} \any{\NT{projectobj}} with pattern \NT{id} \any{\NT{patternsub}}}
+
+    \RULE{patternobj}
+    \CASE{on pattern \NT{id}}
+
+    \RULE{projectobj}
+    \CASE{on project \NT{id}}
+
+    \RULE{patternsub}
+    \CASE{with pattern \NT{id}}
+
+    \RULE{projectsub}
+    \CASE{with project \NT{id}}
+  \end{grammar}
 \section{Expression rules}
 \label{sec:exp-rules}
 
