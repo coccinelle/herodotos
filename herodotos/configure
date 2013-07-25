@@ -68,8 +68,7 @@ my $error = 0;
 #---------------------------------------------------------------------
 $error +=
     check_config("echo \"1;;\\n\" | ocaml |",
-#                 "Objective(.*) 3.0[9]",
-                 "Objective(.*) 3.",
+                 "(Objective(.*) 3.0[9]|OCaml version 4.)",
                  "OCaml (the wonderful language) is present.",
                  "The program ocaml is missing or is not a good version. We need at least 3.09",
                  );
@@ -119,7 +118,7 @@ if ($opt eq ".opt") {
 
 #$error += # menhir is not mandatory anymore. Parsers are pre-generated.
     check_config("menhir --version |",
-                 "menhir, version 20(1.|0[89]).*",
+                 "menhir, version 20(0[89]|1[0-9]).*",
 #                 "menhir, version 2007.*",
 #  TODO: Check with earlier version
                  "Menhir (the parser generator) is present.",
