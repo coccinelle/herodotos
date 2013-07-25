@@ -1,5 +1,5 @@
 exception Not_Declared of string
-(*could find better *)
+
 let update_path ()= Sys.command "export PATH=/usr/bin/sloccount:$PATH" 
 
 let exec_count dir = Sys.command ("sloccount "^dir^" > count.tmp")
@@ -63,7 +63,7 @@ let get_size dir =
                    size
 
 
-(* *)
+
 let get_date path version deposit =
                                try 
                                  let current_dir = Sys.command "pwd > .pwd.tmp" in
@@ -84,10 +84,10 @@ let get_date path version deposit =
 let extract_code path version deposit = if((Sys.file_exists (path^"/"^version))&&(Sys.is_directory(path^"/"^version))) then  
                                           0 
                                         else 
-                                          let tag = get_tag version in 
+                                          (*let tag = get_tag version in*) 
                                           Sys.command ("cd "^(path^"/"^deposit)^" && 
                                                 git archive --format=tar --prefix="^version^"/ "^
-                                                tag^" > ../"^version^".tar; cd .. && tar xf "^version^".tar")
+                                                version^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar")
 
 (* extracts versions information thanks to a regexp describing versions tags *)
 let extract_vers_infos path expression deposit declared_versions = 
@@ -97,16 +97,17 @@ let extract_vers_infos path expression deposit declared_versions =
                                 let in_channel = open_in (current_dir^"/.tags.tmp") in
                                 let tag_string = String.create (in_channel_length in_channel) in
                                 let buff =  really_input in_channel tag_string 0 (in_channel_length in_channel) in
+                                let close = close_in in_channel in
+                                let clean = clean (current_dir^"/.tags.tmp") in
                                 let tag_list = Str.split (Str.regexp "\n") tag_string  in
-                                let code_recup = List.map(fun tag->let version = version_from_tag tag in
-                                      let trace = Printf.printf "%s\n" (path^"/"^version) in       
+                                let code_recup = List.map(fun tag->let version = (*version_from_tag*) tag in
                                       if((Sys.file_exists (path^"/"^version))&&(Sys.is_directory(path^"/"^version))) then
                                           0
                                       else           
                                            Sys.command ("cd "^(path^"/"^deposit)^" && 
                                            git archive --format=tar --prefix="^version^"/ "^
-                                           tag^" > ../"^version^".tar; cd .. && tar xf "^version^".tar") ) tag_list in 
-                                List.map(fun tag -> let version = version_from_tag tag in 
+                                           tag^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar") ) tag_list in 
+                                List.map(fun tag -> let version = (*version_from_tag*) tag in 
                                                     try
                                                       let v = get_already_declared declared_versions version in
                                                       let (n,d,s) = v in

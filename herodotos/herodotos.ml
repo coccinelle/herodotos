@@ -49,9 +49,9 @@ let options = [
   "-help", Arg.Set help, " Display this list of options";
   "--help", Arg.Set help, " Display this list of options";
   "--init", Arg.Set init, " Initialize a tracking environment as defined in the configuration file";
+  "--preinit",Arg.Set preinit, " Recover missing parts of a version descripiton (size and release date) , or extract version code";
   "--longhelp", Arg.Set longhelp, " Display this list of options and the supported graph types";
   "--parse_org", Arg.Set_string orgfile, "file path to an Org file to parse (test)";
-  "--preinit",Arg.Set preinit, " Compute code size";
   "--prefix", Arg.Set_string prefix, "path prefix of the source directories (test)";
   "--profile", Arg.Unit (fun () -> prerr_endline "*** PROFILING ENABLED ***";
 			   Debug.profile := Debug.PALL), " gather timing information about the main functions";

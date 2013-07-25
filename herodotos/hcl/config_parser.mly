@@ -197,11 +197,11 @@ attrs:
   TLCB atts=list(attr) TRCB {atts}
 
 version:
-  TLPAR name=TSTRING TCOMMA d=date  size=suite TRPAR {
+  TLPAR name=TSTRING TCOMMA d=date  size=size TRPAR {
     
   }
 
-suite:
+size:
   |TCOMMA size=TInt {}
   | { }
 
@@ -320,8 +320,7 @@ prjattr:
   | TSUBDIR        TEQUAL d=path                     {"" }
   | TVERSIONS      TEQUAL TLCB  deposit vs=list(versionPreinit) TRCB {"{\n"^(String.concat "\n" vs)^"\n}\n"}
   | TDEPOSIT       TEQUAL dep=TSTRING TVERSIONS TEQUAL exp=TSTRING
-      { let tr = Printf.printf "%s\n" exp in
-        let vs = Compute_size_and_date.extract_vers_infos (!Setup.projectsdir^"/"^(!Setup.dir)) exp dep !already_declared_versions in
+      {let vs = Compute_size_and_date.extract_vers_infos (!Setup.projectsdir^"/"^(!Setup.dir)) exp dep !already_declared_versions in
         "{\n"^(String.concat "\n" vs)^"\n}\n" }
   | TCOLOR         TEQUAL r=float v=float b=float    { "" }
   | TCORREL        TEQUAL TNONE                      { "" }
@@ -362,7 +361,7 @@ prjattr:
   | TSIZE          TEQUAL x=float y=float            { ""}   
 
 versionPreinit:
-  TLPAR name=TSTRING TCOMMA d=datePreinit  size=suitePreinit TRPAR {
+  TLPAR name=TSTRING TCOMMA d=datePreinit  size=sizePreinit TRPAR {
     let recup = Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!deposit_git) in
     let date = if d="" then 
                          (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!deposit_git))
@@ -370,15 +369,12 @@ versionPreinit:
     let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then      
       
       let size=Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name) in 
-      let affiche_vers= Printf.printf"(\"%s\",%s,%d)\n" name  date size in
       "("^"\""^name^"\""^","^ date^","^(string_of_int size)^")"
-      
      else 
-        let affiche_vers = Printf.printf"(\"%s\",%s,%d)\n" name  date size in
         "("^"\""^name^"\""^","^ date ^","^(string_of_int size)^")"
   }
 
-suitePreinit:
+sizePreinit:
   |TCOMMA size=TInt {size}
   | { 0 }
 

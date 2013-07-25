@@ -39,7 +39,7 @@ let is_SAME_as_next_in_correl correl file ver pos =
 	&& cnpos  = pos
     ) correl
 
-let find_all_next strict prefix vlist orgs correl bug =
+let find_all_next strict prefix vlist (orgs:Ast_org.bugs) correl bug =
   let (_, _, _, file, ver, pos, _, t, _, _, _) = bug in
   let (_, cb, ce) = pos in
     (*

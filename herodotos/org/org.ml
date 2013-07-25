@@ -590,14 +590,14 @@ let org_version bug version :Ast_org.org= let (_,_,_,_,_,_,_,_,_,_,orgs) = bug i
 
 let rec orgs_version prefix orgs version  = 
                                        (*let ver = Str.regexp (".*"^version^"/") in*) 
-                                         match orgs with
-                                          []->[]
-                                         |Ast_org.Org(i,s,n,link,o)::orgstail-> let (path,_,_) = link in
-                                                                                let (file, ver, pos2, face, t) = flat_link prefix 1 link in
-                                                                                if(ver = version or (is_more_recent_v ver version)) then
-                                                                                  ((Ast_org.Org(i,s,n,link,o))::orgstail)
-                                                                                else
-                                                                                  ( orgs_version prefix orgstail version)
+                                    match orgs with
+                                     []->[]
+                                    |Ast_org.Org(i,s,n,link,o)::orgstail-> let (path,_,_) = link in
+                                                                           let (file, ver, pos2, face, t) = flat_link prefix 1 link in
+                                                                           if(ver = version or (is_more_recent_v ver version)) then
+                                                                             ((Ast_org.Org(i,s,n,link,o))::orgstail)
+                                                                           else
+                                                                             ( orgs_version prefix orgstail version)
 
 
 (*-----------------------------------------------------------------------------------------------------------------------------------------------*)
