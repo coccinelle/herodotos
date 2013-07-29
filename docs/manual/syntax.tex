@@ -60,12 +60,10 @@ A HTML version of this documentation is available online at
     \RULE{prjattr}
     \CASE{flags = \NT{string} \ttmid~dir = \NT{string}}
     \CASE{\NT{styleattr}}
-    \CASE{versions =\ttlb\NT{deposit} \ANY{\NT{version}}\ttrb}
-    \CASE{deposit = \NT{string} versions = \NT{string}}
-
-    \RULE{deposit}
-    \CASE{deposit = \NT{string}}
-    \CASE{}
+    \CASE{local\_scm = \NT{string}}
+    \CASE{public\_scm = \NT{string}}
+    \CASE{versions =\ttlb \ANY{\NT{version}}\ttrb}
+    \CASE{versions = \NT{string}}
   \end{grammar}
 
 \section{Pattern attributes}
@@ -82,15 +80,14 @@ A HTML version of this documentation is available online at
 
   \begin{grammar}
     \RULE{version}
-    \CASE{(\NT{string},\NT{date} \NT{size}}
-
+    \CASE{(\NT{string},\NT{date} \NT{int})}
+    \CASE{(\NT{string},\NT{date})}
+    \CASE{(\NT{string},)}
+    
     \RULE{date}
     \CASE{\NT{int}/\NT{int}/\NT{int}}
     \CASE{}
 
-    \RULE{size}
-    \CASE{,\NT{int}}
-    \CASE{}
   \end{grammar}
 
 \section{Graphs rules}

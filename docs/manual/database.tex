@@ -1,0 +1,55 @@
+\chapter{SQL modes}
+\label{sec:sql-modes}
+
+\section{SQL queries from a report}
+\label{sec:sql-queries}
+The to-sql mode of herodotos generates SQL queries from a report. Thus, the user has to run the to-sql mode of herodotos
+with all reports, save the generated queries, and insert them in the database.
+For example, the command
+../herodotos --prefix /home/lotfi/RICM4/stage/dev/herodotos/herodotos/ --parse\_org results/testDemo/Test\_Error.new.org --to-sql
+Has the following result:
+\begin{lstlisting}
+BEGIN;SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+INSERT INTO correlations (correlation\_id,  report\_error_name, status, reason\_phrase,
+        data\_source)
+	SELECT nextval('correlation\_idx'), 'Error', 'BUG', '', 'Test\_Error.new.org' FROM
+        correlation\_idx;
+INSERT INTO reports (correlation_id, file\_id, line\_no, column\_start, column_end,
+        text\_link)
+	SELECT last_value(correlation\_idx), get\_file('testDemo', 'v0/test.c'), 8, 1, 6,
+	'I found an error' FROM correlation\_idx;
+INSERT INTO reports (correlation\_id, file\_id, line\_no, column\_start, column_end,
+        text\_link)
+	SELECT last\_value(correlation\_idx), get\_file('testDemo', 'v1/test.c'),
+	9, 1, 6, 'I found an error' FROM correlation\_idx;
+INSERT INTO reports (correlation\_id, file\_id, line_no, column_start, column\_end,
+        text\_link)
+	SELECT last_value(correlation\_idx), get_file('testDemo', 'v2/test.c'), 9, 1, 6,
+	'I found an error' FROM correlation\_idx;
+INSERT INTO report\_annotations SELECT (SELECT report\_id FROM reports, correlation\_idx 
+        WHERE file\_id=get\_file('testDemo', 'v0/test.c') AND
+        correlation\_id=last\_value(correlation\_idx)
+        AND line\_no=8 AND column\_start=1 AND column\_end=6), 8, 7, 10, 'err';
+COMMIT;
+\end{lstlisting}
+
+This part of the result shows that each bug inserted in the database can be identified thanks to its correlation\_idx.
+Consequently, a bug can be seen as a correlation, and what is insert into reports table is actually each version of
+each bug.
+
+\section{Incremental SQL queries from a report}
+\label{sec:sql-queries}
+When a study has been done on a large number of versions, and data have been inserted into the database, insert new data
+corresponding to newer versions results with the to-sql mode involves the deletion of the database and the generation
+of new queries from reports including the latest versions. To avoid that, SQL functions and some tests have been added
+to allow updating a database since a given version. Thanks to bug identifiers, herodotos checks if the bug already
+belongs to a correlaiton, if it does,it is inserted with this correlation identifier, 
+else, it is inserted as a new correlation.
+This mode is the to-sql-update mode.For the example we have, if a v3 and a v4  
+versions are added to the study, the command to run to generate incremental queries is:
+../herodotos --prefix /home/lotfi/RICM4/stage/dev/herodotos/herodotos/ --parse\_org results/testDemo/Test\_Error.new.org --to-sql-update v3.
+
+
+Even if herodotos does not handle SQL connection and these modes need an execution of herodotos for each pattern,
+the process can easily be automated thanks to scripts which run herodotos with one of these modes on each
+report, redirect the output to a text file, and then give it as a database input.

@@ -4,6 +4,8 @@
 At this point, you must have Herodotos installed. You now have to
 setup your environment and write a Herodotos Configuration file.
 
+
+
 \begin{enumerate}
 \item Setup the environment
   \begin{itemize}
@@ -18,10 +20,17 @@ setup your environment and write a Herodotos Configuration file.
     command will then use that configuration file.
   \end{itemize}
 
+\item Recover missing elements in a version description, like a release
+  date, the code size, or extract the code from a given repository:
+
+  \texttt{make preinit}
+  
 \item Initialize the environment:
 
   \texttt{make init}
 
+  
+  
 \item Compute raw data:
 
   \texttt{make -j2}
@@ -67,7 +76,25 @@ setup your environment and write a Herodotos Configuration file.
 \item Edit and adjust your HC file\\
 
   Iterate on steps 9 and 10.
+
+\item Generate SQL queries from *.new.org files:
+  
+  \texttt{herodotos ---prefix prefix/ ---parse\_org results/*/*/*.new.org ---to-sql}
+  
+\item Generate incremental SQL queries from *.new.org files
+
+  \texttt{herodotos ---prefix prefix/ ---parse\_org results/*/*/*.new.org ---to-sql-update version}
+  
+  Generated queries are used to update a data base containing data about all versions preceding
+  the given version, with data about the given version and all versions following it.
+  
+  Note: For the last two commands, it's supposed that a database has already been created. To insert 
+  new data corresponding to generated queries, the output result of these commands can be redirected 
+  to a .sql file, which can be called once connected to the database. This process, that has to be done
+  for each .new.org file, can be automated with a script that handles queries generation and the insertion
+  of data corresponding to these queries.
 \end{enumerate}
+
 
 %%% Local Variables:
 %%% mode: LaTeX
