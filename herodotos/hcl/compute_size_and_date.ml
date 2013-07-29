@@ -81,17 +81,26 @@ let get_date path version deposit =
                                with _->raise (Not_Declared "Error in deposit declaration")  
 
 
-let extract_code path version deposit = if((Sys.file_exists (path^"/"^version))&&(Sys.is_directory(path^"/"^version))) then  
+let extract_code path version deposit origin = if((Sys.file_exists (path^"/"^version))&&(Sys.is_directory(path^"/"^version))) then  
                                           0 
                                         else 
-                                          (*let tag = get_tag version in*) 
-                                          Sys.command ("cd "^(path^"/"^deposit)^" && 
-                                                git archive --format=tar --prefix="^version^"/ "^
-                                                version^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar")
+                                          (*let tag = get_tag version in*)
+                                          if((Sys.file_exists (path^"/"^deposit))&&(Sys.is_directory(path^"/"^deposit))) then
+                                            Sys.command ("cd "^(path^"/"^deposit)^" && 
+                                                  git archive --format=tar --prefix="^version^"/ "^
+                                                  version^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar")
+                                          else 
+                                            Sys.command ("cd "^path^";git clone "^origin^" "^deposit^";cd "^(path^"/"^deposit)^" && 
+                                                  git archive --format=tar --prefix="^version^"/ "^
+                                                  version^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar")
 
 (* extracts versions information thanks to a regexp describing versions tags *)
-let extract_vers_infos path expression deposit declared_versions = 
+let extract_vers_infos path expression deposit declared_versions origin= 
                                 let current_dir = Sys.getcwd() in
+                                let recup_deposit = if ((Sys.file_exists (path^"/"^deposit))&&(Sys.is_directory(path^"/"^deposit))) then
+                                                      0
+                                                    else
+                                                     Sys.command ("cd "^path^";git clone "^origin^" "^deposit ) in  
                                 let tags = Sys.command ("cd "^path^"/"^deposit^"&&
                                                  git tag | grep \""^expression   ^"\" > "^current_dir^"/.tags.tmp") in
                                 let in_channel = open_in (current_dir^"/.tags.tmp") in
@@ -103,7 +112,7 @@ let extract_vers_infos path expression deposit declared_versions =
                                 let code_recup = List.map(fun tag->let version = (*version_from_tag*) tag in
                                       if((Sys.file_exists (path^"/"^version))&&(Sys.is_directory(path^"/"^version))) then
                                           0
-                                      else           
+                                      else          
                                            Sys.command ("cd "^(path^"/"^deposit)^" && 
                                            git archive --format=tar --prefix="^version^"/ "^
                                            tag^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar") ) tag_list in 

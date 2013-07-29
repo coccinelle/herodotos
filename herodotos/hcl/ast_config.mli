@@ -44,7 +44,8 @@ type attr =
   | VMin of string
   | Author of bool
   | Prune of bool
-  | SCM of string
+  | LOCALSCM of string
+  | PUBLICSCM of string
   | SPFlags of string
   | Size of float * float
   | Sort of bool

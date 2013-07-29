@@ -11,7 +11,8 @@
     let newlinere = Str.regexp_string "\\n" in
     Str.global_replace newlinere "\\\n" s
   let versions_string = ref "" 
-  let deposit_git = ref ""
+  let public_scm = ref ""
+  let local_scm = ref ""
   let already_declared_versions = ref []
 %}
 
@@ -23,8 +24,8 @@
 %token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE TEXPERIENCE
 %token TPREFIX TCOCCI TPROJECTS TRESULTS TWEBSITE TFINDCMD TSPFLAGS TCPUCORE
 %token TFINDCHILD
-%token TSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT TDEPOSIT
-%token TLEGEND TXLEGEND TXMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR TON TWITH
+%token TLOCALSCM TPUBLICSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT 
+%token TLEGEND TXLEGEND TXMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR TON TWITH TAPPLYING
 %token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR TFOOTER
 %token TFILE TFILENAME TRATIO TSORT TGROUP TINFO TSIZE TVMIN TPRUNE TAUTHOR
 %token<int> TInt
@@ -108,26 +109,26 @@ experience:
 
 
 objects:
- |TON TPATTERN name=TId patterns= list(patternobj) TWITH TPROJECT name2=TId projects= list(projectsub) 
+ |TAPPLYING TPATTERN name=TId patterns= list(patternobj) TWITH TPROJECT name2=TId projects= list(projectsub) 
      {(Ast_config.ObjPatt((Ast_config.ExpPattern(name))::patterns),Ast_config.ObjProj((Ast_config.ExpProject(name2))::projects))}
- |TON TPROJECT name=TId projects= list (projectobj) TWITH TPATTERN name2=TId patterns= list(patternsub) 
+ |TAPPLYING TPROJECT name=TId projects= list (projectobj) TWITH TPATTERN name2=TId patterns= list(patternsub) 
      {(Ast_config.ObjProj((Ast_config.ExpProject(name))::projects),Ast_config.ObjPatt((Ast_config.ExpPattern(name2))::patterns))}
 
 patternobj:
- TON TPATTERN name=TId {Ast_config.ExpPattern(name)}
+ TCOMMA name=TId {Ast_config.ExpPattern(name)}
 
 projectobj:
- TON TPROJECT name=TId {Ast_config.ExpProject(name)}
+ TCOMMA name=TId {Ast_config.ExpProject(name)}
 
 
 patternsub:
- TWITH TPATTERN name=TId {Ast_config.ExpPattern(name)}
+ TCOMMA name=TId {Ast_config.ExpPattern(name)}
  
 
  
  
 projectsub: 
- TWITH TPROJECT name=TId {Ast_config.ExpProject(name)}
+ TCOMMA name=TId {Ast_config.ExpProject(name)}
 
 
 
@@ -171,12 +172,13 @@ attr:
 | TAUTHOR        TEQUAL b=TBOOL                    { Ast_config.Author(b)}
 | TPRUNE         TEQUAL b=TBOOL                    { Ast_config.Prune(b)}
 | TRATIO         TEQUAL b=TBOOL                    { Ast_config.Ratio(b)}
-| TVERSIONS      TEQUAL TLCB  deposit vs=list(version) TRCB {
+| TVERSIONS      TEQUAL TLCB  vs=list(version) TRCB {
     Setup.pull_versions()
   }
-| TDEPOSIT       TEQUAL dep=TSTRING TVERSIONS TEQUAL e=TSTRING{Setup.pull_versions()}
+| TVERSIONS TEQUAL e=TSTRING{Setup.pull_versions()}
 | TVMIN          TEQUAL v=TSTRING                  { Ast_config.VMin(v)}
-| TSCM           TEQUAL v=TSTRING                  { Ast_config.SCM(v)}
+| TLOCALSCM      TEQUAL v=TSTRING                  { Ast_config.LOCALSCM(v)}
+| TPUBLICSCM     TEQUAL v=TSTRING                  { Ast_config.PUBLICSCM(v)}
 | TSPFLAGS       TEQUAL f=TSTRING                  { Ast_config.SPFlags(f)}
 | TSORT          TEQUAL b=TBOOL                    { Ast_config.Sort(b)}
 | TSIZE          TEQUAL x=float y=float            { Ast_config.Size(x,y)}
@@ -318,9 +320,9 @@ projectPreinit:
 prjattr:
   | TDIR           TEQUAL d=path                     {Setup.setDir d ;""}
   | TSUBDIR        TEQUAL d=path                     {"" }
-  | TVERSIONS      TEQUAL TLCB  deposit vs=list(versionPreinit) TRCB {"{\n"^(String.concat "\n" vs)^"\n}\n"}
-  | TDEPOSIT       TEQUAL dep=TSTRING TVERSIONS TEQUAL exp=TSTRING
-      {let vs = Compute_size_and_date.extract_vers_infos (!Setup.projectsdir^"/"^(!Setup.dir)) exp dep !already_declared_versions in
+  | TVERSIONS      TEQUAL TLCB  vs=list(versionPreinit) TRCB {"{\n"^(String.concat "\n" vs)^"\n}\n"}
+  | TVERSIONS TEQUAL exp=TSTRING
+      {let vs = Compute_size_and_date.extract_vers_infos (!Setup.projectsdir^"/"^(!Setup.dir)) exp !local_scm !already_declared_versions !public_scm in
         "{\n"^(String.concat "\n" vs)^"\n}\n" }
   | TCOLOR         TEQUAL r=float v=float b=float    { "" }
   | TCORREL        TEQUAL TNONE                      { "" }
@@ -330,8 +332,7 @@ prjattr:
   | TPATTERNCOLOR  TEQUAL r=float v=float b=float    { ""}
   | TDATA          TEQUAL e=expression               { ""}
   | TFACTOR        TEQUAL f=float                    { ""}
-  | TFILE          TEQUAL f=TSTRING
-      { "" }
+  | TFILE          TEQUAL f=TSTRING                  {""}
   | TFILE          TEQUAL TNONE                      { ""}
   | TFILENAME      TEQUAL b=TBOOL                    { ""}
   | TFOOTER        TEQUAL l=TSTRING                  { ""}
@@ -355,16 +356,17 @@ prjattr:
   | TPRUNE         TEQUAL b=TBOOL                    { ""}
   | TRATIO         TEQUAL b=TBOOL                    { ""}
   | TVMIN          TEQUAL v=TSTRING                  { ""}
-  | TSCM           TEQUAL v=TSTRING                  { ""}
   | TSPFLAGS       TEQUAL f=TSTRING                  { ""}
   | TSORT          TEQUAL b=TBOOL                    { ""}
   | TSIZE          TEQUAL x=float y=float            { ""}   
+  | TLOCALSCM      TEQUAL v=TSTRING                  {local_scm := v;"" }
+  | TPUBLICSCM     TEQUAL v=TSTRING                  {public_scm := v;"" }
 
 versionPreinit:
   TLPAR name=TSTRING TCOMMA d=datePreinit  size=sizePreinit TRPAR {
-    let recup = Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!deposit_git) in
+    let recup = Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!local_scm) (!public_scm) in
     let date = if d="" then 
-                         (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!deposit_git))
+                         (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!local_scm))
                       else d in
     let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then      
       
@@ -383,9 +385,7 @@ datePreinit:
     { (string_of_int m)^"/"^(string_of_int d)^"/"^(string_of_int y)}
   | {""}
 
-deposit:
-  |TDEPOSIT TEQUAL dep=TSTRING {deposit_git := dep}
-  |{}
+
 
 (*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*)
 (*buffered versions parsing rules *)

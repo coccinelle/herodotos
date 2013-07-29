@@ -189,7 +189,7 @@ let show_attr attr =
       | Ast_config.VMin (s) -> prerr_endline ("vmin = \""^s^"\"")
       | Ast_config.Prune (b) -> prerr_endline ("prune = "^Misc.string_of_bool b)
       | Ast_config.SPFlags (s) -> prerr_endline ("flags = \""^s^"\"")
-      | Ast_config.SCM (s) -> prerr_endline ("scm = \""^s^"\"")
+      | Ast_config.LOCALSCM (s) -> prerr_endline ("scm = \""^s^"\"")
       | Ast_config.Size (x,y) -> prerr_endline ("size = "^string_of_float x ^ "x" ^ string_of_float y)
       | Ast_config.Sort b -> prerr_endline ("sort = "^Misc.string_of_bool b)
   else
@@ -546,11 +546,11 @@ let get_scm prj =
 	match
 	  List.find (fun x ->
 		       match x with
-			   Ast_config.SCM _ -> true
+			   Ast_config.LOCALSCM _ -> true
 			 | _ -> false
 		    ) atts
 	with
-	    Ast_config.SCM s -> s
+	    Ast_config.LOCALSCM s -> s
 	  | _ -> raise Unrecoverable
       with _ ->
 	raise (Misconfiguration "project source code repository is not set")

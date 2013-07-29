@@ -49,13 +49,13 @@ rule token = parse
       commentdepth := !commentdepth + 1;
       comment lexbuf
 			      }
+  | "applying"                { P.TAPPLYING      }
   | "author"                  { P.TAUTHOR        }
   | "color"                   { P.TCOLOR         }
   | "correl"                  { P.TCORREL        }
   | "cpucore"                 { P.TCPUCORE       }
   | "curve"                   { P.TCURVE         }
   | "data"                    { P.TDATA          }
-  | "deposit"                 { P.TDEPOSIT       }
   | "dir"                     { P.TDIR           }
   | "empty"                   { P.TEMPTY         }
   | "experience"              { P.TEXPERIENCE    }
@@ -87,7 +87,8 @@ rule token = parse
   | "prune"                   { P.TPRUNE         }
   | "ratio"                   { P.TRATIO         }
   | "results"                 { P.TRESULTS       }
-  | "scm"                     { P.TSCM           }
+  | "local_scm"               { P.TLOCALSCM      }
+  | "public_scm"              { P.TPUBLICSCM     }
   | "size"                    { P.TSIZE          }
   | "sort"                    { P.TSORT          }
   | "subdir"                  { P.TSUBDIR        }
