@@ -1,1 +1,9 @@
 auto
+*.aux
+*.log
+*.out
+*.toc
+
+hevea.sty
+herodotos.pdf
+howto-herodotos.pdf
