@@ -1,6 +1,6 @@
 TARGET = database
 
-SOURCES = sql.ml
+SOURCES = sql.ml sql_update.ml
 INTFS =
 INCLUDES = -I ../commons -I ../org
 

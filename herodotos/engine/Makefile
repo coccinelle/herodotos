@@ -6,6 +6,7 @@ SOURCES = occ_correl.ml \
 	cfghelper.ml    \
 	cfgmode.ml      \
 	cfginit.ml      \
+	cfgpreinit.ml   \
 	cfgcorrel.ml    \
 	cfgstat.ml      \
 	cfgerase.ml     \
