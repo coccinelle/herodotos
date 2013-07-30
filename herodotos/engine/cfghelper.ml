@@ -1,14 +1,15 @@
 exception Error of string
+exception NotFound of string
 
-let get_bugset_of_group atts group : string list =
+let get_bugset_of_group (atts:Ast_config.attr list) (group:Ast_config.group) : string list =
     match group with
 	Ast_config.GrpCurve (_, curves) ->
 	  List.flatten (List.map (Config.get_bugset_of_curve atts) curves)
       | Ast_config.GrpPatt (patt, pos) ->
 	  let projects = Config.get_projects atts in
 	    List.map (Config.get_bugset_of_grp_patt patt pos) projects
-
-let get_bugset_of_graph name (atts, subgraph) =
+(*liste des noms de bugs sur le graphe de nom name *)
+let get_bugset_of_graph (name:string) ((atts, subgraph):Ast_config.gph):string list =
   match subgraph with
       Ast_config.Curves curves ->
 	(match Config.get_ytype name atts with
@@ -22,7 +23,7 @@ let get_bugset_of_graph name (atts, subgraph) =
 	let orgs = List.map (get_bugset_of_group atts) groups in
 	  (List.flatten orgs)
 
-let get_all_bugset () =
+let get_all_bugset ():string list*string list =
   let (graphs, bugsets) =
     List.split
       (Setup.GphTbl.fold
@@ -32,6 +33,66 @@ let get_all_bugset () =
     )
   in
     (graphs, List.flatten bugsets)
+
+
+(*  for experiences*)
+let rec get_all_bugset_of_patt patts p:string list= let (Ast_config.ExpProject prj)=p in 
+                                        let (Ast_config.ObjPatt pl)=patts in match pl with
+                                       []->[]
+                                      |(Ast_config.ExpPattern pat)::patterns->
+                                              (Config.locate_data prj pat (Global.bugext))::
+                                             (get_all_bugset_of_patt (Ast_config.ObjPatt patterns) p) 
+
+
+let rec get_all_bugset_of_exp (exp:Ast_config.experience):string list list =let (st1,st2) = exp in 
+                                         match st1 with
+                                         Ast_config.ObjPatt patts->let (Ast_config.ObjProj lp)=st2 in 
+                                                                begin
+                                                                  match lp with
+                                                                    []->[]
+                                                                   |p::projects->(get_all_bugset_of_patt st1 p)::
+                                                                      (get_all_bugset_of_exp (st1,(Ast_config.ObjProj projects)))
+                                                                end
+                                        |Ast_config.ObjProj projs->
+                                                                begin
+                                                                  match projs with
+                                                                    []->[]
+                                                                   |p::projects->(get_all_bugset_of_patt st2 p)::
+                                                                      (get_all_bugset_of_exp (st2,(Ast_config.ObjProj projects)))
+                                                                end 
+                                          
+
+
+let get_bugset_of_exp name = 
+  try 
+    let exp = Setup.ExpTbl.find Setup.experiences name in let debug=Printf.printf "je passe\n" in
+    List.flatten (get_all_bugset_of_exp exp)
+  with Not_found->raise (NotFound ("Experience "^name^" is not declared"))
+ 
+(*changement de l'ordre des paramètres ,utile pour la suite *) 
+let find exp tbl = Setup.ExpTbl.find tbl exp
+(*fonction qui retourne la liste des experiences *)  
+let listExp():Ast_config.experience list=
+  Setup.ExpTbl.fold(
+    fun name exp liste -> (find name Setup.experiences) :: liste 
+  ) Setup.experiences []                                                                                
+
+let get_all_bugset_exp ():string list =let liste= List.map(fun exp->get_all_bugset_of_exp exp)(listExp()) in
+                            List.flatten(List.flatten liste) 
+
+
+(*imprimer des studies  *)
+let print_studies st= match st with
+            |Ast_config.ObjPatt pat->List.iter(fun elt->let (Ast_config.ExpPattern e)=elt in Printf.printf "PATTERN %S\n" e) pat
+            |Ast_config.ObjProj pro->List.iter(fun elt->let (Ast_config.ExpProject e)=elt in Printf.printf "PROJECT %S\n" e) pro
+(*imprimer les attributs d'une exp*)
+  
+
+(*fin_impression--ça se passe comme attendu *)
+
+(*end for experiences *)
+
+
 
 let check_filter filter file =
 (* Check whether the filter is for a particular prj/patt pair *)
@@ -54,33 +115,39 @@ let check_filter filter file =
    with Not_found -> false
   )
 
+
+
+
+
 let get_bugset filter : string list =
-  let orgs =
     if filter = "" then
-      snd (get_all_bugset ())
+      Misc.unique_list (snd (get_all_bugset ()))
     else
       try
 	let datagraph = Setup.GphTbl.find Setup.graphs filter in
-	  get_bugset_of_graph filter datagraph
+	  Misc.unique_list(get_bugset_of_graph filter datagraph)
       with Not_found ->
 	let (graphs, fullbugset) = get_all_bugset () in
-	let bugset = List.filter (check_filter filter) fullbugset in
-	  if bugset <> [] then
-	    bugset
-	  else
-	    begin
-	      prerr_endline ("*** ERROR *** No graph or file named "^filter);
-	      prerr_endline (" - GRAPH LIST: (Use --debug to have file list)");
-	      List.iter (fun g -> prerr_endline ("\t"^g)) graphs;
-	      if !Misc.debug then
-		begin
-		  prerr_endline (" - BUG SET LIST");
-		  List.iter (fun f -> prerr_endline ("\t"^f)) fullbugset;
-		end;
-	      exit 2
-	    end
-  in
-    Misc.unique_list orgs
+	Misc.unique_list(List.filter (check_filter filter) fullbugset)
+
+(*for experiments *)
+let get_bugset_exp filter = 
+    if filter = "" then
+      Misc.unique_list (get_all_bugset_exp ())
+    else
+      try
+	let experience = Setup.ExpTbl.find Setup.experiences filter in
+	  Misc.unique_list(List.flatten(get_all_bugset_of_exp experience))
+      with Not_found ->
+	Misc.unique_list(List.filter(check_filter filter) (get_all_bugset_exp ()))
+      
+(*bug set involving graphs and experiences *)	
+let get_bugset_gen filter=let orgs=Misc.unique_list((get_bugset filter)@ (get_bugset_exp filter)) in
+  if orgs <> [] then
+    orgs
+  else
+    raise (Error("*** ERROR *** No graph,file, or experience named "^filter))
+    
 
 let by_project p bug =
   let (pb, _) = bug in

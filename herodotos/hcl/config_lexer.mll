@@ -49,6 +49,7 @@ rule token = parse
       commentdepth := !commentdepth + 1;
       comment lexbuf
 			      }
+  | "applying"                { P.TAPPLYING      }
   | "author"                  { P.TAUTHOR        }
   | "color"                   { P.TCOLOR         }
   | "correl"                  { P.TCORREL        }
@@ -57,6 +58,7 @@ rule token = parse
   | "data"                    { P.TDATA          }
   | "dir"                     { P.TDIR           }
   | "empty"                   { P.TEMPTY         }
+  | "experience"              { P.TEXPERIENCE    }
   | "factor"                  { P.TFACTOR        }
   | "file"                    { P.TFILE          }
   | "filename"                { P.TFILENAME      }
@@ -76,6 +78,7 @@ rule token = parse
   | "nooccurcolor"            { P.TCLEANCOLOR    }
   | "notexistcolor"           { P.TNOTEXISTCOLOR }
   | "occurcolor"              { P.TPATTERNCOLOR  }
+  | "on"                      { P.TON            }
   | "pattern"                 { P.TPATTERN       }
   | "patterns"                { P.TCOCCI         }
   | "prefix"                  { P.TPREFIX        }
@@ -84,13 +87,15 @@ rule token = parse
   | "prune"                   { P.TPRUNE         }
   | "ratio"                   { P.TRATIO         }
   | "results"                 { P.TRESULTS       }
-  | "scm"                     { P.TSCM           }
+  | "local_scm"               { P.TLOCALSCM      }
+  | "public_scm"              { P.TPUBLICSCM     }
   | "size"                    { P.TSIZE          }
   | "sort"                    { P.TSORT          }
   | "subdir"                  { P.TSUBDIR        }
   | "versions"                { P.TVERSIONS      }
   | "vmin"                    { P.TVMIN          }
   | "website"                 { P.TWEBSITE       }
+  | "with"                    { P.TWITH          }
   | "xaxis"                   { P.TXAXIS         }
   | "xmin"                    { P.TXMIN          }
   | "xlegend"                 { P.TXLEGEND       }
@@ -134,8 +139,8 @@ and string  = parse
          (match v with
          | 'n' -> ()  | 't' -> () | 'v'  -> ()  | 'b' -> () | 'r' -> ()
 	 | 'f' -> ()  | 'a' -> ()
-	 | '\\' -> () | '?' -> () | '\'' -> ()  | '"' -> ()
-         | 'e' -> ()
+	 | '\\' -> () | '?' -> () | '\'' -> ()  | '"' -> () | '(' -> ()
+         | '.' -> ()  | ')' -> () | 'e' -> ()  
          | '\n' -> set_newline lexbuf
          | _ -> lexerr "unrecognised symbol:" (tok lexbuf)
 	 );

@@ -6,7 +6,7 @@ let s2s s = "'"^Str.global_replace (Str.regexp_string "'") "''" s^"'"
 let get_correlation_id = "last_value(correlation_idx)"
 let get_new_correlation_id = "nextval('correlation_idx')"
 
-let filter_annot org =
+let filter_annot org : bool =
   let Ast_org.Org(l, _, _, _, _) = org in
     l = max_int
 
@@ -20,7 +20,7 @@ create table report_annotations (
 	text_link            VarChar(256)            -- text hyperlink
 );
 *)
-let get_report_id prefix cfile cver cpos =
+let get_report_id prefix cfile cver (cpos : Ast_org.pos) =
   let (line, colb, cole) = cpos in
   let file_id = "get_file('"^cver^"', '"^Misc.get_canonical_name prefix cver cfile^"')" in
     "(SELECT report_id FROM reports, correlation_idx WHERE file_id="^file_id^
@@ -97,7 +97,7 @@ create table correlations (
 );
 *)
 
-let insert_correl_report prefix src patt org =
+let insert_correl_report prefix src patt (org:Ast_org.bug) =
   let (_, s, r, file, ver, pos, face, t, _, _, sub) = org in
 (*  let text = Org.clean_link_text prefix ver file pos t in*)
   let fields = "correlation_id,  report_error_name, status, reason_phrase, data_source" in

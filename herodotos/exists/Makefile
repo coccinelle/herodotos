@@ -21,6 +21,8 @@ OPTLIB=$(LIB:.cma=.cmxa)
 MENHIR=$(MENHIR_PATH)/menhirLib.cmo
 MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 
+AST_DEPEND=ast_exist
+
 # The Caml compilers.
 OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
 OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
@@ -47,7 +49,7 @@ all.opt: $(OPTLIB)
 $(LEXER_SOURCES:.mll=.ml) :	$(LEXER_SOURCES)
 	$(OCAMLLEX) $(LEXER_SOURCES)
 
-$(PARSER_SOURCES:.mly=.ml) $(PARSER_SOURCES:.mly=.mli) : $(PARSER_SOURCES)
+$(PARSER_SOURCES:.mly=.ml) $(PARSER_SOURCES:.mly=.mli) : $(AST_DEPEND).cmi $(PARSER_SOURCES)
 	$(OCAMLYACC) $(PARSER_SOURCES)
 
 $(LIB): $(GENERATED) $(OBJS)

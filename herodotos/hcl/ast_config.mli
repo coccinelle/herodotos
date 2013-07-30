@@ -44,10 +44,12 @@ type attr =
   | VMin of string
   | Author of bool
   | Prune of bool
-  | SCM of string
+  | LOCALSCM of string
+  | PUBLICSCM of string
   | SPFlags of string
   | Size of float * float
   | Sort of bool
+  | Deposit of string
 
 type curve = string option * string option * attr list * Ast.pos
 
@@ -60,3 +62,12 @@ type subgraph =
   | Groups of group list
 
 type gph = attr list * subgraph
+
+type expPattern = ExpPattern of string
+
+type expProject = ExpProject of string
+
+type studies = ObjPatt of expPattern list | ObjProj of expProject list
+ 
+type experience=studies * studies
+

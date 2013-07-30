@@ -2,7 +2,7 @@ TARGET = hcl
 
 LEXER_SOURCES = config_lexer.mll
 PARSER_SOURCES = config_parser.mly
-SOURCES = setup.ml $(PARSER_SOURCES:.mly=.ml) $(LEXER_SOURCES:.mll=.ml) config.ml
+SOURCES = setup.ml compute_size_and_date.ml $(PARSER_SOURCES:.mly=.ml) $(LEXER_SOURCES:.mll=.ml) config.ml 
 #MENHIR_PATH=../menhirlib
 #INCLUDES = -I $(MENHIR_PATH) -I ../commons
 INCLUDES = -I ../commons
