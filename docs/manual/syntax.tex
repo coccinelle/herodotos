@@ -3,20 +3,19 @@
 \label{sec:hcl-grammar}
 
 This document presents the grammar of the Herodotos Configuration
-Language used by the
-\href{http://www.diku.dk/~npalix/herodotos/}{Herodotos tool}.  The
-grammar uses some unspecified nonterminals, such as \T{id}, etc.
-These refer to the sets suggested by the name, {\em i.e.}, \T{id}
-refers to the set of possible identifiers.
+Language used by the Herodotos tool. The grammar uses some unspecified
+nonterminals, such as \T{id}, etc.  These refer to the sets suggested
+by the name, {\em i.e.}, \T{id} refers to the set of possible
+identifiers.
 
-\ifhevea
-A PDF version of this documentation is available at
-\url{http://www.diku.dk/~npalix/herodotos/docs/herodotos.pdf}.
-\else
-A HTML version of this documentation is available online at
-\url{http://www.diku.dk/~npalix/herodotos/docs/herodotos.html}.
-\fi
-
+% \ifhevea
+% A PDF version of this documentation is available at
+% \url{http://www.diku.dk/~npalix/herodotos/docs/herodotos.pdf}.
+% \else
+% A HTML version of this documentation is available online at
+% \url{http://www.diku.dk/~npalix/herodotos/docs/herodotos.html}.
+% \fi
+% 
 \section{Global attributes and top-level definitions}
 \label{sec:globattr}
 
@@ -80,13 +79,12 @@ A HTML version of this documentation is available online at
 
   \begin{grammar}
     \RULE{version}
-    \CASE{(\NT{string},\NT{date} \NT{int})}
+    \CASE{(\NT{string},\NT{date}, \NT{int})}
     \CASE{(\NT{string},\NT{date})}
-    \CASE{(\NT{string},)}
+    \CASE{(\NT{string})}
     
     \RULE{date}
     \CASE{\NT{int}/\NT{int}/\NT{int}}
-    \CASE{}
 
   \end{grammar}
 

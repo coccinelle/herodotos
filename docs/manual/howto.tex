@@ -4,8 +4,6 @@
 At this point, you must have Herodotos installed. You now have to
 setup your environment and write a Herodotos Configuration file.
 
-
-
 \begin{enumerate}
 \item Setup the environment
   \begin{itemize}
@@ -14,7 +12,7 @@ setup your environment and write a Herodotos Configuration file.
     \texttt{herodotos/scripts}. For a package install, copy the files
     from the Herodotos
     examples\footnote{\texttt{/usr/share/doc/herodotos/examples/scripts}}.
-  \item Write a HC file which declares your projects, patterns and graphs.\\
+  \item Write a HC file which declares your projects, patterns and experiments.\\
     If you want to have several .hc files, you should define the CONF
     environment variable to select a default one. Every following make
     command will then use that configuration file.
@@ -28,8 +26,6 @@ setup your environment and write a Herodotos Configuration file.
 \item Initialize the environment:
 
   \texttt{make init}
-
-  
   
 \item Compute raw data:
 
@@ -85,14 +81,17 @@ setup your environment and write a Herodotos Configuration file.
 
   \texttt{herodotos ---prefix prefix/ ---parse\_org results/*/*/*.new.org ---to-sql-update version}
   
-  Generated queries are used to update a data base containing data about all versions preceding
-  the given version, with data about the given version and all versions following it.
+  Generated queries are used to update a data base containing data
+  about all versions preceding the given version, with data about the
+  given version and all versions following it.
   
-  Note: For the last two commands, it's supposed that a database has already been created. To insert 
-  new data corresponding to generated queries, the output result of these commands can be redirected 
-  to a .sql file, which can be called once connected to the database. This process, that has to be done
-  for each .new.org file, can be automated with a script that handles queries generation and the insertion
-  of data corresponding to these queries.
+  \textbf{Note}: For the last two commands, it's supposed that a
+  database has already been created. To insert new data corresponding
+  to generated queries, the output result of these commands can be
+  redirected to a .sql file, which can be called once connected to the
+  database. This process, that has to be done for each .new.org file,
+  can be automated with a script that handles queries generation and
+  the insertion of data corresponding to these queries.
 \end{enumerate}
 
 
