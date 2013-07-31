@@ -81,7 +81,8 @@ let get_date path version deposit =
                                with _->raise (Not_Declared "Error in deposit declaration")  
 
 
-let extract_code path version deposit origin = if((Sys.file_exists (path^"/"^version))&&(Sys.is_directory(path^"/"^version))) then  
+let extract_code path version local_scm origin = let deposit = Str.replace_first (Str.regexp "git:") "" local_scm in
+                                       if((Sys.file_exists (path^"/"^version))&&(Sys.is_directory(path^"/"^version))) then  
                                           0 
                                         else 
                                           (*let tag = get_tag version in*)
@@ -95,7 +96,8 @@ let extract_code path version deposit origin = if((Sys.file_exists (path^"/"^ver
                                                   version^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar")
 
 (* extracts versions information thanks to a regexp describing versions tags *)
-let extract_vers_infos path expression deposit declared_versions origin= 
+let extract_vers_infos path expression local_scm declared_versions origin= 
+                                let deposit = Str.replace_first (Str.regexp "git:") "" local_scm in
                                 let current_dir = Sys.getcwd() in
                                 let recup_deposit = if ((Sys.file_exists (path^"/"^deposit))&&(Sys.is_directory(path^"/"^deposit))) then
                                                       0
