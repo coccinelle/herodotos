@@ -199,7 +199,7 @@ attrs:
   TLCB atts=list(attr) TRCB {atts}
 
 version:
-  TLPAR name=TSTRING TCOMMA d=date  size=size TRPAR {
+  TLPAR name=TSTRING d=date  size=size TRPAR {
     
   }
 
@@ -208,7 +208,7 @@ size:
   | { }
 
 date:
-  m=TInt TSLASH d=TInt TSLASH y=TInt
+  |TCOMMA m=TInt TSLASH d=TInt TSLASH y=TInt
     { snd (Unix.mktime {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
        (* Don't care about the time *)
        Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
@@ -363,7 +363,7 @@ prjattr:
   | TPUBLICSCM     TEQUAL v=TSTRING                  {public_scm := v;"" }
 
 versionPreinit:
-  TLPAR name=TSTRING TCOMMA d=datePreinit  size=sizePreinit TRPAR {
+  TLPAR name=TSTRING  d=datePreinit  size=sizePreinit TRPAR {
     let recup = Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!local_scm) (!public_scm) in
     let date = if d="" then 
                          (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!local_scm))
@@ -381,7 +381,7 @@ sizePreinit:
   | { 0 }
 
 datePreinit:
-  | m=TInt TSLASH d=TInt TSLASH y=TInt
+  |TCOMMA m=TInt TSLASH d=TInt TSLASH y=TInt
     { (string_of_int m)^"/"^(string_of_int d)^"/"^(string_of_int y)}
   | {""}
 

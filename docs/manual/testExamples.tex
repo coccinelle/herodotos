@@ -11,11 +11,20 @@ projects="/home/lotfi/RICM4/stage/dev/herodotos/herodotos"
 results="./results"
 website="./website"
 findcmd="spatch %f -sp_file %p -dir %d 2> %b.log > %o"
-//findchild = 8
-//flags="-timeout 60 -use_glimpse"
-flags="-timeout 60"
+findchild = 8
+flags="-timeout 60 -use_glimpse"
 cpucore = 1
 \end{lstlisting}
+In this section, infomation necessary to indicate the work environment are indicated, like semantic patches,
+results, and projects pathes , and the command to execute.
+Other parameters can be givern, like the number of cores, to paralellize matching pattern step, instanciated in 
+cpucore parameter, and the number of processes that coccinelle can run , given in findchild parameter.
+Parameters in the command, indicated by a \% represent:
+  \%f : Execution parameter, here the timeout is indicated.
+  \%p : The semantic patch to apply.
+  \%d : The directory where to study version code is located.
+  \%o : The resulting report file.
+  The three last parameters can be fixed in a Make file.
 
 \section{Projects}
 \label{sec:ex-projects}
@@ -25,12 +34,47 @@ cpucore = 1
  
 project Test {
  dir = testDemo	
- deposit = "test"
+ local_scm = "test"
  versions = "^v[0-2]$"       
 }
  
 \end{lstlisting}
+In this section, project relative path is indicated, and different versions to study are described.
+In this example, versions are described with a regular expression: versions to study are v0,v1 and v2 versions.
+In this case, some information, like versions code size, and release date, are missing. These information are recovered
+thanks to the local source code manager, which corresponds to a git repository. Source code can also be recovered if
+the source code of a versions has not been recovered yet. If a local repository does not exist yet, it can be created
+with a distant git repository, communicated with the "public\_scm" flag. In this case, a local git repository is 
+created its name is fixed by the "local\_scm" flag value. After that, missing code is recovered, release date and code 
+size are computed and saved. This step is consequently done once for each version.
+There are other ways to describe versions, without using  regular expressions. Here are some examples:
 
+\begin{lstlisting}
+ 
+project Test {
+ dir = testDemo	
+ ("v0",07/23/2013,10)
+ ("v1",07/23/2013,11)
+ ("v2",07/23/2013,11)
+}
+\end{lstlisting}
+This kind of declaration is necessary when there is no available source code manager, assuming that source code
+is already present. In this case, the only information which can miss is code size.
+
+\begin{lstlisting}
+project Test2 {
+	
+	dir = testDemo
+	local_scm = "test"
+	versions = {
+              ("v0",)
+              ("v1",)
+              ("v2",)
+        }
+}
+\end{lstlisting}
+This declaration is equivalent to the fist one, since versions names are listed without other information, instead of
+being defined with a regular expression.
 
 \section{Patterns}
 \label{sec:ex-patterns}
@@ -56,9 +100,9 @@ pattern Notes {
 
 \begin{lstlisting}
 
-experience exp on project Test 
-               with pattern Error
-               with pattern Notes	
+experience exp applying pattern Error,Notes
+               with project Test, Test2		
+
 
 \end{lstlisting}
 
