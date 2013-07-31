@@ -16,7 +16,7 @@ let parse_projects_versions versions_file =
      let ast = Config_parser.parse_versions Config_lexer.token lexbuf in
        close_in in_ch;
        ast
-  with _->prerr_string ("File "^versions_file^" does not exit, run make preinit.\n")   
+  with _->prerr_string ("File "^versions_file^" does not exist or has been modified, run make preinit.\n")   
 
 (* checks versions already treated, in order to avoid computing date, size,... *)
 let parse_check_versions versions_file =
@@ -62,11 +62,28 @@ let parse_config file : unit =
 let parse_preinit file:string = 
   let in_ch = open_in file in
   let lexbuf = Lexing.from_channel in_ch  in
+  try
     Misc.init file lexbuf;    
     let ast = Config_parser.preinit Config_lexer.token lexbuf in
-      close_in in_ch;
-      ast
-
+    close_in in_ch;
+    ast
+  with
+      (Config_lexer.Lexical msg) ->
+	let pos = lexbuf.lex_curr_p in
+	  Misc.report_error
+	    { Ast.file  = file;
+	      Ast.line  = pos.pos_lnum;
+	      Ast.colfr = pos.pos_cnum - pos.pos_bol;
+	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
+	    ("Config Lexer Error: " ^ msg);
+    | Config_parser.Error ->
+	let pos = lexbuf.lex_curr_p in
+	  Misc.report_error
+	    { Ast.file  = file;
+	      Ast.line  = pos.pos_lnum;
+	      Ast.colfr = pos.pos_cnum - pos.pos_bol;
+	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
+	    ("Config Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
 
 let get_abs_days_of tm =
   (* 60.0 (s) *. 60.0 (mn) *. 24.0  (h) = 86400.0 *)
