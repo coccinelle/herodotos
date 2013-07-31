@@ -20,13 +20,13 @@ PROJECTS=$(PRJS:%=$(RESULTS)%)
 UPDATES=$(PRJS:%=update-%)
 
 .PHONY:: all projects update stat statcorrel statfp
-.PHONY:: init correl graph web h-stat clean
+.PHONY:: preinit init correl graph web h-stat clean
 .PHONY:: help check-conf
 .PHONY:: $(PROJECTS) $(UPDATES)
 
 -include .depend
 
-init correl web stat statfp: check-conf $(CONF)
+preinit init correl web stat statfp: check-conf $(CONF)
 	$(HERODOTOS) $(FLAGS) -c $(CONF) --$@
 	@if [ "$@" = "init" ]; then echo "NEXT: make all [-jX]"; fi
 	@if [ "$@" = "init" ]; then echo "OR: dmake X (if you stand on the shoulders of giants !)"; fi
