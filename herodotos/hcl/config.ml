@@ -209,6 +209,7 @@ let show_attr attr =
       | Ast_config.LOCALSCM (s) -> prerr_endline ("scm = \""^s^"\"")
       | Ast_config.Size (x,y) -> prerr_endline ("size = "^string_of_float x ^ "x" ^ string_of_float y)
       | Ast_config.Sort b -> prerr_endline ("sort = "^Misc.string_of_bool b)
+      |_ -> ()
   else
     match attr with
       | Ast_config.Version (_, vs) ->
@@ -889,7 +890,7 @@ let rec get_cmdList p pattern_list: ((string * string) *(string * (string * (str
                               match pattern_list with
                                  []->[]
                                 |patt::tail->let cli=spatch_cli p patt in 
-                                             let origs = get_origs cli in
+                                             let _ = get_origs cli in
                                              let data = locate_data p patt Global.origext in
                                              ((p,patt),(data,cli))::(get_cmdList p tail)
 

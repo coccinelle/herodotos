@@ -70,7 +70,6 @@ let insert_report_orgs prefix bug version =
   let (line1, colb1, cole1) = pos1 in
   let orgs_interest = Org.orgs_version prefix orgs version in
   let reqs = ref "" in
-  let iter = 
     List.iter(fun o ->let Ast_org.Org(l, s, r, link, sub) = o in
       let (file, ver, pos2, face, t) = Org.flat_link prefix 1 link in
       let text = Org.clean_link_text prefix ver file pos2 t in
@@ -87,7 +86,7 @@ let insert_report_orgs prefix bug version =
         string_of_int cole2;
         s2s text]
       in
-       reqs := !reqs ^ Printf.sprintf "INSERT INTO reports (%s)\n\tSELECT %s FROM correlation_idx;\n" fields values) orgs_interest in
+       reqs := !reqs ^ Printf.sprintf "INSERT INTO reports (%s)\n\tSELECT %s FROM correlation_idx;\n" fields values) orgs_interest; 
       !reqs
 
 let insert_report_single prefix bug version =
@@ -178,7 +177,7 @@ let print_orgs ch prefix orgfile (orgs:Ast_org.bug list) version =
                        insert_correl_report prefix basefile patt o
                      else
                        try
-                         let org = Org.orgs_version prefix orgs version in
+                         let _ = Org.orgs_version prefix orgs version in
                          insert_report_orgs prefix o version
                            
                        with _->""  

@@ -78,7 +78,6 @@ rule token = parse
   | "nooccurcolor"            { P.TCLEANCOLOR    }
   | "notexistcolor"           { P.TNOTEXISTCOLOR }
   | "occurcolor"              { P.TPATTERNCOLOR  }
-  | "on"                      { P.TON            }
   | "pattern"                 { P.TPATTERN       }
   | "patterns"                { P.TCOCCI         }
   | "prefix"                  { P.TPREFIX        }

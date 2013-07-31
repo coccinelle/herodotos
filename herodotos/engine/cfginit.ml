@@ -242,17 +242,22 @@ let comp_makefile_for_group atts group =
 
 
 (*equivalent for experiences *)
-let comp_makefile_for_exp experience=let (se1,se2)=experience in match se1 with
+let comp_makefile_for_exp (experience:Ast_config.experience)=let (se1,se2)=experience in match se1 with
                                            |Ast_config.ObjPatt patts->let lpatts=List.map(get_pattern_name) patts in
-                                                                      let Ast_config.ObjProj projs=se2 in
-                                                                      let lprojs=List.map(get_project_name) projs in
-                                                                      List.map(fun p->
-                                                                        Config.get_cmdList p lpatts) lprojs 
+                                                                      begin
+                                                                        match se2 with 
+                                                                          |Ast_config.ObjProj projs -> let lprojs=List.map(get_project_name) projs in
+                                                                                                       List.map(fun p->
+                                                                                                       Config.get_cmdList p lpatts) lprojs
+                                                                          |_ -> raise (Misconfiguration "A pattern list must be given")
+                                                                      end
                                            |Ast_config.ObjProj projs->let lprojs=List.map(get_project_name) projs in
-                                                                      let Ast_config.ObjPatt patts=se2 in
-                                                                      let lpatts=List.map(get_pattern_name) patts in
-                                                                      List.map(fun p->
-                                                                        Config.get_cmdList p lpatts) lprojs 
+                                                                      match se2 with
+                                                                        |Ast_config.ObjPatt patts -> let lpatts=List.map(get_pattern_name) patts in
+                                                                                                     List.map(fun p->
+                                                                                                     Config.get_cmdList p lpatts) lprojs 
+                                                                        |_ -> raise (Misconfiguration "A pattern list must be given")
+
 
 let comp_makefile_for_experiences experience=List.flatten (comp_makefile_for_exp experience)
 

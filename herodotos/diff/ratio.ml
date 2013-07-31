@@ -29,6 +29,7 @@ let compute_ratio delta state =
 	  let fileweight = (2.0 *. filesize) +. filechange in
 	    linechange /. fileweight
       | Ast_exist.True   -> raise MalformedExists
+      | Ast_exist.Empty   -> raise MalformedExists
 
 let compute_deltas diffs exists =
   let (vers, entries) = exists in

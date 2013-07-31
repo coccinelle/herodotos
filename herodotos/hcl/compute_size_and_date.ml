@@ -10,24 +10,25 @@ let clean nameFile =Sys.command ("rm "^nameFile)
 let get_already_declared version_list version = List.find(fun v -> let (name,date,size) = v in name = version) version_list
 
 
-let get_tags path deposit = let tag_list = Sys.command("cd "^(path^"/"^deposit)^";"^"git tag > .tags.tmp") in
+let get_tags path deposit =  let _ = Sys.command("cd "^(path^"/"^deposit)^";"^"git tag > .tags.tmp") in
                                            let in_channel = open_in ".tags.tmp" in 
                                            let tag_string = String.create (in_channel_length in_channel) in
-                                           let buff =  really_input in_channel tag_string 0 (in_channel_length in_channel) in
+                                           really_input in_channel tag_string 0 (in_channel_length in_channel) ;
                                            Str.split (Str.regexp "\n") tag_string
 
 let tag_filter tag_list filter = let result = ref [] in 
-                                 let loop = List.iter(fun tag -> if Str.string_match (Str.regexp filter) tag 0 then
+                                 List.iter(fun tag -> if Str.string_match (Str.regexp filter) tag 0 then
                                                                    result := tag :: !result
                                                                  else 
-                                                                   ())tag_list in !result
+                                                                   ())tag_list ; 
+                                                                      !result
 
 
 
 let rec string_match_exp (exp:Str.regexp) (strings:string list)= match strings with
                                         []->""
                                        |s1::tail -> try 
-                                                      let correspond = Str.search_forward exp s1 0 in
+                                                      let _ = Str.search_forward exp s1 0 in
                                                       let posbeg=Str.match_beginning() in
                                                       (String.sub s1 posbeg ((String.length s1)-posbeg))
                                                     with Not_found->(string_match_exp exp tail) 
@@ -49,34 +50,35 @@ let get_tag version = let num = Str.regexp "[0-9].*" in
                       "v"^(String.sub version start_num ((String.length version)- start_num)) 
 
 let get_size dir = 
-                   let count=exec_count dir in                 
+                   let _ = exec_count dir in                 
 		   let in_channel=open_in "count.tmp" in
  		   let lines=read_recursive [] in_channel in
 		   let chaine = String.concat "\n" lines in       
 		   let expression=  Str.regexp "ansic: *[0-9]+" in
                    let expNumber= Str.regexp"[0-9]+" in 
 		   let expSep = Str.regexp" +" in
-		   let correspond=Str.search_forward expression chaine 0 in
+		   let _ = Str.search_forward expression chaine 0 in
                    let size = int_of_string (string_match_exp expNumber (Str.split expSep (string_match_exp expression lines))) in
-		   let close = close_in in_channel in
-                   let clean=clean "count.tmp" in
+		   close_in in_channel ;
+                   let _ = clean "count.tmp" in 
                    size
 
 
 
 let get_date path version deposit =
                                try 
-                                 let current_dir = Sys.command "pwd > .pwd.tmp" in
+                                 let _ = Sys.command "pwd > .pwd.tmp" in
                                  let in_channel = open_in ".pwd.tmp" in
                                  let pwd = input_line in_channel in 
                                  let tag = get_tag version in
-                                 let depl = Sys.command ("cd "^(path^"/"^deposit)^" ; 
+                                 let _ = Sys.command ("cd "^(path^"/"^deposit)^" ; 
                                                         git log --pretty=raw --format=\"%ci\"  "^tag ^" -1 | cut -f1 -d' ' >            "^pwd^"/.date.tmp") in
                                  let in_ch_date = open_in ".date.tmp" in 
                                  let date = input_line in_ch_date in 
                                  let list_comp = Str.split (Str.regexp "-") date in
-                                 let close = close_in in_channel;close_in in_ch_date in
-                                 let clean = clean ".pwd.tmp";clean ".date.tmp" in
+                                 close_in in_channel;close_in in_ch_date ;
+                                 let _ = clean ".pwd.tmp" in
+                                 let _ = clean ".date.tmp" in
                                  (List.hd(List.tl list_comp))^"/"^(List.hd (List.tl(List.tl list_comp)))^"/"^(List.hd list_comp)
                                with _->raise (Not_Declared "Error in deposit declaration")  
 
@@ -99,19 +101,19 @@ let extract_code path version local_scm origin = let deposit = Str.replace_first
 let extract_vers_infos path expression local_scm declared_versions origin= 
                                 let deposit = Str.replace_first (Str.regexp "git:") "" local_scm in
                                 let current_dir = Sys.getcwd() in
-                                let recup_deposit = if ((Sys.file_exists (path^"/"^deposit))&&(Sys.is_directory(path^"/"^deposit))) then
+                                let _ = if ((Sys.file_exists (path^"/"^deposit))&&(Sys.is_directory(path^"/"^deposit))) then
                                                       0
                                                     else
-                                                     Sys.command ("cd "^path^";git clone "^origin^" "^deposit ) in  
-                                let tags = Sys.command ("cd "^path^"/"^deposit^"&&
+                                                     Sys.command ("cd "^path^";git clone "^origin^" "^deposit ) in 
+                                let _ = Sys.command ("cd "^path^"/"^deposit^"&&
                                                  git tag | grep \""^expression   ^"\" > "^current_dir^"/.tags.tmp") in
                                 let in_channel = open_in (current_dir^"/.tags.tmp") in
                                 let tag_string = String.create (in_channel_length in_channel) in
-                                let buff =  really_input in_channel tag_string 0 (in_channel_length in_channel) in
-                                let close = close_in in_channel in
-                                let clean = clean (current_dir^"/.tags.tmp") in
+                                really_input in_channel tag_string 0 (in_channel_length in_channel) ;
+                                close_in in_channel ;
+                                let _ = clean (current_dir^"/.tags.tmp") in
                                 let tag_list = Str.split (Str.regexp "\n") tag_string  in
-                                let code_recup = List.map(fun tag->let version = (*version_from_tag*) tag in
+                                let _ = List.map(fun tag->let version = (*version_from_tag*) tag in
                                       if((Sys.file_exists (path^"/"^version))&&(Sys.is_directory(path^"/"^version))) then
                                           0
                                       else          

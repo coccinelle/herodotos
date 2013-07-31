@@ -25,7 +25,7 @@
 %token TPREFIX TCOCCI TPROJECTS TRESULTS TWEBSITE TFINDCMD TSPFLAGS TCPUCORE
 %token TFINDCHILD
 %token TLOCALSCM TPUBLICSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT 
-%token TLEGEND TXLEGEND TXMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR TON TWITH TAPPLYING
+%token TLEGEND TXLEGEND TXMIN TXAXIS TYAXIS TYLEGEND TYLEGENDFACTOR TFACTOR TWITH TAPPLYING
 %token TCOLOR TNOTEXISTCOLOR TCLEANCOLOR TPATTERNCOLOR TFOOTER
 %token TFILE TFILENAME TRATIO TSORT TGROUP TINFO TSIZE TVMIN TPRUNE TAUTHOR
 %token<int> TInt
@@ -172,10 +172,10 @@ attr:
 | TAUTHOR        TEQUAL b=TBOOL                    { Ast_config.Author(b)}
 | TPRUNE         TEQUAL b=TBOOL                    { Ast_config.Prune(b)}
 | TRATIO         TEQUAL b=TBOOL                    { Ast_config.Ratio(b)}
-| TVERSIONS      TEQUAL TLCB  vs=list(version) TRCB {
+| TVERSIONS      TEQUAL TLCB  vs=list(version) TRCB{
     Setup.pull_versions()
   }
-| TVERSIONS TEQUAL e=TSTRING{Setup.pull_versions()}
+| TVERSIONS TEQUAL TSTRING                         {Setup.pull_versions()}
 | TVMIN          TEQUAL v=TSTRING                  { Ast_config.VMin(v)}
 | TLOCALSCM      TEQUAL v=TSTRING                  { Ast_config.LOCALSCM(v)}
 | TPUBLICSCM     TEQUAL v=TSTRING                  { Ast_config.PUBLICSCM(v)}
@@ -199,12 +199,12 @@ attrs:
   TLCB atts=list(attr) TRCB {atts}
 
 version:
-  TLPAR name=TSTRING d=date  size=size TRPAR {
+  TLPAR name=TSTRING date  size TRPAR {
     
   }
 
 size:
-  |TCOMMA size=TInt {}
+  |TCOMMA TInt {}
   | { }
 
 date:
@@ -319,56 +319,56 @@ projectPreinit:
 (*currently used for preinit parsing *)
 prjattr:
   | TDIR           TEQUAL d=path                     {Setup.setDir d ;""}
-  | TSUBDIR        TEQUAL d=path                     {"" }
+  | TSUBDIR        TEQUAL path                       {"" }
   | TVERSIONS      TEQUAL TLCB  vs=list(versionPreinit) TRCB {"{\n"^(String.concat "\n" vs)^"\n}\n"}
   | TVERSIONS TEQUAL exp=TSTRING
       {let vs = Compute_size_and_date.extract_vers_infos (!Setup.projectsdir^"/"^(!Setup.dir)) exp !local_scm !already_declared_versions !public_scm in
         "{\n"^(String.concat "\n" vs)^"\n}\n" }
-  | TCOLOR         TEQUAL r=float v=float b=float    { "" }
+  | TCOLOR         TEQUAL float float float          { "" }
   | TCORREL        TEQUAL TNONE                      { "" }
-  | TCORREL        TEQUAL dft=TId                    { "" }
-  | TCLEANCOLOR    TEQUAL r=float v=float b=float    { ""}
-  | TPATTERN       TEQUAL dft=TId                    { ""}
-  | TPATTERNCOLOR  TEQUAL r=float v=float b=float    { ""}
-  | TDATA          TEQUAL e=expression               { ""}
-  | TFACTOR        TEQUAL f=float                    { ""}
-  | TFILE          TEQUAL f=TSTRING                  {""}
+  | TCORREL        TEQUAL TId                        { "" }
+  | TCLEANCOLOR    TEQUAL float float float          { ""}
+  | TPATTERN       TEQUAL TId                        { ""}
+  | TPATTERNCOLOR  TEQUAL float float float          { ""}
+  | TDATA          TEQUAL expression                 { ""}
+  | TFACTOR        TEQUAL float                      { ""}
+  | TFILE          TEQUAL TSTRING                    {""}
   | TFILE          TEQUAL TNONE                      { ""}
-  | TFILENAME      TEQUAL b=TBOOL                    { ""}
-  | TFOOTER        TEQUAL l=TSTRING                  { ""}
-  | TFORMAT        TEQUAL dft=TId                    { ""}
-  | TINFO          TEQUAL b=TBOOL                    { ""}
-  | TLEGEND        TEQUAL l=TSTRING                  { ""}
-  | TXLEGEND       TEQUAL l=TSTRING                  { ""}
-  | TYLEGEND       TEQUAL l=TSTRING                  { ""}
-  | TYLEGENDFACTOR TEQUAL f=TId                      { ""}
+  | TFILENAME      TEQUAL TBOOL                      { ""}
+  | TFOOTER        TEQUAL TSTRING                    { ""}
+  | TFORMAT        TEQUAL TId                        { ""}
+  | TINFO          TEQUAL TBOOL                      { ""}
+  | TLEGEND        TEQUAL TSTRING                    { ""}
+  | TXLEGEND       TEQUAL TSTRING                    { ""}
+  | TYLEGEND       TEQUAL TSTRING                    { ""}
+  | TYLEGENDFACTOR TEQUAL TId                        { ""}
   | TLINESTYLE     TEQUAL TNONE                      { ""}
-  | TLINESTYLE     TEQUAL s=TId                      { ""}
+  | TLINESTYLE     TEQUAL TId                        { ""}
   | TMARKTYPE      TEQUAL TNONE                      { ""}
-  | TMARKTYPE      TEQUAL m=TId                      { ""}  
-  | TMARKSIZE      TEQUAL v=float                    { ""}
-  | TXAXIS         TEQUAL t=TId                      { ""}
-  | TXMIN          TEQUAL v=float                    { ""}
-  | TYAXIS         TEQUAL t=gid                      { ""}
-  | TNOTEXISTCOLOR TEQUAL r=float v=float b=float    { ""}
-  | TPROJECT       TEQUAL prj=TId                    { ""}
-  | TAUTHOR        TEQUAL b=TBOOL                    { ""}
-  | TPRUNE         TEQUAL b=TBOOL                    { ""}
-  | TRATIO         TEQUAL b=TBOOL                    { ""}
-  | TVMIN          TEQUAL v=TSTRING                  { ""}
-  | TSPFLAGS       TEQUAL f=TSTRING                  { ""}
-  | TSORT          TEQUAL b=TBOOL                    { ""}
-  | TSIZE          TEQUAL x=float y=float            { ""}   
+  | TMARKTYPE      TEQUAL TId                        { ""}  
+  | TMARKSIZE      TEQUAL float                      { ""}
+  | TXAXIS         TEQUAL TId                        { ""}
+  | TXMIN          TEQUAL float                      { ""}
+  | TYAXIS         TEQUAL gid                        { ""}
+  | TNOTEXISTCOLOR TEQUAL float float float          { ""}
+  | TPROJECT       TEQUAL TId                        { ""}
+  | TAUTHOR        TEQUAL TBOOL                      { ""}
+  | TPRUNE         TEQUAL TBOOL                      { ""}
+  | TRATIO         TEQUAL TBOOL                      { ""}
+  | TVMIN          TEQUAL TSTRING                    { ""}
+  | TSPFLAGS       TEQUAL TSTRING                    { ""}
+  | TSORT          TEQUAL TBOOL                      { ""}
+  | TSIZE          TEQUAL float float                { ""}   
   | TLOCALSCM      TEQUAL v=TSTRING                  {local_scm := v;"" }
   | TPUBLICSCM     TEQUAL v=TSTRING                  {public_scm := v;"" }
 
 versionPreinit:
   TLPAR name=TSTRING  d=datePreinit  size=sizePreinit TRPAR {
-    let recup = Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!local_scm) (!public_scm) in
+    let _ =Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!local_scm) (!public_scm) in
     let date = if d="" then 
                          (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!local_scm))
                       else d in
-    let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then      
+    let _ =List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then      
       
       let size=Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name) in 
       "("^"\""^name^"\""^","^ date^","^(string_of_int size)^")"

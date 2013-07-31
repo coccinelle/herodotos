@@ -64,7 +64,7 @@ path_elt:
 
 split_path_elt:
    e=TId                             {e}
- | e=TEQUAL                          {"="}
+ | TEQUAL                          {"="}
 
 ol_option:
     TCOLON TCOLON TLINB TEQUAL v=TInt   { Ast_org.Line v }

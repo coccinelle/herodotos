@@ -560,7 +560,7 @@ let num_version version = let vers_format = Str.regexp "[0-9].*" in
                                             let length_vname = String.length version in
                                             let posb = Str.search_forward vers_format version 0 in
                                             let ver_nums = String.sub version posb (length_vname - posb) in
-                                            let numbers = Str.split (Str.regexp "\.") ver_nums in
+                                            let numbers = Str.split (Str.regexp "\\.") ver_nums in
                                             List.map (fun s-> int_of_string s ) numbers 
 
 
@@ -592,7 +592,7 @@ let rec orgs_version prefix orgs version  =
                                        (*let ver = Str.regexp (".*"^version^"/") in*) 
                                     match orgs with
                                      []->[]
-                                    |Ast_org.Org(i,s,n,link,o)::orgstail-> let (path,_,_) = link in
+                                    |Ast_org.Org(i,s,n,link,o)::orgstail-> 
                                                                            let (file, ver, pos2, face, t) = flat_link prefix 1 link in
                                                                            if(ver = version or (is_more_recent_v ver version)) then
                                                                              ((Ast_org.Org(i,s,n,link,o))::orgstail)
