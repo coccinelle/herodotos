@@ -13,3 +13,18 @@ let listext   = ".list"
 let sep = "_"
 
 let hacks = ref false
+
+type hmode =
+  Help
+| Longhelp
+| Version
+
+| PreInit
+| Init
+| Correl
+| Stat
+| Statcorrel
+| StatFP
+| Test
+| Erase
+| Blame

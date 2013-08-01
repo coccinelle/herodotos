@@ -10,6 +10,7 @@ SOURCES = occ_correl.ml \
 	cfgcorrel.ml    \
 	cfgstat.ml      \
 	cfgerase.ml     \
+	cfgblame.ml     \
 	test.ml
 INTFS =
 INCLUDES = -I ../commons -I ../hcl -I ../exists -I ../org -I ../diff -I ../graph -I ../html -I ../scm
@@ -58,7 +59,7 @@ clean::
 distclean: clean
 	rm -f .depend
 
-.depend depend: $(INTFS) $(SOURCES)
+.depend depend: # $(INTFS) $(SOURCES)
 	$(OCAMLDEP) *.mli *.ml > .depend
 
 -include .depend

@@ -1,9 +1,8 @@
+open Global
 
 exception Misconfigured
 
 let configfile = ref ""
-let help = ref false
-let longhelp = ref false
 let orgfile = ref ""
 let prefix = ref ""
 let extract = ref ""
@@ -17,14 +16,7 @@ let png = ref false
 let pdf = ref true
 let web = ref false
 
-let init = ref false
-let correl = ref false
-let stat = ref false
-let statcorrel = ref false
-let statfp = ref false
-let test = ref false
-let erase = ref false
-let preinit = ref false
+let mode = ref None
 
 let sql = ref false
 let sqlnotes = ref false
@@ -34,23 +26,31 @@ let freearg = ref ""
 
 let usage_msg =
   "Usage: " ^ Filename.basename Sys.argv.(0) ^
-    " [-c <configurationfile> [--init | --correl | --erase]]\n"
+    " [-c <configurationfile> [preinit | init | correl | erase | blame]]\n"
 
 let options = [
+
+  "-h", Arg.Unit (fun () -> mode := Some Help) , " Display this list of options";
+  "help", Arg.Unit (fun () -> mode := Some Help), " Display this list of options";
+  "-help", Arg.Unit (fun () -> mode := Some Help), " Display this list of options";
+  "--help", Arg.Unit (fun () -> mode := Some Help), " Display this list of options";
+  "--longhelp", Arg.Unit (fun () -> mode := Some Longhelp), " Display this list of options and the supported graph types";
+
+  "preinit", Arg.Unit (fun () -> mode := Some PreInit), " Recover missing parts of a version description (size and release date) , or extract version code";
+  "init", Arg.Unit (fun () -> mode := Some Init), " Initialize a tracking environment as defined in the configuration file";
+  "correl", Arg.Unit( fun () -> mode := Some Correl), " Correlation mode with the configuration file";
+  "stat", Arg.Unit (fun () -> mode := Some Stat), " Compute statistics";
+  "statcorrel", Arg.Unit (fun () -> mode := Some Statcorrel), " Compute statistics about correlations";
+  "statfp", Arg.Unit (fun () -> mode := Some StatFP), " Compute statistics about false positives";
+  "test", Arg.Unit (fun () -> mode := Some Test), " Test for development (test)";
+  "erase", Arg.Unit (fun () -> mode := Some Erase), " Erase some data";
+
   "-c", Arg.Set_string configfile, "file Configuration file describing the requested data";
   "--config", Arg.Set_string configfile, "file Configuration file describing the requested data";
-  "--correl", Arg.Set correl, " Correlation mode with the configuration file";
   "--cvs", Arg.Set cvs, " Generation of .cvsignore files (in init mode)";
   "--debug", Arg.Set Misc.debug, " Debug mode";
-  "--erase", Arg.Set erase, " Erase some data";
   "--extract", Arg.Set_string extract, "version Gives the version to extract from a correlated report";
   "--hacks", Arg.Set Global.hacks, " Enable hacks (to perform customized studies)";
-  "-h", Arg.Set help, " Display this list of options";
-  "-help", Arg.Set help, " Display this list of options";
-  "--help", Arg.Set help, " Display this list of options";
-  "--init", Arg.Set init, " Initialize a tracking environment as defined in the configuration file";
-  "--preinit",Arg.Set preinit, " Recover missing parts of a version descripiton (size and release date) , or extract version code";
-  "--longhelp", Arg.Set longhelp, " Display this list of options and the supported graph types";
   "--parse_org", Arg.Set_string orgfile, "file path to an Org file to parse (test)";
   "--prefix", Arg.Set_string prefix, "path prefix of the source directories (test)";
   "--profile", Arg.Unit (fun () -> prerr_endline "*** PROFILING ENABLED ***";
@@ -62,10 +62,6 @@ let options = [
   "--to-sql-notes", Arg.Unit (fun () -> sqlnotes:=true;sql:=true), " Convert the parsed Org file to SQL (table of notes)";
   "--to-sql-update",Arg.Tuple[Arg.Set sql_update;Arg.Set_string version_incr], " Update the database including new versions study results";
 
-  "--stat", Arg.Set stat, " Compute statistics";
-  "--statcorrel", Arg.Set statcorrel, " Compute statistics about correlations";
-  "--statfp", Arg.Set statfp, " Compute statistics about false positives";
-  "--test", Arg.Set test, " Test for development (test)";
   "--version", Arg.Set version, " Print Herodotos version";
   "-v", Arg.Set verbose1, " verbose mode";
   "-vv", Arg.Set verbose2, " more verbose mode";
@@ -113,39 +109,42 @@ let multi_output verbose vlist fileexist bfl =
 *)
 
 let main aligned =
-  if !version then
-    print_endline ("Herodotos version "^ Global.version)
-  else
-    if !test then
-      Test.test !configfile
-    else
-      begin
-	if !verbose3 then verbose2 := true;
-	if !verbose2 then verbose1 := true;
-	if (!help || !longhelp) then
-	  (
-	    Arg.usage aligned usage_msg;
+  match !mode with
+      Some running_mode ->
+	begin
+	  match running_mode with
+	      Version -> print_endline ("Herodotos version "^ Global.version)
+	    | Help | Longhelp ->
+	      if !verbose3 then verbose2 := true;
+	      if !verbose2 then verbose1 := true;
+	      Arg.usage aligned usage_msg;
+	      
+	      if running_mode = Longhelp then
+		prerr_endline ("\n"^Cfgmode.supported_types^"\n")
+	    | _ -> 
+	      if ((String.length !configfile) <> 0) then
+		match running_mode with
+		    Test -> Test.test !configfile
 
-	    if !longhelp then
-	      prerr_endline ("\n"^Cfgmode.supported_types^"\n")
-	  )
-	else
-	  let anystat = !stat || !statfp || !statcorrel in
-	    if ((String.length !configfile) <> 0) then
-	      if !init && not !correl && not anystat && not !erase && not !preinit then
-		Debug.profile_code "initialize env."
-		  (fun () -> Cfginit.init_env !verbose1 !verbose2 !verbose3 !configfile !cvs)
-	      else if not !init && !correl && not anystat && not !erase && not !preinit then
-		Debug.profile_code "correlation"
-		  (fun () -> Cfgcorrel.correl !verbose1 !verbose2 !verbose3 !configfile !freearg)
-	      else if not !init && not !correl && anystat && not !erase && not !preinit then
-		Debug.profile_code "statistics"
-		  (fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg !statcorrel !statfp)
-	      else if not !init && not !correl && not anystat && !erase && not !preinit then
-		Debug.profile_code "erase env."
-		  (fun () -> Cfgerase.erase_env !verbose1 !verbose2 !verbose3 !configfile !freearg)
-	      else if not !init && not !correl && not anystat && not !erase && !preinit then
-		  Cfgpreinit.preinit !configfile 
+		  | Stat | Statcorrel | StatFP -> 
+		    Debug.profile_code "statistics"
+		      (fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg running_mode)
+		  | PreInit ->
+		    Debug.profile_code "pre-initialize env."
+		      (fun () -> Cfgpreinit.preinit !configfile)
+		  | Init->
+		    Debug.profile_code "initialize env."
+		      (fun () -> Cfginit.init_env !verbose1 !verbose2 !verbose3 !configfile !cvs)
+		  | Correl ->
+		    Debug.profile_code "correlation"
+		      (fun () -> Cfgcorrel.correl !verbose1 !verbose2 !verbose3 !configfile !freearg)
+		  | Erase ->
+		    Debug.profile_code "erase env."
+		      (fun () -> Cfgerase.erase_env !verbose1 !verbose2 !verbose3 !configfile !freearg)
+		  | Blame ->
+		    Debug.profile_code "erase env."
+		      (fun () -> Cfgblame.blame !verbose1 !verbose2 !verbose3 !configfile !freearg)
+		  | Version|Longhelp|Help -> () (* The ones have been match before. *)
 	      else
 		(
 		  print_endline ("Herodotos version "^ Global.version);
@@ -153,56 +152,56 @@ let main aligned =
 		  Cfgmode.graph_gen !verbose1 !verbose2 !verbose3 !configfile !pdf !png !web !freearg;
 		  prerr_newline ()
 		)
-
-	    else
-	      (* For Org file parsing *)
-	      (* For converting Org file to SQL entries *)
-	      if ((String.length !orgfile) <> 0)
-	      then
-		begin
-		  let vb = !extract = "" && not !sql in
-		    if ((String.length !prefix) = 0) then prerr_endline "*** WARNING *** Prefix not set";
-		    if vb then prerr_endline " Parsing...\n";
-		    let ast = Org.parse_org vb !orgfile in
-		      if ast = [] then
+	end
+    | None -> Arg.usage aligned usage_msg
+		(*
+		  else
+		(* For Org file parsing *)
+		(* For converting Org file to SQL entries *)
+		  if ((String.length !orgfile) <> 0)
+		  then
+		  begin
+			let vb = !extract = "" && not !sql in
+			if ((String.length !prefix) = 0) then prerr_endline "*** WARNING *** Prefix not set";
+			if vb then prerr_endline " Parsing...\n";
+			let ast = Org.parse_org vb !orgfile in
+			if ast = [] then
 			prerr_endline "Empty Org file"
-		      else
+			else
 			begin
-			  if vb then prerr_endline ("\nChecking... ("^string_of_int (List.length ast)^" elements)");
-			  if !Misc.debug then
-			    (Misc.print_stack (List.map (Org.make_org "") ast);
-			     prerr_newline ();
-			    );
-			  let (msg, formatted) =
-			    try
-			      ("", Org.format_orgs !prefix 1 ast)
-			    with Misc.Strip msg -> (msg, [])
-			  in
-			    if vb then
-			      prerr_endline ("\nConverting... ("^string_of_int (List.length formatted)^" elements)\n");
- 			    if msg <> "" then prerr_endline msg;
-			    if formatted = [] then
-			      prerr_endline "Failed!"
-			    else
-			      (if !sql then
-				 if !sqlnotes then
-				   Sql.print_orgs_as_notes stdout !prefix !orgfile formatted
-				 else
-				     Sql.print_orgs stdout !prefix !orgfile formatted
-                               else if !sql_update then
-                                     Sql_update.print_orgs stdout !prefix !orgfile formatted !version_incr                                  
- 			       else
-				 let filtered =
-				   if !extract = "" then formatted
-				   else Orgfilter.filter_version !extract !prefix formatted
-				 in
-				   Org.print_orgs_raw stdout !prefix filtered;
-				   if vb then prerr_endline "\nDone!")
+			if vb then prerr_endline ("\nChecking... ("^string_of_int (List.length ast)^" elements)");
+			if !Misc.debug then
+			(Misc.print_stack (List.map (Org.make_org "") ast);
+			prerr_newline ();
+			);
+			let (msg, formatted) =
+			try
+			("", Org.format_orgs !prefix 1 ast)
+			with Misc.Strip msg -> (msg, [])
+			in
+			if vb then
+			prerr_endline ("\nConverting... ("^string_of_int (List.length formatted)^" elements)\n");
+ 			if msg <> "" then prerr_endline msg;
+			if formatted = [] then
+			prerr_endline "Failed!"
+			else
+			(if !sql then
+			if !sqlnotes then
+			Sql.print_orgs_as_notes stdout !prefix !orgfile formatted
+			else
+			Sql.print_orgs stdout !prefix !orgfile formatted
+			else if !sql_update then
+			Sql_update.print_orgs stdout !prefix !orgfile formatted !version_incr                                  
+ 			else
+			let filtered =
+			if !extract = "" then formatted
+			else Orgfilter.filter_version !extract !prefix formatted
+			in
+			Org.print_orgs_raw stdout !prefix filtered;
+			if vb then prerr_endline "\nDone!")
 			end
-		end
-	      else
-		Arg.usage aligned usage_msg
-      end
+			end
+		      *)
 
 let _ =
   let aligned = Arg.align options in

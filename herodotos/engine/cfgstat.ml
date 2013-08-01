@@ -114,7 +114,9 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 	else
 	  print_endline (duple ^" (no correlation requested) Skipping...")
 
-let stats v1 v2 v3 configfile graph correl fp =
+let stats v1 v2 v3 configfile graph statmode =
+  let correl = if statmode = Global.Stat || statmode = Global.Statcorrel then true else false in
+  let fp =  if statmode = Global.Stat || statmode = Global.StatFP then true else false in
   (* If correl and fp are both set to false, we request both... and more ! *)
   ignore(Config.parse_config configfile);
   let bugfiles = Cfghelper.get_bugset graph in
