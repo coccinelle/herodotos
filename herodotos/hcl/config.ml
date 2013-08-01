@@ -123,6 +123,12 @@ let sort_by_date v1 v2 =
   let (_,d2,_,_) = v2 in
     compare d1 d2
 
+let compute_versinfos vs =
+  let m = get_vers_min vs in
+  let list = List.map (get_versinfo m) vs in
+  let ordered = List.sort sort_by_date list in
+    Array.of_list ordered
+
 let get_versinfos p =
   try
     let (optarray, atts) = Setup.PrjTbl.find Setup.projects p in

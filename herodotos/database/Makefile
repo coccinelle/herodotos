@@ -1,11 +1,22 @@
 TARGET = database
 
-SOURCES = sql.ml sql_update.ml
+SOURCES = database.ml sql.ml sql_update.ml
 INTFS =
-INCLUDES = -I ../commons -I ../org
+INCLUDES = -I ../commons -I ../org -I ../hcl
+
+OCAMLFIND=ocamlfind
+
+LIBNAMES=unix postgresql
+NATIVELIBS=unix.cma threads.cma postgresql.cma
 
 # Automatic computation
 -include ../Makefile.config
+
+LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+FLAGS=$(LIBDIR:%=-I %) $(INCLUDES)
+CFLAGS=-g -thread $(FLAGS)
+#LFLAGS=-thread $(FLAGS) -custom -ccopt  $(NATIVELIBS) $(LIBS)
+LFLAGS=-g -thread $(FLAGS)  $(NATIVELIBS) $(LIBS)
 
 OBJS = $(SOURCES:.ml=.cmo)
 OPTOBJS = $(OBJS:.cmo=.cmx)
@@ -14,9 +25,14 @@ OPTLIB=$(LIB:.cma=.cmxa)
 
 # The Caml compilers.
 OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
-OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
-OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES)
 OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
+ifeq ("$(OPTBIN)",".opt")
+OCAMLC=$(OCAMLFIND) ocamlc -predicates native
+OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates native
+else
+OCAMLC=$(OCAMLFIND) ocamlc
+OCAMLOPT=$(OCAMLFIND) ocamlopt
+endif
 
 all: $(LIB)
 all.opt: $(OPTLIB)
@@ -26,13 +42,13 @@ all.opt: $(OPTLIB)
 .PHONY: depend clean
 
 .ml.cmo:
-	$(OCAMLC) -c $<
+	$(OCAMLC) -c $@ $(CFLAGS) $<
 
 .mli.cmi:
 	$(OCAMLC) -c $<
 
 .ml.cmx:
-	$(OCAMLOPT) -c $<
+	$(OCAMLOPT) -c $@ $(CFLAGS) $<
 
 $(LIB): $(OBJS)
 	$(OCAMLC) -a -o $(LIB) $(OBJS)

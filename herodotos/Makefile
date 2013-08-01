@@ -7,9 +7,11 @@ SOURCES =
 SUBDIRS = commons exists hcl org diff scm graph html database engine
 MENHIR_PATH=../menhirLib
 DEPDIRS = $(MENHIR_PATH)
+EXTLIBS=postgresql
 
-OCAMLLIBS=str.cma unix.cma
-FLAG=
+OCAMLFIND=ocamlfind
+
+OCAMLLIBS=str.cma unix.cma $(EXTLIBS:%=%.cma)
 
 # ocamlmktop -custom -thread  -o threadedocaml unix.cma threads.cma -cclib -lthreads
 # Automatic computation
@@ -17,6 +19,8 @@ INCLUDES=$(SUBDIRS:%=-I %)
 
 OBJS = $(SOURCES:.ml=.cmo)
 ROOTLIB = $(TARGET).cmo
+LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
+FLAGS=$(LIBDIR:%=-I %) $(INCLUDES)
 LIBS = $(SUBDIRS:%=%.cma)
 ALLLIBS = $(LIBS) $(ROOTLIB)
 
@@ -33,10 +37,15 @@ MENHIR=$(MENHIR_PATH)/menhirLib.cmo
 MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 
 # The Caml compilers.
-OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
-OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
-OCAMLOPT = ocamlopt$(OPTBIN) $(FLAGS) $(INCLUDES)
+CFLAGS ?= -g -dtypes $(FLAGS)
 OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
+ifeq ("$(OPTBIN)",".opt")
+OCAMLC=$(OCAMLFIND) ocamlc -predicates native
+OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates native
+else
+OCAMLC=$(OCAMLFIND) ocamlc
+OCAMLOPT=$(OCAMLFIND) ocamlopt
+endif
 
 .PHONY:: all all.opt clean distclean debclean $(DEP)
 .PHONY:: depend install sudo_install deploy
@@ -93,13 +102,13 @@ engine.opt: commons.opt diff.opt exists.opt orgs.opt
 .SUFFIXES: .ml .mli .cmo .cmi .cmx .cma
 
 .ml.cmo:
-	$(OCAMLC) -c $<
+	$(OCAMLC) -c $@ $(CFLAGS) $<
 
 .mli.cmi:
 	$(OCAMLC) -c $<
 
 .ml.cmx:
-	$(OCAMLOPT) -c $<
+	$(OCAMLOPT) -c $@ $(CFLAGS) $<
 
 #
 # To compile bytecode version
@@ -109,7 +118,7 @@ engine.opt: commons.opt diff.opt exists.opt orgs.opt
 #	$(OCAMLC) -a -o $@ $(OBJS)
 
 $(EXEC): $(ALLLIBS) $(TARGET).cmo
-	$(OCAMLC) -o $@ $(OCAMLLIBS) $(MENHIR) $^
+	$(OCAMLC) $(CFLAGS) -o $@ $(OCAMLLIBS) $(MENHIR) $^
 
 $(LIBS): $(LIBS:%.cma=%)
 $(DEP):
@@ -123,7 +132,7 @@ $(DEP):
 #	$(OCAMLOPT) -a -o $@ $(OPTOBJS)
 
 $(EXEC).opt: $(OPTALLLIBS)  $(TARGET).cmx
-	$(OCAMLOPT) -o $@ $(OPTOCAMLLIBS) $(MENHIRO) $^
+	$(OCAMLOPT) $(CFLAGS) -o $@ $(OPTOCAMLLIBS) $(MENHIRO) $^
 
 $(OPTLIBS): $(LIBS:%.cma=%.opt)
 $(DEP:%=%.opt):
