@@ -1,5 +1,15 @@
 open Helper
 
+(*
+Initial commit of Linux full history
+
+commit 7a2deb32924142696b8174cdf9b38cd72a11fc96
+Author:     Linus Torvalds <torvalds@athlon.transmeta.com>
+AuthorDate: Mon Feb 4 17:40:40 2002 -0800
+Commit:     Linus Torvalds <torvalds@athlon.transmeta.com>
+CommitDate: Mon Feb 4 17:40:40 2002 -0800
+*)
+
 let get_expertise vlist idx name =
   if name = "Linus Torvalds" && idx=0 then
     (* Ignore initial import to git done by Linus. *)
