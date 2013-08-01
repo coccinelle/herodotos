@@ -329,7 +329,11 @@ let mark_vmin debug name atts curves =
 let get_scmpath scmfeature prj =
   if scmfeature then
     let scm = try Config.get_scm prj with _ -> "" in
-      Str.replace_first (Str.regexp_string "git:") "" scm
+    let scmpath = Str.replace_first (Str.regexp_string "git:") "" scm in
+    if Filename.is_relative scmpath then
+      !Setup.projectsdir ^ Config.get_prjdir prj ^ Filename.dir_sep ^ scmpath
+    else
+      scmpath
   else
     ""
 
