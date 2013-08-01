@@ -1,6 +1,7 @@
 
 let print_head path =
-  let (_, vlist) = Config.get_versinfos "Linux" in
+  let (_, vlist) = Config.get_versinfos "Linux-2.6" in
+    prerr_endline ("Looking in " ^path);
     Git.load_authors path;
     (*   let author = Git.blame true vlist path "linux-2.6.26" 326 "mm/sparse.c" in *)
     (*     prerr_endline ("Bug author:"); *)
@@ -25,11 +26,8 @@ let print_head path =
 let test configfile =
   ignore(Config.parse_config configfile);
   prerr_endline "Config parsing OK!";
-  Setup.PrjTbl.iter
-    (fun name (_,atts) ->
-       let scm = Config.get_scm name in
-       let scmpath =  Str.replace_first (Str.regexp_string "git:") "" scm in
-	 print_head scmpath
-    )
-    Setup.projects;
+  let name = "Linux-2.6" in
+  let scm = Config.get_scm name in
+  let scmpath =  Str.replace_first (Str.regexp_string "git:") "" scm in
+  print_head (!Setup.projectsdir ^ Config.get_prjdir name ^ "/" ^ scmpath)
 
