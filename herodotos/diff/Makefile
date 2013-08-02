@@ -1,6 +1,6 @@
 TARGET = diff
 
-SOURCES = diff.ml ratio.ml
+SOURCES = diff.ml churn.ml
 INCLUDES = -I ../commons -I ../exists -I ../org
 
 # Automatic computation
