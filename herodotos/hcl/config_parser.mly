@@ -7,6 +7,14 @@
       to have multiple lines legend. For convenience, we use
       '\n' and convert them to '\' followed by '\n'.
     *)
+
+  let build_date m d y =   snd (Unix.mktime {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
+       (* Don't care about the time *)
+       Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
+       (* Will be normalized by mktime *)
+       Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
+      })
+
   let to_jgraph_fmt s =
     let newlinere = Str.regexp_string "\\n" in
     Str.global_replace newlinere "\\\n" s
@@ -47,7 +55,7 @@
 %type <unit> parse_versions
 
 %start declared_versions
-%type <unit> declared_versions
+%type <(string*(string*string*string) list) list> declared_versions
 
 %%
 
@@ -57,7 +65,7 @@ parse_versions:
 
 
 declared_versions:
-  l = list(present_versions) EOF { already_declared_versions := (List.flatten l)} 
+  l = list(present_versions) EOF { already_declared_versions :=  List.flatten(snd(List.split  l));l} 
 
 
 
@@ -209,19 +217,9 @@ size:
 
 date:
   |TCOMMA m=TInt TSLASH d=TInt TSLASH y=TInt
-    { snd (Unix.mktime {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
-       (* Don't care about the time *)
-       Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
-       (* Will be normalized by mktime *)
-       Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
-      })
+    { Some(build_date m d y)
     }
-  |{snd (Unix.mktime {Unix.tm_mon=0; Unix.tm_mday=1; Unix.tm_year=2000-1900;
-       (* Don't care about the time *)
-       Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
-       (* Will be normalized by mktime *)
-       Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
-      })}
+  |{None}
 
 pattern:
   TPATTERN name=TId atts=attrs { Setup.addDft name atts }
@@ -315,7 +313,7 @@ expression:
 (* preinit parsing rules*)
 
 projectPreinit:
-  TPROJECT name=TId TLCB versions=list(prjattr) TRCB {versions_string:= !versions_string^(String.concat "\n" versions)}
+  TPROJECT name=TId TLCB versions=list(prjattr) TRCB {versions_string:= !versions_string^name^(String.concat "\n" versions)}
 (*currently used for preinit parsing *)
 prjattr:
   | TDIR           TEQUAL d=path                     {Setup.setDir d ;""}
@@ -391,7 +389,7 @@ datePreinit:
 (*buffered versions parsing rules *)
 
 buffered_versions:
-  TLCB vs=list(buffered_version)  TRCB { let (cl, vl) = List.split vs in
+  project=TId TLCB vs=list(buffered_version)  TRCB { let (cl, vl) = List.split vs in
                                          let count = List.fold_left max 0 cl in
                                          Setup.push_versions(Ast_config.Version(count, vl) )}
 
@@ -403,19 +401,14 @@ buffered_version:
 
 buffered_date:
   m=TInt TSLASH d=TInt TSLASH y=TInt
-    { snd (Unix.mktime {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
-       (* Don't care about the time *)
-       Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
-       (* Will be normalized by mktime *)
-       Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
-      })
+    {Some(build_date m d y)
     }
 
 (*---------------------------------------------------------------------------------------------------------------------------------------*)
 (* already declared versions parsing rules  *)
 
 present_versions:
-  TLCB vs=list(present_version) TRCB { vs}
+  project = TId TLCB vs=list(present_version) TRCB { (project,vs)}
 
 present_version:
   TLPAR name=TSTRING TCOMMA date=present_date TCOMMA size=TInt TRPAR 

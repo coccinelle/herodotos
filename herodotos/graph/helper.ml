@@ -7,7 +7,7 @@ type datatype =
     Single of float option
   | Duple of float option * float option
 
-type version = (string * int * Unix.tm * int) array
+type version = (string * int * Unix.tm option * int) array
 type bugset = string
 type value = version * string * string * string * string * Setup.PrjTbl.key * bugset * datatype array
 type eval_type =
@@ -36,6 +36,7 @@ let combine data1 data2 =
 		Duple (get_value_of_dt d1, get_value_of_dt (Array.get data2 i))
 	     ) data1
 *)
+
 
 let combine data1 data2 =
   Array.mapi (fun i d1 -> Duple (d1, Array.get data2 i)) data1
@@ -233,8 +234,10 @@ let rec gen_tm_year_serie minyear maxyear =
     []
 
 let get_years_with_mark extradays varray =
-  let (_, _, mintm, _) = Array.get varray 0 in
-  let (_, _, relmaxtm, _) = Array.get varray (Array.length varray - 1) in
+  let (_, _, minitm, _) = Array.get varray 0 in
+  let (_, _, relmaxitm, _) = Array.get varray (Array.length varray - 1) in
+  let mintm = Config.get_date minitm in
+  let relmaxtm = Config.get_date relmaxitm in
   let maxtm = snd  (Unix.mktime
 		       {Unix.tm_mon=relmaxtm.Unix.tm_mon;
 			Unix.tm_mday=relmaxtm.Unix.tm_mday+extradays;
@@ -256,7 +259,7 @@ let get_years_with_mark extradays varray =
   let list = List.map
     (fun tmyear ->
        let name = string_of_int (Misc.get_year_of tmyear) in
-       let dn = Config.get_rel_days_of (Config.get_abs_days_of mintm) tmyear in
+       let dn = Config.get_rel_days_of (Config.get_abs_days_of (Some mintm)) (Some tmyear) in
 	 Printf.sprintf "hash_at % 4d\nhash_label at % 4d : %s" dn dn name
     ) years
   in
@@ -518,6 +521,7 @@ let build_evolution_of_size vb debug name grinfo scmfeature atts curve evolfunc 
 	 match curve with
 	     (Some p,_,_,_) ->
 	       let (_, varray) = Config.get_versinfos p in
+               (*let varray = Array.map (fun (st,i,d,i1) -> (st,i,Config.get_date d,i1)) array in*)
 	       let values = evolfunc varray [] grinfo None in
 		 Some (varray, linetype, color, marktype, marksize, label, "",crop varray atts curve values)
 
@@ -655,7 +659,7 @@ mhash 0 hash_labels fontsize 8
 
 let get_point v mindate d value =
   let dayname = Misc.string_of_date d in
-  let dn = Config.get_rel_days_of mindate d in
+  let dn = Config.get_rel_days_of mindate (Some d) in
   let pos = Printf.sprintf "% 5d % 12.6f" dn value in
     Printf.sprintf "%s (* %s %s *)\n" pos v dayname
 
@@ -703,10 +707,10 @@ let draw_curve ch msg mindate ((vlist, linetype, color, marktype, marksize, labe
 						    let valuedt = Array.get evol i in
 						      match valuedt with
 							  Single valueopt ->
-							    (value_to_str v mindate d valueopt, "")
+							    (value_to_str v mindate (Config.get_date d) valueopt, "")
 							| Duple (v1opt, v2opt) ->
- 							    (value_to_str v mindate d v1opt,
- 							     value_to_str v mindate d v2opt)
+ 							    (value_to_str v mindate (Config.get_date d) v1opt,
+ 							     value_to_str v mindate (Config.get_date d) v2opt)
 						 ) vlist);
        in
        let (pts, cplx) = List.split cplxduple in

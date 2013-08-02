@@ -26,14 +26,17 @@ tail:
  | THASHPLUS TSTODO TCOLON TSPACE TTODO TSPACE TVERT nonempty_list(tailelm) EOL        {}
 
 tailelm:
-   TSPACE TBUG       {}
- | TSPACE TFP        {}
- | TSPACE TNONBUG    {}
- | TSPACE TSAME      {}
- | TSPACE TUNRELATED {}
- | TSPACE TUNKNOWN   {}
- | TSPACE TIGNORED   {}
- | TSPACE TId        {}
+  TSPACE lm {}
+
+lm:
+   TBUG       {}
+ | TFP        {}
+ | TNONBUG    {}
+ | TSAME      {}
+ | TUNRELATED {}
+ | TUNKNOWN   {}
+ | TIGNORED   {}
+ | TId        {}
 
 oneline:
    level=nonempty_list(TSTAR) nonempty_list(TSPACE) s=status r=reason l=link
@@ -56,21 +59,27 @@ path:
  |  e=TId p=list(path_elt)           { e ^ "/" ^ (String.concat "/" p) }
 
 path_elt:
-    TSLASH e=TId                     { e               }
- |  TSLASH TCONFIG                   { "config"        }
- |  TSLASH e=TInt                    { string_of_int e }
- |  TSLASH e=TTEXT                   { e               }
- |  TSLASH e=nonempty_list(split_path_elt) { String.concat "" e }
+    TSLASH e = elt {e}
+
+elt:
+    e1=TId e2=list(split_path_elt)        { e1 ^ (String.concat "" e2)}  
+ |  TEQUAL e=list(split_path_elt)         { "=" ^ (String.concat "" e)} 
+ |  TCONFIG                               { "config"        }
+ |  e=TInt                                { string_of_int e }
+ |  e=TTEXT                               {e               }
 
 split_path_elt:
    e=TId                             {e}
  | TEQUAL                          {"="}
 
 ol_option:
-    TCOLON TCOLON TLINB TEQUAL v=TInt   { Ast_org.Line v }
- |  TCOLON TCOLON TCOLB TEQUAL v=TInt   { Ast_org.ColB v }
- |  TCOLON TCOLON TCOLE TEQUAL v=TInt   { Ast_org.ColE v }
- |  TCOLON TCOLON TFACE TEQUAL v=TId    { Ast_org.Face v }
+    TCOLON TCOLON v = org_option {v}
+
+org_option:
+   TLINB TEQUAL v=TInt   { Ast_org.Line v }
+ | TCOLB TEQUAL v=TInt   { Ast_org.ColB v }
+ | TCOLE TEQUAL v=TInt   { Ast_org.ColE v }
+ | TFACE TEQUAL v=TId    { Ast_org.Face v }
 
 text:
     el=list(textelm)                    { String.concat "" el }
