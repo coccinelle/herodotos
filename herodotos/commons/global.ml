@@ -22,6 +22,7 @@ type hmode =
 | PreInit
 | Init
 | Correl
+| Graph
 | Stat
 | Statcorrel
 | StatFP

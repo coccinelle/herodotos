@@ -26,7 +26,7 @@ let freearg = ref ""
 
 let usage_msg =
   "Usage: " ^ Filename.basename Sys.argv.(0) ^
-    " [-c <configurationfile> [preinit | init | correl | erase | blame]]\n"
+    " [-c <configurationfile> [preinit | init | correl | graph | erase | blame]]\n"
 
 let options = [
 
@@ -39,6 +39,7 @@ let options = [
   "preinit", Arg.Unit (fun () -> mode := Some PreInit), " Recover missing parts of a version description (size and release date) , or extract version code";
   "init", Arg.Unit (fun () -> mode := Some Init), " Initialize a tracking environment as defined in the configuration file";
   "correl", Arg.Unit( fun () -> mode := Some Correl), " Correlation mode with the configuration file";
+  "graph", Arg.Unit (fun () -> mode := Some Graph), " Generate the graphs";
   "stat", Arg.Unit (fun () -> mode := Some Stat), " Compute statistics";
   "statcorrel", Arg.Unit (fun () -> mode := Some Statcorrel), " Compute statistics about correlations";
   "statfp", Arg.Unit (fun () -> mode := Some StatFP), " Compute statistics about false positives";
@@ -125,7 +126,6 @@ let main aligned =
 	      if ((String.length !configfile) <> 0) then
 		match running_mode with
 		    Test -> Test.test !configfile
-
 		  | Stat | Statcorrel | StatFP -> 
 		    Debug.profile_code "statistics"
 		      (fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg running_mode)
@@ -138,6 +138,14 @@ let main aligned =
 		  | Correl ->
 		    Debug.profile_code "correlation"
 		      (fun () -> Cfgcorrel.correl !verbose1 !verbose2 !verbose3 !configfile !freearg)
+		  | Graph ->
+		    Debug.profile_code "graph generation"
+		      (fun () ->
+			print_endline ("Herodotos version "^ Global.version);
+			prerr_endline ("Processing "^ !configfile);
+			Cfgmode.graph_gen !verbose1 !verbose2 !verbose3 !configfile !pdf !png !web !freearg;
+			prerr_newline ()
+		      )
 		  | Erase ->
 		    Debug.profile_code "erase env."
 		      (fun () -> Cfgerase.erase_env !verbose1 !verbose2 !verbose3 !configfile !freearg)
@@ -145,13 +153,6 @@ let main aligned =
 		    Debug.profile_code "erase env."
 		      (fun () -> Cfgblame.blame !verbose1 !verbose2 !verbose3 !configfile !freearg)
 		  | Version|Longhelp|Help -> () (* The ones have been match before. *)
-	      else
-		(
-		  print_endline ("Herodotos version "^ Global.version);
-		  prerr_endline ("Processing "^ !configfile);
-		  Cfgmode.graph_gen !verbose1 !verbose2 !verbose3 !configfile !pdf !png !web !freearg;
-		  prerr_newline ()
-		)
 	end
     | None -> Arg.usage aligned usage_msg
 		(*
