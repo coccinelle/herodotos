@@ -5,6 +5,7 @@ exception Not_Found
 exception Unrecoverable
 exception Warning of string
 exception Misconfiguration of string
+exception BadDate of string
 exception Misconfigurationat of string * Ast.pos
 
 (*parse the .projects_configfile to recover each project versions *)  
@@ -30,7 +31,7 @@ let parse_check_versions versions_file =
       res;
     end       
   else
-    ()
+    []
 
 let parse_config file : unit =
  parse_projects_versions (".projects_"^file);
@@ -85,9 +86,17 @@ let parse_preinit file:string =
 	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
 	    ("Config Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
 
+
+let get_date d = match d with
+      Some d -> d
+     |None -> raise(BadDate "Date is not defined")
+
+
+
 let get_abs_days_of tm =
   (* 60.0 (s) *. 60.0 (mn) *. 24.0  (h) = 86400.0 *)
-  fst (Unix.mktime tm) /. (86400.0)
+  fst (Unix.mktime (get_date tm)) /. (86400.0)
+
 
 let get_rel_days_of refday tm =
   let ds = get_abs_days_of tm in
@@ -99,7 +108,7 @@ let get_versinfo dm (name, date, size) =
 
 let show_versinfo (name, days, date, size) =
   prerr_endline ("Version "^name ^
-		   " released the "^ Misc.string_of_date date ^
+		   " released the "^ Misc.string_of_date (get_date date) ^
 		   " -- " ^ (string_of_int days) ^
 		   " ("^ (string_of_int size) ^" LOC)")
 

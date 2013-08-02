@@ -19,6 +19,7 @@ type project = string
 type defect = string
 type graph = string
 type experience = string
+type versions = string
 
 module Prj =
 struct
@@ -26,6 +27,7 @@ struct
   let equal = (=)
   let hash = Hashtbl.hash
 end
+
 
 module Dft =
 struct
@@ -48,6 +50,14 @@ struct
   let hash = Hashtbl.hash
 end 
 
+module Vers = 
+struct
+  type t = versions
+  let equal = (=)
+  let hash = Hashtbl.hash
+end
+
+
 module PrjTbl = Hashtbl.Make (Prj)
 
 module DftTbl = Hashtbl.Make (Dft)
@@ -56,10 +66,13 @@ module GphTbl = Hashtbl.Make (Gph)
 
 module ExpTbl = Hashtbl.Make (Exp)
 
+
+
 let projects = PrjTbl.create 5
 let smatchs = DftTbl.create 11
 let graphs = GphTbl.create 97
 let experiences = ExpTbl.create 97
+
 
 let setRef p r msg =
   if (String.length !r) = 0 then
@@ -113,13 +126,13 @@ let getCPUcore () =
     | Some cpucore -> cpucore
 
 (* For projects *)
-let addPrj (name:string) (prj : (int * (string * int * Unix.tm * int) array) option * Ast_config.attr list) =
+let addPrj (name:string) (prj : (int * (string * int * Unix.tm option * int) array) option * Ast_config.attr list) =
   if PrjTbl.mem projects name then
     raise (BadConfiguration ("project "^name^" is already declared."))
   else
     PrjTbl.add projects name prj
 
-let updPrj (name:string) (prj : (int * (string * int * Unix.tm * int) array) option * Ast_config.attr list) =
+let updPrj (name:string) (prj : (int * (string * int * Unix.tm option * int) array) option * Ast_config.attr list) =
   PrjTbl.replace projects name prj
 
 (* For patterns *)

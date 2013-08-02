@@ -1,4 +1,4 @@
-type version = string * Unix.tm * int
+type version = string * Unix.tm option * int
 
 type correl = Strict | Nocorrel | Default
 type format = CSV | Org

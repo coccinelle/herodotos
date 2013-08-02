@@ -55,7 +55,7 @@ let sec_to_days sec =
   int_of_float (sec /. (86400.0)) (* convert secondes into days*)
 
 let tm_to_days tm =
-  sec_to_days (fst (Unix.mktime tm))
+  sec_to_days (fst (Unix.mktime (Config.get_date tm)))
 
 let get_day strdate =
   match Str.split (Str.regexp "-") strdate with
