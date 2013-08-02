@@ -11,7 +11,7 @@ EXTLIBS=postgresql
 
 OCAMLFIND=ocamlfind
 
-OCAMLLIBS=str.cma unix.cma $(EXTLIBS:%=%.cma)
+OCAMLLIBS=str.cma unix.cma threads.cma bigarray.cma $(EXTLIBS:%=%.cma)
 
 # ocamlmktop -custom -thread  -o threadedocaml unix.cma threads.cma -cclib -lthreads
 # Automatic computation
@@ -37,7 +37,7 @@ MENHIR=$(MENHIR_PATH)/menhirLib.cmo
 MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 
 # The Caml compilers.
-CFLAGS ?= -g -dtypes $(FLAGS)
+CFLAGS ?= -g -dtypes -thread $(FLAGS)
 OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
 ifeq ("$(OPTBIN)",".opt")
 OCAMLC=$(OCAMLFIND) ocamlc -predicates native

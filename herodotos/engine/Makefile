@@ -13,7 +13,8 @@ SOURCES = occ_correl.ml \
 	cfgblame.ml     \
 	test.ml
 INTFS =
-INCLUDES = -I ../commons -I ../hcl -I ../exists -I ../org -I ../diff -I ../graph -I ../html -I ../scm
+TOPLIB=commons hcl exists org diff graph html scm database
+INCLUDES=$(TOPLIB:%=-I ../%)
 
 # Automatic computation
 -include ../Makefile.config
