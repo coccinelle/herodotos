@@ -24,18 +24,11 @@ let sql_update = ref false
 
 let freearg = ref ""
 
-let usage_msg =
+let usage_msg_headline =
   "Usage: " ^ Filename.basename Sys.argv.(0) ^
-    " [-c <configurationfile> [preinit | init | correl | graph | erase | blame]]\n"
+    " [-c <configurationfile> [preinit | init | correl | graph | erase | blame]]\n\nModes:\n"
 
-let options = [
-
-  "-h", Arg.Unit (fun () -> mode := Some Help) , " Display this list of options";
-  "help", Arg.Unit (fun () -> mode := Some Help), " Display this list of options";
-  "-help", Arg.Unit (fun () -> mode := Some Help), " Display this list of options";
-  "--help", Arg.Unit (fun () -> mode := Some Help), " Display this list of options";
-  "--longhelp", Arg.Unit (fun () -> mode := Some Longhelp), " Display this list of options and the supported graph types";
-
+let modes = [
   "preinit", Arg.Unit (fun () -> mode := Some PreInit), " Recover missing parts of a version description (size and release date) , or extract version code";
   "init", Arg.Unit (fun () -> mode := Some Init), " Initialize a tracking environment as defined in the configuration file";
   "correl", Arg.Unit( fun () -> mode := Some Correl), " Correlation mode with the configuration file";
@@ -43,8 +36,20 @@ let options = [
   "stat", Arg.Unit (fun () -> mode := Some Stat), " Compute statistics";
   "statcorrel", Arg.Unit (fun () -> mode := Some Statcorrel), " Compute statistics about correlations";
   "statfp", Arg.Unit (fun () -> mode := Some StatFP), " Compute statistics about false positives";
-  "test", Arg.Unit (fun () -> mode := Some Test), " Test for development (test)";
   "erase", Arg.Unit (fun () -> mode := Some Erase), " Erase some data";
+  "test", Arg.Unit (fun () -> mode := Some Test), " Test for development (test)";
+  "help", Arg.Unit (fun () -> mode := Some Help), " Display this list of options";
+ ]
+
+let usage_msg = Arg.usage_string (Arg.align modes) usage_msg_headline ^ "\n\nOptions:\n"
+
+let options = [
+
+  "-h", Arg.Unit (fun () -> mode := Some Help) , " Display this list of options";
+  "-help", Arg.Unit (fun () -> mode := Some Help), " Display this list of options";
+  "--help", Arg.Unit (fun () -> mode := Some Help), " Display this list of options";
+  "--longhelp", Arg.Unit (fun () -> mode := Some Longhelp), " Display this list of options and the supported graph types";
+  "--version", Arg.Unit (fun () -> mode := Some Version), " Print Herodotos version";
 
   "-c", Arg.Set_string configfile, "file Configuration file describing the requested data";
   "--config", Arg.Set_string configfile, "file Configuration file describing the requested data";
@@ -63,7 +68,6 @@ let options = [
   "--to-sql-notes", Arg.Unit (fun () -> sqlnotes:=true;sql:=true), " Convert the parsed Org file to SQL (table of notes)";
   "--to-sql-update",Arg.Tuple[Arg.Set sql_update;Arg.Set_string version_incr], " Update the database including new versions study results";
 
-  "--version", Arg.Set version, " Print Herodotos version";
   "-v", Arg.Set verbose1, " verbose mode";
   "-vv", Arg.Set verbose2, " more verbose mode";
   "-vvv", Arg.Set verbose3, " more more verbose mode";
@@ -154,7 +158,8 @@ let main aligned =
 		      (fun () -> Cfgblame.blame !verbose1 !verbose2 !verbose3 !configfile !freearg)
 		  | Version|Longhelp|Help -> () (* The ones have been match before. *)
 	end
-    | None -> Arg.usage aligned usage_msg
+    | None ->
+      Arg.usage aligned usage_msg
 		(*
 		  else
 		(* For Org file parsing *)
@@ -204,10 +209,22 @@ let main aligned =
 			end
 		      *)
 
+let anon_fun = fun
+  x ->
+    if not (List.exists (fun (mode, arg, _) ->
+      if x = mode then
+	match arg with
+	    Arg.Unit f -> f (); true
+	  | _ -> false
+      else 
+	false
+    ) modes) then
+      freearg := x
+
 let _ =
   let aligned = Arg.align options in
     (try
-      Arg.parse_argv Sys.argv aligned (fun x -> freearg := x) usage_msg;
+      Arg.parse_argv Sys.argv aligned anon_fun usage_msg;
     with Arg.Bad msg ->
       (prerr_string msg; exit 0));
     main aligned;
