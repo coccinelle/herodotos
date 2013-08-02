@@ -7,6 +7,9 @@
       to have multiple lines legend. For convenience, we use
       '\n' and convert them to '\' followed by '\n'.
     *)
+  let to_jgraph_fmt s =
+    let newlinere = Str.regexp_string "\\n" in
+    Str.global_replace newlinere "\\\n" s
 
   let build_date m d y =   snd (Unix.mktime {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
        (* Don't care about the time *)
@@ -14,14 +17,6 @@
        (* Will be normalized by mktime *)
        Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
       })
-
-  let to_jgraph_fmt s =
-    let newlinere = Str.regexp_string "\\n" in
-    Str.global_replace newlinere "\\\n" s
-  let versions_string = ref "" 
-  let public_scm = ref ""
-  let local_scm = ref ""
-  let already_declared_versions = ref []
 %}
 
 // TCOLEQ TLAB TRAB
@@ -48,39 +43,16 @@
 %start main
 %type <unit> main
 
-%start preinit
-%type <string> preinit
-
-%start parse_versions
-%type <unit> parse_versions
-
-%start declared_versions
-%type <(string*(string*string*string) list) list> declared_versions
+%start projects_cache
+%type <(string*(string*Unix.tm option*int) list) list> projects_cache
 
 %%
 
+projects_cache:
+  l=list(project_cache) EOF {l}
 
-parse_versions:
-  list(buffered_versions) EOF {Setup.reorder_versions()}
-
-
-declared_versions:
-  l = list(present_versions) EOF { already_declared_versions :=  List.flatten(snd(List.split  l));l} 
-
-
-
-
-preinit:
- list(mainrules) EOF {!versions_string }
-
-mainrules:
-  gbattr  {}
-| projectPreinit {}
-| pattern {}
-| experience {}
-| graph   {}
-
-
+project_cache:
+  project = TId TLCB vs=list(full_version_desc) TRCB { (project,vs)}
 
 
 main:
@@ -92,10 +64,6 @@ toplevel:
 | pattern {}
 | experience {}
 | graph   {}
-
-
-
-
 
 project:
   TPROJECT name=TId TLCB atts=list(attr) TRCB { Setup.addPrj name (None, atts) }
@@ -111,10 +79,8 @@ gbattr:
 | TSPFLAGS     TEQUAL f=TSTRING        { Setup.setSPFlags(f)}
 | TCPUCORE     TEQUAL c=TInt           { Setup.setCPUcore(c)}
 
-
 experience:
    TEXPERIENCE name=TId descExperience=objects    {Setup.addExp name (descExperience)}  
-
 
 objects:
  |TAPPLYING TPATTERN name=TId patterns= list(patternobj) TWITH TPROJECT name2=TId projects= list(projectsub) 
@@ -128,22 +94,11 @@ patternobj:
 projectobj:
  TCOMMA name=TId {Ast_config.ExpProject(name)}
 
-
 patternsub:
  TCOMMA name=TId {Ast_config.ExpPattern(name)}
  
-
- 
- 
 projectsub: 
  TCOMMA name=TId {Ast_config.ExpProject(name)}
-
-
-
-
-
-
-
 
 attr:
   TCOLOR         TEQUAL r=float v=float b=float    { Ast_config.Color(r,v,b) }
@@ -181,9 +136,12 @@ attr:
 | TPRUNE         TEQUAL b=TBOOL                    { Ast_config.Prune(b)}
 | TRATIO         TEQUAL b=TBOOL                    { Ast_config.Ratio(b)}
 | TVERSIONS      TEQUAL TLCB  vs=list(version) TRCB{
-    Setup.pull_versions()
-  }
-| TVERSIONS TEQUAL TSTRING                         {Setup.pull_versions()}
+  match vs with
+      (name, _,_)::_ ->
+	let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in
+	Ast_config.Version (count, vs)
+    | [] -> Ast_config.Version (0, [])}
+| TVERSIONS      TEQUAL re=TSTRING                 { Ast_config.VersionRE (re)}
 | TVMIN          TEQUAL v=TSTRING                  { Ast_config.VMin(v)}
 | TLOCALSCM      TEQUAL v=TSTRING                  { Ast_config.LOCALSCM(v)}
 | TPUBLICSCM     TEQUAL v=TSTRING                  { Ast_config.PUBLICSCM(v)}
@@ -191,35 +149,19 @@ attr:
 | TSORT          TEQUAL b=TBOOL                    { Ast_config.Sort(b)}
 | TSIZE          TEQUAL x=float y=float            { Ast_config.Size(x,y)}
 
-
-
-
-
-
-
-
-
-
-
-
-
 attrs:
   TLCB atts=list(attr) TRCB {atts}
 
 version:
-  TLPAR name=TSTRING date  size TRPAR {
+   full=full_version_desc                           { full }
+| TLPAR name=TSTRING TCOMMA date=date TRPAR         { (name, date, 0) }
+| TLPAR name=TSTRING TRPAR                          { (name, None, 0) }
     
-  }
-
-size:
-  |TCOMMA TInt {}
-  | { }
+full_version_desc:
+  TLPAR name=TSTRING TCOMMA date=date TCOMMA size=TInt TRPAR { (name, date, size) }
 
 date:
-  |TCOMMA m=TInt TSLASH d=TInt TSLASH y=TInt
-    { Some(build_date m d y)
-    }
-  |{None}
+  m=TInt TSLASH d=TInt TSLASH y=TInt                    { Some(build_date m d y)  }
 
 pattern:
   TPATTERN name=TId atts=attrs { Setup.addDft name atts }
@@ -308,115 +250,3 @@ expression:
 | e1=expression TMINUS e2=expression { Ast_config.Minus(e1, e2) }
 | e1=expression TSTAR  e2=expression { Ast_config.Mul(e1, e2)   }
 | e1=expression TSLASH e2=expression { Ast_config.Div(e1, e2)   }
-
-(*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*)
-(* preinit parsing rules*)
-
-projectPreinit:
-  TPROJECT name=TId TLCB versions=list(prjattr) TRCB {versions_string:= !versions_string^name^(String.concat "\n" versions)}
-(*currently used for preinit parsing *)
-prjattr:
-  | TDIR           TEQUAL d=path                     {Setup.setDir d ;""}
-  | TSUBDIR        TEQUAL path                       {"" }
-  | TVERSIONS      TEQUAL TLCB  vs=list(versionPreinit) TRCB {"{\n"^(String.concat "\n" vs)^"\n}\n"}
-  | TVERSIONS TEQUAL exp=TSTRING
-      {let vs = Compute_size_and_date.extract_vers_infos (!Setup.projectsdir^"/"^(!Setup.dir)) exp !local_scm !already_declared_versions !public_scm in
-        "{\n"^(String.concat "\n" vs)^"\n}\n" }
-  | TCOLOR         TEQUAL float float float          { "" }
-  | TCORREL        TEQUAL TNONE                      { "" }
-  | TCORREL        TEQUAL TId                        { "" }
-  | TCLEANCOLOR    TEQUAL float float float          { ""}
-  | TPATTERN       TEQUAL TId                        { ""}
-  | TPATTERNCOLOR  TEQUAL float float float          { ""}
-  | TDATA          TEQUAL expression                 { ""}
-  | TFACTOR        TEQUAL float                      { ""}
-  | TFILE          TEQUAL TSTRING                    {""}
-  | TFILE          TEQUAL TNONE                      { ""}
-  | TFILENAME      TEQUAL TBOOL                      { ""}
-  | TFOOTER        TEQUAL TSTRING                    { ""}
-  | TFORMAT        TEQUAL TId                        { ""}
-  | TINFO          TEQUAL TBOOL                      { ""}
-  | TLEGEND        TEQUAL TSTRING                    { ""}
-  | TXLEGEND       TEQUAL TSTRING                    { ""}
-  | TYLEGEND       TEQUAL TSTRING                    { ""}
-  | TYLEGENDFACTOR TEQUAL TId                        { ""}
-  | TLINESTYLE     TEQUAL TNONE                      { ""}
-  | TLINESTYLE     TEQUAL TId                        { ""}
-  | TMARKTYPE      TEQUAL TNONE                      { ""}
-  | TMARKTYPE      TEQUAL TId                        { ""}  
-  | TMARKSIZE      TEQUAL float                      { ""}
-  | TXAXIS         TEQUAL TId                        { ""}
-  | TXMIN          TEQUAL float                      { ""}
-  | TYAXIS         TEQUAL gid                        { ""}
-  | TNOTEXISTCOLOR TEQUAL float float float          { ""}
-  | TPROJECT       TEQUAL TId                        { ""}
-  | TAUTHOR        TEQUAL TBOOL                      { ""}
-  | TPRUNE         TEQUAL TBOOL                      { ""}
-  | TRATIO         TEQUAL TBOOL                      { ""}
-  | TVMIN          TEQUAL TSTRING                    { ""}
-  | TSPFLAGS       TEQUAL TSTRING                    { ""}
-  | TSORT          TEQUAL TBOOL                      { ""}
-  | TSIZE          TEQUAL float float                { ""}   
-  | TLOCALSCM      TEQUAL v=TSTRING                  {local_scm := v;"" }
-  | TPUBLICSCM     TEQUAL v=TSTRING                  {public_scm := v;"" }
-
-versionPreinit:
-  TLPAR name=TSTRING  d=datePreinit  size=sizePreinit TRPAR {
-    let _ =Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!local_scm) (!public_scm) in
-    let date = if d="" then 
-                         (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!local_scm))
-                      else d in
-    let _ =List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then      
-      
-      let size=Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name) in 
-      "("^"\""^name^"\""^","^ date^","^(string_of_int size)^")"
-     else 
-        "("^"\""^name^"\""^","^ date ^","^(string_of_int size)^")"
-  }
-
-sizePreinit:
-  |TCOMMA size=TInt {size}
-  | { 0 }
-
-datePreinit:
-  |TCOMMA m=TInt TSLASH d=TInt TSLASH y=TInt
-    { (string_of_int m)^"/"^(string_of_int d)^"/"^(string_of_int y)}
-  | {""}
-
-
-
-(*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*)
-(*buffered versions parsing rules *)
-
-buffered_versions:
-  project=TId TLCB vs=list(buffered_version)  TRCB { let (cl, vl) = List.split vs in
-                                         let count = List.fold_left max 0 cl in
-                                         Setup.push_versions(Ast_config.Version(count, vl) )}
-
-buffered_version:
-  TLPAR name=TSTRING TCOMMA d=buffered_date TCOMMA size=TInt TRPAR {
-    let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in
-      (count, (name, d, size))
-  }
-
-buffered_date:
-  m=TInt TSLASH d=TInt TSLASH y=TInt
-    {Some(build_date m d y)
-    }
-
-(*---------------------------------------------------------------------------------------------------------------------------------------*)
-(* already declared versions parsing rules  *)
-
-present_versions:
-  project = TId TLCB vs=list(present_version) TRCB { (project,vs)}
-
-present_version:
-  TLPAR name=TSTRING TCOMMA date=present_date TCOMMA size=TInt TRPAR 
-       {(name,date,(string_of_int size))}
-
-present_date:
-  m=TInt TSLASH d=TInt TSLASH y=TInt 
-    {(string_of_int m)^"/"^(string_of_int d)^"/"^(string_of_int y)}
-
-
-

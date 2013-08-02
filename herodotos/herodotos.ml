@@ -2,7 +2,7 @@ open Global
 
 exception Misconfigured
 
-let configfile = ref ""
+let configfile = ref "study.hc"
 let orgfile = ref ""
 let prefix = ref ""
 let extract = ref ""
@@ -31,8 +31,9 @@ let usage_msg_headline =
 let modes = [
   "preinit", Arg.Unit (fun () -> mode := Some PreInit), " Recover missing parts of a version description (size and release date) , or extract version code";
   "init", Arg.Unit (fun () -> mode := Some Init), " Initialize a tracking environment as defined in the configuration file";
-  "correl", Arg.Unit( fun () -> mode := Some Correl), " Correlation mode with the configuration file";
+  "correl", Arg.Unit ( fun () -> mode := Some Correl), " Correlation mode with the configuration file";
   "graph", Arg.Unit (fun () -> mode := Some Graph), " Generate the graphs";
+  "blame", Arg.Unit (fun () -> mode := Some Blame), " Annotate reports with author name";
   "stat", Arg.Unit (fun () -> mode := Some Stat), " Compute statistics";
   "statcorrel", Arg.Unit (fun () -> mode := Some Statcorrel), " Compute statistics about correlations";
   "statfp", Arg.Unit (fun () -> mode := Some StatFP), " Compute statistics about false positives";
@@ -135,7 +136,7 @@ let main aligned =
 		      (fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg running_mode)
 		  | PreInit ->
 		    Debug.profile_code "pre-initialize env."
-		      (fun () -> Cfgpreinit.preinit !configfile)
+		      (fun () -> Cfgpreinit.preinit !verbose1 !verbose2 !verbose3 !configfile)
 		  | Init->
 		    Debug.profile_code "initialize env."
 		      (fun () -> Cfginit.init_env !verbose1 !verbose2 !verbose3 !configfile !cvs)
@@ -154,7 +155,7 @@ let main aligned =
 		    Debug.profile_code "erase env."
 		      (fun () -> Cfgerase.erase_env !verbose1 !verbose2 !verbose3 !configfile !freearg)
 		  | Blame ->
-		    Debug.profile_code "erase env."
+		    Debug.profile_code "blame authors"
 		      (fun () -> Cfgblame.blame !verbose1 !verbose2 !verbose3 !configfile !freearg)
 		  | Version|Longhelp|Help -> () (* The ones have been match before. *)
 	end

@@ -41,6 +41,7 @@ type attr =
   | Ratio of bool
   | NotExistColor of float * float * float
   | Version of int * version list
+  | VersionRE of string
   | VMin of string
   | Author of bool
   | Prune of bool
