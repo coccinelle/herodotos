@@ -11,7 +11,7 @@ TARGET=sql2jgr
 OBJS=$(SRC:%.ml=%.cmo)
 LIBS=$(SUBDIRS:%=%.cma)
 
-OCAMLLIBS=unix.cma threads.cma str.cma $(EXTLIBS:%=%.cma)
+OCAMLLIBS=unix.cma threads.cma str.cma bigarray.cma $(EXTLIBS:%=%.cma)
 
 LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
 ALLLIBS=$(OCAMLLIBS) $(LIBS)
