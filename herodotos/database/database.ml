@@ -10,14 +10,14 @@ let sqldate_to_tm sqldate =
 	let y = int_of_string year in
 	let m = int_of_string month in
 	let d = int_of_string day in
-	  snd (Unix.mktime
+	  Some (snd (Unix.mktime
 		 {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
 		  (* Don't care about the time *)
 		  Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
 		  (* Will be normalized by mktime *)
 		  Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
 		 }
-	      )
+	      ))
     | _ -> raise (Unexpected "Unsupported format date. YYYY-MM-DD expected from PostgreSQL.")
 
 let print_conn_info conn =
@@ -50,6 +50,18 @@ let print_res conn res =
   | Bad_response -> printf "Bad response: %s\n" res#error; conn#reset
   | Nonfatal_error -> printf "Non fatal error: %s\n" res#error
   | Fatal_error -> printf "Fatal error: %s\n" res#error
+
+let print_tuples table =
+  let dimx = ArrayLabels.length table in
+  let dimy = ArrayLabels.length table.(0) in
+  Printf.eprintf "Tuples: %d\n" dimx;
+  Printf.eprintf "Fields: %d\n" dimy;
+  for tuple = 0 to dimx - 1 do
+    for field = 0 to dimy - 1  do
+      Printf.eprintf "| %s\t" table.(tuple).(field)
+    done;
+    Printf.eprintf "\n"
+  done
 
 let build_varray res =
   let vs =
@@ -128,6 +140,11 @@ let read_grtuples vb conn res =
     | Nonfatal_error -> raise (Unexpected ("Non fatal error: "^ res#error))
     | Fatal_error -> raise (Unexpected ("Fatal error: " ^ res#error))
 
+let dump_single_res conn =
+  match conn#get_result with
+  | Some res -> print_res conn res; flush stdout
+  | None -> ()
+
 let rec dump_res conn =
   match conn#get_result with
   | Some res -> print_res conn res; flush stdout; dump_res conn
@@ -168,6 +185,7 @@ let open_db vb conninfo : connection =
     failwith "cannot run on Windows";
   let conn = new connection ~conninfo () in
   if vb then print_conn_info conn;
+  flush stdout;
   conn#set_notice_processor (fun s -> eprintf "postgresql error [%s]\n" s);
   ignore(Thread.create listener conn);
   conn
@@ -175,11 +193,8 @@ let open_db vb conninfo : connection =
 let close_db (conn: connection) =
   conn#finish
 
-let test_query (conn:connection) (sql: string) =
-  try
-    conn#send_query sql;
-    dump_res conn
-  with End_of_file -> close_db conn
+let send_query (conn:connection) (sql: string) =
+  conn#send_query sql
 
 let get_tuples vb (conn:connection) (sql: string) =
   read_tuples vb conn (conn#exec sql)
@@ -191,14 +206,52 @@ let get_grtuples vb (conn:connection) (sql: string) =
 (*   conn#send_query sql; *)
 (*   dump_grtuples conn *)
 
+
+let get_tuples_of (conn : connection) sqlquery =
+  conn#send_query sqlquery;
+  match conn#get_result with
+      Some res ->
+	begin
+	  match res#status with
+	      Tuples_ok ->
+		let dimx = res#ntuples in
+		let dimy = res#nfields in
+		let table = ArrayLabels.make_matrix ~dimx ~dimy "" in
+		for tuple = 0 to dimx - 1 do
+		  for field = 0 to dimy - 1  do
+		    table.(tuple).(field) <- res#getvalue tuple field
+		  done;
+		done;
+		table
+	    | _ -> raise (Unexpected res#error)
+	end
+    | None -> raise (Unexpected "No result!")
+
+let cmd vb (conn : connection) sqlquery =
+  if vb then prerr_endline ("Sending SQL: " ^sqlquery);
+  conn#send_query sqlquery;
+  dump_single_res conn
+
+let interactive_mode conn =
+  try
+    while true do
+      print_string "> ";
+      let s = read_line () in
+      send_query conn s;
+      dump_res conn
+    done
+  with End_of_file -> conn#finish
+
+
 (*************************************************
 let main () =
   if Obj.is_block (Obj.repr Unix.stdin) then
     failwith "cannot run on Windows";
   let user = "npalix" in
-  let dbname = "npalix" in
-  let port = "5433" in
-  let conn = new connection ~user ~dbname ~port () in
+  let dbname = "atocs" in
+  let host = "localhost" in
+  let port = "5432" in
+  let conn = new connection ~host ~user ~dbname ~port () in
   print_conn_info conn;
   flush stdout;
   conn#set_notice_processor (fun s -> eprintf "postgresql error [%s]\n" s);
@@ -212,8 +265,14 @@ let main () =
     done
   with End_of_file -> conn#finish
 
-let _ =
+let test () =
   try main () with
   | Error e -> prerr_endline (string_of_error e)
   | e -> prerr_endline (Printexc.to_string e)
-*************************************************)
+***************************************************)
+
+let test (conn:connection) =
+  try
+    interactive_mode conn
+  with Error e -> prerr_endline (string_of_error e)
+    | e -> prerr_endline (Printexc.to_string e)

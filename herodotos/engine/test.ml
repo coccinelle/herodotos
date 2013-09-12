@@ -3,23 +3,20 @@ let print_head path =
   let (_, vlist) = Config.get_versinfos "Linux-2.6" in
     prerr_endline ("Looking in " ^path);
     Git.load_authors path;
-    (*   let author = Git.blame true vlist path "linux-2.6.26" 326 "mm/sparse.c" in *)
+    (*   let author = Git.blame true vlist path "linux-2.6.0" "linux-2.6.26" 326 "mm/sparse.c" in *)
     (*     prerr_endline ("Bug author:"); *)
     (*     Git.prerr_author vlist author "linux-2.6.26"; *)
-    let idx = Misc.get_idx_of_version vlist "linux-2.6.28" in
-    let author = Git.blame true vlist path idx 946 "arch/sparc64/kernel/irq.c" in
+    let file = "arch/sparc64/kernel/irq.c" in
+    let (author, _) = Git.blame true path "linux-2.6.0" "linux-2.6.28" file 946 in
       prerr_endline ("Bug author:");
       Git.prerr_author vlist author "linux-2.6.17";
-      let idx = Misc.get_idx_of_version vlist "linux-2.6.23" in
-      let author = Git.blame true vlist path idx 997 "arch/sparc64/kernel/irq.c" in
+      let (author, _) = Git.blame true path "linux-2.6.0" "linux-2.6.23" file 997 in
 	prerr_endline ("Bug author:");
 	Git.prerr_author vlist author "linux-2.6.17";
-	let idx = Misc.get_idx_of_version vlist "linux-2.6.22" in
-	let author = Git.blame true vlist path idx 908 "arch/sparc64/kernel/irq.c" in
+	let (author, _) = Git.blame true path "linux-2.6.0" "linux-2.6.22" file 908 in
 	  prerr_endline ("Bug author:");
 	  Git.prerr_author vlist author "linux-2.6.17";
-	  let idx = Misc.get_idx_of_version vlist "linux-2.6.17" in
-	  let author = Git.blame true vlist path idx 1000 "arch/sparc64/kernel/irq.c" in
+	  let (author, _) = Git.blame true path "linux-2.6.0" "linux-2.6.17" file 1000 in
 	    prerr_endline ("Bug author:");
 	    Git.prerr_author vlist author "linux-2.6.17"
 

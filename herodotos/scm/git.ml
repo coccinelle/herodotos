@@ -1,16 +1,17 @@
 (*
-
 let difffmt  = format_of_string "git --git-dir %s diff v1..v2 file"
 let logfmt   = format_of_string "git --git-dir %s log v1..v2 file"
 let headfmt  = format_of_string "git --git-dir %s log -1"
-
 *)
 
-exception Failed
+exception SCMFailure of string
 exception MalformedGitLog
+
+let firstversion = "linux-2.6.0"
 
 let blamefmt = format_of_string "git --git-dir %s blame --incremental %s -L %d,+1 -- %s"
 let authorsfmt = format_of_string "git --git-dir %s log --date=short --pretty=format:\"%%an;%%ae;%%ad;%%H\" > %s"
+let containsfmt = format_of_string "git --git-dir %s tag --contains %s -l %s"
 
 let authordb = Hashtbl.create 5
 
@@ -19,6 +20,20 @@ let is_author line =
 
 let is_filename line =
   Str.string_match (Str.regexp "^filename ") line 0
+
+let is_before vb path sha1 version =
+  let cmd = Printf.sprintf containsfmt path sha1 version in
+  if vb then prerr_string ("Executing: "^cmd);
+  let ch = Unix.open_process_in cmd in
+  try
+    let res = input_line ch in
+    match Unix.close_process_in ch with
+        Unix.WEXITED 0 ->
+          if vb then prerr_endline (" - OK"); true
+      | _         ->
+        if vb then prerr_endline (" - KO("^res^")"); false
+  with End_of_file ->         
+    if vb then prerr_endline (" - KO"); false
 
 let rec get_first_author ch =
   let line = input_line ch in
@@ -30,18 +45,23 @@ let rec get_first_author ch =
       else
 	failwith "author not found"
 
-let blame vb vlist (path:string) (idx:int) (line:int) (file:string) =
-  let (version,_,_,_) = Array.get vlist idx in
+let blame vb (path:string) (vmin:string) (version:string) (file:string) (line:int) =
   let cmd = Printf.sprintf blamefmt path version line file in
     if vb then prerr_string ("Executing: "^cmd);
     let ch = Unix.open_process_in cmd in
-      ignore(input_line ch); (* Ignore SHA1 and line info *)
-      let author = get_first_author ch in
-	match Unix.close_process_in ch with
-	    Unix.WEXITED 0 ->
-	      if vb then prerr_endline (" - OK"); author
-	  | _         ->
-	      if vb then prerr_endline (" - KO"); raise Failed
+    let sha1 = List.hd (Str.split (Str.regexp " ") (input_line ch)) in (* SHA1 and line info *)
+    let author = get_first_author ch in
+    match Unix.close_process_in ch with
+	Unix.WEXITED 0 ->
+	  if vb then prerr_endline (" - OK");
+	  (* let (firstversion, _, _, _) = vmin in *)
+	  let firstversion = vmin in
+	  if is_before vb path sha1 firstversion then
+	    ("Unknow author", sha1)
+	  else
+	    (author, sha1)
+      | _         ->
+	if vb then prerr_endline (" - KO"); raise (SCMFailure cmd)
 
 let print_duration days =
   if days < 30 then
@@ -144,7 +164,7 @@ let cache_log path =
     prerr_string ("Retrieving commit info");
     match Unix.system cmd with
 	Unix.WEXITED 0 -> prerr_endline (" - OK"); tmp
-      | _         -> prerr_endline (" - KO"); raise Failed
+      | _         -> prerr_endline (" - KO"); raise (SCMFailure cmd)
 
 let load_authors path =
   try

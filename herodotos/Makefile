@@ -89,7 +89,7 @@ bugs: $(MENHIR_PATH) commons
 orgs: $(MENHIR_PATH) commons diff
 diff: commons
 hcl: commons
-engine: commons diff exists orgs
+engine: commons diff exists orgs graph database scm
 #########################
 exists.opt: $(MENHIR_PATH).opt commons.opt
 bugs.opt: $(MENHIR_PATH).opt commons.opt

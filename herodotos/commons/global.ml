@@ -29,3 +29,4 @@ type hmode =
 | Test
 | Erase
 | Blame
+| ExpHistory

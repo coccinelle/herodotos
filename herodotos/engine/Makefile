@@ -10,14 +10,19 @@ SOURCES = occ_correl.ml \
 	cfgcorrel.ml    \
 	cfgstat.ml      \
 	cfgerase.ml     \
-	cfgblame.ml     \
+	cfgscm.ml       \
 	test.ml
 INTFS =
 TOPLIB=commons hcl exists org diff graph html scm database
-INCLUDES=$(TOPLIB:%=-I ../%)
 
+LIBNAMES=postgresql
 # Automatic computation
+OCAMLFIND=ocamlfind
+
 -include ../Makefile.config
+
+LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+INCLUDES=$(LIBDIR:%=-I %) $(TOPLIB:%=-I ../%)
 
 OBJS = $(SOURCES:.ml=.cmo)
 OPTOBJS = $(OBJS:.cmo=.cmx)
@@ -28,7 +33,7 @@ OPTLIB=$(LIB:.cma=.cmxa)
 OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
 OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
 OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES)
-OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
+OCAMLDEP = ocamldep$(OPTBIN) #$(INCLUDES)
 
 all: $(LIB)
 all.opt: $(OPTLIB)

@@ -126,10 +126,8 @@ let get_versinfos p =
 			    ) atts
 		with
 		    Ast_config.Version (depth, vs) ->
-		      let m = get_vers_min vs in
-		      let list = List.map (get_versinfo m) vs in
-		      let ordered = List.sort sort_by_date list in
-			(depth, Array.of_list ordered)
+		      let ordered = compute_versinfos vs in
+		      (depth, ordered)
 		  | _ -> raise Unrecoverable
 	      with _ ->
 		raise (Warning ("project versions are not set for "^p))

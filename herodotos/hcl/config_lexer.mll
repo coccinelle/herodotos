@@ -56,6 +56,7 @@ rule token = parse
   | "cpucore"                 { P.TCPUCORE       }
   | "curve"                   { P.TCURVE         }
   | "data"                    { P.TDATA          }
+  | "dbconn"                  { P.TDBCONN        }
   | "dir"                     { P.TDIR           }
   | "empty"                   { P.TEMPTY         }
   | "experience"              { P.TEXPERIENCE    }

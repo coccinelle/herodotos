@@ -34,6 +34,7 @@ let modes = [
   "correl", Arg.Unit ( fun () -> mode := Some Correl), " Correlation mode with the configuration file";
   "graph", Arg.Unit (fun () -> mode := Some Graph), " Generate the graphs";
   "blame", Arg.Unit (fun () -> mode := Some Blame), " Annotate reports with author name";
+  "export-history", Arg.Unit (fun () -> mode := Some ExpHistory), " Export scm history to SQL DB (currently date and author of commits)";
   "stat", Arg.Unit (fun () -> mode := Some Stat), " Compute statistics";
   "statcorrel", Arg.Unit (fun () -> mode := Some Statcorrel), " Compute statistics about correlations";
   "statfp", Arg.Unit (fun () -> mode := Some StatFP), " Compute statistics about false positives";
@@ -121,43 +122,49 @@ let main aligned =
 	  match running_mode with
 	      Version -> print_endline ("Herodotos version "^ Global.version)
 	    | Help | Longhelp ->
-	      if !verbose3 then verbose2 := true;
-	      if !verbose2 then verbose1 := true;
 	      Arg.usage aligned usage_msg;
 	      
 	      if running_mode = Longhelp then
 		prerr_endline ("\n"^Cfgmode.supported_types^"\n")
 	    | _ -> 
 	      if ((String.length !configfile) <> 0) then
-		match running_mode with
-		    Test -> Test.test !configfile
-		  | Stat | Statcorrel | StatFP -> 
-		    Debug.profile_code "statistics"
-		      (fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg running_mode)
-		  | PreInit ->
-		    Debug.profile_code "pre-initialize env."
-		      (fun () -> Cfgpreinit.preinit !verbose1 !verbose2 !verbose3 !configfile)
-		  | Init->
-		    Debug.profile_code "initialize env."
-		      (fun () -> Cfginit.init_env !verbose1 !verbose2 !verbose3 !configfile !cvs)
-		  | Correl ->
-		    Debug.profile_code "correlation"
-		      (fun () -> Cfgcorrel.correl !verbose1 !verbose2 !verbose3 !configfile !freearg)
-		  | Graph ->
-		    Debug.profile_code "graph generation"
-		      (fun () ->
-			print_endline ("Herodotos version "^ Global.version);
-			prerr_endline ("Processing "^ !configfile);
-			Cfgmode.graph_gen !verbose1 !verbose2 !verbose3 !configfile !pdf !png !web !freearg;
-			prerr_newline ()
-		      )
-		  | Erase ->
-		    Debug.profile_code "erase env."
-		      (fun () -> Cfgerase.erase_env !verbose1 !verbose2 !verbose3 !configfile !freearg)
-		  | Blame ->
-		    Debug.profile_code "blame authors"
-		      (fun () -> Cfgblame.blame !verbose1 !verbose2 !verbose3 !configfile !freearg)
-		  | Version|Longhelp|Help -> () (* The ones have been match before. *)
+		begin
+		  if !verbose3 then verbose2 := true;
+		  if !verbose2 then verbose1 := true;
+		  match running_mode with
+		      Test -> Test.test !configfile
+		    | Stat | Statcorrel | StatFP -> 
+		      Debug.profile_code "statistics"
+			(fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg running_mode)
+		    | PreInit ->
+		      Debug.profile_code "pre-initialize env."
+			(fun () -> Cfgpreinit.preinit !verbose1 !verbose2 !verbose3 !configfile)
+		    | Init->
+		      Debug.profile_code "initialize env."
+			(fun () -> Cfginit.init_env !verbose1 !verbose2 !verbose3 !configfile !cvs)
+		    | Correl ->
+		      Debug.profile_code "correlation"
+			(fun () -> Cfgcorrel.correl !verbose1 !verbose2 !verbose3 !configfile !freearg)
+		    | Graph ->
+		      Debug.profile_code "graph generation"
+			(fun () ->
+			  print_endline ("Herodotos version "^ Global.version);
+			  prerr_endline ("Processing "^ !configfile);
+			  Cfgmode.graph_gen !verbose1 !verbose2 !verbose3 !configfile !pdf !png !web !freearg;
+			  prerr_newline ()
+			)
+		    | Erase ->
+		      Debug.profile_code "erase env."
+			(fun () -> Cfgerase.erase_env !verbose1 !verbose2 !verbose3 !configfile !freearg)
+		    | Blame ->
+		      Debug.profile_code "blame authors"
+			(fun () -> Cfgscm.blame !verbose1 !verbose2 !verbose3 !configfile !freearg)
+		    | ExpHistory ->
+		      Debug.profile_code "export scm history"
+			( fun () -> () )
+			(* (fun () -> Cfgscm.history !verbose1 !verbose2 !verbose3 !configfile !freearg) *)
+		    | Version|Longhelp|Help -> () (* The ones have been match before. *)
+		end
 	end
     | None ->
       Arg.usage aligned usage_msg

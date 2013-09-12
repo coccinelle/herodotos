@@ -75,13 +75,14 @@ let compute_bug_info vb1 vb2 prefix fel vlist scmpath vminopt bug =
 	      else
 		false
   in
+  let (vmin,_,_,_) = Array.get vlist 0 in
   let (v,_,_,_) = Array.get vlist bmin in
   let author =
     if noneed_author then None
     else
       (
 	let (line, _, _) = pos in
-	let a = Git.blame vb2 vlist scmpath bmin line fb in
+	let (a,_) = Git.blame vb2 scmpath vmin v fb line in
 	  if vb2 then prerr_endline (a^";"^fb^";"^v);
 	  Some a
       )
@@ -331,12 +332,14 @@ let mark_vmin debug name atts curves =
 
 let get_scmpath scmfeature prj =
   if scmfeature then
-    let scm = try Config.get_scm prj with _ -> "" in
-    let scmpath = Str.replace_first (Str.regexp_string "git:") "" scm in
-    if Filename.is_relative scmpath then
-      !Setup.projectsdir ^ Config.get_prjdir prj ^ Filename.dir_sep ^ scmpath
-    else
-      scmpath
+    try
+      let scm = Config.get_scm prj in
+      let scmpath = Str.replace_first (Str.regexp_string "git:") "" scm in
+      if Filename.is_relative scmpath then
+	!Setup.projectsdir ^ Config.get_prjdir prj ^ Filename.dir_sep ^ scmpath
+      else
+	scmpath
+    with _ -> ""
   else
     ""
 
