@@ -3,7 +3,6 @@ open Printf
 
 let create_tmp_tbl = "create table tmp_bug_authors (
 correlation_id       int            primary key,
-author               VarChar(256)   not null,
 commit_id            VarChar(64)    not null,  
 author_id            int    
 );"
