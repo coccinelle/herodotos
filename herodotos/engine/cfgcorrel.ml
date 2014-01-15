@@ -59,7 +59,7 @@ let reparse_org tmpfile prefix depth vlist orgs =
     Org.sort cleanorgs;
     cleanorgs
 
-let correl_patt_prj v1 v2 v3 bugfile_ext =
+let correl_patt_prj v1 v2 v3 bugfile_ext diffalgo =
   let file = Filename.chop_suffix (Filename.basename bugfile_ext) Global.bugext in
   let (p,patt) =                                                                                                                    
     (* TODO: Fixme. This may not work according to the names of the projects *)
@@ -73,7 +73,7 @@ let correl_patt_prj v1 v2 v3 bugfile_ext =
   let bugfile = Filename.chop_suffix bugfile_ext Global.bugext in
   let orgfile    = bugfile ^ Global.origext in
   let correlfile = bugfile ^ Global.correlext in
-  let difffile   = bugfile ^ Global.patchext in
+  let difffile   = Diff.select_diff diffalgo bugfile in
   let editfile   = bugfile ^ Global.editext in
     if Config.get_format patt = Ast_config.Org then
 	if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
@@ -81,7 +81,7 @@ let correl_patt_prj v1 v2 v3 bugfile_ext =
             let orgs1 = (Org.build_org_arr prefix depth !Setup.resultsdir pdir (file^Global.origext) vlist ) in
             
 	    
-	    let diffs1= Diff.get_diff v1 !Setup.resultsdir pdir prefix vlist orgs1 (file^Global.origext) difffile in (*Diff.parse_diff v1 prefix difffile in*)
+	    let diffs1= Diff.get_diff v1 !Setup.resultsdir pdir prefix vlist orgs1 (file^Global.origext) difffile in
 	    let correl = List.rev (Org.parse_org false correlfile) in
 	    
 	      (* 
@@ -146,21 +146,21 @@ let correl_patt_prj v1 v2 v3 bugfile_ext =
       if Config.get_format patt = Ast_config.Org then
 	prerr_endline ("*** SKIP (NOT FOUND) *** "^ orgfile)
 
-let correl_patt_prj_nofail v1 v2 v3 file =
+let correl_patt_prj_nofail v1 v2 v3 diffalgo file =
   try
-    correl_patt_prj v1 v2 v3 file;
+    correl_patt_prj v1 v2 v3 diffalgo file;
     0
   with Config.Warning msg ->
     prerr_endline ("*** WARNING *** " ^ msg);
     1
 
-let run_correl_job v1 v2 v3 file =
+let run_correl_job v1 v2 v3 diffalgo file =
   let pid = Unix.fork () in
     if pid = 0 then (* I'm a slave *)
       begin
 	let pid = Unix.getpid() in
 	  if !Misc.debug then prerr_endline ("New child "^ string_of_int pid^ " on "^file);
-	  let ret = correl_patt_prj_nofail v1 v2 v3 file in
+	  let ret = correl_patt_prj_nofail v1 v2 v3 diffalgo file in
 	    if !Misc.debug then prerr_endline ("Job done for child "^ string_of_int pid);
 	    let msg = Debug.profile_diagnostic () in
 	      if msg <> "" then prerr_endline msg;
@@ -169,7 +169,7 @@ let run_correl_job v1 v2 v3 file =
     else (* I'm the master *)
       pid
 
-let dispatch_correl_job v1 v2 v3 cpucore (perr, pidlist) file:int*int list =
+let dispatch_correl_job v1 v2 v3 cpucore diffalgo (perr, pidlist) file :int*int list =
   let (error, newlist) =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
@@ -183,10 +183,10 @@ let dispatch_correl_job v1 v2 v3 cpucore (perr, pidlist) file:int*int list =
     else
       (perr, pidlist)
   in
-  let pid = run_correl_job v1 v2 v3 file in
+  let pid = run_correl_job v1 v2 v3 diffalgo file in
     (error, pid::newlist)
 
-let correl v1 v2 v3 configfile filter =
+let correl v1 v2 v3 configfile diffalgo filter =
   ignore(Config.parse_config configfile);
   if v2 then prerr_endline "Config parsing OK!";
   if v1 then Config.show_config v2 v3;
@@ -198,13 +198,10 @@ let correl v1 v2 v3 configfile filter =
   let cpucore = Setup.getCPUcore () in
   let error =
     if cpucore = 1 then
-      
-      let errs = List.map (correl_patt_prj_nofail v1 v2 v3)  bugfiles in
-        
+      let errs = List.map (correl_patt_prj_nofail v1 v2 v3 diffalgo)  bugfiles in
 	List.fold_left (+) 0 errs
     else
-      
-      let (err, pidlist) = List.fold_left (dispatch_correl_job v1 v2 v3 cpucore) (0, []) bugfiles in
+      let (err, pidlist) = List.fold_left (dispatch_correl_job v1 v2 v3 cpucore diffalgo) (0, []) bugfiles in
       let res = List.map (fun x ->
 			    let (death, status) = Unix.wait () in
 			      if !Misc.debug then

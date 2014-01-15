@@ -1,144 +1,42 @@
 open Lexing
 
-exception Unexpected of string
+exception UnsupportedDiff of string
 exception Break
 
-let line = ref Int64.zero
-(* let diffcmd = "diff -Ebw -U0 " *)
-let diffcmd = "diff -U0 "
+type difftype =
+    GNUDiff of string
+  | Gumtree of string
 
-let nonewline_re = Str.regexp "^\\\\ "
+let get_difffile difffile =
+  match difffile with
+      GNUDiff file -> file
+    | Gumtree file -> file
 
-let read_pos pos =
-  let pos_re = Str.regexp "^\\([0-9]+\\)\\(,\\([0-9]+\\)\\)?$" in
-  let posb = Str.string_match pos_re pos 0 in
-    if posb then
-      let linepos = int_of_string (Str.matched_group 1 pos) in
-      let linenum =
-	try int_of_string (Str.matched_group 3 pos)
-	with Not_found -> 1
-      in
-	(linepos, linenum)
-    else
-      raise (Unexpected ("bad hunk position format at line "^Int64.to_string !line))
+let get_diffcmd ofile nfile difffile =
+  match difffile with
+      GNUDiff file -> Gnudiff.diffcmd ^ofile ^" "^ nfile ^ " >> "^ file
+    | Gumtree file -> Gumtree.diffcmd ^ofile ^" "^ nfile ^ " >> "^ file
 
-let rec skip in_ch lineskip =
-  if lineskip > 0 then
-    begin
-      let linetxt = input_line in_ch in
-	line := Int64.succ !line;
-	if Str.string_match nonewline_re linetxt 0 then
-	    skip in_ch (lineskip)
-	else
-	  skip in_ch (lineskip -1)
-    end
+let parse_diff v prefix difffile : Ast_diff.diffs =
+  match difffile with
+      GNUDiff file -> Gnudiff.parse_diff v prefix file
+    | Gumtree file -> Gumtree.parse_diff v prefix file
 
-let rec read_hunks in_ch =
-  let hunk_desc = input_line in_ch in
-  let hunk_re = Str.regexp "^@@ -\\([^ ]+\\) \\+\\([^ ]+\\) @@$" in
-  let hunkb = Str.string_match hunk_re hunk_desc 0 in
-    if hunkb then
-      begin
-	line := Int64.succ !line;
-	let before = read_pos (Str.matched_group 1 hunk_desc) in
-	  ignore(Str.string_match hunk_re hunk_desc 0);
-	  let after = read_pos (Str.matched_group 2 hunk_desc) in
-	    skip in_ch ((snd before) + (snd after));
-	    let tail =
-	      try
-		read_hunks in_ch
-	      with End_of_file -> []
-	    in
-	      (before, after)::tail
-      end
-    else
-      begin
-	seek_in in_ch ((pos_in in_ch) - (1+String.length hunk_desc));
-	[]
-      end
-
-let rec lookfor_minusline in_ch =
-  try
-    let line_rm0 = input_line in_ch in
-    let tab_re = Str.regexp "\t" in
-    let rm_re = Str.regexp "^--- \\([^ ]+\\) .*$" in
-    let line_rm = Str.global_replace tab_re " " line_rm0 in
-    let rmb = Str.string_match rm_re line_rm 0 in
-    line := Int64.succ !line;
-      if rmb then
-	Some line_rm0
-      else
-	lookfor_minusline in_ch
-  with _ -> None
-
-let rec read_diff prefix file in_ch =
-  let line_rm00 = input_line in_ch in
-  let line_rm0 =
-    if Str.string_match nonewline_re line_rm00 0
-    then
-      (line := Int64.succ !line; input_line in_ch)
-    else
-      line_rm00
+let select_diff diffalgo bugfile : difftype =
+  let (proto, file) =
+    match Str.split (Str.regexp_string ":") diffalgo with
+	[] -> ("diff", diffalgo)
+      | proto::fileparts ->
+	let file = String.concat "" fileparts in
+	(proto, file)
   in
-    line := Int64.succ !line;
-    let tab_re = Str.regexp "\t" in
-    let rm_re = Str.regexp "^--- \\([^ ]+\\) .*$" in
-    let line_rm = Str.global_replace tab_re " " line_rm0 in
-    let rmb = Str.string_match rm_re line_rm 0 in
-      if rmb then
-	let rmfile = Str.matched_group 1 line_rm in
-	  ignore(input_line in_ch); (* Read +++ line *)
-	  line := Int64.succ !line;
-	  let hunks = read_hunks in_ch in
-	  let tail =
-	    try
-	      read_diff prefix file in_ch
-	    with End_of_file -> []
-	  in
-	  let ver_file = Misc.strip_prefix prefix rmfile in
-	    (ver_file, hunks)::tail
-      else
-	begin
-	  prerr_endline
-	    ("Error: Desynchronized? no more diff found in "^file
-	     ^ " at line "^Int64.to_string !line);
-	  prerr_endline
-	    ("Expects a \"---\" line. Got \""^line_rm0^"\"");
-	  prerr_endline
-	    ("Looking for filename in \""^line_rm^"\"");
-	  match lookfor_minusline in_ch with
-	      None ->
-		prerr_endline ("Unable to re-synchronize"); []
-	    | Some l ->
-		prerr_endline ("Re-synchronize on "^l);
-		match lookfor_minusline in_ch with
-		    None   -> []
-		  | Some l ->
-		      seek_in in_ch ((pos_in in_ch) - (1+String.length l));
-		      line := Int64.pred !line;
-		      read_diff prefix file in_ch
-	end
+  match proto with
+      "diff" ->
+	if file = "" then GNUDiff (bugfile ^ Global.patchext)
+	else GNUDiff file
+    | "gumtree" -> Gumtree file
+    | _ -> raise (UnsupportedDiff (proto ^ " is unsupported as a diff algorithm."))
 
-let parse_diff v prefix file : Ast_diff.diffs =
-  try
-    let in_ch = open_in file in
-      try
-	line := Int64.zero;
-	let ast = read_diff prefix file in_ch in
-	  close_in in_ch;
-	  ast
-      with
-	  (Unexpected msg) ->
-	    prerr_endline ("Unexpected token: "^msg);
-	    close_in in_ch;
-	    raise (Unexpected msg)
-	| End_of_file ->
-	    if v then prerr_endline ("*** WARNING *** "^file^" is empty !");
-	    close_in in_ch;
-	    []
-  with Sys_error msg ->
-    prerr_endline ("*** WARNING *** "^msg);
-    []
 
 let rec gen_diff_of_orglist prefix vlist orgs : (string * string) list =
   match orgs with
@@ -166,7 +64,8 @@ let gen_diff prefix vlist (orgarray: Ast_org.orgarray) : (string * string) list 
 			    ))
        ) [] orgarray
 
-let get_diff v resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile file : Ast_diff.diffs =
+let get_diff v resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile difffile : Ast_diff.diffs =
+  let file = get_difffile difffile in
   let orgstat = Misc.get_change_stat resultsdir pdir vlist orgfile (ref []) in
   let patchstat =
     if Sys.file_exists file
@@ -175,7 +74,7 @@ let get_diff v resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile fil
   in
 
   if Sys.file_exists file && orgstat < patchstat then
-    parse_diff v prefix file
+    parse_diff v prefix difffile
   else
     (
       if orgstat > patchstat
@@ -185,7 +84,7 @@ let get_diff v resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile fil
 	ignore (Unix.system ("> "^file));
 	List.iter
 	  (fun (ofile, nfile) ->
-	     let cmd = diffcmd ^ofile ^" "^ nfile ^ " >> "^ file in
+	     let cmd = get_diffcmd ofile nfile difffile in
 	       match
 		 Unix.system cmd
 	       with
@@ -194,127 +93,17 @@ let get_diff v resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile fil
 		 | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
 		 | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
 	  ) pair ;
-	parse_diff v prefix file
+	parse_diff v prefix difffile
     )
 
-type lineprediction =
-    Deleted
-  | Sing of int
-  | Cpl of int * int
-
-(* Old implementation *)
-let compute_new_pos_with_rec (diffs: Ast_diff.diffs) file ver pos : lineprediction * int * int =
-  let (orig_line, o_colb, o_cole) = pos in
-  let o_pos = (Sing orig_line, o_colb, o_cole) in
-  try
-(*    prerr_string " - as new line:"; *)
-    let hunks = List.assoc (ver, file) diffs in
-    let newhunks = List.map
-      (fun p ->
-	 let ((bl,bsize),(al,asize)) = p in
-	   if bsize = 0 then
-	     ((bl+1,bsize),(al,asize))
-	   else if asize = 0 then
-	     ((bl,bsize),(al+1,asize))
-	   else
-	     p
-      ) hunks
-    in
-    let new_pos = List.fold_left
-      (fun (wrap_line, colb, cole) ((bl,bsize),(al,asize)) ->
-	 match wrap_line with
-	     Sing line ->
-	       (* Occurrence is known to be at a exact line *)
-	       if  bl <= orig_line then
-		 (* Hunks before orig_line are interesting *)
-		 if (bl+bsize-1) < orig_line then
-		   (* orig_line is after the modified lines *)
-		   let nline = line + asize - bsize in
-		     (*	     prerr_string (" " ^string_of_int nline);*)
-		     (Sing nline, colb, cole)
-		 else if asize = 0 then
-		   (*
-		     orig_line is IN the current hunk.
-		     '+' part is empty. All hunk lines are removed.
-		   *)
-		   (Deleted, 0, 0)
-		 else
-		   (*
-		      We are IN the hunk,
-		      give the set of lines in '+' part
-		   *)
-		   (Cpl (al,al+asize-1),colb,cole)
-	       else (* bl > orig_line, remaining hunks are not interesting *)
-		 (*
-		   Return the current value.
-		 *)
-		 (wrap_line, colb, cole)
-	   | Deleted | Cpl _  ->
-	       (wrap_line, colb, cole)
-      ) o_pos newhunks
-    in (* prerr_newline (); *) new_pos
-  with Not_found -> o_pos
-
-let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : lineprediction * int * int =
-  Debug.profile_code_silent "Diff.compute_new_pos_with_findhunk"
-    (fun () ->
-  let (line, colb, cole) = pos in
-    try
-      let hunks =
-	Debug.profile_code_silent "Diff.compute_new_pos#List.assoc"
-	  (fun () ->
-	    List.assoc (ver, file) diffs
-	  )
-      in
-      let newhunks = List.map
-	(fun p ->
-	   let ((bl,bsize),(al,asize)) = p in
-	     if bsize = 0 then
-	       ((bl+1,bsize),(al,asize))
-	     else if asize = 0 then
-	       ((bl,bsize),(al+1,asize))
-	     else
-	       p
-	) hunks
-      in
-      let hunk = List.fold_left
-	(fun p1 p2 ->
-	   let ((bl1,_),_) = p1 in
-	   let ((bl2,_),_) = p2 in
-	     if bl1 <= line && line < bl2 then p1
-	     else p2
-	) ((0,0),(0,0)) newhunks
-      in
-      let ((bl,bsize),(al,asize)) = hunk in
-	if (bl+bsize) <= line then
-	  (*
-	    If we are above the current hunk, but still before the next,
-	    we computes the prediction by adding the two offsets.
-	  *)
-	  let nline = line + (al - bl) + (asize - bsize) in
-	    (Sing nline, colb, cole)
-	else
-	  (*
-	    We are IN the hunk.
-	  *)
-	  if asize = 0 then
-	    (Deleted, 0, 0)
-	  else
-	    (*
-	      We are maybe in the set of replacing lines !?
-	    *)
-	    (Cpl (al,al+asize-1),colb,cole)
-    with Not_found -> (Sing line, colb, cole)
-    )
-
-let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : lineprediction * int * int =
+let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
   Debug.profile_code_silent "Diff.compute_new_pos"
     (fun () ->
   let my_compute_new_pos =
     if true then
-      compute_new_pos_with_findhunk
+      Gnudiff.compute_new_pos_with_findhunk
     else
-      compute_new_pos_with_rec
+      Gumtree.compute_new_pos_with_gumtree
   in my_compute_new_pos diffs file ver pos
     )
 

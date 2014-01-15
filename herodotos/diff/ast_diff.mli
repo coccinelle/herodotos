@@ -6,3 +6,8 @@ type vname = string
 
 type diff = (vname * path) * hunk list
 type diffs = diff list
+
+type lineprediction =
+    Deleted
+  | Sing of int
+  | Cpl of int * int

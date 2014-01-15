@@ -174,24 +174,24 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	     (prerr_string (Org.get_string_pos p);
 	      prerr_string " as new pos: ";
 	      match diffcheck_pos with
-		  (Diff.Sing line,colb,cole) ->
+		  (Ast_diff.Sing line,colb,cole) ->
 		    let check_pos = (line, colb, cole) in
 		      prerr_endline (Org.get_string_pos check_pos)
-		| (Diff.Deleted, _,_) ->
+		| (Ast_diff.Deleted, _,_) ->
 		    prerr_endline "Deleted line"
-		| (Diff.Cpl (lineb,linee),colb, cole) ->
+		| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
 		    prerr_endline "Somewhere"
 	     );
 	   match diffcheck_pos with
-	       (Diff.Sing line,colb,cole) -> (* We are between two hunks. *)
+	       (Ast_diff.Sing line,colb,cole) -> (* We are between two hunks. *)
 		 check_next verbose strict prefix depth vlist diffs correl bugs bug (line,colb,cole)
-	     | (Diff.Deleted, colb,cole) ->
+	     | (Ast_diff.Deleted, colb,cole) ->
 		 (*
 		   We are inside a hunk and lines have been removed.
 		   Check for manual correlation.
 		 *)
 		 check_next verbose strict prefix depth vlist diffs correl bugs bug (0,colb,cole)
-	     | (Diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
+	     | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
 		 (*
 		   Could we do something for bugs inside a hunk ?
 		   It seems to be impossible and worthless.

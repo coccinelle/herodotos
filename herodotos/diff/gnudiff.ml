@@ -1,0 +1,191 @@
+
+exception Unexpected of string
+
+let line = ref Int64.zero
+(* let diffcmd = "diff -Ebw -U0 " *)
+let diffcmd = "diff -U0 "
+
+let nonewline_re = Str.regexp "^\\\\ "
+
+let read_pos pos =
+  let pos_re = Str.regexp "^\\([0-9]+\\)\\(,\\([0-9]+\\)\\)?$" in
+  let posb = Str.string_match pos_re pos 0 in
+    if posb then
+      let linepos = int_of_string (Str.matched_group 1 pos) in
+      let linenum =
+	try int_of_string (Str.matched_group 3 pos)
+	with Not_found -> 1
+      in
+	(linepos, linenum)
+    else
+      raise (Unexpected ("bad hunk position format at line "^Int64.to_string !line))
+
+let rec skip in_ch lineskip =
+  if lineskip > 0 then
+    begin
+      let linetxt = input_line in_ch in
+	line := Int64.succ !line;
+	if Str.string_match nonewline_re linetxt 0 then
+	    skip in_ch (lineskip)
+	else
+	  skip in_ch (lineskip -1)
+    end
+
+let rec read_hunks in_ch =
+  let hunk_desc = input_line in_ch in
+  let hunk_re = Str.regexp "^@@ -\\([^ ]+\\) \\+\\([^ ]+\\) @@$" in
+  let hunkb = Str.string_match hunk_re hunk_desc 0 in
+    if hunkb then
+      begin
+	line := Int64.succ !line;
+	let before = read_pos (Str.matched_group 1 hunk_desc) in
+	  ignore(Str.string_match hunk_re hunk_desc 0);
+	  let after = read_pos (Str.matched_group 2 hunk_desc) in
+	    skip in_ch ((snd before) + (snd after));
+	    let tail =
+	      try
+		read_hunks in_ch
+	      with End_of_file -> []
+	    in
+	      (before, after)::tail
+      end
+    else
+      begin
+	seek_in in_ch ((pos_in in_ch) - (1+String.length hunk_desc));
+	[]
+      end
+
+let rec lookfor_minusline in_ch =
+  try
+    let line_rm0 = input_line in_ch in
+    let tab_re = Str.regexp "\t" in
+    let rm_re = Str.regexp "^--- \\([^ ]+\\) .*$" in
+    let line_rm = Str.global_replace tab_re " " line_rm0 in
+    let rmb = Str.string_match rm_re line_rm 0 in
+    line := Int64.succ !line;
+      if rmb then
+	Some line_rm0
+      else
+	lookfor_minusline in_ch
+  with _ -> None
+
+let rec read_diff prefix file in_ch =
+  let line_rm00 = input_line in_ch in
+  let line_rm0 =
+    if Str.string_match nonewline_re line_rm00 0
+    then
+      (line := Int64.succ !line; input_line in_ch)
+    else
+      line_rm00
+  in
+    line := Int64.succ !line;
+    let tab_re = Str.regexp "\t" in
+    let rm_re = Str.regexp "^--- \\([^ ]+\\) .*$" in
+    let line_rm = Str.global_replace tab_re " " line_rm0 in
+    let rmb = Str.string_match rm_re line_rm 0 in
+      if rmb then
+	let rmfile = Str.matched_group 1 line_rm in
+	  ignore(input_line in_ch); (* Read +++ line *)
+	  line := Int64.succ !line;
+	  let hunks = read_hunks in_ch in
+	  let tail =
+	    try
+	      read_diff prefix file in_ch
+	    with End_of_file -> []
+	  in
+	  let ver_file = Misc.strip_prefix prefix rmfile in
+	    (ver_file, hunks)::tail
+      else
+	begin
+	  prerr_endline
+	    ("Error: Desynchronized? no more diff found in "^file
+	     ^ " at line "^Int64.to_string !line);
+	  prerr_endline
+	    ("Expects a \"---\" line. Got \""^line_rm0^"\"");
+	  prerr_endline
+	    ("Looking for filename in \""^line_rm^"\"");
+	  match lookfor_minusline in_ch with
+	      None ->
+		prerr_endline ("Unable to re-synchronize"); []
+	    | Some l ->
+		prerr_endline ("Re-synchronize on "^l);
+		match lookfor_minusline in_ch with
+		    None   -> []
+		  | Some l ->
+		      seek_in in_ch ((pos_in in_ch) - (1+String.length l));
+		      line := Int64.pred !line;
+		      read_diff prefix file in_ch
+	end
+
+let parse_diff v prefix file : Ast_diff.diffs =
+  try
+    let in_ch = open_in file in
+      try
+	line := Int64.zero;
+	let ast = read_diff prefix file in_ch in
+	  close_in in_ch;
+	  ast
+      with
+	  (Unexpected msg) ->
+	    prerr_endline ("Unexpected token: "^msg);
+	    close_in in_ch;
+	    raise (Unexpected msg)
+	| End_of_file ->
+	    if v then prerr_endline ("*** WARNING *** "^file^" is empty !");
+	    close_in in_ch;
+	    []
+  with Sys_error msg ->
+    prerr_endline ("*** WARNING *** "^msg);
+    []
+
+let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
+  Debug.profile_code_silent "Diff.compute_new_pos_with_findhunk"
+    (fun () ->
+  let (line, colb, cole) = pos in
+    try
+      let hunks =
+	Debug.profile_code_silent "Diff.compute_new_pos#List.assoc"
+	  (fun () ->
+	    List.assoc (ver, file) diffs
+	  )
+      in
+      let newhunks = List.map
+	(fun p ->
+	   let ((bl,bsize),(al,asize)) = p in
+	     if bsize = 0 then
+	       ((bl+1,bsize),(al,asize))
+	     else if asize = 0 then
+	       ((bl,bsize),(al+1,asize))
+	     else
+	       p
+	) hunks
+      in
+      let hunk = List.fold_left
+	(fun p1 p2 ->
+	   let ((bl1,_),_) = p1 in
+	   let ((bl2,_),_) = p2 in
+	     if bl1 <= line && line < bl2 then p1
+	     else p2
+	) ((0,0),(0,0)) newhunks
+      in
+      let ((bl,bsize),(al,asize)) = hunk in
+	if (bl+bsize) <= line then
+	  (*
+	    If we are above the current hunk, but still before the next,
+	    we computes the prediction by adding the two offsets.
+	  *)
+	  let nline = line + (al - bl) + (asize - bsize) in
+	    (Ast_diff.Sing nline, colb, cole)
+	else
+	  (*
+	    We are IN the hunk.
+	  *)
+	  if asize = 0 then
+	    (Ast_diff.Deleted, 0, 0)
+	  else
+	    (*
+	      We are maybe in the set of replacing lines !?
+	    *)
+	    (Ast_diff.Cpl (al,al+asize-1),colb,cole)
+    with Not_found -> (Ast_diff.Sing line, colb, cole)
+    )
