@@ -2,13 +2,6 @@ open Xml
 
 exception MalformedXML
 
-(* begin line * begin col * end line * end col *)
-type position = int * int * int * int
-type action =
-    Insert of position
-  | Move of position * position (* before * after *)
-  | Delete of position
-
 let diffcmd = "gumtree "
 
 let get_type attrs =
@@ -73,9 +66,9 @@ let parse_action xml =
       Element("action", attributes, children) ->
 	(
 	  match get_type attributes with
-	      "Insert" -> Insert (get_after children)
-	    | "Move"   -> Move (get_before children, get_after children)
-	    | "Delete" -> Delete (get_pos attributes)
+	      "Insert" -> Ast_diff.Insert (get_after children)
+	    | "Move"   -> Ast_diff.Move (get_before children, get_after children)
+	    | "Delete" -> Ast_diff.Delete (get_pos attributes)
 	    | _ -> raise MalformedXML
 	)
     | _ -> raise MalformedXML

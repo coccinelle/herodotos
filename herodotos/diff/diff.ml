@@ -7,6 +7,8 @@ type difftype =
     GNUDiff of string
   | Gumtree of string
 
+let selected_compute_new_pos = ref Gnudiff.compute_new_pos_with_findhunk
+
 let get_difffile difffile =
   match difffile with
       GNUDiff file -> file
@@ -34,7 +36,9 @@ let select_diff diffalgo bugfile : difftype =
       "diff" ->
 	if file = "" then GNUDiff (bugfile ^ Global.patchext)
 	else GNUDiff file
-    | "gumtree" -> Gumtree file
+    | "gumtree" ->
+      selected_compute_new_pos := Gumtree.compute_new_pos_with_gumtree;
+      Gumtree file
     | _ -> raise (UnsupportedDiff (proto ^ " is unsupported as a diff algorithm."))
 
 
@@ -99,35 +103,35 @@ let get_diff v resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile dif
 let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
   Debug.profile_code_silent "Diff.compute_new_pos"
     (fun () ->
-  let my_compute_new_pos =
-    if true then
-      Gnudiff.compute_new_pos_with_findhunk
-    else
-      Gumtree.compute_new_pos_with_gumtree
-  in my_compute_new_pos diffs file ver pos
+      !selected_compute_new_pos diffs file ver pos
     )
+
+let show_gnudiff hunks =
+  List.iter (fun ((bl,bsize),(al,asize)) ->
+    prerr_int bl;
+    prerr_string "(";
+    prerr_int bsize;
+    prerr_string ") -> ";
+    prerr_int al;
+    prerr_string "(";
+    prerr_int asize;
+    prerr_string "), "
+  ) hunks
 
 let show_diff verbose vlist ast =
   if verbose then
     begin
       prerr_endline "SHOW DIFF";
-      List.iter (fun ((ver, file), hunks) ->
+      List.iter (fun ((ver, file), difftype) ->
 		   prerr_string file;
 		   prerr_string " from ";
 		   prerr_string ver;
 		   prerr_string " to ";
 		   prerr_string (Misc.get_next_version vlist ver);
 		   prerr_endline "";
-		   List.iter (fun ((bl,bsize),(al,asize)) ->
-				prerr_int bl;
-				prerr_string "(";
-				prerr_int bsize;
-				prerr_string ") -> ";
-				prerr_int al;
-				prerr_string "(";
-				prerr_int asize;
-				prerr_string "), "
-			     ) hunks;
+		   match difftype with
+		       Ast_diff.GNUDiff hunks -> show_gnudiff hunks
+		     | _ -> raise (UnsupportedDiff "")
 		   prerr_endline ""
 		) ast
     end

@@ -94,7 +94,7 @@ let rec read_diff prefix file in_ch =
 	    with End_of_file -> []
 	  in
 	  let ver_file = Misc.strip_prefix prefix rmfile in
-	    (ver_file, hunks)::tail
+	    (ver_file, Ast_diff.GNUDiff hunks)::tail
       else
 	begin
 	  prerr_endline
@@ -146,7 +146,9 @@ let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : Ast_dif
       let hunks =
 	Debug.profile_code_silent "Diff.compute_new_pos#List.assoc"
 	  (fun () ->
-	    List.assoc (ver, file) diffs
+	    match List.assoc (ver, file) diffs with
+		Ast_diff.GNUDiff hunks -> hunks
+	      | _ -> raise (Unexpected "Wrong diff type")
 	  )
       in
       let newhunks = List.map
