@@ -120,6 +120,7 @@ let multi_output verbose vlist fileexist bfl =
 *)
 
 let main aligned =
+<<<<<<< HEAD
   match !mode with
       Some running_mode ->
 	begin
