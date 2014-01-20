@@ -85,6 +85,7 @@ let parse_action xml =
 	  match get_type attributes with
 	      "Insert" -> Ast_diff.Insert (get_after children)
 	    | "Move"   -> Ast_diff.Move (get_before children, get_after children)
+	    | "Update"   -> Ast_diff.Update (get_before children, get_after children)
 	    | "Delete" -> Ast_diff.Delete (get_pos attributes)
 	    | _ ->
 	      print_endline "parse_action";

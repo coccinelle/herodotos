@@ -9,6 +9,7 @@ type position = int * int * int * int
 type action =
     Insert of position
   | Move of position * position (* before * after *)
+  | Update of position * position (* before * after *)
   | Delete of position
 
 (* Generic types *)
