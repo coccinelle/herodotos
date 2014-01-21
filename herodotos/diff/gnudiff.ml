@@ -139,12 +139,12 @@ let parse_diff v prefix file : Ast_diff.diffs =
     []
 
 let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
-  Debug.profile_code_silent "Diff.compute_new_pos_with_findhunk"
+  Debug.profile_code_silent "Gnudiff.compute_new_pos_with_findhunk"
     (fun () ->
   let (line, colb, cole) = pos in
     try
       let hunks =
-	Debug.profile_code_silent "Diff.compute_new_pos#List.assoc"
+	Debug.profile_code_silent "GNUDiff.compute_new_pos#List.assoc"
 	  (fun () ->
 	    match List.assoc (ver, file) diffs with
 		Ast_diff.GNUDiff hunks -> hunks

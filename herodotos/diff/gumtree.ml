@@ -1,6 +1,7 @@
 open Xml
 
 exception MalformedXML
+exception Unexpected of string
 
 let diffcmd = "gumtree "
 
@@ -86,7 +87,7 @@ let parse_action xml =
 	      "Insert" -> Ast_diff.Insert (get_after children)
 	    | "Move"   -> Ast_diff.Move (get_before children, get_after children)
 	    | "Update"   -> Ast_diff.Update (get_before children, get_after children)
-	    | "Delete" -> Ast_diff.Delete (get_pos attributes)
+	    | "Delete" -> Ast_diff.Delete (get_before children)
 	    | _ ->
 	      print_endline "parse_action";
 	      print_endline (Xml.to_string xml);
@@ -115,9 +116,26 @@ let parse_diff v prefix file =
   [(ver_file, Ast_diff.Gumtree (parse_actions x))]
 
 let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
-  Debug.profile_code_silent "Diff.compute_new_pos_with_findhunk"
+  Debug.profile_code_silent "Gumtree.compute_new_pos_with_gumtree"
     (fun () ->
       let (line, colb, cole) = pos in
-      (* TODO Implement with gumtree information *)
-      (Ast_diff.Sing line, colb, cole)
+      try
+	let actions =
+	  Debug.profile_code_silent "Gumtree.compute_new_pos#List.assoc"
+	  (fun () ->
+	    match List.assoc (ver, file) diffs with
+		Ast_diff.Gumtree actions -> actions
+	      | _ -> raise (Unexpected "Wrong diff type")
+	  )
+	in
+	 (* let action = List.fold_left *)
+	 (*   (fun p1 p2 -> *)
+	 (*     let ((bl1,_),_) = p1 in *)
+	 (*     let ((bl2,_),_) = p2 in *)
+	 (*     if bl1 <= line && line < bl2 then p1 *)
+	 (*     else p2 *)
+	 (*   ) ((0,0),(0,0)) newhunks *)
+	 (* in *)
+	 (Ast_diff.Sing line, colb, cole)
+      with Not_found -> (Ast_diff.Sing line, colb, cole)
     )
