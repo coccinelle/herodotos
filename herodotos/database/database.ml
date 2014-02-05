@@ -71,7 +71,7 @@ let build_varray res =
 	else
 	  let name = res#getvalue tuple 0 in (* Should be version_name *)
 	  let date = sqldate_to_tm (res#getvalue tuple 1) in (* Should be release_date *)
-	    (name, Some date, 0)::init (tuple+1) (* Size is considered to be zero *)
+	    (name, date, 0)::init (tuple+1) (* Size is considered to be zero *)
     in
       init 0
   in

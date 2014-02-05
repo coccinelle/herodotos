@@ -1,7 +1,7 @@
 TARGET = diff
 
 INTFS=ast_diff.mli
-SOURCES =  gumtree.ml gnudiff.ml diff.ml ratio.ml churn.ml
+SOURCES =  gumtree.ml gnudiff.ml diff.ml churn.ml
 INCLUDES = -I ../commons -I ../exists -I ../org
 
 LIBNAMES=xml-light

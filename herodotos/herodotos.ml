@@ -136,7 +136,7 @@ let main aligned =
 		  if !verbose3 then verbose2 := true;
 		  if !verbose2 then verbose1 := true;
 		  match running_mode with
-		      Test -> Test.test !configfile
+		      Test -> Test.test !configfile !diffalgo
 		    | Stat | Statcorrel | StatFP -> 
 		      Debug.profile_code "statistics"
 			(fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg running_mode)
