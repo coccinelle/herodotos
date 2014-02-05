@@ -84,7 +84,7 @@ let parse_action xml =
       Element("action", attributes, children) ->
 	(
 	  match get_type attributes with
-	      "Insert" -> Ast_diff.Insert (get_after children)
+	      "Insert" -> Ast_diff.Insert (get_before children, get_after children)
 	    | "Move"   -> Ast_diff.Move (get_before children, get_after children)
 	    | "Update"   -> Ast_diff.Update (get_before children, get_after children)
 	    | "Delete" -> Ast_diff.Delete (get_before children)
@@ -115,6 +115,34 @@ let parse_diff v prefix file =
   print_endline (Xml.to_string x);
   [(ver_file, Ast_diff.Gumtree (parse_actions x))]
 
+let get_pos_before action =
+  match action with
+      Ast_diff.Empty -> (0,0,0,0)
+    | Ast_diff.Insert (pb, _) -> pb
+    | Ast_diff.Move (pb, _) -> pb
+    | Ast_diff.Update (pb, _) -> pb
+    | Ast_diff.Delete pb -> pb
+
+(* To be used when the fault is NOT inside the modified code *)
+let get_offset_after action = (* Offset is given in term of (line, column) *)
+  match action with
+      Ast_diff.Empty -> (0,0)
+    | Ast_diff.Insert (pb, pa) ->
+      let (bl1, bc1, el1, ec1) = pb in
+      let (bl2, bc2, el2, ec2) = pa in
+      (el2 - el1, ec2 - ec1)
+    | Ast_diff.Move (pb, pa) ->
+      let (bl1, bc1, el1, ec1) = pb in
+      let (bl2, bc2, el2, ec2) = pa in
+      (el2 - el1, ec2 - ec1)
+    | Ast_diff.Update (pb, pa) ->
+      let (bl1, bc1, el1, ec1) = pb in
+      let (bl2, bc2, el2, ec2) = pa in
+      (el2 - el1, ec2 - ec1)
+    | Ast_diff.Delete pb ->
+      let (bl1, bc1, el1, ec1) = pb in
+      (el1 - bl1, ec1 - bc1) (* TODO: Tester l'encode de gumtree pour une ligne supprimée *)
+
 let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
   Debug.profile_code_silent "Gumtree.compute_new_pos_with_gumtree"
     (fun () ->
@@ -128,14 +156,39 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff
 	      | _ -> raise (Unexpected "Wrong diff type")
 	  )
 	in
-	 (* let action = List.fold_left *)
-	 (*   (fun p1 p2 -> *)
-	 (*     let ((bl1,_),_) = p1 in *)
-	 (*     let ((bl2,_),_) = p2 in *)
-	 (*     if bl1 <= line && line < bl2 then p1 *)
-	 (*     else p2 *)
-	 (*   ) ((0,0),(0,0)) newhunks *)
-	 (* in *)
-	 (Ast_diff.Sing line, colb, cole)
+	 let action = List.fold_left
+	   (fun a1 a2 ->
+	     let (bl1, bc1, el1, ec1) = get_pos_before a1 in
+	     let (bl2, bc2, el2, ec2) = get_pos_before a2 in
+		 if bl1 <= line then
+		   if line < bl2
+		     || line == bl2 && cole < bc2 then
+		     a1
+		   else
+		     a2
+		 else
+		   a2
+	   ) Ast_diff.Empty actions
+	 in
+	 (*
+	   1. Check the action is before the fault
+	   2.a. yes, use the implied offset to predict in n+1
+	   2.b. no, use action to predict in n+1 (fault is inside the change)
+	 *)
+	 match action with
+	     Ast_diff.Empty ->
+	       (Ast_diff.Sing line, colb, cole)
+	   | Ast_diff.Insert _ ->
+	     raise (Unexpected "Fault is inside an insert section!")
+	   | Ast_diff.Update (pb, pa) ->
+	     let (bl1, bc1, el1, ec1) = pb in
+	     let (bl2, bc2, el2, ec2) = pa in
+	     (Ast_diff.Sing line, colb, cole)
+	   | Ast_diff.Move (pb, pa) ->
+	     let (bl1, bc1, el1, ec1) = pb in
+	     let (bl2, bc2, el2, ec2) = pa in
+	     (Ast_diff.Sing line, colb, cole)
+	   | Ast_diff.Delete pb ->
+	     (Ast_diff.Deleted, 0, 0)
       with Not_found -> (Ast_diff.Sing line, colb, cole)
     )

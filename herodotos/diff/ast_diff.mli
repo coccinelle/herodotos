@@ -7,7 +7,8 @@ type hunk = pos * pos
 (* begin line * begin col * end line * end col *)
 type position = int * int * int * int
 type action =
-    Insert of position
+    Empty
+  | Insert of position * position
   | Move of position * position (* before * after *)
   | Update of position * position (* before * after *)
   | Delete of position
