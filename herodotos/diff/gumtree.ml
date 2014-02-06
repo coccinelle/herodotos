@@ -175,19 +175,31 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff
 	   2.a. yes, use the implied offset to predict in n+1
 	   2.b. no, use action to predict in n+1 (fault is inside the change)
 	 *)
-	 match action with
+	 let (bl, bc, el, ec) = get_pos_before action in
+	 if el < line || el == line && ec < colb then
+	   let (line_offset, col_offset) = get_offset_after action in
+	   (Ast_diff.Sing (line + line_offset), colb + col_offset, cole + col_offset)
+	 else
+	   match action with
 	     Ast_diff.Empty ->
 	       (Ast_diff.Sing line, colb, cole)
+
 	   | Ast_diff.Insert _ ->
 	     raise (Unexpected "Fault is inside an insert section!")
+
 	   | Ast_diff.Update (pb, pa) ->
-	     let (bl1, bc1, el1, ec1) = pb in
-	     let (bl2, bc2, el2, ec2) = pa in
-	     (Ast_diff.Sing line, colb, cole)
+	     let (bl, bc, el, ec) = pa in
+	     if bl == el then
+	       (Ast_diff.Sing line, bc, ec)
+	     else
+	       (Ast_diff.Cpl (bl, el), bc, ec)
+
 	   | Ast_diff.Move (pb, pa) ->
-	     let (bl1, bc1, el1, ec1) = pb in
-	     let (bl2, bc2, el2, ec2) = pa in
-	     (Ast_diff.Sing line, colb, cole)
+	     (* begin/end * line/column * before/after *)
+	     let (blb, bcb, elb, ecb) = pb in
+	     let (bla, bca, ela, eca) = pa in
+	     (Ast_diff.Sing (line + bla - blb), colb + bca - bcb, cole + eca - ecb)
+
 	   | Ast_diff.Delete pb ->
 	     (Ast_diff.Deleted, 0, 0)
       with Not_found -> (Ast_diff.Sing line, colb, cole)
