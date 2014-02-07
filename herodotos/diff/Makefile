@@ -18,9 +18,9 @@ LIB=$(TARGET).cma
 OPTLIB=$(LIB:.cma=.cmxa)
 
 # The Caml compilers.
-OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
-OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
-OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES)
+OCAMLCFLAGS ?= -g -dtypes
+OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(FLAGS) $(INCLUDES)
+OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(FLAGS) $(INCLUDES)
 OCAMLDEP = ocamldep$(OPTBIN) #$(INCLUDES)
 
 all: $(LIB)
