@@ -3,7 +3,7 @@ open Xml
 exception MalformedXML
 exception Unexpected of string
 
-let diffcmd = "gumtree "
+let diffcmd = "gumtree --output xml "
 
 let get_type attrs =
   snd (List.find (fun (key, value) -> key = "type") attrs)

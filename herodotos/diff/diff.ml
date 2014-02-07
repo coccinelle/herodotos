@@ -14,10 +14,13 @@ let get_difffile difffile =
       GNUDiff file -> file
     | Gumtree file -> file
 
-let get_diffcmd ofile nfile difffile =
+let get_diffcmd prefix ofile nfile difffile =
   match difffile with
       GNUDiff file -> Gnudiff.diffcmd ^ofile ^" "^ nfile ^ " >> "^ file
-    | Gumtree file -> Gumtree.diffcmd ^ofile ^" "^ nfile ^ " >> "^ file
+    | Gumtree file ->
+        let (ver, stripped_ofile) = Misc.strip_prefix prefix ofile in
+	let outfile = String.concat Filename.dir_sep [file; ver; stripped_ofile] in
+	Gumtree.diffcmd ^ofile ^" "^ nfile ^ " > "^ outfile
 
 let parse_diff v prefix difffile : Ast_diff.diffs =
   match difffile with
@@ -38,7 +41,8 @@ let select_diff diffalgo bugfile : difftype =
 	else GNUDiff file
     | "gumtree" ->
       selected_compute_new_pos := Gumtree.compute_new_pos_with_gumtree;
-      Gumtree file
+	if file = "" then Gumtree (bugfile ^ Global.patchext)
+	else Gumtree file
     | _ -> raise (UnsupportedDiff (proto ^ " is unsupported as a diff algorithm."))
 
 
@@ -85,13 +89,17 @@ let get_diff v resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile dif
       then prerr_endline ("*** RECOMPUTE *** " ^file)
       else prerr_endline ("*** COMPUTE *** " ^file);
       let pair = Misc.unique_list (gen_diff prefix vlist orgs) in
-	ignore (Unix.system ("> "^file));
-	List.iter
+      (match difffile with
+	GNUDiff file -> ignore (Unix.system ("> "^file));
+      | Gumtree file -> Unix.mkdir file 0o770;
+      );
+      List.iter
 	  (fun (ofile, nfile) ->
-	     let cmd = get_diffcmd ofile nfile difffile in
-	       match
-		 Unix.system cmd
-	       with
+	     let cmd = get_diffcmd prefix ofile nfile difffile in
+	     if v then prerr_endline ("Running: " ^cmd);
+	     match
+	       Unix.system cmd
+	     with
 		   Unix.WEXITED 0 -> ()
 		 | Unix.WEXITED 1 -> ()
 		 | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
