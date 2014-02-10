@@ -9,6 +9,11 @@ type difftype =
 
 let selected_compute_new_pos = ref Gnudiff.compute_new_pos_with_findhunk
 
+let is_GNUdiff difffile =
+  match difffile with
+      GNUDiff _ -> true
+    | Gumtree _ -> false
+
 let get_difffile difffile =
   match difffile with
       GNUDiff file -> file
@@ -134,7 +139,9 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
     else orgstat
   in
 
-  if Sys.file_exists file && orgstat < patchstat then
+  if Sys.file_exists file
+    && is_GNUdiff difffile
+    && orgstat < patchstat then
     parse_diff v prefix difffile
   else
     (
@@ -218,9 +225,9 @@ let show_diff verbose vlist ast =
 		   prerr_string " to ";
 		   prerr_string (Misc.get_next_version vlist ver);
 		   prerr_endline "";
-		   match difftype with
+		   (match difftype with
 		       Ast_diff.GNUDiff hunks -> show_gnudiff hunks
-		     | _ -> raise (UnsupportedDiff "")
+		     | _ -> raise (UnsupportedDiff ""));
 		   prerr_endline ""
 		) ast
     end
