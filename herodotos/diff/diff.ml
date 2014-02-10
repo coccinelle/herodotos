@@ -84,37 +84,31 @@ let gen_diff prefix vlist (orgarray: Ast_org.orgarray) : (string * string) list 
 			    ))
        ) [] orgarray
 
-let get_diff_job v prefix orgstat difffile ofile nfile =
-  let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
-  let patchstat = get_basetime orgstat outfile in
-  if orgstat > patchstat then
-    begin
-      if v then prerr_endline ("Running: " ^cmd);
-      match
-	Unix.system cmd
-      with
-	  Unix.WEXITED 0 -> ()
-	| Unix.WEXITED 1 -> ()
-	| Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
-	| _ -> prerr_endline ("*** FAILURE *** " ^cmd)
-    end
+let get_diff_job v prefix difffile cmd =
+  if v then prerr_endline ("Running: " ^cmd);
+  match
+    Unix.system cmd
+  with
+      Unix.WEXITED 0 -> ()
+    | Unix.WEXITED 1 -> ()
+    | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
+    | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
 
-let get_diff_nofail v prefix orgstat difffile (ofile, nfile) =
+let get_diff_nofail v prefix difffile cmd =
   try
-    get_diff_job v prefix orgstat difffile ofile nfile;
+    get_diff_job v prefix difffile cmd;
     0
   with Config.Warning msg ->
     prerr_endline ("*** WARNING *** " ^ msg);
     1
 
-let run_get_diff_job v prefix orgstat difffile file_pair =
-  let (ofile, nfile) = file_pair in
+let run_get_diff_job v prefix difffile cmd =
   let pid = Unix.fork () in
     if pid = 0 then (* I'm a slave *)
       begin
 	let pid = Unix.getpid() in
-	  if !Misc.debug then prerr_endline ("New child "^ string_of_int pid^ " on "^ofile ^"/"^nfile);
-	  let ret = get_diff_nofail v prefix orgstat difffile file_pair in
+	  if !Misc.debug then prerr_endline ("New child "^ string_of_int pid^ " on "^cmd);
+	  let ret = get_diff_nofail v prefix difffile cmd in
 	    if !Misc.debug then prerr_endline ("Job done for child "^ string_of_int pid);
 	    let msg = Debug.profile_diagnostic () in
 	      if msg <> "" then prerr_endline msg;
@@ -123,7 +117,7 @@ let run_get_diff_job v prefix orgstat difffile file_pair =
     else (* I'm the master *)
       pid
 
-let dispatch_get_diff_job v cpucore prefix orgstat difffile (perr, pidlist) file_pair =
+let dispatch_get_diff_job v cpucore prefix difffile (perr, pidlist) cmd =
   let (error, newlist) =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
@@ -137,7 +131,7 @@ let dispatch_get_diff_job v cpucore prefix orgstat difffile (perr, pidlist) file
     else
       (perr, pidlist)
   in
-  let pid = run_get_diff_job v prefix orgstat difffile file_pair in
+  let pid = run_get_diff_job v prefix difffile cmd in
     (error, pid::newlist)
 
 let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile difffile : Ast_diff.diffs =
@@ -172,18 +166,31 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
 	    ) pair ;
 	  parse_diff v prefix difffile
       | Gumtree file ->
-	Unix.mkdir file 0o770;
-	prerr_endline ("*** CREATING DIRECTORY *** " ^file);
+	if not (Sys.file_exists file) then
+	  (Unix.mkdir file 0o770;
+	   prerr_endline ("*** CREATING DIRECTORY *** " ^file));
+	let pairs =
+	  List.fold_left (fun list file_pair ->
+	    let (ofile, nfile) = file_pair in
+	    let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
+	    let patchstat = get_basetime orgstat outfile in
+	    if orgstat > patchstat then
+	      (outfile,cmd)::list
+	    else
+	      list
+	  ) [] pair
+	in
+	let (outfiles, cmds) = List.split pairs in
 	let error =
 	  if cpucore = 1 then
-	    let errs = List.map (get_diff_nofail v prefix orgstat difffile) pair in
+	    let errs = List.map (get_diff_nofail v prefix difffile) cmds in
 	    List.fold_left (+) 0 errs
 	  else
 	    let (err, pidlist) =
 	      List.fold_left
-		(dispatch_get_diff_job v cpucore prefix orgstat difffile)
+		(dispatch_get_diff_job v cpucore prefix difffile)
 		(0, [])
-		pair
+		cmds
 	    in
 	    let res = List.map (fun x ->
 	      let (death, status) = Unix.wait () in
@@ -198,7 +205,9 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
 	in
 	if error <> 0 then
 	  prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the gumtree diff.");
-	parse_diff v prefix difffile
+	ignore (List.map (fun x -> parse_diff v prefix (Gumtree x)) outfiles);
+	List.iter (fun x -> prerr_endline x) outfiles;
+	[] (* FIXME *)
       )
     )
 
