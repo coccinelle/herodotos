@@ -24,6 +24,7 @@ let get_endcol attrs =
   let str = snd (List.find (fun (key, value) -> key = "end_col") attrs) in
   int_of_string str
 
+let dummy_pos = (0,0,0,0)
 let get_pos attributes =
   (get_beginline attributes,
    get_begincol attributes,
@@ -83,15 +84,20 @@ let parse_action xml =
   match xml with
       Element("action", attributes, children) ->
 	(
-	  match get_type attributes with
-	      "Insert" -> Ast_diff.Insert (get_before children, get_after children)
-	    | "Move"   -> Ast_diff.Move (get_before children, get_after children)
-	    | "Update"   -> Ast_diff.Update (get_before children, get_after children)
-	    | "Delete" -> Ast_diff.Delete (get_before children)
-	    | _ ->
-	      print_endline "parse_action";
-	      print_endline (Xml.to_string xml);
-	      raise MalformedXML
+	  try
+	    match get_type attributes with
+		"Insert" -> Ast_diff.Insert (dummy_pos (* get_before children*),  get_after children)
+	      | "Move"   -> Ast_diff.Move (get_before children, get_after children)
+	      | "Update"   -> Ast_diff.Update (get_before children, get_after children)
+	      | "Delete" -> Ast_diff.Delete (get_before children)
+	      | _ ->
+		print_endline "parse_action";
+		print_endline (Xml.to_string xml);
+		raise MalformedXML
+	  with _ ->
+	    print_endline "parse_action";
+	    print_endline (Xml.to_string xml);
+	    raise MalformedXML
 	)
     | _ ->
       print_endline "parse_action";
@@ -108,11 +114,9 @@ let parse_actions xml =
       raise MalformedXML
 
 let parse_diff v prefix file =
-  print_endline file;
+  if v then print_endline ("Parsing "^file);
   let x = Xml.parse_file file in
-  let fff = "v1/foo/" in
-  let ver_file = Misc.strip_prefix prefix fff in
-  print_endline (Xml.to_string x);
+  let ver_file = Misc.strip_prefix prefix file in
   [(ver_file, Ast_diff.Gumtree (parse_actions x))]
 
 let get_pos_before action =
