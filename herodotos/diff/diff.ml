@@ -207,13 +207,14 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
 	in
 	if error <> 0 then
 	  prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the gumtree diff.");
-	ignore (List.map (fun x ->
-	  try
+	List.flatten (
+	  List.map (fun x ->
+	    try
 	    (* file is the .patchset directory used as prefix here *)
-	    parse_diff v (file^Filename.dir_sep) (Gumtree x)
-	  with e -> prerr_endline ("Error parsing "^ x); raise e
-	) outfiles);
-	[] (* FIXME *)
+	      parse_diff v (file^Filename.dir_sep) (Gumtree x)
+	    with e -> prerr_endline ("Error parsing "^ x); raise e
+	  ) outfiles
+	)
       )
     )
 
