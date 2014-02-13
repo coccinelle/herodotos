@@ -11,8 +11,8 @@ let selected_compute_new_pos = ref Gnudiff.compute_new_pos_with_findhunk
 
 let get_basetime orgstat patchfile =
   if Sys.file_exists patchfile
-  then (Unix.stat patchfile).Unix.st_ctime
-  else orgstat
+  then (Unix.stat patchfile).Unix.st_mtime
+  else neg_infinity (* To force diff-ing tool *)
 
 let is_GNUdiff difffile =
   match difffile with
@@ -169,18 +169,20 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
 	if not (Sys.file_exists file) then
 	  (Unix.mkdir file 0o770;
 	   prerr_endline ("*** CREATING DIRECTORY *** " ^file));
-	let pairs =
-	  List.fold_left (fun list file_pair ->
+	let (outfiles, cmds) =
+	  List.fold_left (fun (outlist, cmdlist) file_pair ->
 	    let (ofile, nfile) = file_pair in
 	    let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
+	    prerr_string ("Checking " ^outfile);
 	    let patchstat = get_basetime orgstat outfile in
 	    if orgstat > patchstat then
-	      (outfile,cmd)::list
+	      (prerr_endline " - Keep";
+	       (outfile::outlist,cmd::cmdlist))
 	    else
-	      list
-	  ) [] pair
+	      (prerr_endline " - Skip";
+	       (outfile::outlist,cmdlist))
+	  ) ([],[]) pair
 	in
-	let (outfiles, cmds) = List.split pairs in
 	let error =
 	  if cpucore = 1 then
 	    let errs = List.map (get_diff_nofail v prefix difffile) cmds in
@@ -205,8 +207,12 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
 	in
 	if error <> 0 then
 	  prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the gumtree diff.");
-	ignore (List.map (fun x -> parse_diff v prefix (Gumtree x)) outfiles);
-	List.iter (fun x -> prerr_endline x) outfiles;
+	ignore (List.map (fun x ->
+	  try
+	    (* file is the .patchset directory used as prefix here *)
+	    parse_diff v (file^Filename.dir_sep) (Gumtree x)
+	  with e -> prerr_endline ("Error parsing "^ x); raise e
+	) outfiles);
 	[] (* FIXME *)
       )
     )
