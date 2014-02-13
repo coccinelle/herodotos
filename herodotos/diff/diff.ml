@@ -236,6 +236,34 @@ let show_gnudiff hunks =
     prerr_string "), "
   ) hunks
 
+let show_gumtree_pos (bl, bc, el, ec) =
+    prerr_int bl;
+    prerr_string ":";
+    prerr_int bc;
+    prerr_string "-";
+    prerr_int el;
+    prerr_string ":";
+    prerr_int ec
+  
+let show_gumtree_action mark before after =
+  prerr_string mark;
+  prerr_string ": ";
+  show_gumtree_pos before;
+  prerr_string " -> ";
+  show_gumtree_pos after;
+  prerr_string ", "
+
+let show_gumtree actions =
+  List.iter (
+    fun action ->
+      match action with
+	  Ast_diff.Empty -> prerr_string "X"
+	| Ast_diff.Insert (before, after) -> show_gumtree_action "I" before after
+	| Ast_diff.Move   (before, after) -> show_gumtree_action "M" before after
+	| Ast_diff.Update (before, after) -> show_gumtree_action "U" before after
+	| Ast_diff.Delete (before, after) -> show_gumtree_action "D" before after
+  ) actions
+
 let show_diff verbose vlist ast =
   if verbose then
     begin
@@ -249,7 +277,7 @@ let show_diff verbose vlist ast =
 		   prerr_endline "";
 		   (match difftype with
 		       Ast_diff.GNUDiff hunks -> show_gnudiff hunks
-		     | _ -> raise (UnsupportedDiff ""));
+		     | Ast_diff.Gumtree actions -> show_gumtree actions);
 		   prerr_endline ""
 		) ast
     end

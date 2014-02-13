@@ -8,10 +8,11 @@ type hunk = pos * pos
 type position = int * int * int * int
 type action =
     Empty
+  (* before * after *)
   | Insert of position * position
-  | Move of position * position (* before * after *)
-  | Update of position * position (* before * after *)
-  | Delete of position
+  | Move of position * position
+  | Update of position * position
+  | Delete of position * position
 
 (* Generic types *)
 type changes =

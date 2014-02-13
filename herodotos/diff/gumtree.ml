@@ -89,7 +89,7 @@ let parse_action xml =
 		"Insert" -> Ast_diff.Insert (dummy_pos (* get_before children*),  get_after children)
 	      | "Move"   -> Ast_diff.Move (get_before children, get_after children)
 	      | "Update"   -> Ast_diff.Update (get_before children, get_after children)
-	      | "Delete" -> Ast_diff.Delete (get_before children)
+	      | "Delete" -> Ast_diff.Delete (get_before children, dummy_pos) (* FIXME *)
 	      | _ ->
 		print_endline "parse_action";
 		print_endline (Xml.to_string xml);
@@ -121,11 +121,11 @@ let parse_diff v prefix file =
 
 let get_pos_before action =
   match action with
-      Ast_diff.Empty -> (0,0,0,0)
+      Ast_diff.Empty -> dummy_pos
     | Ast_diff.Insert (pb, _) -> pb
     | Ast_diff.Move (pb, _) -> pb
     | Ast_diff.Update (pb, _) -> pb
-    | Ast_diff.Delete pb -> pb
+    | Ast_diff.Delete (pb, _) -> pb
 
 (* To be used when the fault is NOT inside the modified code *)
 let get_offset_after action = (* Offset is given in term of (line, column) *)
@@ -143,7 +143,7 @@ let get_offset_after action = (* Offset is given in term of (line, column) *)
       let (bl1, bc1, el1, ec1) = pb in
       let (bl2, bc2, el2, ec2) = pa in
       (el2 - el1, ec2 - ec1)
-    | Ast_diff.Delete pb ->
+    | Ast_diff.Delete (pb, _) ->
       let (bl1, bc1, el1, ec1) = pb in
       (el1 - bl1, ec1 - bc1) (* TODO: Tester l'encode de gumtree pour une ligne supprimée *)
 
@@ -204,7 +204,7 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff
 	     let (bla, bca, ela, eca) = pa in
 	     (Ast_diff.Sing (line + bla - blb), colb + bca - bcb, cole + eca - ecb)
 
-	   | Ast_diff.Delete pb ->
-	     (Ast_diff.Deleted, 0, 0)
+	   | Ast_diff.Delete (pb, _) ->
+	     (Ast_diff.Deleted, 0, 0) (* FIXME. Can we use position after to set the columns ? *)
       with Not_found -> (Ast_diff.Sing line, colb, cole)
     )
