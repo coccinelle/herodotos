@@ -39,7 +39,7 @@ pattern Notes {
 }
 
 pattern Notes2 {
- file = "empty"
+ file = "empty.cocci"
  format = csv
 }
 
