@@ -73,8 +73,8 @@ let parse_config file : unit =
 	    ("Config Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
 
 let get_date d = match d with
-      Some d -> d
-     |None -> raise(BadDate "Date is not defined")
+    Some d -> d
+  | None -> raise(BadDate "Date is not defined")
 
 let parse_preinit file:string = 
   let in_ch = open_in file in

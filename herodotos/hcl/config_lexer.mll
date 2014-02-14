@@ -49,7 +49,6 @@ rule token = parse
       commentdepth := !commentdepth + 1;
       comment lexbuf
 			      }
-  | "applying"                { P.TAPPLYING      }
   | "author"                  { P.TAUTHOR        }
   | "color"                   { P.TCOLOR         }
   | "correl"                  { P.TCORREL        }
@@ -79,6 +78,7 @@ rule token = parse
   | "nooccurcolor"            { P.TCLEANCOLOR    }
   | "notexistcolor"           { P.TNOTEXISTCOLOR }
   | "occurcolor"              { P.TPATTERNCOLOR  }
+  | "on"                      { P.TON            }
   | "pattern"                 { P.TPATTERN       }
   | "patterns"                { P.TCOCCI         }
   | "prefix"                  { P.TPREFIX        }
