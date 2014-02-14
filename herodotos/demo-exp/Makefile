@@ -1,5 +1,5 @@
 CONF=demo.hc
-HERODOTOS=herodotos
+HERODOTOS=../herodotos
 ifeq ($(D),1)
 FLAGS=--debug -v
 else ifeq ($(D),2)
@@ -7,7 +7,6 @@ FLAGS=--debug -vv
 else ifeq ($(D),3)
 FLAGS=--debug -vvv
 else
-HERODOTOS=herodotos.opt
 FLAGS?=
 endif
 

@@ -1,6 +1,6 @@
 prefix="."
 patterns="./cocci"
-projects="/home/lotfi/RICM4/stage/dev/herodotos/herodotos/demo"
+projects="."
 results="./results"
 website="./website"
 findcmd="spatch %f -sp_file %p -dir %d 2> %b.log > %o"
@@ -19,15 +19,10 @@ project Test {
 	}
 }
 
-
-
 pattern Error {
  file = "error.cocci"
  correl = strict
 }
-
-
-
 
 experience exp on project Test
 	with pattern Error
