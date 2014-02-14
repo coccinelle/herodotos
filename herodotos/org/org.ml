@@ -126,20 +126,20 @@ let make_link prefix link =
 let rec make_org prefix org =
   let Ast_org.Org(l, s, r, link, sub) = org in
   let head = String.concat " "
-    (List.filter (fun x -> x <> "")               
-       [ make_star l ; Org_helper.get_status s ; r]) 
+    (List.filter (fun x -> x <> "")
+       [ make_star l ; Org_helper.get_status s ; r])
   in
-  let head = Printf.sprintf "%s %s" head (make_link prefix link) in    
-  let tail = List.map (make_org prefix) sub in                        
+  let head = Printf.sprintf "%s %s" head (make_link prefix link) in
+  let tail = List.map (make_org prefix) sub in
   let tailstring = String.concat "\n" tail in
-    head ^ if tailstring = "" then "" else "\n" ^ tailstring        
-                                                                               
+    head ^ if tailstring = "" then "" else "\n" ^ tailstring
+
 
 let make_flat_org prefix org =
-  let (l, s, r, file, ver, pos, face, t, _, _, sub) = org in 
+  let (l, s, r, file, ver, pos, face, t, _, _, sub) = org in
   let head = String.concat " "
     (List.filter (fun x -> x <> "")
-       [ make_star l ; Org_helper.get_status s ; r]) 
+       [ make_star l ; Org_helper.get_status s ; r])
   in
   let link = make_orglinkbug_freetext prefix org in
   let head = Printf.sprintf "%s %s" head link in
@@ -272,7 +272,7 @@ let parse_all_lines v file ch =
 	None     -> orgs
       | Some (_,org) -> [org]::orgs
 
-let parse_org v file : Ast_org.orgs =    
+let parse_org v file : Ast_org.orgs =
   Debug.profile_code_silent "parse_org"
     (fun () ->
        try
@@ -352,9 +352,9 @@ let flat_org prefix depth raw_org : Ast_org.bug =
 
 
 
-let get_version_name file = let dirList = Str.split (Str.regexp "/") file in 
+let get_version_name file = let dirList = Str.split (Str.regexp "/") file in
                                    let vname = List.nth dirList (List.length dirList -2) in
-                                   (vname,file) 
+                                   (vname,file)
 
 
 let get_version prefix depth vlist raw_org=
@@ -363,7 +363,7 @@ let get_version prefix depth vlist raw_org=
   Misc.get_idx_of_version vlist ver
 
 let flat_org_for_arrBis  prefix depth (flist,tbl) (raw_org:Ast_org.org)  =
-  let org = flat_org prefix depth raw_org in 
+  let org = flat_org prefix depth raw_org in
   let (_, _, _, file, ver, _, _, _, _, _, _) = org in
   let (orglist:Ast_org.bug list) = try Hashtbl.find tbl file with _ -> [] in
   let newlist = update_list orglist org in
@@ -374,16 +374,15 @@ let flat_org_for_arrBis  prefix depth (flist,tbl) (raw_org:Ast_org.org)  =
        (flist,tbl)
 
 let flat_org_for_arr prefix depth vlist orgarray (raw_org:Ast_org.org) : unit =
-  let org = flat_org prefix depth raw_org in 
+  let org = flat_org prefix depth raw_org in
   let (_, _, _, file, ver, _, _, _, _, _, _) = org in
   let idx = Misc.get_idx_of_version vlist ver in
-  let ((flist, tbl)) = Array.get orgarray idx in 
+  let ((flist, tbl)) = Array.get orgarray idx in
   let (orglist:Ast_org.bug list) = try Hashtbl.find tbl file with _ -> [] in
   let newlist = update_list orglist org in
     Hashtbl.replace tbl file newlist;
     if not (List.mem file flist) then
       Array.set orgarray idx (file::flist, tbl)
-
 
 let format_orgs prefix depth orgs =
   Debug.profile_code_silent "format_orgs"
@@ -392,28 +391,21 @@ let format_orgs prefix depth orgs =
     )
 
 
-let build_org_arr prefix depth resultsdir pdir orgfile vlist :Ast_org.orgarray =  
+let build_org_arr prefix depth resultsdir pdir orgfile vlist :Ast_org.orgarray =
   Array.map(fun vers -> let (vname,i,tm,i2) = vers in
-			
+
                         let orgs=(parse_org false (resultsdir^pdir^"/"^vname^"/"^orgfile)) in
-                        
+
                         List.fold_left(fun arrayelt org ->flat_org_for_arrBis  prefix depth arrayelt org)([],Hashtbl.create 97) orgs
-                         
+
                         ) vlist
 
-
-  
-
 let format_orgs_to_arr prefix depth vlist (orgs:Ast_org.orgs ) : Ast_org.orgarray =
-   Debug.profile_code_silent "format_orgs_to_arr" 
+   Debug.profile_code_silent "format_orgs_to_arr"
     (fun () -> let orgarray = emptyarray vlist in
        List.iter (flat_org_for_arr prefix depth vlist orgarray) orgs;
        orgarray
     )
-
-
-                                              
-
 
 let count = ref 0
 
@@ -547,54 +539,56 @@ let list_of_bug_array bugarray =
 let length bugarray =
   Array.fold_left
     (fun sum (flist, tbl) ->
-       sum + (List.fold_left
-		(fun sum file ->
-		   sum + (List.length (Hashtbl.find tbl file))
-		) 0 flist
+      sum + (List.fold_left
+	       (fun sum file ->
+		 sum + (List.length (Hashtbl.find tbl file))
+	       ) 0 flist
 	 )
     ) 0 bugarray
 
-(*compare versions *)
-let num_version version = let vers_format = Str.regexp "[0-9].*" in
-                                            let length_vname = String.length version in
-                                            let posb = Str.search_forward vers_format version 0 in
-                                            let ver_nums = String.sub version posb (length_vname - posb) in
-                                            let numbers = Str.split (Str.regexp "\\.") ver_nums in
-                                            List.map (fun s-> int_of_string s ) numbers 
+(* Compare versions *)
+let num_version version =
+  let vers_format = Str.regexp "[0-9].*" in
+  let length_vname = String.length version in
+  let posb = Str.search_forward vers_format version 0 in
+  let ver_nums = String.sub version posb (length_vname - posb) in
+  let numbers = Str.split (Str.regexp "\\.") ver_nums in
+  List.map (fun s-> int_of_string s ) numbers
 
+let rec is_more_recent lv1 lv2 =
+  match lv1,lv2 with
+      [],l2->false
+    |l1,[]->true
+    |p1::q1,p2::q2 ->begin
+      if p1 > p2 then true
+      else if p1 < p2 then false
+      else (is_more_recent q1 q2)
+    end
 
-let rec is_more_recent lv1 lv2 = 
-                                       match lv1,lv2 with 
-                                        [],l2->false
-                                       |l1,[]->true
-                                       |p1::q1,p2::q2 ->begin
-                                                          if p1 > p2 then true
-                                                          else if p1 < p2 then false
-                                                          else (is_more_recent q1 q2)
-                                                        end
-                      
-let is_more_recent_v version1 version2 = is_more_recent (num_version version1) (num_version version2)
-                                                  
+let is_more_recent_v version1 version2 =
+  is_more_recent (num_version version1) (num_version version2)
 
-
-let is_new bug version = let (_,_,_,_,vn,_,_,_,_,_,_) = bug in vn = version
+let is_new bug version =
+  let (_,_,_,_,vn,_,_,_,_,_,_) = bug in
+  vn = version
 
 (*returns bug's version corresponding to the given version *)
-let org_version bug version :Ast_org.org= let (_,_,_,_,_,_,_,_,_,_,orgs) = bug in
-                              let ver = Str.regexp (".*"^version^"/") in 
-                              List.find(fun org-> let Ast_org.Org(_,_,_,link,_)=org in
-                                                  let (path,_,_) = link in 
-                                                  Str.string_match ver path 0 )orgs
+let org_version bug version : Ast_org.org =
+  let (_,_,_,_,_,_,_,_,_,_,orgs) = bug in
+  let ver = Str.regexp (".*"^version^"/") in
+  List.find(fun org-> let Ast_org.Org(_,_,_,link,_)=org in
+                      let (path,_,_) = link in
+                      Str.string_match ver path 0 )orgs
 
-let rec orgs_version prefix orgs version  = 
-                                       (*let ver = Str.regexp (".*"^version^"/") in*) 
-                                    match orgs with
-                                     []->[]
-                                    |Ast_org.Org(i,s,n,link,o)::orgstail-> 
-                                                                           let (file, ver, pos2, face, t) = flat_link prefix 1 link in
-                                                                           if(ver = version or (is_more_recent_v ver version)) then
-                                                                             ((Ast_org.Org(i,s,n,link,o))::orgstail)
-                                                                           else
-                                                                             ( orgs_version prefix orgstail version)
+let rec orgs_version prefix orgs version  =
+  (*let ver = Str.regexp (".*"^version^"/") in*)
+  match orgs with
+      []->[]
+    |Ast_org.Org(i,s,n,link,o)::orgstail->
+      let (file, ver, pos2, face, t) = flat_link prefix 1 link in
+      if(ver = version or (is_more_recent_v ver version)) then
+        ((Ast_org.Org(i,s,n,link,o))::orgstail)
+      else
+        (orgs_version prefix orgstail version)
 
 (*-----------------------------------------------------------------------------------------------------------------------------------------------*)
