@@ -1,6 +1,6 @@
 exception Malformed of string
 
-
+(* TO REMOVE ?
 
 let print_org org = let Ast_org.Org(i , status , text , link , orgs)= org in let (path,o,t) = link in
                     Printf.printf "%d | %s | %s | %s | %s  \n" i (Org_helper.get_status status) text path t
@@ -12,7 +12,7 @@ let print_bug bug = let (ind , status , tex , path , vname , pos , str , text , 
  
 
 let print_bugs2 bugs2 = List.iter(fun e->let (p,bl)=e in Printf.printf "PATH %s\n" p;List.iter(fun bugs-> List.iter(fun bug->print_bug bug )bugs)bl)bugs2
-
+*)
 
 let rec count_todo ch =
   try

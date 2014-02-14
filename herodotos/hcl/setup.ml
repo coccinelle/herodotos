@@ -13,6 +13,9 @@ let cpucore = ref None
 let findchild = ref None
 let dbconn = ref ""
 
+(** FIXME: Check usefullness *)
+let versions_list:Ast_config.attr list ref= ref []
+
 type project = string
 type defect = string
 type graph = string
@@ -71,7 +74,6 @@ let smatchs = DftTbl.create 11
 let graphs = GphTbl.create 97
 let experiences = ExpTbl.create 97
 
-
 let setRef p r msg =
   if (String.length !r) = 0 then
     r := p
@@ -88,6 +90,23 @@ let setRefOwt p r msg =
       r := p
     )
 *)
+
+(*for versions list managing *)
+
+let set_versions_list vlist = versions_list := vlist  
+
+let pull_versions ()= 
+  try
+    let vers = List.hd (!versions_list) in
+    versions_list := List.tl (!versions_list);
+    vers
+  with _-> versions_list :=  [] ;
+           failwith ""
+
+let push_versions vers = versions_list := vers :: (!versions_list)
+
+let reorder_versions () = versions_list := List.rev (!versions_list)
+
 
 let setPrefix p = setRef p prefix "prefix is already set"
 let setSmatchDir p = setRef p smatchdir "semantic match directory is already set"

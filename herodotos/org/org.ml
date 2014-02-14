@@ -554,7 +554,6 @@ let length bugarray =
 	 )
     ) 0 bugarray
 
-
 (*compare versions *)
 let num_version version = let vers_format = Str.regexp "[0-9].*" in
                                             let length_vname = String.length version in
@@ -587,7 +586,6 @@ let org_version bug version :Ast_org.org= let (_,_,_,_,_,_,_,_,_,_,orgs) = bug i
                                                   let (path,_,_) = link in 
                                                   Str.string_match ver path 0 )orgs
 
-
 let rec orgs_version prefix orgs version  = 
                                        (*let ver = Str.regexp (".*"^version^"/") in*) 
                                     match orgs with
@@ -598,6 +596,5 @@ let rec orgs_version prefix orgs version  =
                                                                              ((Ast_org.Org(i,s,n,link,o))::orgstail)
                                                                            else
                                                                              ( orgs_version prefix orgstail version)
-
 
 (*-----------------------------------------------------------------------------------------------------------------------------------------------*)

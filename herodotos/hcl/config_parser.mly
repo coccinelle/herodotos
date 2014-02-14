@@ -17,6 +17,10 @@
        (* Will be normalized by mktime *)
        Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
       })
+
+  let versions_string = ref ""
+
+  let repository_git = ref "" (* FIXME: To remove. Replace with PUBLIC_SCM attribut *)
 %}
 
 // TCOLEQ TLAB TRAB
@@ -46,6 +50,12 @@
 %start projects_cache
 %type <(string*(string*Unix.tm option*int) list) list> projects_cache
 
+%start preinit
+%type <string> preinit
+
+%start parse_versions
+%type <unit> parse_versions
+
 %%
 
 projects_cache:
@@ -54,6 +64,18 @@ projects_cache:
 project_cache:
   project = TId TLCB vs=list(full_version_desc) TRCB { (project,vs)}
 
+parse_versions:
+  list(buffered_versions) EOF {Setup.reorder_versions()}
+
+preinit:
+ list(mainrules) EOF {!versions_string }
+
+mainrules:
+  gbattr  {}
+| projectPreinit {}
+| pattern {}
+| experience {}
+| graph   {}
 
 main:
  list(toplevel) EOF { }
@@ -150,14 +172,26 @@ attr:
 | TSORT          TEQUAL b=TBOOL                    { Ast_config.Sort(b)}
 | TSIZE          TEQUAL x=float y=float            { Ast_config.Size(x,y)}
 
+
+
+
+
+
+
+
+
+
+
+
+
 attrs:
   TLCB atts=list(attr) TRCB {atts}
 
 version:
-   full=full_version_desc                           { full }
-| TLPAR name=TSTRING TCOMMA date=date TRPAR         { (name, date, 0) }
-| TLPAR name=TSTRING TRPAR                          { (name, None, 0) }
-    
+  desc=full_version_desc                     { desc }
+| TLPAR name=TSTRING TCOMMA date=date TRPAR  { (name, date, 0) }
+| TLPAR name=TSTRING TRPAR                   { (name, None, 0) }
+
 full_version_desc:
   TLPAR name=TSTRING TCOMMA date=date TCOMMA size=TInt TRPAR { (name, date, size) }
 
@@ -251,3 +285,100 @@ expression:
 | e1=expression TMINUS e2=expression { Ast_config.Minus(e1, e2) }
 | e1=expression TSTAR  e2=expression { Ast_config.Mul(e1, e2)   }
 | e1=expression TSLASH e2=expression { Ast_config.Div(e1, e2)   }
+
+(*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*)
+(* preinit parsing rules*)
+
+projectPreinit:
+  TPROJECT name=TId TLCB versions=list(prjattr) TRCB {versions_string:= !versions_string^(String.concat "\n" versions)}
+(*currently used for preinit parsing *)
+prjattr:
+  | TDIR           TEQUAL d=path                     {Setup.setDir d ;""}
+  | TSUBDIR        TEQUAL path                     { "" }
+  | TVERSIONS      TEQUAL TLCB vs=list(versionPreinit) TRCB {"{\n"^(String.concat "\n" vs)^"\n}\n"}
+  | TCOLOR         TEQUAL float float float    { "" }
+  | TCORREL        TEQUAL TNONE                      { "" }
+  | TCORREL        TEQUAL TId                    { "" }
+  | TCLEANCOLOR    TEQUAL float float float    { ""}
+  | TPATTERN       TEQUAL TId                    { ""}
+  | TPATTERNCOLOR  TEQUAL float float float    { ""}
+  | TDATA          TEQUAL expression               { ""}
+  | TFACTOR        TEQUAL float                    { ""}
+  | TFILE          TEQUAL TSTRING                  { "" }
+  | TFILE          TEQUAL TNONE                      { ""}
+  | TFILENAME      TEQUAL TBOOL                    { ""}
+  | TFOOTER        TEQUAL TSTRING                  { ""}
+  | TFORMAT        TEQUAL TId                    { "" }
+  | TINFO          TEQUAL TBOOL                    { ""}
+  | TLEGEND        TEQUAL TSTRING                  { ""}
+  | TXLEGEND       TEQUAL TSTRING                  { ""}
+  | TYLEGEND       TEQUAL TSTRING                  { ""}
+  | TYLEGENDFACTOR TEQUAL TId                      { ""}
+  | TLINESTYLE     TEQUAL TNONE                      { ""}
+  | TLINESTYLE     TEQUAL TId                      { ""}
+  | TMARKTYPE      TEQUAL TNONE                      { ""}
+  | TMARKTYPE      TEQUAL TId                      { ""}  
+  | TMARKSIZE      TEQUAL float                    { ""}
+  | TXAXIS         TEQUAL TId                      { ""}
+  | TXMIN          TEQUAL float                    { ""}
+  | TYAXIS         TEQUAL gid                      { ""}
+  | TNOTEXISTCOLOR TEQUAL float float float    { ""}
+  | TPROJECT       TEQUAL TId                    { ""}
+  | TAUTHOR        TEQUAL TBOOL                    { ""}
+  | TPRUNE         TEQUAL TBOOL                    { ""}
+  | TRATIO         TEQUAL TBOOL                    { ""}
+  | TVMIN          TEQUAL TSTRING                  { ""}
+  | TSPFLAGS       TEQUAL TSTRING                  { ""}
+  | TSORT          TEQUAL TBOOL                    { ""}
+  | TSIZE          TEQUAL float float            { ""}   
+
+versionPreinit:
+  TLPAR name=TSTRING TCOMMA d=datePreinit  size=suitePreinit TRPAR {
+    (* FIXME: Should not be in parser !!! *)
+    ignore(Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!repository_git) (!repository_git));
+    let date =
+      if d="" then 
+        (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!repository_git))
+      else d
+    in
+    let corrected_size =
+      if size=0 then    
+	Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name)
+      else
+	size
+    in
+    "("^"\""^name^"\""^","^ date^","^(string_of_int corrected_size)^")"
+  }
+
+suitePreinit:
+    TCOMMA size=TInt {size}
+  |                  { 0 }
+
+datePreinit:
+  | m=TInt TSLASH d=TInt TSLASH y=TInt
+    { (string_of_int m)^"/"^(string_of_int d)^"/"^(string_of_int y)}
+  | {""}
+
+(*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*)
+(*buffered versions parsing rules *)
+
+buffered_versions:
+  TLCB vs=list(buffered_version)  TRCB { let (cl, vl) = List.split vs in
+                                         let count = List.fold_left max 0 cl in
+                                         Setup.push_versions(Ast_config.Version(count, vl) )}
+
+buffered_version:
+  TLPAR name=TSTRING TCOMMA d=buffered_date TCOMMA size=TInt TRPAR {
+    let count = List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in
+      (count, (name, Some d, size))
+  }
+
+buffered_date:
+  m=TInt TSLASH d=TInt TSLASH y=TInt
+    { snd (Unix.mktime {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
+       (* Don't care about the time *)
+       Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
+       (* Will be normalized by mktime *)
+       Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
+      })
+    }

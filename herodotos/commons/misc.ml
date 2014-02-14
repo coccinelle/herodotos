@@ -287,8 +287,11 @@ let size_of_file file =
 
 (* **************************************************************** *)
 (* last status change time of most recent modified orgfile   *)
-let get_change_stat resultsdir pdir vlist orgfile_base acc :float =Array.iter(fun (vname,_,_,_)->acc:=(vname^"/"^orgfile_base)::!acc)vlist;
-                                     let status_change_times =List.map(fun f->let file =resultsdir^pdir^"/"^f in 
-                                                                       (Unix.stat file).Unix.st_ctime )  (List.rev !acc) in 
-                                     List.hd(List.rev(List.sort compare status_change_times))
+(* Author: Manseur *)
+let get_change_stat resultsdir pdir vlist orgfile_base acc :float = 
+  Array.iter(fun (vname,_,_,_)->acc:=(vname^"/"^orgfile_base)::!acc)vlist;
+  let status_change_times =
+    List.map(fun f->let file =resultsdir^pdir^"/"^f in 
+                    (Unix.stat file).Unix.st_ctime )  (List.rev !acc) in 
+  List.hd(List.rev(List.sort compare status_change_times))
 

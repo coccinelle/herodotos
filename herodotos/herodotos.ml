@@ -183,36 +183,36 @@ let main aligned =
 			prerr_endline "Empty Org file"
 			else
 			begin
-			if vb then prerr_endline ("\nChecking... ("^string_of_int (List.length ast)^" elements)");
-			if !Misc.debug then
-			(Misc.print_stack (List.map (Org.make_org "") ast);
-			prerr_newline ();
-			);
-			let (msg, formatted) =
-			try
-			("", Org.format_orgs !prefix 1 ast)
-			with Misc.Strip msg -> (msg, [])
-			in
-			if vb then
-			prerr_endline ("\nConverting... ("^string_of_int (List.length formatted)^" elements)\n");
- 			if msg <> "" then prerr_endline msg;
-			if formatted = [] then
-			prerr_endline "Failed!"
-			else
-			(if !sql then
-			if !sqlnotes then
-			Sql.print_orgs_as_notes stdout !prefix !orgfile formatted
-			else
-			Sql.print_orgs stdout !prefix !orgfile formatted
-			else if !sql_update then
-			Sql_update.print_orgs stdout !prefix !orgfile formatted !version_incr                                  
- 			else
-			let filtered =
-			if !extract = "" then formatted
-			else Orgfilter.filter_version !extract !prefix formatted
-			in
-			Org.print_orgs_raw stdout !prefix filtered;
-			if vb then prerr_endline "\nDone!")
+		  if vb then prerr_endline ("\nChecking... ("^string_of_int (List.length ast)^" elements)");
+			  if !Misc.debug then
+			    (Misc.print_stack (List.map (Org.make_org "") ast);
+			     prerr_newline ();
+			    );
+			  let (msg, formatted) =
+			    try
+			      ("", Org.format_orgs !prefix 1 ast)
+			    with Misc.Strip msg -> (msg, [])
+			  in
+			    if vb then
+			      prerr_endline ("\nConverting... ("^string_of_int (List.length formatted)^" elements)\n");
+ 			    if msg <> "" then prerr_endline msg;
+			    if formatted = [] then
+			      prerr_endline "Failed!"
+			    else
+			      (if !sql then
+				 if !sqlnotes then
+				   Sql.print_orgs_as_notes stdout !prefix !orgfile formatted
+				 else
+				     Sql.print_orgs stdout !prefix !orgfile formatted
+                               else if !sql_update then
+                                     Sql_update.print_orgs stdout !prefix !orgfile formatted !version_incr                                  
+ 			       else
+				 let filtered =
+				   if !extract = "" then formatted
+				   else Orgfilter.filter_version !extract !prefix formatted
+				 in
+				   Org.print_orgs_raw stdout !prefix filtered;
+				   if vb then prerr_endline "\nDone!")
 			end
 			end
 		      *)
