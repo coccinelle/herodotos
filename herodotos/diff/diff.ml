@@ -53,8 +53,8 @@ let select_diff diffalgo bugfile : difftype =
 	else GNUDiff file
     | "gumtree" ->
       selected_compute_new_pos := Gumtree.compute_new_pos_with_gumtree;
-	if file = "" then Gumtree (bugfile ^ Global.patchext)
-	else Gumtree file
+      if file = "" then Gumtree (bugfile ^ Global.gumtreeext)
+      else Gumtree file
     | _ -> raise (UnsupportedDiff (proto ^ " is unsupported as a diff algorithm."))
 
 
