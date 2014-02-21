@@ -19,10 +19,22 @@ project Test {
 	}
 }
 
+project Insert {
+	dir = insert 
+
+	versions = {
+	("ver0",12/31/1999,10)
+	("ver1",01/01/2001,11)
+	}
+}
+
 pattern Error {
  file = "error.cocci"
  correl = strict
 }
 
 experience exp on project Test
+	with pattern Error
+
+experience insert on project Insert
 	with pattern Error
