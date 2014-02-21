@@ -1,6 +1,6 @@
 prefix="."
 patterns="./cocci"
-projects="."
+projects="tests"
 results="./results"
 website="./website"
 findcmd="spatch %f -sp_file %p -dir %d 2> %b.log > %o"
@@ -40,5 +40,8 @@ experience pdir on project P     \
 	with pattern Error       \
 
 TEST(Insert,insert)
+TEST(Insert2,insert2)
 TEST(Move,move)
+TEST(Delete,delete)
+TEST(Delete2,delete2)
 

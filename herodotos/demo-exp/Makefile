@@ -23,7 +23,7 @@ all:: ./results/test/Test_Notes2.new.org
 	
 $(CONF): $(CONF).base
 	cpp -P -undef -D$(HOST) $(@:%=%.base) > $@
-	sed -i -e "s|projects=\".*\"$$|projects=\"$(PWD)\"|" $@
+	sed -i -e "s|projects=\"\(.*\)\"$$|projects=\"$(PWD)/\1\"|" $@
 	@echo "Run 'make init' now"
 
 fix-orig fix-correl fix-new:
