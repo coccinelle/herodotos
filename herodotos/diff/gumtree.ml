@@ -86,7 +86,7 @@ let parse_action xml =
 	(
 	  try
 	    match get_type attributes with
-		"Insert" -> Ast_diff.Insert (dummy_pos (* get_before children*),  get_after children)
+		"Insert" -> Ast_diff.Insert (get_before children,  get_after children)
 	      | "Move"   -> Ast_diff.Move (get_before children, get_after children)
 	      | "Update"   -> Ast_diff.Update (get_before children, get_after children)
 	      | "Delete" -> Ast_diff.Delete (get_before children, dummy_pos) (* FIXME *)
@@ -180,7 +180,10 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff
 	   2.b. no, use action to predict in n+1 (fault is inside the change)
 	 *)
 	 let (bl, bc, el, ec) = get_pos_before action in
-	 if el < line || el == line && ec < colb then
+	 if el < line then
+	   let (line_offset, _) = get_offset_after action in
+	   (Ast_diff.Sing (line + line_offset), colb, cole)
+	 else if el == line && ec < colb then
 	   let (line_offset, col_offset) = get_offset_after action in
 	   (Ast_diff.Sing (line + line_offset), colb + col_offset, cole + col_offset)
 	 else
