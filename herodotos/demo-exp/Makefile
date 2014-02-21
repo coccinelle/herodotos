@@ -1,5 +1,9 @@
 CONF=demo.hc
 HERODOTOS=../herodotos
+
+
+-include Makefile.local
+
 ifeq ($(D),1)
 FLAGS=--debug -v
 else ifeq ($(D),2)

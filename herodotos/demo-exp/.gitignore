@@ -1,7 +1,8 @@
+Makefile.local
 .jgrfiles
 gr
 website
 results
 demo.hc
 .depend.*
-
+.projects_*.hc
