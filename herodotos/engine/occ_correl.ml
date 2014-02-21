@@ -110,7 +110,7 @@ let check_next verbose strict prefix depth vlist diffs correl (bugs:Ast_org.orga
 	     prerr_newline ();
 	     prerr_endline ("List:");
 	     List.iter (Org.show_bug true) subbugs;
-	     prerr_endline ("\n=========");
+	     prerr_newline ();
 	   );
 	 try
 	   let next = get_bug strict prefix check subbugs in
@@ -149,14 +149,14 @@ let check_next verbose strict prefix depth vlist diffs correl (bugs:Ast_org.orga
 		  let next = get_bug strict prefix check subbugs in
 		    n.Ast_org.def <- Some next;
 		    update_nohead next;
-		    if verbose then prerr_endline "Manual correlation OK";
+		    if verbose then prerr_endline "Manual correlation OK\n=========";
 		    0 (* No automatic correlation performed *)
 		with Not_found ->
-		  if verbose then prerr_endline "Manual correlation KO";
+		  if verbose then prerr_endline "Manual correlation KO\n=========";
 		  0 (* No automatic correlation performed *)
 	       )
 	   with Not_found ->
-	     if verbose then prerr_endline "Manual correlation KO - KO";
+	     if verbose then prerr_endline "Manual correlation KO - KO\n=========";
 	     0 (* No automatic correlation performed *)
     )
 
