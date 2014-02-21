@@ -13,16 +13,17 @@ endif
 .PHONY:: distclean
 
 PWD=$(shell pwd)
+HOST=$(shell uname -n | cut -f1 -d"." | tr '-' '_')
 
 setup: $(CONF)
 
 all:: ./results/test/Test_Notes2.new.org
 
 ./results/test/Test_Notes2.new.org:
-	echo "ver0;8;\nver1;10;\nver2;8;" > $@
-
+	
 $(CONF): $(CONF).base
-	sed "s|projects=\".*\"$$|projects=\"$(PWD)\"|" demo.hc.base > demo.hc
+	cpp -P -undef -D$(HOST) $(@:%=%.base) > $@
+	sed -i -e "s|projects=\".*\"$$|projects=\"$(PWD)\"|" $@
 	@echo "Run 'make init' now"
 
 fix-orig fix-correl fix-new:

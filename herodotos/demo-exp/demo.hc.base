@@ -9,6 +9,11 @@ findcmd="spatch %f -sp_file %p -dir %d 2> %b.log > %o"
 flags="-timeout 60"
 cpucore = 1
 
+pattern Error {
+ file = "error.cocci"
+ correl = strict
+}
+
 project Test {
 	dir = test
 
@@ -19,22 +24,21 @@ project Test {
 	}
 }
 
-project Insert {
-	dir = insert 
-
-	versions = {
-	("ver0",12/31/1999,10)
-	("ver1",01/01/2001,11)
-	}
-}
-
-pattern Error {
- file = "error.cocci"
- correl = strict
-}
-
 experience exp on project Test
 	with pattern Error
 
-experience insert on project Insert
-	with pattern Error
+#define TEST(P,pdir)             \
+project P {                      \
+	dir = pdir               \
+                                 \
+	versions = {             \
+	("ver0",12/31/1999,10)   \
+	("ver1",01/01/2001,11)   \
+	}                        \
+}                                \
+experience pdir on project P     \
+	with pattern Error       \
+
+TEST(Insert,insert)
+TEST(Move,move)
+
