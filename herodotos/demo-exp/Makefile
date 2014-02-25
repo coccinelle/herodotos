@@ -21,10 +21,6 @@ HOST=$(shell uname -n | cut -f1 -d"." | tr '-' '_')
 
 setup: $(CONF)
 
-all:: ./results/test/Test_Notes2.new.org
-
-./results/test/Test_Notes2.new.org:
-	
 $(CONF): $(CONF).base
 	cpp -P -undef -D$(HOST) $(@:%=%.base) > $@
 	sed -i -e "s|projects=\"\(.*\)\"$$|projects=\"$(PWD)/\1\"|" $@
@@ -38,5 +34,11 @@ unfix-orig unfix-correl unfix-new:
 
 distclean:
 	rm -rf results gr website .depend demo.hc
+
+diff:
+	diff -u tests/$(PRJ)/ver0/test.c tests/$(PRJ)/ver1/test.c
+
+gumtree:
+	gumtree --output xml tests/$(PRJ)/ver0/test.c tests/$(PRJ)/ver1/test.c
 
 -include ../scripts/Makefile.inc
