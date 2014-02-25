@@ -12,6 +12,7 @@ let match_bug strict prefix bug1 bug2 =
 		begin
 		  prerr_string ("MATCH_BUG: \""^ new_t^ "\"");
 		  prerr_endline (" <-> \""^ new_tb^ "\"");
+		  prerr_endline "Auto-correlation OK\n=========";
 		end;
 	      new_t = new_tb
 	  else true)
@@ -138,6 +139,7 @@ let check_next verbose strict prefix depth vlist diffs correl (bugs:Ast_org.orga
 						      begin
 							prerr_string ("\""^ new_t^ "\"");
 							prerr_endline (" <-> \""^ t^ "\"");
+							prerr_endline "Auto-correlation OK\n=========";
 						      end;
 						    new_t = t
 						else true
