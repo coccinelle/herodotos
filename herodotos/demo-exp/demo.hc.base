@@ -42,6 +42,7 @@ experience pdir on project P     \
 TEST(Insert,insert)
 TEST(Insert2,insert2)
 TEST(Move,move)
+TEST(Move2,move2)
 TEST(Delete,delete)
 TEST(Delete2,delete2)
 
