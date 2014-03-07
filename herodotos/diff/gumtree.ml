@@ -91,7 +91,7 @@ let show_gumtree_pos (_, _, bl, bc, el, ec) =
     prerr_string ":";
     prerr_int ec
 
-let rec show_gumtree depth tree =
+let rec show_gumtree dorec depth tree =
   let before = get_pos_before tree in
   let oafter = get_pos_after tree in
   let children = get_children tree in
@@ -104,26 +104,50 @@ let rec show_gumtree depth tree =
     | None -> prerr_string "XXX"
   );
   prerr_newline ();  
-  List.iter (show_gumtree (depth +1)) children
+  if dorec then
+    List.iter (show_gumtree dorec (depth +1)) children
 
 (* *)
+let is_perfect pos (tree:Ast_diff.tree) =
+  let (line, colb, cole) = pos in
+  let (_, _, bl, bc, el, ec)  = get_pos_before tree in
+  line = bl && line = el
+       && colb = bc && cole = ec
+
+let found tree =
+  if !Misc.debug then
+    (show_gumtree false 0 tree;
+     prerr_endline "-----------------";
+     true)
+  else true
+ 
 let match_tree pos (tree:Ast_diff.tree) =
   let (line, colb, cole) = pos in
   let (_, _, bl, bc, el, ec)  = get_pos_before tree in
   if line > bl && line < el then
-    true
+    found tree
+  else if line = bl && line < el
+       && colb >= bc then
+    found tree
   else if line = bl && line = el
-    && colb >= bc && cole <= ec then
-    true
+	       && colb >= bc && cole <= ec then
+    found tree
   else
     false
 
 let rec lookup_tree pos (tree:Ast_diff.tree) : Ast_diff.tree =
-  let children = get_children tree in
-  try
-    lookup_tree pos (List.find (match_tree pos) children)
-  with Not_found ->
-    tree
+  Debug.profile_code_silent "Gumtree.lookup_tree"
+    (fun () ->
+      let children = get_children tree in
+      try
+	let candidate = List.find (match_tree pos) children in
+	if is_perfect pos candidate then
+	  candidate
+	else
+	  lookup_tree pos candidate
+      with Not_found ->
+	tree
+    )
 
 let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
   Debug.profile_code_silent "Gumtree.compute_new_pos_with_gumtree"
@@ -139,9 +163,9 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff
 	  )
 	in
 	 let matched_tree = lookup_tree pos root in
-(*
-  show_gumtree 0 matched_tree;
-*)
+	 if !Misc.debug then
+	   (show_gumtree true 0 matched_tree;
+	    prerr_endline "-----------------");
 	 match get_pos_after matched_tree with
 	     Some (_, _, bl, bc, el, ec) ->
 	       if bl == el then
