@@ -4,20 +4,16 @@ type pos = int * int
 type hunk = pos * pos
 
 (* For Gumtree *)
-(* begin line * begin col * end line * end col *)
-type position = int * int * int * int
-type action =
-    Empty
-  (* before * after *)
-  | Insert of position * position
-  | Move of position * position
-  | Update of position * position
-  | Delete of position * position
+(* pos * length * begin line * begin col * end line * end col *)
+type position = int * int * int * int * int * int
+type tree =
+    (* Position before * position after * children nodes *)
+    Tree of position * position option * tree list
 
 (* Generic types *)
 type changes =
     GNUDiff of hunk list
-  | Gumtree of action list 
+  | Gumtree of tree
 
 type path = string
 type vname = string
