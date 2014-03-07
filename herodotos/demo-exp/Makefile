@@ -39,6 +39,6 @@ diff:
 	diff -u tests/$(PRJ)/ver0/test.c tests/$(PRJ)/ver1/test.c
 
 gumtree:
-	gumtree --output xml tests/$(PRJ)/ver0/test.c tests/$(PRJ)/ver1/test.c
+	gumtree --output asrc tests/$(PRJ)/ver0/test.c tests/$(PRJ)/ver1/test.c
 
 -include ../scripts/Makefile.inc

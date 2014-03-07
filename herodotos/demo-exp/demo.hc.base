@@ -43,6 +43,8 @@ TEST(Insert,insert)
 TEST(Insert2,insert2)
 TEST(Move,move)
 TEST(Move2,move2)
+TEST(Move3,move3)
+TEST(Move4,move4)
 TEST(Delete,delete)
 TEST(Delete2,delete2)
 
