@@ -14,6 +14,11 @@ pattern Error {
  correl = strict
 }
 
+pattern ErrorExp {
+ file = "error_exp.cocci"
+ correl = strict
+}
+
 project Test {
 	dir = test
 
@@ -47,4 +52,8 @@ TEST(Move3,move3)
 TEST(Move4,move4)
 TEST(Delete,delete)
 TEST(Delete2,delete2)
+TEST(Deref,deref)
+
+experience DerefExp on project Deref
+	with pattern ErrorExp
 
