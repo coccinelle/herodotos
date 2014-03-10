@@ -27,7 +27,7 @@ let may_have_changed strict prefix vlist bfl bug =
 	     && head.Ast_org.is_head = true
       ) bfl
 
-let find_disappeared strict prefix vlist (orgs:Ast_org.bug list) =
+let find_disappeared strict prefix vlist (orgs:Ast_org.bugs) : Ast_org.bugs =
   List.find_all (may_have_changed strict prefix vlist orgs) orgs
 
 let is_SAME_as_next_in_correl correl file ver pos =
@@ -147,6 +147,14 @@ let correlate verbose strict prefix vlist correlfile prefix rev_correl orgs =
   let correl = Misc.unique_list (List.rev rev_correl) in
   let buglist = List.flatten (List.map (fun x -> List.flatten (snd x)) orgs) in
   let disps = find_disappeared strict prefix vlist buglist in
+  if !Misc.debug then
+    begin
+      prerr_endline "------------------";
+      Org.show_correlation true correl;
+      prerr_endline "------------------";
+      Org.show_buglist true disps;
+      prerr_endline "------------------"
+    end;
   let todo = List.map (fun bug ->
 		 try
 		   (*

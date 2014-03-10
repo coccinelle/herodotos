@@ -409,6 +409,17 @@ let format_orgs_to_arr prefix depth vlist (orgs:Ast_org.orgs ) : Ast_org.orgarra
 
 let count = ref 0
 
+let show_buglist verbose bugs =
+  count := 0;
+  List.iter (fun bug ->
+    prerr_string "#";
+    prerr_int !count;
+    count := !count + 1;
+    prerr_string " ";
+    show_bug verbose bug;
+    prerr_newline ()
+  ) bugs
+
 let show_org verbose prefix (orgs: (string*Ast_org.bugs  list)list) =
   count := 0;
   if verbose then
