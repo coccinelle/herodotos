@@ -173,13 +173,13 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
 	  List.fold_left (fun (outlist, cmdlist) file_pair ->
 	    let (ofile, nfile) = file_pair in
 	    let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
-	    prerr_string ("Checking " ^outfile);
+	    if v then prerr_string ("Checking " ^outfile);
 	    let patchstat = get_basetime orgstat outfile in
 	    if orgstat > patchstat then
-	      (prerr_endline " - Keep";
+	      (if v then prerr_endline " - Keep";
 	       (outfile::outlist,cmd::cmdlist))
 	    else
-	      (prerr_endline " - Skip";
+	      (if v then prerr_endline " - Skip";
 	       (outfile::outlist,cmdlist))
 	  ) ([],[]) pair
 	in
