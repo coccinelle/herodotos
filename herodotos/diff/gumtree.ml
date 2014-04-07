@@ -65,9 +65,15 @@ let rec parse_tree xml =
 
 let parse_diff v prefix file =
   if v then print_endline ("Parsing "^file);
-  let x = Xml.parse_file file in
-  let ver_file = Misc.strip_prefix prefix file in
-  [(ver_file, Ast_diff.Gumtree (parse_tree x))]
+  try
+    let x = Xml.parse_file file in
+    let ver_file = Misc.strip_prefix prefix file in
+    [(ver_file, Ast_diff.Gumtree (parse_tree x))]
+  with Xml.Error _ ->
+    let newfile = file^Global.failed in
+    if v then print_endline ("Failed while parsing: check "^newfile);
+    Sys.rename file newfile;
+    []
 
 let get_pos_before tree =
   let Ast_diff.Tree(pos_before, _, _) = tree in
