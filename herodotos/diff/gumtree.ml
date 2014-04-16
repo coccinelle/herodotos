@@ -66,9 +66,9 @@ let rec parse_tree xml =
 let parse_diff v prefix file =
   if v then print_endline ("Parsing "^file);
   try
-    let x = Xml.parse_file file in
     let ver_file = Misc.strip_prefix prefix file in
-    [(ver_file, Ast_diff.Gumtree (parse_tree x))]
+    let x = open_in_bin file in
+    [(ver_file, Ast_diff.Gumtree (input_value x))]
   with Xml.Error _ ->
     let newfile = file^Global.failed in
     if v then print_endline ("Failed while parsing: check "^newfile);

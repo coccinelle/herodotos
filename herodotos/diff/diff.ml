@@ -32,7 +32,7 @@ let get_diffcmd prefix ofile nfile difffile =
 	let outfile = String.concat Filename.dir_sep [file; ver; stripped_ofile] in
 	(outfile,
 	 "mkdir -p " ^ Filename.dirname outfile ^" && " ^
-	   Gumtree.diffcmd ^ofile ^" "^ nfile ^ " > "^ outfile)
+	   Gumtree.diffcmd ^ofile ^" "^ nfile ^ " | gum2hero "^ outfile)
 
 let parse_diff v prefix difffile : Ast_diff.diffs =
   match difffile with
