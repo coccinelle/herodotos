@@ -130,7 +130,7 @@ let found tree =
 let match_tree pos (tree:Ast_diff.tree) =
   let (line, colb, cole) = pos in
   let (_, _, bl, bc, el, ec)  = get_pos_before tree in
-  if line > bl && line < el then
+  if line > bl && line <= el then
     found tree
   else if line = bl && line < el
        && colb >= bc then
