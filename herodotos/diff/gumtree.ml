@@ -131,12 +131,17 @@ let match_tree pos (tree:Ast_diff.tree) =
   let (line, colb, cole) = pos in
   let (_, _, bl, bc, el, ec)  = get_pos_before tree in
   if line > bl && line <= el then
+    (* Match a node that start before, but may end at the right line, or after *)
     found tree
   else if line = bl && line < el
        && colb >= bc then
+    (* Match a *large* node that start at the right line. The begin column must be right too. *)
     found tree
   else if line = bl && line = el
 	       && colb >= bc && cole <= ec then
+    (* The perfect line matching is not capture in the previous case.
+       We check it here, and also check the columns.
+    *)
     found tree
   else
     false
