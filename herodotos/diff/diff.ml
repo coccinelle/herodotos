@@ -249,7 +249,7 @@ let show_diff verbose vlist ast =
 		   prerr_endline "";
 		   (match difftype with
 		       Ast_diff.GNUDiff hunks -> show_gnudiff hunks
-		     | Ast_diff.Gumtree root -> Gumtree.show_gumtree true 0 root);
+		     | Ast_diff.Gumtree root -> if !Misc.debug then Gumtree.show_gumtree true 0 root);
 		   prerr_endline ""
 		) ast
     end
