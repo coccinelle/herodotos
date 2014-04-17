@@ -1,9 +1,11 @@
-open Xml
 
-exception MalformedXML
 exception Unexpected of string
 
 let diffcmd = "gumtree --output asrc "
+
+(*
+open Xml
+exception MalformedXML
 
 (* Get positions in reference tree - With asrc option, it is the source tree *)
 (* Get positions in the associated tree - With asrc, it is the destination tree *)
@@ -62,14 +64,18 @@ let rec parse_tree xml =
       print_endline "parse_tree";
       print_endline (Xml.to_string xml);
       raise MalformedXML
+*)
 
 let parse_diff v prefix file =
   if v then print_endline ("Parsing "^file);
   try
     let ver_file = Misc.strip_prefix prefix file in
     let x = open_in_bin file in
-    [(ver_file, Ast_diff.Gumtree (input_value x))]
-  with Xml.Error _ ->
+    let tree = input_value x in
+    close_in x;
+    [(ver_file, Ast_diff.Gumtree (tree))]
+  with e ->
+    Printexc.print_backtrace stderr;
     let newfile = file^Global.failed in
     if v then print_endline ("Failed while parsing: check "^newfile);
     Sys.rename file newfile;
