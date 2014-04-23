@@ -126,7 +126,11 @@ let parse_diff v prefix file : Ast_diff.diffs =
 	  close_in in_ch;
 	  ast
       with
-	  (Unexpected msg) ->
+	  Misc.Strip msg ->
+	    prerr_endline ("Strip: "^msg);
+	    close_in in_ch;
+	    raise (Unexpected msg)
+	| (Unexpected msg) ->
 	    prerr_endline ("Unexpected token: "^msg);
 	    close_in in_ch;
 	    raise (Unexpected msg)

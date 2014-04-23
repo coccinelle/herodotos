@@ -25,21 +25,20 @@ let get_difffile difffile =
     | Gumtree file -> file
 
 let get_diffcmd prefix ofile nfile difffile =
-  match difffile with
-      GNUDiff file -> (file, Gnudiff.diffcmd ^ofile ^" "^ nfile ^ " >> "^ file)
-    | Gumtree file ->
-        let (ver, stripped_ofile) = Misc.strip_prefix prefix ofile in
-	let outfile = String.concat Filename.dir_sep [file; ver; stripped_ofile] in
-	(outfile,
-	 "mkdir -p " ^ Filename.dirname outfile ^" && " ^
-	   Gumtree.diffcmd ^ofile ^" "^ nfile ^ " | gum2hero "^ outfile)
+  let (ver, stripped_ofile) = Misc.strip_prefix prefix ofile in
+  let file = get_difffile difffile in
+  let outfile = String.concat Filename.dir_sep [file; ver; stripped_ofile] in
+  let cmd = match difffile with
+      GNUDiff _ -> Gnudiff.diffcmd ^ofile ^" "^ nfile ^ " > "^ outfile
+    | Gumtree _ -> Gumtree.diffcmd ^ofile ^" "^ nfile ^ " | gum2hero "^ outfile
+  in (outfile, "mkdir -p " ^ Filename.dirname outfile ^" && " ^ cmd)
 
 let parse_diff v prefix difffile : Ast_diff.diffs =
   match difffile with
       GNUDiff file -> Gnudiff.parse_diff v prefix file
     | Gumtree file -> Gumtree.parse_diff v prefix file
 
-let select_diff diffalgo bugfile : difftype =
+let select_diff diffalgo project : difftype =
   let (proto, file) =
     match Str.split (Str.regexp_string ":") diffalgo with
 	[] -> ("diff", diffalgo)
@@ -49,11 +48,11 @@ let select_diff diffalgo bugfile : difftype =
   in
   match proto with
       "diff" ->
-	if file = "" then GNUDiff (bugfile ^ Global.patchext)
+	if file = "" then GNUDiff (project ^ Global.patchext)
 	else GNUDiff file
     | "gumtree" ->
       selected_compute_new_pos := Gumtree.compute_new_pos_with_gumtree;
-      if file = "" then Gumtree (bugfile ^ Global.gumtreeext)
+      if file = "" then Gumtree (project ^ Global.gumtreeext)
       else Gumtree file
     | _ -> raise (UnsupportedDiff (proto ^ " is unsupported as a diff algorithm."))
 
@@ -139,84 +138,61 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
   let orgstat = Misc.get_change_stat resultsdir pdir vlist orgfile (ref []) in
   let patchstat = get_basetime orgstat file in
 
-  if Sys.file_exists file
-    && is_GNUdiff difffile
-    && orgstat < patchstat then
-    parse_diff v prefix difffile
-  else
-    (
-      if orgstat > patchstat
-      then prerr_endline ("*** RECOMPUTE *** " ^file)
-      else prerr_endline ("*** COMPUTE *** " ^file);
-      let pair = Misc.unique_list (gen_diff prefix vlist orgs) in
-      (match difffile with
-	GNUDiff file ->
-	  ignore (Unix.system ("> "^file));
-	  List.iter
-	    (fun (ofile, nfile) ->
-	      let (_, cmd) = get_diffcmd prefix ofile nfile difffile in
-	      if v then prerr_endline ("Running: " ^cmd);
-	      match
-		Unix.system cmd
-	      with
-		  Unix.WEXITED 0 -> ()
-		| Unix.WEXITED 1 -> ()
-		| Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
-		| _ -> prerr_endline ("*** FAILURE *** " ^cmd)
-	    ) pair ;
-	  parse_diff v prefix difffile
-      | Gumtree file ->
-	if not (Sys.file_exists file) then
-	  (Unix.mkdir file 0o770;
-	   prerr_endline ("*** CREATING DIRECTORY *** " ^file));
-	let (outfiles, cmds) =
-	  List.fold_left (fun (outlist, cmdlist) file_pair ->
-	    let (ofile, nfile) = file_pair in
-	    let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
-	    if v then prerr_string ("Checking " ^outfile);
-	    let patchstat = get_basetime orgstat outfile in
-	    if orgstat > patchstat then
-	      (if v then prerr_endline " - Keep";
-	       (outfile::outlist,cmd::cmdlist))
-	    else
-	      (if v then prerr_endline " - Skip";
-	       (outfile::outlist,cmdlist))
-	  ) ([],[]) pair
-	in
-	let error =
-	  if cpucore = 1 then
-	    let errs = List.map (get_diff_nofail v prefix difffile) cmds in
-	    List.fold_left (+) 0 errs
-	  else
-	    let (err, pidlist) =
-	      List.fold_left
-		(dispatch_get_diff_job v cpucore prefix difffile)
-		(0, [])
-		cmds
-	    in
-	    let res = List.map (fun x ->
-	      let (death, status) = Unix.wait () in
-	      if !Misc.debug then
-		prerr_endline ("Master: Job done for child "^ string_of_int death);
-	      match status with
-		  Unix.WEXITED 0 -> 0
-		| _ -> 1
-	    ) pidlist
-	    in
-	    List.fold_left (+) err res
-	in
-	if error <> 0 then
-	  prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the gumtree diff.");
-	List.flatten (
-	  List.map (fun x ->
-	    try
-	    (* file is the .patchset directory used as prefix here *)
-	      parse_diff v (file^Filename.dir_sep) (Gumtree x)
-	    with e -> prerr_endline ("Error parsing "^ x); raise e
-	  ) outfiles
-	)
-      )
-    )
+  if orgstat > patchstat
+  then prerr_endline ("*** RECOMPUTE *** " ^file)
+  else prerr_endline ("*** COMPUTE *** " ^file);
+  let pair = Misc.unique_list (gen_diff prefix vlist orgs) in
+  if not (Sys.file_exists file) then
+    (Unix.mkdir file 0o770;
+     prerr_endline ("*** CREATING DIRECTORY *** " ^file));
+  let (outfiles, cmds) =
+    List.fold_left (fun (outlist, cmdlist) file_pair ->
+      let (ofile, nfile) = file_pair in
+      let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
+      if v then prerr_string ("Checking " ^outfile);
+      let patchstat = get_basetime orgstat outfile in
+      if orgstat > patchstat then
+	(if v then prerr_endline " - Keep";
+	 (outfile::outlist,cmd::cmdlist))
+      else
+	(if v then prerr_endline " - Skip";
+	 (outfile::outlist,cmdlist))
+    ) ([],[]) pair
+  in
+  let error =
+    if cpucore = 1 then
+      let errs = List.map (get_diff_nofail v prefix difffile) cmds in
+      List.fold_left (+) 0 errs
+    else
+      let (err, pidlist) =
+	List.fold_left
+	  (dispatch_get_diff_job v cpucore prefix difffile)
+	  (0, [])
+	  cmds
+      in
+      let res = List.map (fun x ->
+	let (death, status) = Unix.wait () in
+	if !Misc.debug then
+	  prerr_endline ("Master: Job done for child "^ string_of_int death);
+	match status with
+	    Unix.WEXITED 0 -> 0
+	  | _ -> 1
+      ) pidlist
+      in
+      List.fold_left (+) err res
+  in
+  if error <> 0 then
+    prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the diff.");
+  List.flatten (
+    List.map (fun x ->
+      try
+	if is_GNUdiff difffile then
+	  parse_diff v prefix (GNUDiff x)
+	else
+	  parse_diff v (file^Filename.dir_sep) (Gumtree x)
+      with e -> prerr_endline ("Error parsing "^ x); raise e
+    ) outfiles
+  )
 
 let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
   Debug.profile_code_silent "Diff.compute_new_pos"

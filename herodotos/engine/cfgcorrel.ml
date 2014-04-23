@@ -73,7 +73,7 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
   let bugfile = Filename.chop_suffix bugfile_ext Global.bugext in
   let orgfile    = bugfile ^ Global.origext in
   let correlfile = bugfile ^ Global.correlext in
-  let difffile   = Diff.select_diff diffalgo bugfile in
+  let difffile   = Diff.select_diff diffalgo p in
   let editfile   = bugfile ^ Global.editext in
     if Config.get_format patt = Ast_config.Org then
 	if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
@@ -83,7 +83,6 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 	    
 	    let diffs1= Diff.get_diff v1 cpucore !Setup.resultsdir pdir prefix vlist orgs1 (file^Global.origext) difffile in
 	    let correl = List.rev (Org.parse_org false correlfile) in
-	    
 	      (* 
 		Compute correlation from correlation org file
 		then process defect report using correlation information
