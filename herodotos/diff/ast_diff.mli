@@ -1,4 +1,3 @@
-
 (* For GNU diff *)
 type pos = int * int
 type hunk = pos * pos

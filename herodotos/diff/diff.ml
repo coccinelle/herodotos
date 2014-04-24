@@ -1,11 +1,8 @@
 open Lexing
+open Diff_type
 
 exception UnsupportedDiff of string
 exception Break
-
-type difftype =
-    GNUDiff of string
-  | Gumtree of string
 
 let selected_compute_new_pos = ref Gnudiff.compute_new_pos_with_findhunk
 
@@ -17,12 +14,18 @@ let get_basetime orgstat patchfile =
 let is_GNUdiff difffile =
   match difffile with
       GNUDiff _ -> true
-    | Gumtree _ -> false
+    | _ -> false
+
+let is_hybrid difffile =
+  match difffile with
+      Hybrid _ -> true
+    | _ -> false
 
 let get_difffile difffile =
   match difffile with
       GNUDiff file -> file
     | Gumtree file -> file
+    | Hybrid  file -> file 
 
 let get_diffcmd prefix ofile nfile difffile =
   let (ver, stripped_ofile) = Misc.strip_prefix prefix ofile in
@@ -31,12 +34,14 @@ let get_diffcmd prefix ofile nfile difffile =
   let cmd = match difffile with
       GNUDiff _ -> Gnudiff.diffcmd ^ofile ^" "^ nfile ^ " > "^ outfile
     | Gumtree _ -> Gumtree.diffcmd ^ofile ^" "^ nfile ^ " | gum2hero "^ outfile
+    | Hybrid _ -> raise (UnsupportedDiff "Hybrid should be instanciated at this point.")
   in (outfile, "mkdir -p " ^ Filename.dirname outfile ^" && " ^ cmd)
 
 let parse_diff v prefix difffile : Ast_diff.diffs =
   match difffile with
       GNUDiff file -> Gnudiff.parse_diff v prefix file
     | Gumtree file -> Gumtree.parse_diff v prefix file
+    | Hybrid _ -> raise (UnsupportedDiff "Hybrid should be instanciated at this point.")
 
 let select_diff diffalgo project : difftype =
   let (proto, file) =
@@ -54,6 +59,9 @@ let select_diff diffalgo project : difftype =
       selected_compute_new_pos := Gumtree.compute_new_pos_with_gumtree;
       if file = "" then Gumtree (project ^ Global.gumtreeext)
       else Gumtree file
+    | "hybrid" ->
+      selected_compute_new_pos := Hybrid.compute_new_pos;
+      Hybrid (project)
     | _ -> raise (UnsupportedDiff (proto ^ " is unsupported as a diff algorithm."))
 
 
@@ -133,32 +141,56 @@ let dispatch_get_diff_job v cpucore prefix difffile (perr, pidlist) cmd =
   let pid = run_get_diff_job v prefix difffile cmd in
     (error, pid::newlist)
 
-let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile difffile : Ast_diff.diffs =
-  let file = get_difffile difffile in
+let gen_cmd_basic v prefix pair orgstat difffile =
+  List.fold_left (fun (outlist, cmdlist) file_pair ->
+    let (ofile, nfile) = file_pair in
+    let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
+    if v then prerr_string ("Checking " ^outfile);
+    let patchstat = get_basetime orgstat outfile in
+    if orgstat > patchstat then
+      (if v then prerr_endline " - Keep";
+       (outfile::outlist,cmd::cmdlist))
+    else
+      (if v then prerr_endline " - Skip";
+       (outfile::outlist,cmdlist))
+  ) ([],[]) pair
+
+let gen_cmd v prefix pair orgstat difffile =
+  if is_hybrid difffile then
+    let file = get_difffile difffile in
+    let gnudiff = gen_cmd_basic v prefix pair orgstat (GNUDiff (file^ Global.patchext)) in
+    let gumtree = gen_cmd_basic v prefix pair orgstat (Gumtree (file^ Global.gumtreeext)) in
+    (fst gnudiff @ fst gumtree, snd gnudiff @ snd gumtree)
+  else
+    gen_cmd_basic v prefix pair orgstat difffile
+
+let mkdir_cache_basic resultsdir pdir vlist orgfile file =
   let orgstat = Misc.get_change_stat resultsdir pdir vlist orgfile (ref []) in
   let patchstat = get_basetime orgstat file in
 
   if orgstat > patchstat
   then prerr_endline ("*** RECOMPUTE *** " ^file)
   else prerr_endline ("*** COMPUTE *** " ^file);
-  let pair = Misc.unique_list (gen_diff prefix vlist orgs) in
   if not (Sys.file_exists file) then
     (Unix.mkdir file 0o770;
      prerr_endline ("*** CREATING DIRECTORY *** " ^file));
-  let (outfiles, cmds) =
-    List.fold_left (fun (outlist, cmdlist) file_pair ->
-      let (ofile, nfile) = file_pair in
-      let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
-      if v then prerr_string ("Checking " ^outfile);
-      let patchstat = get_basetime orgstat outfile in
-      if orgstat > patchstat then
-	(if v then prerr_endline " - Keep";
-	 (outfile::outlist,cmd::cmdlist))
-      else
-	(if v then prerr_endline " - Skip";
-	 (outfile::outlist,cmdlist))
-    ) ([],[]) pair
-  in
+  orgstat
+
+let mkdir_cache resultsdir pdir vlist orgfile difffile =
+  let file = get_difffile difffile in
+  if is_hybrid difffile then
+    let file = get_difffile difffile in
+    let orgstatpatch = mkdir_cache_basic resultsdir pdir vlist orgfile (file^ Global.patchext) in
+    let orgstatgumtree = mkdir_cache_basic resultsdir pdir vlist orgfile (file^ Global.gumtreeext) in
+    max orgstatgumtree orgstatpatch
+  else
+    mkdir_cache_basic resultsdir pdir vlist orgfile file
+
+let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile difffile : Ast_diff.diffs =
+  let orgstat = mkdir_cache resultsdir pdir vlist orgfile difffile in
+  let file = get_difffile difffile in
+  let pair = Misc.unique_list (gen_diff prefix vlist orgs) in
+  let (outfiles, cmds) = gen_cmd v prefix pair orgstat difffile in
   let error =
     if cpucore = 1 then
       let errs = List.map (get_diff_nofail v prefix difffile) cmds in
@@ -186,10 +218,10 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
   List.flatten (
     List.map (fun x ->
       try
-	if is_GNUdiff difffile then
-	  parse_diff v prefix (GNUDiff x)
-	else
-	  parse_diff v (file^Filename.dir_sep) (Gumtree x)
+	match difffile with
+	    GNUDiff _ -> parse_diff v prefix (GNUDiff x)
+	  | Gumtree _ -> parse_diff v (file^Filename.dir_sep) (Gumtree x)
+	  | Hybrid _ -> Hybrid.parse_config v prefix file; []
       with e -> prerr_endline ("Error parsing "^ x); raise e
     ) outfiles
   )

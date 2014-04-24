@@ -70,7 +70,7 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 	    let count =
 	      if v1 && cinfo && fpinfo then
 		begin
-		  let difffile = Diff.GNUDiff (bugfile ^ Global.patchext) in (* TODO: FIXME for gumtree *)
+		  let difffile = Diff_type.GNUDiff (bugfile ^ Global.patchext) in (* TODO: FIXME for gumtree *)
 		  let diffs  = Diff.parse_diff v1 prefix difffile in
 		  let strict = ((Config.get_correl_mode v1 patt) = Ast_config.Strict) in
 		  let _ = if strict then print_endline ("*** INFO *** Strict correlation used for the pattern "^patt) in

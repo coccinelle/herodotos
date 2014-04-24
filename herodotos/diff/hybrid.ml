@@ -1,0 +1,30 @@
+
+let verbose = ref false
+let prefix = ref ""
+let gnudiff = ref ""
+let gumtree = ref ""
+
+let parse_config v p f =
+  verbose := v;
+  prefix := p;
+  gnudiff := f ^ Global.patchext;
+  gumtree := f ^ Global.gumtreeext
+
+let make_path prefix ver file =
+  prefix ^ Filename.dir_sep ^ ver ^ Filename.dir_sep ^ file
+
+let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
+  Debug.profile_code_silent "Hybrid.compute_new_pos"
+    (fun () ->
+      let gnufile = make_path !gnudiff ver file in
+      if !Misc.debug then Printf.eprintf "Parsing GNU Diff: %s\n" gnufile;
+      let diffs = Gnudiff.parse_diff !verbose !prefix gnufile in
+      let new_pos = Gnudiff.compute_new_pos_with_findhunk diffs file ver pos in
+      match new_pos with
+	  (Ast_diff.Deleted, 0, 0) ->
+	    let gumfile = make_path !gumtree ver file in
+	    if !Misc.debug then Printf.eprintf "GNU Diff correlation failed. Trying Gumtree with %s\n" gumfile;
+	    let diffs = Gumtree.parse_diff !verbose (!gumtree^Filename.dir_sep) gumfile in
+	    Gumtree.compute_new_pos_with_gumtree diffs file ver pos
+	| _ -> new_pos
+    )
