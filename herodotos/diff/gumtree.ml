@@ -5,18 +5,23 @@ let diffcmd = "gumtree --output asrc "
 
 let parse_diff v prefix file =
   if v then print_endline ("Parsing "^file);
+  let x = open_in_bin file in
   try
     let ver_file = Misc.strip_prefix prefix file in
-    let x = open_in_bin file in
     let tree = input_value x in
     close_in x;
     [(ver_file, Ast_diff.Gumtree (tree))]
-  with e ->
-    Printexc.print_backtrace stderr;
-    let newfile = file^Global.failed in
-    if v then print_endline ("Failed while parsing: check "^newfile);
-    Sys.rename file newfile;
-    []
+  with
+      Misc.Strip msg ->
+	prerr_endline ("Strip: "^msg);
+	close_in x;
+	raise (Unexpected msg)
+    | e ->
+      Printexc.print_backtrace stderr;
+      let newfile = file^Global.failed in
+      if v then print_endline ("Failed while parsing: check "^newfile);
+      Sys.rename file newfile;
+      []
 
 let get_pos_before tree =
   let Ast_diff.Tree(pos_before, _, _) = tree in
