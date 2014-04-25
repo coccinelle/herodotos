@@ -13,6 +13,7 @@ type tree =
 type changes =
     GNUDiff of hunk list
   | Gumtree of tree
+  | DeletedFile
 
 type path = string
 type vname = string

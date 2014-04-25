@@ -391,14 +391,16 @@ let format_orgs prefix depth orgs =
     )
 
 
-let build_org_arr prefix depth resultsdir pdir orgfile vlist :Ast_org.orgarray =
-  Array.map(fun vers -> let (vname,i,tm,i2) = vers in
-
-                        let orgs=(parse_org false (resultsdir^pdir^"/"^vname^"/"^orgfile)) in
-
-                        List.fold_left(fun arrayelt org ->flat_org_for_arrBis  prefix depth arrayelt org)([],Hashtbl.create 97) orgs
-
-                        ) vlist
+let build_org_arr prefix depth resultsdir pdir orgfile vlist : Ast_org.orgarray =
+  Array.map (fun vers ->
+    let (vname,i,tm,i2) = vers in
+    let file = resultsdir ^ pdir ^ "/" ^ vname ^ "/" ^ orgfile in
+    (* if !Misc.debug then Printf.eprintf "Parsing Org file %s\n" file; *)
+    let orgs = parse_org false file in
+    List.fold_left (fun arrayelt org ->
+      flat_org_for_arrBis prefix depth arrayelt org
+    ) ([], Hashtbl.create 97) orgs
+  ) vlist
 
 let format_orgs_to_arr prefix depth vlist (orgs:Ast_org.orgs ) : Ast_org.orgarray =
    Debug.profile_code_silent "format_orgs_to_arr"

@@ -1,12 +1,10 @@
 
 let verbose = ref false
-let prefix = ref ""
 let gnudiff = ref ""
 let gumtree = ref ""
 
-let parse_config v p f =
+let parse_config v f =
   verbose := v;
-  prefix := p;
   gnudiff := f ^ Global.patchext;
   gumtree := f ^ Global.gumtreeext
 
@@ -17,8 +15,7 @@ let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : Ast_diff.linepredicti
   Debug.profile_code_silent "Hybrid.compute_new_pos"
     (fun () ->
       let gnufile = make_path !gnudiff ver file in
-      if !Misc.debug then Printf.eprintf "Parsing GNU Diff: %s\n" gnufile;
-      let diffs = Gnudiff.parse_diff !verbose !prefix gnufile in
+      let diffs = Gnudiff.parse_diff !verbose (!gnudiff^Filename.dir_sep) gnufile in
       let new_pos = Gnudiff.compute_new_pos_with_findhunk diffs file ver pos in
       match new_pos with
 	  (Ast_diff.Deleted, 0, 0) ->

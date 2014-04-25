@@ -4,24 +4,29 @@ exception Unexpected of string
 let diffcmd = "gumtree --output asrc "
 
 let parse_diff v prefix file =
-  if v then print_endline ("Parsing "^file);
-  let x = open_in_bin file in
-  try
-    let ver_file = Misc.strip_prefix prefix file in
-    let tree = input_value x in
-    close_in x;
-    [(ver_file, Ast_diff.Gumtree (tree))]
-  with
-      Misc.Strip msg ->
-	prerr_endline ("Strip: "^msg);
+  let ver_file = Misc.strip_prefix prefix file in
+  if Sys.file_exists file then
+    begin
+      if !Misc.debug then prerr_endline ("Parsing Gumtree diff: "^file);
+      let x = open_in_bin file in
+      try
+	let tree = input_value x in
 	close_in x;
-	raise (Unexpected msg)
-    | e ->
-      Printexc.print_backtrace stderr;
-      let newfile = file^Global.failed in
-      if v then print_endline ("Failed while parsing: check "^newfile);
-      Sys.rename file newfile;
-      []
+	[(ver_file, Ast_diff.Gumtree (tree))]
+      with
+	  Misc.Strip msg ->
+	    prerr_endline ("Strip: "^msg);
+	    close_in x;
+	    raise (Unexpected msg)
+	| e ->
+	  Printexc.print_backtrace stderr;
+	  let newfile = file^Global.failed in
+	  if v then print_endline ("Failed while parsing: check "^newfile);
+	  Sys.rename file newfile;
+	  []
+    end
+  else
+    [(ver_file, Ast_diff.DeletedFile)]
 
 let get_pos_before tree =
   let Ast_diff.Tree(pos_before, _, _) = tree in
@@ -113,24 +118,22 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff
     (fun () ->
       let (line, colb, cole) = pos in
       try
-	let root =
-	  Debug.profile_code_silent "Gumtree.compute_new_pos#List.assoc"
-	  (fun () ->
-	    match List.assoc (ver, file) diffs with
-		Ast_diff.Gumtree tree -> tree
-	      | _ -> raise (Unexpected "Wrong diff type")
-	  )
-	in
-	 let matched_tree = lookup_tree pos root in
-	 if !Misc.debug then
-	   (show_gumtree true 0 matched_tree;
-	    prerr_endline "-----------------");
-	 match get_pos_after matched_tree with
-	     Some (_, _, bl, bc, el, ec) ->
-	       if bl == el then
-		 (Ast_diff.Sing bl, bc, ec)
-	       else
-		 (Ast_diff.Cpl (bl, el), bc, ec)
-	   | None -> (Ast_diff.Deleted, 0, 0)
+	match List.assoc (ver, file) diffs with
+	    Ast_diff.Gumtree root ->
+	      begin
+		let matched_tree = lookup_tree pos root in
+		if !Misc.debug then
+		  (show_gumtree true 0 matched_tree;
+		   prerr_endline "-----------------");
+		match get_pos_after matched_tree with
+		    Some (_, _, bl, bc, el, ec) ->
+		      if bl == el then
+			(Ast_diff.Sing bl, bc, ec)
+		      else
+			(Ast_diff.Cpl (bl, el), bc, ec)
+		  | None -> (Ast_diff.Deleted, 0, 0)
+	      end
+	  | Ast_diff.DeletedFile -> (Ast_diff.Deleted, 0, 0)
+	  | _ -> raise (Unexpected "Wrong diff type")
       with Not_found -> (Ast_diff.Sing line, colb, cole)
     )

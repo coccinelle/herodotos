@@ -84,17 +84,23 @@ let rec read_diff prefix file in_ch =
     let line_rm = Str.global_replace tab_re " " line_rm0 in
     let rmb = Str.string_match rm_re line_rm 0 in
       if rmb then
-	let rmfile = Str.matched_group 1 line_rm in
+	begin
 	  ignore(input_line in_ch); (* Read +++ line *)
 	  line := Int64.succ !line;
 	  let hunks = read_hunks in_ch in
-	  let tail =
-	    try
-	      read_diff prefix file in_ch
-	    with End_of_file -> []
-	  in
-	  let ver_file = Misc.strip_prefix prefix rmfile in
-	    (ver_file, Ast_diff.GNUDiff hunks)::tail
+	  hunks
+	end
+      (* This was when several diff where aggreated in a single patchset *)
+      (*
+	let rmfile = Str.matched_group 1 line_rm in
+	let tail =
+	try
+	read_diff prefix file in_ch
+	with End_of_file -> []
+	in
+	let ver_file = Misc.strip_prefix prefix rmfile in
+	(ver_file, Ast_diff.GNUDiff hunks)::tail
+      *)
       else
 	begin
 	  prerr_endline
@@ -118,80 +124,85 @@ let rec read_diff prefix file in_ch =
 	end
 
 let parse_diff v prefix file : Ast_diff.diffs =
-  try
-    let in_ch = open_in file in
-      try
-	line := Int64.zero;
-	let ast = read_diff prefix file in_ch in
+  try    
+    let ver_file = Misc.strip_prefix prefix file in
+    if Sys.file_exists file then
+      begin
+	if !Misc.debug then Printf.eprintf "Parsing GNU Diff: %s\n" file;
+	let in_ch = open_in file in
+	try
+	  line := Int64.zero;
+	  let ast = read_diff prefix file in_ch in
 	  close_in in_ch;
-	  ast
-      with
-	  Misc.Strip msg ->
-	    prerr_endline ("Strip: "^msg);
-	    close_in in_ch;
-	    raise (Unexpected msg)
-	| (Unexpected msg) ->
+	  [(ver_file, Ast_diff.GNUDiff ast)]
+	with
+	    Misc.Strip msg ->
+	      prerr_endline ("Strip: "^msg);
+	      close_in in_ch;
+	      raise (Unexpected msg)
+	  | (Unexpected msg) ->
 	    prerr_endline ("Unexpected token: "^msg);
 	    close_in in_ch;
 	    raise (Unexpected msg)
-	| End_of_file ->
+	  | End_of_file ->
 	    if v then prerr_endline ("*** WARNING *** "^file^" is empty !");
 	    close_in in_ch;
-	    []
+	  []
+      end
+    else
+      [(ver_file, Ast_diff.DeletedFile)]
   with Sys_error msg ->
     prerr_endline ("*** WARNING *** "^msg);
     []
 
-let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
-  Debug.profile_code_silent "Gnudiff.compute_new_pos_with_findhunk"
-    (fun () ->
-  let (line, colb, cole) = pos in
-    try
-      let hunks =
-	Debug.profile_code_silent "GNUDiff.compute_new_pos#List.assoc"
-	  (fun () ->
-	    match List.assoc (ver, file) diffs with
-		Ast_diff.GNUDiff hunks -> hunks
-	      | _ -> raise (Unexpected "Wrong diff type")
-	  )
-      in
-      let newhunks = List.map
-	(fun p ->
-	   let ((bl,bsize),(al,asize)) = p in
-	     if bsize = 0 then
-	       ((bl+1,bsize),(al,asize))
-	     else if asize = 0 then
-	       ((bl,bsize),(al+1,asize))
-	     else
-	       p
-	) hunks
-      in
-      let hunk = List.fold_left
-	(fun p1 p2 ->
-	   let ((bl1,_),_) = p1 in
-	   let ((bl2,_),_) = p2 in
-	     if bl1 <= line && line < bl2 then p1
-	     else p2
-	) ((0,0),(0,0)) newhunks
-      in
-      let ((bl,bsize),(al,asize)) = hunk in
-	if (bl+bsize) <= line then
+let compute_new_pos_with_hunks hunks line colb cole =
+  let newhunks = List.map
+    (fun p ->
+      let ((bl,bsize),(al,asize)) = p in
+      if bsize = 0 then
+	((bl+1,bsize),(al,asize))
+      else if asize = 0 then
+	((bl,bsize),(al+1,asize))
+      else
+	p
+    ) hunks
+  in
+  let hunk = List.fold_left
+    (fun p1 p2 ->
+      let ((bl1,_),_) = p1 in
+      let ((bl2,_),_) = p2 in
+      if bl1 <= line && line < bl2 then p1
+      else p2
+    ) ((0,0),(0,0)) newhunks
+  in
+  let ((bl,bsize),(al,asize)) = hunk in
+  if (bl+bsize) <= line then
 	  (*
 	    If we are above the current hunk, but still before the next,
 	    we computes the prediction by adding the two offsets.
 	  *)
-	  let nline = line + (al - bl) + (asize - bsize) in
-	    (Ast_diff.Sing nline, colb, cole)
-	else
+    let nline = line + (al - bl) + (asize - bsize) in
+    (Ast_diff.Sing nline, colb, cole)
+  else
 	  (*
 	    We are IN the hunk.
 	  *)
-	  if asize = 0 then
-	    (Ast_diff.Deleted, 0, 0)
-	  else
+    if asize = 0 then
+      (Ast_diff.Deleted, 0, 0)
+    else
 	    (*
 	      We are maybe in the set of replacing lines !?
 	    *)
-	    (Ast_diff.Cpl (al,al+asize-1),colb,cole)
-    with Not_found -> (Ast_diff.Sing line, colb, cole)
+      (Ast_diff.Cpl (al,al+asize-1),colb,cole)
+
+let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
+  Debug.profile_code_silent "Gnudiff.compute_new_pos_with_findhunk"
+    (fun () ->
+      let (line, colb, cole) = pos in
+      try
+	match List.assoc (ver, file) diffs with
+	    Ast_diff.GNUDiff hunks -> compute_new_pos_with_hunks hunks line colb cole
+	  | Ast_diff.DeletedFile -> (Ast_diff.Deleted, 0, 0)
+	  | _ -> raise (Unexpected "Wrong diff type")
+      with Not_found -> (Ast_diff.Sing line, colb, cole)
     )

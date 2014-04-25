@@ -142,6 +142,7 @@ let dispatch_get_diff_job v cpucore prefix difffile (perr, pidlist) cmd =
     (error, pid::newlist)
 
 let gen_cmd_basic v prefix pair orgstat difffile =
+  prerr_endline ("*** CHECK CACHE *** " ^ (get_difffile difffile));
   List.fold_left (fun (outlist, cmdlist) file_pair ->
     let (ofile, nfile) = file_pair in
     let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
@@ -164,30 +165,24 @@ let gen_cmd v prefix pair orgstat difffile =
   else
     gen_cmd_basic v prefix pair orgstat difffile
 
-let mkdir_cache_basic resultsdir pdir vlist orgfile file =
-  let orgstat = Misc.get_change_stat resultsdir pdir vlist orgfile (ref []) in
-  let patchstat = get_basetime orgstat file in
-
-  if orgstat > patchstat
-  then prerr_endline ("*** RECOMPUTE *** " ^file)
-  else prerr_endline ("*** COMPUTE *** " ^file);
+let mkdir_cache_basic file =
   if not (Sys.file_exists file) then
     (Unix.mkdir file 0o770;
-     prerr_endline ("*** CREATING DIRECTORY *** " ^file));
-  orgstat
+     prerr_endline ("*** CREATING DIRECTORY *** " ^file))
 
 let mkdir_cache resultsdir pdir vlist orgfile difffile =
   let file = get_difffile difffile in
   if is_hybrid difffile then
     let file = get_difffile difffile in
-    let orgstatpatch = mkdir_cache_basic resultsdir pdir vlist orgfile (file^ Global.patchext) in
-    let orgstatgumtree = mkdir_cache_basic resultsdir pdir vlist orgfile (file^ Global.gumtreeext) in
+    let orgstatpatch = mkdir_cache_basic (file^ Global.patchext) in
+    let orgstatgumtree = mkdir_cache_basic (file^ Global.gumtreeext) in
     max orgstatgumtree orgstatpatch
   else
-    mkdir_cache_basic resultsdir pdir vlist orgfile file
+    mkdir_cache_basic file
 
 let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile difffile : Ast_diff.diffs =
-  let orgstat = mkdir_cache resultsdir pdir vlist orgfile difffile in
+  mkdir_cache resultsdir pdir vlist orgfile difffile;
+  let orgstat = Misc.get_change_stat resultsdir pdir vlist orgfile (ref []) in
   let file = get_difffile difffile in
   let pair = Misc.unique_list (gen_diff prefix vlist orgs) in
   let (outfiles, cmds) = gen_cmd v prefix pair orgstat difffile in
@@ -219,9 +214,9 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
     List.map (fun x ->
       try
 	match difffile with
-	    GNUDiff _ -> parse_diff v prefix (GNUDiff x)
+	    GNUDiff _ -> parse_diff v (file^Filename.dir_sep) (GNUDiff x)
 	  | Gumtree _ -> parse_diff v (file^Filename.dir_sep) (Gumtree x)
-	  | Hybrid _ -> Hybrid.parse_config v prefix file; []
+	  | Hybrid _ -> Hybrid.parse_config v file; []
       with e -> prerr_endline ("Error parsing "^ x); raise e
     ) outfiles
   )
@@ -257,7 +252,8 @@ let show_diff verbose vlist ast =
 		   prerr_endline "";
 		   (match difftype with
 		       Ast_diff.GNUDiff hunks -> show_gnudiff hunks
-		     | Ast_diff.Gumtree root -> if !Misc.debug then Gumtree.show_gumtree true 0 root);
+		     | Ast_diff.Gumtree root -> if !Misc.debug then Gumtree.show_gumtree true 0 root
+		     | Ast_diff.DeletedFile -> prerr_string "(deleted)");
 		   prerr_endline ""
 		) ast
     end
