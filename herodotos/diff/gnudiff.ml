@@ -145,7 +145,7 @@ let parse_diff v prefix file : Ast_diff.diffs =
 	    close_in in_ch;
 	    raise (Unexpected msg)
 	  | End_of_file ->
-	    if v then prerr_endline ("*** WARNING *** "^file^" is empty !");
+	    if !Misc.debug then prerr_endline ("*** DEBUG *** "^file^" is empty !");
 	    close_in in_ch;
 	  []
       end
