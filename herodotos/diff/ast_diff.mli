@@ -22,6 +22,7 @@ type diff = (vname * path) * changes
 type diffs = diff list
 
 type lineprediction =
-    Deleted
+    Deleted            (* When lines disappeared *)
+  | Unlink             (* When file disappeared *)
   | Sing of int
   | Cpl of int * int

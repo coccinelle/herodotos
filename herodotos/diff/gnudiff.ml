@@ -202,7 +202,7 @@ let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : Ast_dif
       try
 	match List.assoc (ver, file) diffs with
 	    Ast_diff.GNUDiff hunks -> compute_new_pos_with_hunks hunks line colb cole
-	  | Ast_diff.DeletedFile -> (Ast_diff.Deleted, 0, 0)
+	  | Ast_diff.DeletedFile -> (Ast_diff.Unlink, 0, 0)
 	  | _ -> raise (Unexpected "Wrong diff type")
       with Not_found -> (Ast_diff.Sing line, colb, cole)
     )
