@@ -79,8 +79,6 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 	if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
 	  begin
             let orgs1 = (Org.build_org_arr prefix depth !Setup.resultsdir pdir (file^Global.origext) vlist ) in
-            
-	    
 	    let diffs1= Diff.get_diff v1 cpucore !Setup.resultsdir pdir prefix vlist orgs1 (file^Global.origext) difffile in
 	    let correl = List.rev (Org.parse_org false correlfile) in
 	      (* 

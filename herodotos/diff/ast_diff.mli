@@ -1,4 +1,3 @@
-
 (* For GNU diff *)
 type pos = int * int
 type hunk = pos * pos
@@ -14,6 +13,7 @@ type tree =
 type changes =
     GNUDiff of hunk list
   | Gumtree of tree
+  | DeletedFile
 
 type path = string
 type vname = string
@@ -22,6 +22,7 @@ type diff = (vname * path) * changes
 type diffs = diff list
 
 type lineprediction =
-    Deleted
+    Deleted            (* When lines disappeared *)
+  | Unlink             (* When file disappeared *)
   | Sing of int
   | Cpl of int * int

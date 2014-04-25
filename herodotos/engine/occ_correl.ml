@@ -181,6 +181,8 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		      prerr_endline (Org.get_string_pos check_pos)
 		| (Ast_diff.Deleted, _,_) ->
 		    prerr_endline "Deleted line"
+		| (Ast_diff.Unlink, _,_) ->
+		    prerr_endline "Deleted file"
 		| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
 		    prerr_endline "Somewhere"
 	     );
@@ -193,6 +195,12 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		   Check for manual correlation.
 		 *)
 		 check_next verbose strict prefix depth vlist diffs correl bugs bug (0,colb,cole)
+	     | (Ast_diff.Unlink, _, _) ->
+	         (*
+		   File has been removed.
+		 *)
+	       if !Misc.debug then prerr_endline "Auto-correlation OK\n=========";
+	       1 (* Considered as an automatic correlation *)
 	     | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
 		 (*
 		   Could we do something for bugs inside a hunk ?
