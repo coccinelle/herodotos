@@ -18,7 +18,7 @@ let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : Ast_diff.linepredicti
       let diffs = Gnudiff.parse_diff !verbose (!gnudiff^Filename.dir_sep) gnufile in
       let new_pos = Gnudiff.compute_new_pos_with_findhunk diffs file ver pos in
       match new_pos with
-	  (Ast_diff.Deleted, 0, 0) ->
+	  (Ast_diff.Deleted false, 0, 0) ->
 	    let gumfile = make_path !gumtree ver file in
 	    if !Misc.debug then Printf.eprintf "GNU Diff correlation failed. Trying Gumtree with %s\n" gumfile;
 	    let diffs = Gumtree.parse_diff !verbose (!gumtree^Filename.dir_sep) gumfile in

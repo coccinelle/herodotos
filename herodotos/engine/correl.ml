@@ -73,7 +73,7 @@ let find_all_next strict prefix vlist (orgs:Ast_org.bugs) correl bug =
 	     *)
 	     && not (List.exists
 		       (fun (_, _, _, _, _, _, _, _, _, next, _) ->
-			  next = {Ast_org.def = Some next2}
+			  next = {Ast_org.def = Some (Some next2)}
 		       )
 		       orgs)
       ) orgs

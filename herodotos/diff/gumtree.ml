@@ -131,7 +131,7 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : Ast_diff
 			(Ast_diff.Sing bl, bc, ec)
 		      else
 			(Ast_diff.Cpl (bl, el), bc, ec)
-		  | None -> (Ast_diff.Deleted, 0, 0)
+		  | None -> (Ast_diff.Deleted true, 0, 0)
 	      end
 	  | Ast_diff.DeletedFile -> (Ast_diff.Unlink, 0, 0)
 	  | _ -> raise (Unexpected "Wrong diff type")

@@ -350,8 +350,6 @@ let flat_org prefix depth raw_org : Ast_org.bug =
   let (file, ver, pos, face, t) = flat_link prefix depth link in
     (lvl, s, r, file, ver, pos, face, t, {Ast_org.is_head=true}, {Ast_org.def=None}, sub)
 
-
-
 let get_version_name file = let dirList = Str.split (Str.regexp "/") file in
                                    let vname = List.nth dirList (List.length dirList -2) in
                                    (vname,file)

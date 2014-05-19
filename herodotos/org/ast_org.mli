@@ -31,7 +31,8 @@ type is_head = {mutable is_head: bool}
 (* level * status * reason phrase * file name * version name * position * font color * link text * is_head * next bug * sub-items *)
 type bug = int * status * text * path * vname * pos * string * text * is_head * next * orgs
 and next = {
-    mutable def: bug option
+ (* None denotes with undefined next, Some (None) denotes tail bug, Some (Some) denotes linked bugs *)
+  mutable def: bug option option
 }
 
 type bugs = bug list
