@@ -206,3 +206,9 @@ licensify:
 	ocaml str.cma ../tools/licensify.ml
 	set -e; for i in $(TOLICENSIFY); do cd $$i; \
 		ocaml str.cma ../../tools/licensify.ml; cd -; done
+
+ocamlbuild-byte:
+	ocamlbuild -use-ocamlfind -cflags -thread -lflags -thread herodotos.byte
+
+ocamlbuild-native:
+	ocamlbuild -use-ocamlfind -cflags -thread -lflags -thread herodotos.native
