@@ -2,5 +2,8 @@ Makefile.config
 herodotos
 herodotos.opt
 TAGS
-_tags
+
+#Ocamlbuild
 _build
+herodotos.native
+herodotos.byte
