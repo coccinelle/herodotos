@@ -20,11 +20,18 @@ let print_head path =
 	    prerr_endline ("Bug author:");
 	    Git.prerr_author vlist author "linux-2.6.17"
 
-let test configfile =
+let test configfile diffalgo =
+  prerr_endline "** RUNNING IN TEST MODE **";
+  ignore(Gumtree.parse_diff false "" diffalgo);
+  exit 0;
+
   ignore(Config.parse_config configfile);
   prerr_endline "Config parsing OK!";
-  let name = "Linux-2.6" in
-  let scm = Config.get_scm name in
-  let scmpath =  Str.replace_first (Str.regexp_string "git:") "" scm in
-  print_head (!Setup.projectsdir ^ Config.get_prjdir name ^ "/" ^ scmpath)
+  Setup.PrjTbl.iter
+    (fun name (_,atts) ->
+      let scm = Config.get_scm name in
+      let scmpath =  Str.replace_first (Str.regexp_string "git:") "" scm in
+      print_head scmpath
+    )
+    Setup.projects;
 

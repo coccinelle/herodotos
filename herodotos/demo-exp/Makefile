@@ -1,5 +1,9 @@
 CONF=demo.hc
 HERODOTOS=../herodotos
+
+
+-include Makefile.local
+
 ifeq ($(D),1)
 FLAGS=--debug -v
 else ifeq ($(D),2)
@@ -13,16 +17,13 @@ endif
 .PHONY:: distclean
 
 PWD=$(shell pwd)
+HOST=$(shell uname -n | cut -f1 -d"." | tr '-' '_')
 
 setup: $(CONF)
 
-all:: ./results/test/Test_Notes2.new.org
-
-./results/test/Test_Notes2.new.org:
-	echo "ver0;8;\nver1;10;\nver2;8;" > $@
-
 $(CONF): $(CONF).base
-	sed "s|projects=\".*\"$$|projects=\"$(PWD)\"|" demo.hc.base > demo.hc
+	cpp -P -undef -D$(HOST) $(@:%=%.base) > $@
+	sed -i -e "s|projects=\"\(.*\)\"$$|projects=\"$(PWD)/\1\"|" $@
 	@echo "Run 'make init' now"
 
 fix-orig fix-correl fix-new:
@@ -33,5 +34,11 @@ unfix-orig unfix-correl unfix-new:
 
 distclean:
 	rm -rf results gr website .depend demo.hc
+
+diff:
+	diff -u tests/$(PRJ)/ver0/test.c tests/$(PRJ)/ver1/test.c
+
+gumtree:
+	gumtree --output asrc tests/$(PRJ)/ver0/test.c tests/$(PRJ)/ver1/test.c
 
 -include ../scripts/Makefile.inc

@@ -3,6 +3,9 @@ open Global
 exception Misconfigured
 
 let configfile = ref "study.hc"
+let help = ref false
+let longhelp = ref false
+let diffalgo = ref "diff"
 let orgfile = ref ""
 let prefix = ref ""
 let extract = ref ""
@@ -57,6 +60,7 @@ let options = [
   "--config", Arg.Set_string configfile, "file Configuration file describing the requested data";
   "--cvs", Arg.Set cvs, " Generation of .cvsignore files (in init mode)";
   "--debug", Arg.Set Misc.debug, " Debug mode";
+  "--diff", Arg.Set_string diffalgo, " Diff algorithm (e.g. 'diff' or 'gumtree:file.xml')";
   "--extract", Arg.Set_string extract, "version Gives the version to extract from a correlated report";
   "--hacks", Arg.Set Global.hacks, " Enable hacks (to perform customized studies)";
   "--parse_org", Arg.Set_string orgfile, "file path to an Org file to parse (test)";
@@ -132,7 +136,7 @@ let main aligned =
 		  if !verbose3 then verbose2 := true;
 		  if !verbose2 then verbose1 := true;
 		  match running_mode with
-		      Test -> Test.test !configfile
+		      Test -> Test.test !configfile !diffalgo
 		    | Stat | Statcorrel | StatFP -> 
 		      Debug.profile_code "statistics"
 			(fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg running_mode)
@@ -144,7 +148,7 @@ let main aligned =
 			(fun () -> Cfginit.init_env !verbose1 !verbose2 !verbose3 !configfile !cvs)
 		    | Correl ->
 		      Debug.profile_code "correlation"
-			(fun () -> Cfgcorrel.correl !verbose1 !verbose2 !verbose3 !configfile !freearg)
+			(fun () -> Cfgcorrel.correl !verbose1 !verbose2 !verbose3 !configfile !diffalgo !freearg)
 		    | Graph ->
 		      Debug.profile_code "graph generation"
 			(fun () ->

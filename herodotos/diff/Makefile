@@ -1,18 +1,24 @@
 TARGET = diff
 
-SOURCES = diff.ml churn.ml
-INCLUDES = -I ../commons -I ../exists -I ../org
+INTFS=ast_diff.mli diff_type.mli
+SOURCES =  gumtree.ml gnudiff.ml hybrid.ml diff.ml churn.ml
+INCLUDEDIRS = commons exists org hcl
+
+LIBNAMES= #xml-light
 
 # Automatic computation
 -include ../Makefile.config
+OCAMLFIND=ocamlfind
 
 OBJS = $(SOURCES:.ml=.cmo)
 OPTOBJS = $(OBJS:.cmo=.cmx)
+LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+INCLUDES=$(LIBDIR:%=-I %) $(INCLUDEDIRS:%=-I ../%)
 LIB=$(TARGET).cma
 OPTLIB=$(LIB:.cma=.cmxa)
 
 # The Caml compilers.
-OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
+OCAMLCFLAGS ?= -g -dtypes
 OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
 OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES)
 OCAMLDEP = ocamldep$(OPTBIN) #$(INCLUDES)
@@ -32,6 +38,8 @@ all.opt: $(OPTLIB)
 
 .ml.cmx:
 	$(OCAMLOPT) -c $<
+
+$(OBJS) $(OPTOBJS): $(INTFS:.mli=.cmi)
 
 $(LIB): $(OBJS)
 	$(OCAMLC) -a -o $(LIB) $(OBJS)

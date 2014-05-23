@@ -1,6 +1,6 @@
 prefix="."
 patterns="./cocci"
-projects="."
+projects="tests"
 results="./results"
 website="./website"
 findcmd="spatch %f -sp_file %p -dir %d 2> %b.log > %o"
@@ -8,6 +8,16 @@ findcmd="spatch %f -sp_file %p -dir %d 2> %b.log > %o"
 //flags="-timeout 60 -use_glimpse"
 flags="-timeout 60"
 cpucore = 1
+
+pattern Error {
+ file = "error.cocci"
+ correl = strict
+}
+
+pattern ErrorExp {
+ file = "error_exp.cocci"
+ correl = strict
+}
 
 project Test {
 	dir = test
@@ -19,10 +29,31 @@ project Test {
 	}
 }
 
-pattern Error {
- file = "error.cocci"
- correl = strict
-}
-
 experience exp on project Test
 	with pattern Error
+
+#define TEST(P,pdir)             \
+project P {                      \
+	dir = pdir               \
+                                 \
+	versions = {             \
+	("ver0",12/31/1999,10)   \
+	("ver1",01/01/2001,11)   \
+	}                        \
+}                                \
+experience pdir on project P     \
+	with pattern Error       \
+
+TEST(Insert,insert)
+TEST(Insert2,insert2)
+TEST(Move,move)
+TEST(Move2,move2)
+TEST(Move3,move3)
+TEST(Move4,move4)
+TEST(Delete,delete)
+TEST(Delete2,delete2)
+TEST(Deref,deref)
+
+experience DerefExp on project Deref
+	with pattern ErrorExp
+

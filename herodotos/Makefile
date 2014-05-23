@@ -7,15 +7,20 @@ SOURCES =
 SUBDIRS = commons exists hcl org diff scm graph html database engine
 MENHIR_PATH=../menhirLib
 DEPDIRS = $(MENHIR_PATH)
-EXTLIBS=postgresql
+EXTLIBS=postgresql # xml-light
 
 OCAMLFIND=ocamlfind
 
 OCAMLLIBS=str.cma unix.cma threads.cma bigarray.cma $(EXTLIBS:%=%.cma)
+FLAG=
 
 # ocamlmktop -custom -thread  -o threadedocaml unix.cma threads.cma -cclib -lthreads
 # Automatic computation
-INCLUDES=$(SUBDIRS:%=-I %)
+OCAMLFIND=ocamlfind
+
+LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+DEPDIRS = $(MENHIR_PATH)
+INCLUDES=$(SUBDIRS:%=-I %) $(LIBDIR:%=-I %)
 
 OBJS = $(SOURCES:.ml=.cmo)
 ROOTLIB = $(TARGET).cmo

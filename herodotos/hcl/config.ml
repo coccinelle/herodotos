@@ -884,21 +884,26 @@ let get_rgb_color verbose g gatts curve =
 	raise (Misconfigurationat ("In graph "^g^", color is not defined.",pos))
 
 
-
+(***********************************************
+  Author: Lotfi <lotfi.manseur@imag.fr>
+  Comment: Added for automated size computation
+           and to compute commands used in
+	   generated Makefiles.
+*)
 let rec get_origs cli=match cli with
                       []->[]
                      |cl::q->let (org,reste)=cl in org::(get_origs q)
 
 (* get a command list from an experience*)
 let rec get_cmdList p pattern_list: ((string * string) *(string * (string * (string * (string * string) list)) list))list=
-                              match pattern_list with
-                                 []->[]
-                                |patt::tail->let cli=spatch_cli p patt in 
-                                             let _ = get_origs cli in
-                                             let data = locate_data p patt Global.origext in
-                                             ((p,patt),(data,cli))::(get_cmdList p tail)
+  match pattern_list with
+      []->[]
+    |patt::tail->let cli=spatch_cli p patt in 
+                 let _ = get_origs cli in
+                 let data = locate_data p patt Global.origext in
+                 ((p,patt),(data,cli))::(get_cmdList p tail)
 
-
+(**********************************************)
 
 (*
   Helper functions to pretty print

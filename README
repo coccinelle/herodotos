@@ -7,6 +7,7 @@
    * Only for building Herodotos
  * menhirlib, the menhir runtime library
  * PostgreSQL-ocaml library (libpostgresql-ocaml-dev)
+ * XML-light (libxml-light-ocaml-dev)
 
  For EPS generation
 ====================

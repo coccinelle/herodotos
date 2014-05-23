@@ -1,4 +1,5 @@
 @initialize:python@
+@@
 
 from coccilib.org import print_todo
 
@@ -7,7 +8,7 @@ expression E;
 position p;
 @@
 
- error@p(E)
+ error(E@p)
 
 @script:python@
 e << r.E;

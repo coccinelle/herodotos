@@ -1,144 +1,72 @@
 open Lexing
+open Diff_type
 
-exception Unexpected of string
+exception UnsupportedDiff of string
 exception Break
 
-let line = ref Int64.zero
-(* let diffcmd = "diff -Ebw -U0 " *)
-let diffcmd = "diff -U0 "
+let selected_compute_new_pos = ref Gnudiff.compute_new_pos_with_findhunk
 
-let nonewline_re = Str.regexp "^\\\\ "
+let selected_alt_new_pos = ref None
 
-let read_pos pos =
-  let pos_re = Str.regexp "^\\([0-9]+\\)\\(,\\([0-9]+\\)\\)?$" in
-  let posb = Str.string_match pos_re pos 0 in
-    if posb then
-      let linepos = int_of_string (Str.matched_group 1 pos) in
-      let linenum =
-	try int_of_string (Str.matched_group 3 pos)
-	with Not_found -> 1
-      in
-	(linepos, linenum)
-    else
-      raise (Unexpected ("bad hunk position format at line "^Int64.to_string !line))
+let get_basetime orgstat patchfile =
+  if Sys.file_exists patchfile
+  then (Unix.stat patchfile).Unix.st_mtime
+  else neg_infinity (* To force diff-ing tool *)
 
-let rec skip in_ch lineskip =
-  if lineskip > 0 then
-    begin
-      let linetxt = input_line in_ch in
-	line := Int64.succ !line;
-	if Str.string_match nonewline_re linetxt 0 then
-	    skip in_ch (lineskip)
-	else
-	  skip in_ch (lineskip -1)
-    end
+let is_GNUdiff difffile =
+  match difffile with
+      GNUDiff _ -> true
+    | _ -> false
 
-let rec read_hunks in_ch =
-  let hunk_desc = input_line in_ch in
-  let hunk_re = Str.regexp "^@@ -\\([^ ]+\\) \\+\\([^ ]+\\) @@$" in
-  let hunkb = Str.string_match hunk_re hunk_desc 0 in
-    if hunkb then
-      begin
-	line := Int64.succ !line;
-	let before = read_pos (Str.matched_group 1 hunk_desc) in
-	  ignore(Str.string_match hunk_re hunk_desc 0);
-	  let after = read_pos (Str.matched_group 2 hunk_desc) in
-	    skip in_ch ((snd before) + (snd after));
-	    let tail =
-	      try
-		read_hunks in_ch
-	      with End_of_file -> []
-	    in
-	      (before, after)::tail
-      end
-    else
-      begin
-	seek_in in_ch ((pos_in in_ch) - (1+String.length hunk_desc));
-	[]
-      end
+let is_hybrid difffile =
+  match difffile with
+      Hybrid _ -> true
+    | _ -> false
 
-let rec lookfor_minusline in_ch =
-  try
-    let line_rm0 = input_line in_ch in
-    let tab_re = Str.regexp "\t" in
-    let rm_re = Str.regexp "^--- \\([^ ]+\\) .*$" in
-    let line_rm = Str.global_replace tab_re " " line_rm0 in
-    let rmb = Str.string_match rm_re line_rm 0 in
-    line := Int64.succ !line;
-      if rmb then
-	Some line_rm0
-      else
-	lookfor_minusline in_ch
-  with _ -> None
+let get_difffile difffile =
+  match difffile with
+      GNUDiff file -> file
+    | Gumtree file -> file
+    | Hybrid  file -> file 
 
-let rec read_diff prefix file in_ch =
-  let line_rm00 = input_line in_ch in
-  let line_rm0 =
-    if Str.string_match nonewline_re line_rm00 0
-    then
-      (line := Int64.succ !line; input_line in_ch)
-    else
-      line_rm00
+let get_diffcmd prefix ofile nfile difffile =
+  let (ver, stripped_ofile) = Misc.strip_prefix prefix ofile in
+  let file = get_difffile difffile in
+  let outfile = String.concat Filename.dir_sep [file; ver; stripped_ofile] in
+  let cmd = match difffile with
+      GNUDiff _ -> Gnudiff.diffcmd ^ofile ^" "^ nfile ^ " > "^ outfile
+    | Gumtree _ -> Gumtree.diffcmd ^ofile ^" "^ nfile ^ " | gum2hero "^ outfile
+    | Hybrid _ -> raise (UnsupportedDiff "Hybrid should be instanciated at this point.")
+  in (outfile, "mkdir -p " ^ Filename.dirname outfile ^" && " ^ cmd)
+
+let parse_diff v prefix difffile : Ast_diff.diffs =
+  match difffile with
+      GNUDiff file -> Gnudiff.parse_diff v prefix file
+    | Gumtree file -> Gumtree.parse_diff v prefix file
+    | Hybrid _ -> raise (UnsupportedDiff "Hybrid should be instanciated at this point.")
+
+let select_diff diffalgo project : difftype =
+  let (proto, file) =
+    match Str.split (Str.regexp_string ":") diffalgo with
+	[] -> ("diff", diffalgo)
+      | proto::fileparts ->
+	let file = String.concat "" fileparts in
+	(proto, file)
   in
-    line := Int64.succ !line;
-    let tab_re = Str.regexp "\t" in
-    let rm_re = Str.regexp "^--- \\([^ ]+\\) .*$" in
-    let line_rm = Str.global_replace tab_re " " line_rm0 in
-    let rmb = Str.string_match rm_re line_rm 0 in
-      if rmb then
-	let rmfile = Str.matched_group 1 line_rm in
-	  ignore(input_line in_ch); (* Read +++ line *)
-	  line := Int64.succ !line;
-	  let hunks = read_hunks in_ch in
-	  let tail =
-	    try
-	      read_diff prefix file in_ch
-	    with End_of_file -> []
-	  in
-	  let ver_file = Misc.strip_prefix prefix rmfile in
-	    (ver_file, hunks)::tail
-      else
-	begin
-	  prerr_endline
-	    ("Error: Desynchronized? no more diff found in "^file
-	     ^ " at line "^Int64.to_string !line);
-	  prerr_endline
-	    ("Expects a \"---\" line. Got \""^line_rm0^"\"");
-	  prerr_endline
-	    ("Looking for filename in \""^line_rm^"\"");
-	  match lookfor_minusline in_ch with
-	      None ->
-		prerr_endline ("Unable to re-synchronize"); []
-	    | Some l ->
-		prerr_endline ("Re-synchronize on "^l);
-		match lookfor_minusline in_ch with
-		    None   -> []
-		  | Some l ->
-		      seek_in in_ch ((pos_in in_ch) - (1+String.length l));
-		      line := Int64.pred !line;
-		      read_diff prefix file in_ch
-	end
+  match proto with
+      "diff" ->
+	if file = "" then GNUDiff (project ^ Global.patchext)
+	else GNUDiff file
+    | "gumtree" ->
+      selected_compute_new_pos := Gumtree.compute_new_pos_with_gumtree;
+      if file = "" then Gumtree (project ^ Global.gumtreeext)
+      else Gumtree file
+    | "hybrid" ->
+      selected_compute_new_pos := Hybrid.compute_new_pos;
+      selected_alt_new_pos := Some (Hybrid.alt_new_pos);
+      Hybrid (project)
+    | _ -> raise (UnsupportedDiff (proto ^ " is unsupported as a diff algorithm."))
 
-let parse_diff v prefix file : Ast_diff.diffs =
-  try
-    let in_ch = open_in file in
-      try
-	line := Int64.zero;
-	let ast = read_diff prefix file in_ch in
-	  close_in in_ch;
-	  ast
-      with
-	  (Unexpected msg) ->
-	    prerr_endline ("Unexpected token: "^msg);
-	    close_in in_ch;
-	    raise (Unexpected msg)
-	| End_of_file ->
-	    if v then prerr_endline ("*** WARNING *** "^file^" is empty !");
-	    close_in in_ch;
-	    []
-  with Sys_error msg ->
-    prerr_endline ("*** WARNING *** "^msg);
-    []
 
 let rec gen_diff_of_orglist prefix vlist orgs : (string * string) list =
   match orgs with
@@ -166,179 +94,177 @@ let gen_diff prefix vlist (orgarray: Ast_org.orgarray) : (string * string) list 
 			    ))
        ) [] orgarray
 
-let get_diff v resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile file : Ast_diff.diffs =
-  let orgstat = Misc.get_change_stat resultsdir pdir vlist orgfile (ref []) in
-  let patchstat =
-    if Sys.file_exists file
-    then (Unix.stat file).Unix.st_ctime
-    else orgstat
-  in
+let get_diff_job v prefix difffile cmd =
+  if v then prerr_endline ("Running: " ^cmd);
+  match
+    Unix.system cmd
+  with
+      Unix.WEXITED 0 -> ()
+    | Unix.WEXITED 1 -> ()
+    | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
+    | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
 
-  if Sys.file_exists file && orgstat < patchstat then
-    parse_diff v prefix file
-  else
-    (
-      if orgstat > patchstat
-      then prerr_endline ("*** RECOMPUTE *** " ^file)
-      else prerr_endline ("*** COMPUTE *** " ^file);
-      let pair = Misc.unique_list (gen_diff prefix vlist orgs) in
-	ignore (Unix.system ("> "^file));
-	List.iter
-	  (fun (ofile, nfile) ->
-	     let cmd = diffcmd ^ofile ^" "^ nfile ^ " >> "^ file in
-	       match
-		 Unix.system cmd
-	       with
-		   Unix.WEXITED 0 -> ()
-		 | Unix.WEXITED 1 -> ()
-		 | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
-		 | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
-	  ) pair ;
-	parse_diff v prefix file
-    )
-
-type lineprediction =
-    Deleted
-  | Sing of int
-  | Cpl of int * int
-
-(* Old implementation *)
-let compute_new_pos_with_rec (diffs: Ast_diff.diffs) file ver pos : lineprediction * int * int =
-  let (orig_line, o_colb, o_cole) = pos in
-  let o_pos = (Sing orig_line, o_colb, o_cole) in
+let get_diff_nofail v prefix difffile cmd =
   try
-(*    prerr_string " - as new line:"; *)
-    let hunks = List.assoc (ver, file) diffs in
-    let newhunks = List.map
-      (fun p ->
-	 let ((bl,bsize),(al,asize)) = p in
-	   if bsize = 0 then
-	     ((bl+1,bsize),(al,asize))
-	   else if asize = 0 then
-	     ((bl,bsize),(al+1,asize))
-	   else
-	     p
-      ) hunks
-    in
-    let new_pos = List.fold_left
-      (fun (wrap_line, colb, cole) ((bl,bsize),(al,asize)) ->
-	 match wrap_line with
-	     Sing line ->
-	       (* Occurrence is known to be at a exact line *)
-	       if  bl <= orig_line then
-		 (* Hunks before orig_line are interesting *)
-		 if (bl+bsize-1) < orig_line then
-		   (* orig_line is after the modified lines *)
-		   let nline = line + asize - bsize in
-		     (*	     prerr_string (" " ^string_of_int nline);*)
-		     (Sing nline, colb, cole)
-		 else if asize = 0 then
-		   (*
-		     orig_line is IN the current hunk.
-		     '+' part is empty. All hunk lines are removed.
-		   *)
-		   (Deleted, 0, 0)
-		 else
-		   (*
-		      We are IN the hunk,
-		      give the set of lines in '+' part
-		   *)
-		   (Cpl (al,al+asize-1),colb,cole)
-	       else (* bl > orig_line, remaining hunks are not interesting *)
-		 (*
-		   Return the current value.
-		 *)
-		 (wrap_line, colb, cole)
-	   | Deleted | Cpl _  ->
-	       (wrap_line, colb, cole)
-      ) o_pos newhunks
-    in (* prerr_newline (); *) new_pos
-  with Not_found -> o_pos
+    get_diff_job v prefix difffile cmd;
+    0
+  with Config.Warning msg ->
+    prerr_endline ("*** WARNING *** " ^ msg);
+    1
 
-let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : lineprediction * int * int =
-  Debug.profile_code_silent "Diff.compute_new_pos_with_findhunk"
+let run_get_diff_job v prefix difffile cmd =
+  let pid = Unix.fork () in
+    if pid = 0 then (* I'm a slave *)
+      begin
+	let pid = Unix.getpid() in
+	  if !Misc.debug then prerr_endline ("New child "^ string_of_int pid^ " on "^cmd);
+	  let ret = get_diff_nofail v prefix difffile cmd in
+	    if !Misc.debug then prerr_endline ("Job done for child "^ string_of_int pid);
+	    let msg = Debug.profile_diagnostic () in
+	      if msg <> "" then prerr_endline msg;
+	    exit ret
+      end
+    else (* I'm the master *)
+      pid
+
+let dispatch_get_diff_job v cpucore prefix difffile (perr, pidlist) cmd =
+  let (error, newlist) =
+    if List.length pidlist > cpucore then
+      let (death, status) = Unix.wait () in
+	if !Misc.debug then
+	  prerr_endline ("Master: Job done for child "^ string_of_int death);
+	let error = match status with
+	    Unix.WEXITED 0 -> perr
+	  | _              -> perr + 1
+	in
+	(error, List.filter (fun x -> x <> death) pidlist)
+    else
+      (perr, pidlist)
+  in
+  let pid = run_get_diff_job v prefix difffile cmd in
+    (error, pid::newlist)
+
+let gen_cmd_basic v prefix pair orgstat difffile =
+  prerr_endline ("*** CHECK CACHE *** " ^ (get_difffile difffile));
+  List.fold_left (fun (outlist, cmdlist) file_pair ->
+    let (ofile, nfile) = file_pair in
+    let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
+    if v then prerr_string ("Checking " ^outfile);
+    let patchstat = get_basetime orgstat outfile in
+    if orgstat > patchstat then
+      (if v then prerr_endline " - Keep";
+       (outfile::outlist,cmd::cmdlist))
+    else
+      (if v then prerr_endline " - Skip";
+       (outfile::outlist,cmdlist))
+  ) ([],[]) pair
+
+let gen_cmd v prefix pair orgstat difffile =
+  if is_hybrid difffile then
+    let file = get_difffile difffile in
+    let gnudiff = gen_cmd_basic v prefix pair orgstat (GNUDiff (file^ Global.patchext)) in
+    let gumtree = gen_cmd_basic v prefix pair orgstat (Gumtree (file^ Global.gumtreeext)) in
+    (fst gnudiff @ fst gumtree, snd gnudiff @ snd gumtree)
+  else
+    gen_cmd_basic v prefix pair orgstat difffile
+
+let mkdir_cache_basic file =
+  if not (Sys.file_exists file) then
+    (Unix.mkdir file 0o770;
+     prerr_endline ("*** CREATING DIRECTORY *** " ^file))
+
+let mkdir_cache resultsdir pdir vlist orgfile difffile =
+  let file = get_difffile difffile in
+  if is_hybrid difffile then
+    let file = get_difffile difffile in
+    let orgstatpatch = mkdir_cache_basic (file^ Global.patchext) in
+    let orgstatgumtree = mkdir_cache_basic (file^ Global.gumtreeext) in
+    max orgstatgumtree orgstatpatch
+  else
+    mkdir_cache_basic file
+
+let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) orgfile difffile : Ast_diff.diffs =
+  mkdir_cache resultsdir pdir vlist orgfile difffile;
+  let orgstat = Misc.get_change_stat resultsdir pdir vlist orgfile (ref []) in
+  let file = get_difffile difffile in
+  let pair = Misc.unique_list (gen_diff prefix vlist orgs) in
+  let (outfiles, cmds) = gen_cmd v prefix pair orgstat difffile in
+  let error =
+    if cpucore = 1 then
+      let errs = List.map (get_diff_nofail v prefix difffile) cmds in
+      List.fold_left (+) 0 errs
+    else
+      let (err, pidlist) =
+	List.fold_left
+	  (dispatch_get_diff_job v cpucore prefix difffile)
+	  (0, [])
+	  cmds
+      in
+      let res = List.map (fun x ->
+	let (death, status) = Unix.wait () in
+	if !Misc.debug then
+	  prerr_endline ("Master: Job done for child "^ string_of_int death);
+	match status with
+	    Unix.WEXITED 0 -> 0
+	  | _ -> 1
+      ) pidlist
+      in
+      List.fold_left (+) err res
+  in
+  if error <> 0 then
+    prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the diff.");
+  List.flatten (
+    List.map (fun x ->
+      try
+	match difffile with
+	    GNUDiff _ -> parse_diff v (file^Filename.dir_sep) (GNUDiff x)
+	  | Gumtree _ -> parse_diff v (file^Filename.dir_sep) (Gumtree x)
+	  | Hybrid _ -> Hybrid.parse_config v file; []
+      with e -> prerr_endline ("Error parsing "^ x); raise e
+    ) outfiles
+  )
+
+let alt_new_pos (diffs: Ast_diff.diffs) file ver pos : (bool * (Ast_diff.lineprediction * int * int)) option =
+  Debug.profile_code_silent "Diff.alt_new_pos"
     (fun () ->
-  let (line, colb, cole) = pos in
-    try
-      let hunks =
-	Debug.profile_code_silent "Diff.compute_new_pos#List.assoc"
-	  (fun () ->
-	    List.assoc (ver, file) diffs
-	  )
-      in
-      let newhunks = List.map
-	(fun p ->
-	   let ((bl,bsize),(al,asize)) = p in
-	     if bsize = 0 then
-	       ((bl+1,bsize),(al,asize))
-	     else if asize = 0 then
-	       ((bl,bsize),(al+1,asize))
-	     else
-	       p
-	) hunks
-      in
-      let hunk = List.fold_left
-	(fun p1 p2 ->
-	   let ((bl1,_),_) = p1 in
-	   let ((bl2,_),_) = p2 in
-	     if bl1 <= line && line < bl2 then p1
-	     else p2
-	) ((0,0),(0,0)) newhunks
-      in
-      let ((bl,bsize),(al,asize)) = hunk in
-	if (bl+bsize) <= line then
-	  (*
-	    If we are above the current hunk, but still before the next,
-	    we computes the prediction by adding the two offsets.
-	  *)
-	  let nline = line + (al - bl) + (asize - bsize) in
-	    (Sing nline, colb, cole)
-	else
-	  (*
-	    We are IN the hunk.
-	  *)
-	  if asize = 0 then
-	    (Deleted, 0, 0)
-	  else
-	    (*
-	      We are maybe in the set of replacing lines !?
-	    *)
-	    (Cpl (al,al+asize-1),colb,cole)
-    with Not_found -> (Sing line, colb, cole)
+      match !selected_alt_new_pos with
+	  None -> None
+	| Some alt_new_pos -> Some (alt_new_pos diffs file ver pos)
     )
 
-let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : lineprediction * int * int =
+let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.lineprediction * int * int) =
   Debug.profile_code_silent "Diff.compute_new_pos"
     (fun () ->
-  let my_compute_new_pos =
-    if true then
-      compute_new_pos_with_findhunk
-    else
-      compute_new_pos_with_rec
-  in my_compute_new_pos diffs file ver pos
+      !selected_compute_new_pos diffs file ver pos
     )
+
+let show_gnudiff hunks =
+  List.iter (fun ((bl,bsize),(al,asize)) ->
+    prerr_int bl;
+    prerr_string "(";
+    prerr_int bsize;
+    prerr_string ") -> ";
+    prerr_int al;
+    prerr_string "(";
+    prerr_int asize;
+    prerr_string "), "
+  ) hunks
 
 let show_diff verbose vlist ast =
   if verbose then
     begin
       prerr_endline "SHOW DIFF";
-      List.iter (fun ((ver, file), hunks) ->
+      List.iter (fun ((ver, file), difftype) ->
 		   prerr_string file;
 		   prerr_string " from ";
 		   prerr_string ver;
 		   prerr_string " to ";
 		   prerr_string (Misc.get_next_version vlist ver);
 		   prerr_endline "";
-		   List.iter (fun ((bl,bsize),(al,asize)) ->
-				prerr_int bl;
-				prerr_string "(";
-				prerr_int bsize;
-				prerr_string ") -> ";
-				prerr_int al;
-				prerr_string "(";
-				prerr_int asize;
-				prerr_string "), "
-			     ) hunks;
+		   (match difftype with
+		       Ast_diff.GNUDiff hunks -> show_gnudiff hunks
+		     | Ast_diff.Gumtree root -> if !Misc.debug then Gumtree.show_gumtree true 0 root
+		     | Ast_diff.DeletedFile -> prerr_string "(deleted)");
 		   prerr_endline ""
 		) ast
     end

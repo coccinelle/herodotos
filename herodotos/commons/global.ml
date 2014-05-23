@@ -5,10 +5,12 @@ let cocciext  = ".cocci"
 let origext   = ".orig.org"
 let correlext = ".correl.org"
 let patchext  = ".patchset"
+let gumtreeext  = ".gumtree"
 let editext   = ".edit.org"
 let bugext    = ".new.org"
 let existext  = ".exist"
 let listext   = ".list"
+let failed = ".failed"
 
 let sep = "_"
 
