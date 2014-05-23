@@ -60,75 +60,118 @@ let get_next_list vlist bugs f vidx =
 
 let update_nohead bug =
   let (l, s, r, f, v, p, face, t, h, n, subs) = bug in
-    h.Ast_org.is_head <- false
+  h.Ast_org.is_head <- false
 
-let check_next verbose strict prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos =
+let manual_check_next verbose strict prefix correl subbugs bug =
+  let (l, s, r, f, v, p, face, t, h, n, _) = bug in
+  let t = if strict then (Org.clean_link_text prefix v f p t) else "" in
+  if verbose then prerr_endline ("Trying manual correlation of "^f^" ver. "^v);
+  try
+    let correlb = List.find (fun b ->
+      let (st, file, ver, pos, _, _, _, ctext) = b in
+      st = Ast_org.SAME
+      && f = file
+	&& v = ver
+	  && p = pos
+	    && (if strict
+	      then
+		let new_t = Org.clean_link_text prefix v f pos ctext in
+		if !Misc.debug then
+		  begin
+		    prerr_string ("\""^ new_t^ "\"");
+		    prerr_endline (" <-> \""^ t^ "\"");
+		    prerr_endline "Auto-correlation OK\n=========";
+		  end;
+		new_t = t
+	      else true
+	    )
+    ) correl in
+    let (_, _, _, _, nfile, nver, next_pos, _) = correlb in
+    let check = (l, s, r, nfile, nver, next_pos, "", t, {Ast_org.is_head=true}, {Ast_org.def=None}, []) in
+    (try
+       let next = get_bug strict prefix check subbugs in
+       n.Ast_org.def <- Some (Some next);
+       update_nohead next;
+       if verbose then prerr_endline "Manual correlation OK\n=========";
+       0 (* No automatic correlation performed *)
+     with Not_found ->
+       if verbose then prerr_endline "Manual correlation KO\n=========";
+       0 (* No automatic correlation performed *)
+    )
+  with Not_found ->
+    if verbose then prerr_endline "Manual correlation KO - KO\n=========";
+    0 (* No automatic correlation performed *)
+
+let rec check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos =
   Debug.profile_code_silent "check_next"
     (fun () ->
-       let (l, s, r, f, v, p, face, t, h, n, _) = bug in
-       let t = if strict then (Org.clean_link_text prefix v f p t) else "" in
-       let vidx = Misc.get_idx_of_version vlist v in
-       let subbugs = get_next_list vlist bugs f vidx in
-       let vn = Misc.get_version_name vlist (vidx+1) in
-       let check = (l, s, r, f, vn, check_pos, face, t, {Ast_org.is_head=true}, {Ast_org.def=None}, []) in
-	 if verbose then
-	   (
-	     prerr_string "check_next of ";
-	     Org.show_bug true bug;
-	     prerr_string (" at ");
-	     Org.show_bug true check;
-	     prerr_newline ();
-	     prerr_endline ("List:");
-	     List.iter (Org.show_bug true) subbugs;
-	     prerr_newline ();
-	   );
-	 try
-	   let next = get_bug strict prefix check subbugs in
-	     if (n.Ast_org.def = None) then
-	       begin
-		 n.Ast_org.def <- Some (Some next);
-		 update_nohead next;
-		 1 (* One automatic correlation performed *)
-	       end
-	     else
-	       failwith "Already defined next !" (* No automatic correlation performed *)
-	 with Not_found ->
-	   if verbose then prerr_endline ("Trying manual correlation of "^f^" ver. "^v);
-	   try
-	     let correlb = List.find (fun b ->
-					let (st, file, ver, pos, _, _, _, ctext) = b in
-					  st = Ast_org.SAME
-					    && f = file
-					    && v = ver
-					    && p = pos
-					    && (if strict
-						then
-						  let new_t = Org.clean_link_text prefix v f pos ctext in
-						    if !Misc.debug then
-						      begin
-							prerr_string ("\""^ new_t^ "\"");
-							prerr_endline (" <-> \""^ t^ "\"");
-							prerr_endline "Auto-correlation OK\n=========";
-						      end;
-						    new_t = t
-						else true
-					       )
-				     ) correl in
-	     let (_, _, _, _, nfile, nver, next_pos, _) = correlb in
-	     let check = (l, s, r, nfile, nver, next_pos, "", t, {Ast_org.is_head=true}, {Ast_org.def=None}, []) in
-	       (try
-		  let next = get_bug strict prefix check subbugs in
-		    n.Ast_org.def <- Some (Some next);
-		    update_nohead next;
-		    if verbose then prerr_endline "Manual correlation OK\n=========";
-		    0 (* No automatic correlation performed *)
-		with Not_found ->
-		  if verbose then prerr_endline "Manual correlation KO\n=========";
-		  0 (* No automatic correlation performed *)
-	       )
-	   with Not_found ->
-	     if verbose then prerr_endline "Manual correlation KO - KO\n=========";
-	     0 (* No automatic correlation performed *)
+      let (l, s, r, f, v, p, face, t, h, n, _) = bug in
+      let t = if strict then (Org.clean_link_text prefix v f p t) else "" in
+      let vidx = Misc.get_idx_of_version vlist v in
+      let subbugs = get_next_list vlist bugs f vidx in
+      let vn = Misc.get_version_name vlist (vidx+1) in
+      let check = (l, s, r, f, vn, check_pos, face, t, {Ast_org.is_head=true}, {Ast_org.def=None}, []) in
+      if verbose then
+	(
+	  prerr_string "check_next of ";
+	  Org.show_bug true bug;
+	  prerr_string (" at ");
+	  Org.show_bug true check;
+	  prerr_newline ();
+	  prerr_endline ("List:");
+	  List.iter (Org.show_bug true) subbugs;
+	  prerr_newline ();
+	);
+      try
+	let next = get_bug strict prefix check subbugs in
+	if (n.Ast_org.def = None) then
+	  begin
+	    n.Ast_org.def <- Some (Some next);
+	    update_nohead next;
+	    1 (* One automatic correlation performed *)
+	  end
+	else
+	  failwith "Already defined next !" (* No automatic correlation performed *)
+      with Not_found ->
+	if conf then
+	  begin
+	    if verbose then prerr_endline "Automatic correlation OK\n=========";
+	    n.Ast_org.def <- Some (None);
+	    1 (* Automatic correlation performed *)
+	  end
+	else
+	  begin
+	    match Diff.alt_new_pos diffs f v p with
+		None -> manual_check_next verbose strict prefix correl subbugs bug
+	      | Some (_, diffcheck_pos) ->
+		match diffcheck_pos with
+		    (Ast_diff.Sing line,colb,cole) ->
+		      ignore(check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole));
+		      if n.Ast_org.def = Some (None) then
+			manual_check_next verbose strict prefix correl subbugs bug
+		      else
+			1 (* Automatic correlation performed *)
+		  | (Ast_diff.Deleted, colb,cole) ->
+		    n.Ast_org.def <- Some (None);
+		    1 (* Considered as an automatic correlation *)
+		  | (Ast_diff.Unlink, _, _) -> (* File has been removed. *)
+		    if !Misc.debug then prerr_endline "Auto-correlation OK\n=========";
+		    n.Ast_org.def <- Some (None);
+		    1 (* Considered as an automatic correlation *)
+		  | (Ast_diff.Cpl (lineb,linee),colb, cole) ->
+		    let rec fold line =
+		      let res = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+		      if res = 0 then
+			if line < linee then
+			  fold (line+1)
+			else 0
+		      else 1
+		    in ignore(fold lineb);
+		    if n.Ast_org.def = Some (None) then
+		      manual_check_next verbose strict prefix correl subbugs bug
+		    else
+		      1 (* Automatic correlation performed *)
+	  end
     )
 
 let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
@@ -140,7 +183,7 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	     Org.show_bug true bug;
 	     prerr_newline ()
 	   );
-	 let diffcheck_pos = Diff.compute_new_pos diffs f v p in
+	 let (conf, diffcheck_pos) = Diff.compute_new_pos diffs f v p in
 	   if verbose then
 	     (prerr_string (Org.get_string_pos p);
 	      prerr_string " as new pos: ";
@@ -157,16 +200,19 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	     );
 	   match diffcheck_pos with
 	       (Ast_diff.Sing line,colb,cole) -> (* We are between two hunks. *)
-		 check_next verbose strict prefix depth vlist diffs correl bugs bug (line,colb,cole)
-	     | (Ast_diff.Deleted false, colb,cole) ->
-		 (*
-		   We are inside a hunk and lines have been removed.
-		   Check for manual correlation.
-		 *)
-	       check_next verbose strict prefix depth vlist diffs correl bugs bug (0,colb,cole)
-	     | (Ast_diff.Deleted true, _, _) ->
-	       n.Ast_org.def <- Some (None);
-	       1 (* Considered as an automatic correlation *)
+		 check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole)
+	     | (Ast_diff.Deleted, colb,cole) ->
+	       if not conf then
+	       (*
+		 We are inside a hunk and lines have been removed.
+		 Check for manual correlation.
+	       *)
+		 check_next verbose strict conf prefix depth vlist diffs correl bugs bug (0,colb,cole)
+	       else
+		 begin
+		   n.Ast_org.def <- Some (None);
+		   1 (* Considered as an automatic correlation *)
+		 end
 	     | (Ast_diff.Unlink, _, _) ->
 	         (*
 		   File has been removed.
@@ -181,7 +227,7 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		   Just check for manual correlation.
 		 *)
 	       let rec fold line =
-		 let res = check_next verbose strict prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+		 let res = check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole) in
 		 if res = 0 then
 		   if line < linee then
 		     fold (line+1)

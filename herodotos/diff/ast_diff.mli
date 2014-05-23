@@ -22,7 +22,7 @@ type diff = (vname * path) * changes
 type diffs = diff list
 
 type lineprediction =
-    Deleted of bool    (* When lines disappeared - Behavior depends on algo. used (GNU Diff vs Gumtree) *)
+    Deleted            (* When lines disappeared - Behavior depends on algo. used (GNU Diff vs Gumtree) *)
   | Unlink             (* When file disappeared *)
   | Sing of int
   | Cpl of int * int

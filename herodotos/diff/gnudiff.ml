@@ -188,21 +188,21 @@ let compute_new_pos_with_hunks hunks line colb cole =
 	    We are IN the hunk.
 	  *)
     if asize = 0 then
-      (Ast_diff.Deleted false, 0, 0)
+      (Ast_diff.Deleted, 0, 0)
     else
 	    (*
 	      We are maybe in the set of replacing lines !?
 	    *)
       (Ast_diff.Cpl (al,al+asize-1),colb,cole)
 
-let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
+let compute_new_pos_with_findhunk (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.lineprediction * int * int) =
   Debug.profile_code_silent "Gnudiff.compute_new_pos_with_findhunk"
     (fun () ->
       let (line, colb, cole) = pos in
       try
 	match List.assoc (ver, file) diffs with
-	    Ast_diff.GNUDiff hunks -> compute_new_pos_with_hunks hunks line colb cole
-	  | Ast_diff.DeletedFile -> (Ast_diff.Unlink, 0, 0)
+	    Ast_diff.GNUDiff hunks -> (false, compute_new_pos_with_hunks hunks line colb cole)
+	  | Ast_diff.DeletedFile -> (true, (Ast_diff.Unlink, 0, 0))
 	  | _ -> raise (Unexpected "Wrong diff type")
-      with Not_found -> (Ast_diff.Sing line, colb, cole)
+      with Not_found -> (false, (Ast_diff.Sing line, colb, cole))
     )

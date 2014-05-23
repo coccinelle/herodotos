@@ -18,8 +18,9 @@ let fast_hash_bug prefix vlist (flist, tbl)=
 
 let may_have_changed strict prefix vlist bfl bug =
   let (_, s, _, file, ver, pos, _, t, _, next, _) = bug in
-    next = {Ast_org.def = None}
-      && List.exists
+  if next = {Ast_org.def = None} then prerr_endline "may_have_changed: no next computed";
+  next = {Ast_org.def = None}
+  && List.exists
       (fun (_, _, _, file2, ver2, pos2, _, t2, head, _, _) ->
 	 let vn = Misc.get_next_version vlist ver in
 	   file = file2
@@ -41,6 +42,7 @@ let is_SAME_as_next_in_correl correl file ver pos =
 
 let find_all_next strict prefix vlist (orgs:Ast_org.bugs) correl bug =
   let (_, _, _, file, ver, pos, _, t, _, _, _) = bug in
+  let vn = Misc.get_next_version vlist ver in
   let (_, cb, ce) = pos in
     (*
       First, we find all bugs in next version with the same
@@ -50,7 +52,6 @@ let find_all_next strict prefix vlist (orgs:Ast_org.bugs) correl bug =
       (fun next2 ->
 	 let (_, _, _, file2, ver2, pos2, _, t2, _, _, _) = next2 in
 	 let (_, cb2, ce2) = pos2 in
-	 let vn = Misc.get_next_version vlist ver in
 	   file = file2 && vn = ver2
 	     (* Expression have at least the same length
 		So, a buggy pattern should not be edited,
@@ -81,11 +82,12 @@ let find_all_next strict prefix vlist (orgs:Ast_org.bugs) correl bug =
 let exists_bug_for_correl bugs cbug =
   List.exists (fun bug ->
 	       let (cs, cfile, cver, cpos, _, _, _,_) = cbug in
-	       let (_, _, _, file, ver, pos, _, _, _, _, _) = bug in
+	       let (_, _, _, file, ver, pos, _, _, _, next, _) = bug in
 		 cfile = file
 		   && cver = ver
 		   && cpos = pos
 		   && cs = Ast_org.SAME
+		   && next = {Ast_org.def = None}
 	    ) bugs
 
 let get_t_of_bug_for_next_correl strict prefix bugs cbug =
@@ -129,6 +131,7 @@ let gen_todo ch strict vlist prefix orgs correl bug =
     For remaining disappearing bugs, propose correlation with
     every available bug in next.
   *)
+  prerr_endline "gen_todo called";
   let next = find_all_next strict prefix vlist orgs correl bug in
   List.iter (fun nbug ->
 	       Printf.fprintf ch "* TODO %s\n %s\n"

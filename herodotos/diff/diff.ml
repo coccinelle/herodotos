@@ -6,6 +6,8 @@ exception Break
 
 let selected_compute_new_pos = ref Gnudiff.compute_new_pos_with_findhunk
 
+let selected_alt_new_pos = ref None
+
 let get_basetime orgstat patchfile =
   if Sys.file_exists patchfile
   then (Unix.stat patchfile).Unix.st_mtime
@@ -61,6 +63,7 @@ let select_diff diffalgo project : difftype =
       else Gumtree file
     | "hybrid" ->
       selected_compute_new_pos := Hybrid.compute_new_pos;
+      selected_alt_new_pos := Some (Hybrid.alt_new_pos);
       Hybrid (project)
     | _ -> raise (UnsupportedDiff (proto ^ " is unsupported as a diff algorithm."))
 
@@ -221,7 +224,15 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
     ) outfiles
   )
 
-let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : Ast_diff.lineprediction * int * int =
+let alt_new_pos (diffs: Ast_diff.diffs) file ver pos : (bool * (Ast_diff.lineprediction * int * int)) option =
+  Debug.profile_code_silent "Diff.alt_new_pos"
+    (fun () ->
+      match !selected_alt_new_pos with
+	  None -> None
+	| Some alt_new_pos -> Some (alt_new_pos diffs file ver pos)
+    )
+
+let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.lineprediction * int * int) =
   Debug.profile_code_silent "Diff.compute_new_pos"
     (fun () ->
       !selected_compute_new_pos diffs file ver pos
