@@ -131,7 +131,7 @@ let gen_todo ch strict vlist prefix orgs correl bug =
     For remaining disappearing bugs, propose correlation with
     every available bug in next.
   *)
-  prerr_endline "gen_todo called";
+  if !Misc.debug then prerr_endline "gen_todo called";
   let next = find_all_next strict prefix vlist orgs correl bug in
   List.iter (fun nbug ->
 	       Printf.fprintf ch "* TODO %s\n %s\n"
