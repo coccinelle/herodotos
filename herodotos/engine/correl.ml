@@ -18,7 +18,7 @@ let fast_hash_bug prefix vlist (flist, tbl)=
 
 let may_have_changed strict prefix vlist bfl bug =
   let (_, s, _, file, ver, pos, _, t, _, next, _) = bug in
-  if next = {Ast_org.def = None} then prerr_endline "may_have_changed: no next computed";
+  if !Misc.debug && next = {Ast_org.def = None} then prerr_endline "may_have_changed: no next computed";
   next = {Ast_org.def = None}
   && List.exists
       (fun (_, _, _, file2, ver2, pos2, _, t2, head, _, _) ->
