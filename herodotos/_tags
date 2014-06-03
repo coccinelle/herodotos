@@ -1,4 +1,4 @@
-true: package(postgresql), package(str)
+true: package(postgresql), package(str), package(parmap)
 true: debug
 true: use_menhir
 <commons> or <exists> or <hcl> or <org> or <diff> or <scm> or <graph> or <html> or <database> or <engine>: include

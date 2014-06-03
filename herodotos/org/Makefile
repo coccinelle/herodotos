@@ -4,13 +4,17 @@ LEXER_SOURCES = org_lexer.mll
 PARSER_SOURCES = org_parser.mly
 SOURCES = org_helper.ml $(PARSER_SOURCES:.mly=.ml) $(LEXER_SOURCES:.mll=.ml) \
 	  org.ml bugs.ml orgfilter.ml
-INCLUDES = -I ../commons
+EXTLIBS=parmap
+INCLUDEDIRS= ../commons
 
 # Automatic computation
 -include ../Makefile.config
 
 GENERATED= $(LEXER_SOURCES:.mll=.ml) \
 	   $(PARSER_SOURCES:.mly=.ml) $(PARSER_SOURCES:.mly=.mli)
+OCAMLFIND=ocamlfind
+LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
+INCLUDES =$(INCLUDEDIRS:%=-I %) $(LIBDIR:%=-I %)
 OBJS = $(SOURCES:.ml=.cmo)
 LIB=$(TARGET).cma
 OPTOBJS = $(OBJS:.cmo=.cmx)

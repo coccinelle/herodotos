@@ -388,17 +388,21 @@ let format_orgs prefix depth orgs =
        filter_orgs flat_orgs_to_filter
     )
 
+let build_org_fct prefix depth resultsdir pdir orgfile vers =
+  let (vname,i,tm,i2) = vers in
+  let file = resultsdir ^ pdir ^ "/" ^ vname ^ "/" ^ orgfile in
+  (* if !Misc.debug then Printf.eprintf "Parsing Org file %s\n" file; *)
+  let orgs = parse_org false file in
+  List.fold_left (fun arrayelt org ->
+    flat_org_for_arrBis prefix depth arrayelt org
+  ) ([], Hashtbl.create 97) orgs
+
+let par_build_org_arr prefix depth resultsdir pdir orgfile vlist : Ast_org.orgarray =
+  let f = build_org_fct prefix depth resultsdir pdir orgfile in
+  Array.of_list (Parmap.parmap f (Parmap.A vlist))
 
 let build_org_arr prefix depth resultsdir pdir orgfile vlist : Ast_org.orgarray =
-  Array.map (fun vers ->
-    let (vname,i,tm,i2) = vers in
-    let file = resultsdir ^ pdir ^ "/" ^ vname ^ "/" ^ orgfile in
-    (* if !Misc.debug then Printf.eprintf "Parsing Org file %s\n" file; *)
-    let orgs = parse_org false file in
-    List.fold_left (fun arrayelt org ->
-      flat_org_for_arrBis prefix depth arrayelt org
-    ) ([], Hashtbl.create 97) orgs
-  ) vlist
+  Array.map (build_org_fct prefix depth resultsdir pdir orgfile) vlist
 
 let format_orgs_to_arr prefix depth vlist (orgs:Ast_org.orgs ) : Ast_org.orgarray =
    Debug.profile_code_silent "format_orgs_to_arr"
