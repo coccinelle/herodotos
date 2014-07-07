@@ -146,27 +146,33 @@ let dispatch_get_diff_job v cpucore prefix difffile (perr, pidlist) cmd =
 
 let gen_cmd_basic v prefix pair orgstat difffile =
   prerr_endline ("*** CHECK CACHE *** " ^ (get_difffile difffile));
-  List.fold_left (fun (outlist, cmdlist) file_pair ->
+  Parmap.parfold (fun file_pair (outlist, cmdlist) ->
     let (ofile, nfile) = file_pair in
     let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
-    if v then prerr_string ("Checking " ^outfile);
+    if v then prerr_string ("Checking ("^(string_of_int (Unix.getpid ()))^") " ^outfile);
     let patchstat = get_basetime orgstat outfile in
     if orgstat > patchstat then
       (if v then prerr_endline " - Keep";
-       (outfile::outlist,cmd::cmdlist))
+       (outfile::outlist,(outfile, cmd)::cmdlist))
     else
       (if v then prerr_endline " - Skip";
        (outfile::outlist,cmdlist))
-  ) ([],[]) pair
+  ) (Parmap.L pair)
+    ([],[])                                  (* Init. *)
+    (fun (x1,x2) (y1, y2) -> (x1@y1, x2@y2)) (* Merge *)
 
 let gen_cmd v prefix pair orgstat difffile =
   if is_hybrid difffile then
     let file = get_difffile difffile in
     let gnudiff = gen_cmd_basic v prefix pair orgstat (GNUDiff (file^ Global.patchext)) in
     let gumtree = gen_cmd_basic v prefix pair orgstat (Gumtree (file^ Global.gumtreeext)) in
-    (fst gnudiff @ fst gumtree, snd gnudiff @ snd gumtree)
+    let gumoutlist = fst gumtree in
+    let gumcmdlist = snd gumtree in
+    Hybrid.register_cmd gumcmdlist;
+    (fst gnudiff @ gumoutlist, snd (List.split (snd gnudiff))) (* We do not run gumtree cmd here !*)
   else
-    gen_cmd_basic v prefix pair orgstat difffile
+    let (one, two) = gen_cmd_basic v prefix pair orgstat difffile in
+    (one, snd (List.split two))
 
 let mkdir_cache_basic file =
   if not (Sys.file_exists file) then

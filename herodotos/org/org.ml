@@ -397,12 +397,10 @@ let build_org_fct prefix depth resultsdir pdir orgfile vers =
     flat_org_for_arrBis prefix depth arrayelt org
   ) ([], Hashtbl.create 97) orgs
 
-let par_build_org_arr prefix depth resultsdir pdir orgfile vlist : Ast_org.orgarray =
+let build_org_arr prefix depth resultsdir pdir orgfile vlist : Ast_org.orgarray =
   let f = build_org_fct prefix depth resultsdir pdir orgfile in
   Array.of_list (Parmap.parmap f (Parmap.A vlist))
-
-let build_org_arr prefix depth resultsdir pdir orgfile vlist : Ast_org.orgarray =
-  Array.map (build_org_fct prefix depth resultsdir pdir orgfile) vlist
+  (* Array.map f vlist *)
 
 let format_orgs_to_arr prefix depth vlist (orgs:Ast_org.orgs ) : Ast_org.orgarray =
    Debug.profile_code_silent "format_orgs_to_arr"

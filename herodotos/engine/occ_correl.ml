@@ -236,6 +236,10 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	       in fold lineb
     )
 
+(*
+Parmap.parmap ~ncores:nc' ~chunksize: cs' pixel (Parmap.L tasks)
+*)
+
 let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs =
   Debug.profile_code_silent "compute_bug_chain"
     (fun () ->
@@ -248,10 +252,21 @@ let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs 
 			List.fold_left
 			  (fun acc file ->
 			     let subbugs = Hashtbl.find tbl file in
+(*
+			     Parmap.parfold
+			       (fun bug acc ->
+				 acc + (compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug)
+			       )
+			       (Parmap.L subbugs)
+			       acc
+			       (+)
+*)
+(**)
 			       List.fold_left
 				 (fun acc bug ->
 				    acc + (compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug)
 				 ) acc subbugs
+(**)
 			  ) res flist
 		       )
 		     end

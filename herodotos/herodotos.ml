@@ -124,7 +124,9 @@ let main aligned =
       Some running_mode ->
 	begin
 	  match running_mode with
-	      Version -> print_endline ("Herodotos version "^ Global.version)
+	      Version ->
+		print_endline ("Herodotos version "^ Global.version);
+		print_endline ("CPU: " ^ (string_of_int (Parmap.get_default_ncores ())))
 	    | Help | Longhelp ->
 	      Arg.usage aligned usage_msg;
 	      

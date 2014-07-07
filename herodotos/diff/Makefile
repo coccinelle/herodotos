@@ -4,7 +4,7 @@ INTFS=ast_diff.mli diff_type.mli
 SOURCES =  gumtree.ml gnudiff.ml hybrid.ml diff.ml churn.ml
 INCLUDEDIRS = commons exists org hcl
 
-LIBNAMES= #xml-light
+LIBNAMES=parmap  #xml-light
 
 # Automatic computation
 -include ../Makefile.config
