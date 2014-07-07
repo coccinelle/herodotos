@@ -18,7 +18,7 @@ let make_path prefix ver file =
 let alt_new_pos (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.lineprediction * int * int) =
   let gumfile = make_path !gumtree ver file in
   if !Misc.debug then Printf.eprintf "GNU Diff correlation failed. Trying Gumtree with %s\n" gumfile;
-  if not Sys.file_exists then
+  if not (Sys.file_exists gumfile) then
     (try
        let cmd = List.assoc gumfile !gumtree_cmd in
        if !verbose then prerr_endline ("Looking for "^gumfile ^", will run "^cmd);
