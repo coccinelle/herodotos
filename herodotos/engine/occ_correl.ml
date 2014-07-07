@@ -161,12 +161,12 @@ let rec check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast
 		  | (Ast_diff.Cpl (lineb,linee),colb, cole) ->
 		    let rec fold line =
 		      let res = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
-		      if res = 0 then
-			if line < linee then
+		      if res = 0 then        (* Nothing at line 'line' *)
+			if line < linee then (* Check next lines until 'linee' *)
 			  fold (line+1)
 			else 0
-		      else 1
-		    in ignore(fold lineb);
+		      else 1                 (* Found something. Stop there. *)
+		    in ignore(fold lineb);   (* Start looking for next bug at line 'lineb' *)
 		    if n.Ast_org.def = Some (None) then
 		      manual_check_next verbose strict prefix correl subbugs bug
 		    else
