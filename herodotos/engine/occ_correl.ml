@@ -102,7 +102,40 @@ let manual_check_next verbose strict prefix correl subbugs bug =
     if verbose then prerr_endline "Manual correlation KO - KO\n=========";
     0 (* No automatic correlation performed *)
 
-let rec check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos =
+let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug subbugs =
+  let (l, s, r, f, v, p, face, t, h, n, _) = bug in
+  match Diff.alt_new_pos diffs f v p with
+      None -> manual_check_next verbose strict prefix correl subbugs bug
+    | Some (_, diffcheck_pos) ->
+      match diffcheck_pos with
+	  (Ast_diff.Sing line,colb,cole) ->
+	    ignore(check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole));
+	    if n.Ast_org.def = Some (None) then
+	      manual_check_next verbose strict prefix correl subbugs bug
+	    else
+	      1 (* Automatic correlation performed *)
+	| (Ast_diff.Deleted, colb,cole) ->
+	  n.Ast_org.def <- Some (None);
+	  1 (* Considered as an automatic correlation *)
+	| (Ast_diff.Unlink, _, _) -> (* File has been removed. *)
+	  if !Misc.debug then prerr_endline "Auto-correlation OK\n=========";
+	  n.Ast_org.def <- Some (None);
+	  1 (* Considered as an automatic correlation *)
+	| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
+	  let rec fold line =
+	    let res = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+	    if res = 0 then        (* Nothing at line 'line' *)
+	      if line < linee then (* Check next lines until 'linee' *)
+		fold (line+1)
+	      else 0
+	    else 1                 (* Found something. Stop there. *)
+	  in ignore(fold lineb);   (* Start looking for next bug at line 'lineb' *)
+	  if n.Ast_org.def = Some (None) then
+	    manual_check_next verbose strict prefix correl subbugs bug
+	  else
+	    1 (* Automatic correlation performed *)
+
+and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos =
   Debug.profile_code_silent "check_next"
     (fun () ->
       let (l, s, r, f, v, p, face, t, h, n, _) = bug in
@@ -140,38 +173,7 @@ let rec check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast
 	    1 (* Automatic correlation performed *)
 	  end
 	else
-	  begin
-	    match Diff.alt_new_pos diffs f v p with
-		None -> manual_check_next verbose strict prefix correl subbugs bug
-	      | Some (_, diffcheck_pos) ->
-		match diffcheck_pos with
-		    (Ast_diff.Sing line,colb,cole) ->
-		      ignore(check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole));
-		      if n.Ast_org.def = Some (None) then
-			manual_check_next verbose strict prefix correl subbugs bug
-		      else
-			1 (* Automatic correlation performed *)
-		  | (Ast_diff.Deleted, colb,cole) ->
-		    n.Ast_org.def <- Some (None);
-		    1 (* Considered as an automatic correlation *)
-		  | (Ast_diff.Unlink, _, _) -> (* File has been removed. *)
-		    if !Misc.debug then prerr_endline "Auto-correlation OK\n=========";
-		    n.Ast_org.def <- Some (None);
-		    1 (* Considered as an automatic correlation *)
-		  | (Ast_diff.Cpl (lineb,linee),colb, cole) ->
-		    let rec fold line =
-		      let res = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
-		      if res = 0 then        (* Nothing at line 'line' *)
-			if line < linee then (* Check next lines until 'linee' *)
-			  fold (line+1)
-			else 0
-		      else 1                 (* Found something. Stop there. *)
-		    in ignore(fold lineb);   (* Start looking for next bug at line 'lineb' *)
-		    if n.Ast_org.def = Some (None) then
-		      manual_check_next verbose strict prefix correl subbugs bug
-		    else
-		      1 (* Automatic correlation performed *)
-	  end
+	  check_alt_next verbose strict prefix depth vlist diffs correl bugs bug subbugs
     )
 
 let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
