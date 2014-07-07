@@ -243,37 +243,30 @@ Parmap.parmap ~ncores:nc' ~chunksize: cs' pixel (Parmap.L tasks)
 let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs =
   Debug.profile_code_silent "compute_bug_chain"
     (fun () ->
-       let bound = ((Array.length vlist) - 1) in
-	 snd (Array.fold_left
-		(fun (i, res) (flist, tbl) ->
-		   if i < bound then
-		     begin
-		       (i+1, 
-			List.fold_left
-			  (fun acc file ->
-			     let subbugs = Hashtbl.find tbl file in
-(*
-			     Parmap.parfold
-			       (fun bug acc ->
-				 acc + (compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug)
-			       )
-			       (Parmap.L subbugs)
-			       acc
-			       (+)
-*)
+      Array.fold_left
+	(fun res (flist, tbl) ->
+	  begin
+	    List.fold_left
+	      (fun acc file ->
+		let subbugs = Hashtbl.find tbl file in
+		(*
+		  Parmap.parfold
+		  (fun bug acc ->
+		  acc + (compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug)
+		  )
+		  (Parmap.L subbugs)
+		  acc
+		  (+)
+		*)
 (**)
-			       List.fold_left
-				 (fun acc bug ->
-				    acc + (compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug)
-				 ) acc subbugs
+		List.fold_left
+		  (fun acc bug ->
+		    acc + (compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug)
+		  ) acc subbugs
 (**)
-			  ) res flist
-		       )
-		     end
-		   else
-		     (i+1, res)
-		) (0, 0) bugs
-	     )
+	      ) res flist
+	  end
+	) 0 bugs
     )
 
 let find_all_org_in org orgs =
