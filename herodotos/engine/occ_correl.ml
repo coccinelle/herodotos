@@ -102,8 +102,10 @@ let manual_check_next verbose strict prefix correl subbugs bug =
     if verbose then prerr_endline "Manual correlation KO - KO\n=========";
     0 (* No automatic correlation performed *)
 
-let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug subbugs =
+let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug : int =
   let (l, s, r, f, v, p, face, t, h, n, _) = bug in
+  let vidx = Misc.get_idx_of_version vlist v in
+  let subbugs = get_next_list vlist bugs f vidx in
   match Diff.alt_new_pos diffs f v p with
       None -> manual_check_next verbose strict prefix correl subbugs bug
     | Some (_, diffcheck_pos) ->
@@ -123,7 +125,7 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug s
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
 	  let rec fold line =
-	    let res = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+	    let (res, _) = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
 	    if res = 0 then        (* Nothing at line 'line' *)
 	      if line < linee then (* Check next lines until 'linee' *)
 		fold (line+1)
@@ -135,7 +137,8 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug s
 	  else
 	    1 (* Automatic correlation performed *)
 
-and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos =
+and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos
+    : int * (string * ((Ast_org.bug -> int) * Ast_org.bug)) list =
   Debug.profile_code_silent "check_next"
     (fun () ->
       let (l, s, r, f, v, p, face, t, h, n, _) = bug in
@@ -161,7 +164,7 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	  begin
 	    n.Ast_org.def <- Some (Some next);
 	    update_nohead next;
-	    1 (* One automatic correlation performed *)
+	    (1, []) (* One automatic correlation performed *)
 	  end
 	else
 	  failwith "Already defined next !" (* No automatic correlation performed *)
@@ -170,10 +173,10 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	  begin
 	    if verbose then prerr_endline "Automatic correlation OK\n=========";
 	    n.Ast_org.def <- Some (None);
-	    1 (* Automatic correlation performed *)
+	    (1, []) (* Automatic correlation performed *)
 	  end
 	else
-	  check_alt_next verbose strict prefix depth vlist diffs correl bugs bug subbugs
+	  (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
     )
 
 let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
@@ -213,7 +216,7 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	       else
 		 begin
 		   n.Ast_org.def <- Some (None);
-		   1 (* Considered as an automatic correlation *)
+		   (1, []) (* Considered as an automatic correlation *)
 		 end
 	     | (Ast_diff.Unlink, _, _) ->
 	         (*
@@ -221,7 +224,7 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		 *)
 	       if !Misc.debug then prerr_endline "Auto-correlation OK\n=========";
 	       n.Ast_org.def <- Some (None);
-	       1 (* Considered as an automatic correlation *)
+	       (1, []) (* Considered as an automatic correlation *)
 	     | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
 		 (*
 		   Could we do something for bugs inside a hunk ?
@@ -229,13 +232,13 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		   Just check for manual correlation.
 		 *)
 	       let rec fold line =
-		 let res = check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+		 let (res, _) = check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole) in
 		 if res = 0 then
 		   if line < linee then
 		     fold (line+1)
 		   else 0
 		 else 1
-	       in fold lineb
+	       in (fold lineb, [])
     )
 
 (*
@@ -246,29 +249,21 @@ let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs 
   Debug.profile_code_silent "compute_bug_chain"
     (fun () ->
       Array.fold_left
-	(fun res (flist, tbl) ->
+	(fun acc (flist, tbl) ->
 	  begin
 	    List.fold_left
 	      (fun acc file ->
 		let subbugs = Hashtbl.find tbl file in
-		(*
-		  Parmap.parfold
-		  (fun bug acc ->
-		  acc + (compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug)
-		  )
-		  (Parmap.L subbugs)
-		  acc
-		  (+)
-		*)
 (**)
 		List.fold_left
-		  (fun acc bug ->
-		    acc + (compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug)
+		  (fun (res_acc, ks_acc) bug ->
+		    let (res, ks) = compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug in
+		    (res_acc + res, ks_acc @ ks)
 		  ) acc subbugs
 (**)
-	      ) res flist
+	      ) acc flist
 	  end
-	) 0 bugs
+	) (0, []) bugs
     )
 
 let find_all_org_in org orgs =
@@ -316,7 +311,33 @@ let compute_org verbose strict prefix depth vlist diffs correl (annots:Ast_org.o
     (int * int) * ((Ast_diff.path * Ast_org.bugs list) list) =
   Debug.profile_code_silent "compute_org"
     (fun () ->
-       let count = compute_bug_chain verbose strict prefix depth 0 vlist diffs correl orgs in
+      if verbose then prerr_endline ("*** CORRELATION - PHASE 1 ***");
+       let (initial_count, ks) = compute_bug_chain verbose strict prefix depth 0 vlist diffs correl orgs in
+       (* Update gumtree cache with missing files *)
+       let (cmds, ks2) = List.split ks in
+       let cleaned_cmds = List.filter (fun x -> x <> "") cmds in
+       if verbose then prerr_endline ("*** UPDATING GUMTREE CACHE ***");
+       Parmap.pariter
+	 (fun cmd ->
+	   if verbose then prerr_endline ("Run "^cmd);
+	   match
+	     Unix.system cmd
+	   with
+	       Unix.WEXITED 0 -> ()
+	     | Unix.WEXITED 1 -> ()
+	     | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
+	     | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
+	 )
+	 (Parmap.L cleaned_cmds);
+	(*	*)
+       if verbose then prerr_endline ("*** CORRELATION - PHASE 2 ***");
+       let count =
+	 List.fold_left
+	   (fun acc (f, bug) ->
+	     acc + f bug
+	   ) initial_count ks2
+       in
+	(*	*)
        let (new_bugs, correlorg) =
 	 List.split (
 	   List.map (fun file ->

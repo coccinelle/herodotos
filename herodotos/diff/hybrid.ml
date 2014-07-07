@@ -15,6 +15,18 @@ let parse_config v f =
 let make_path prefix ver file =
   prefix ^ Filename.dir_sep ^ ver ^ Filename.dir_sep ^ file
 
+let get_cmd gumfile =
+  if not (Sys.file_exists gumfile) then
+    try
+      List.assoc gumfile !gumtree_cmd
+    with Not_found -> ""
+  else
+    ""
+
+let get_cmd2 file ver =
+  let gumfile = make_path !gumtree ver file in
+  get_cmd gumfile
+
 let alt_new_pos (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.lineprediction * int * int) =
   let gumfile = make_path !gumtree ver file in
   if !Misc.debug then Printf.eprintf "GNU Diff correlation failed. Trying Gumtree with %s\n" gumfile;
