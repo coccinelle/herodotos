@@ -116,7 +116,7 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	      manual_check_next verbose strict prefix correl subbugs bug
 	    else
 	      1 (* Automatic correlation performed *)
-	| (Ast_diff.Deleted, colb,cole) ->
+	| (Ast_diff.Deleted _, colb,cole) ->
 	  n.Ast_org.def <- Some (None);
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Unlink, _, _) -> (* File has been removed. *)
@@ -206,7 +206,7 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	   match diffcheck_pos with
 	       (Ast_diff.Sing line,colb,cole) -> (* We are between two hunks. *)
 		 check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole)
-	     | (Ast_diff.Deleted, colb,cole) ->
+	     | (Ast_diff.Deleted cont, colb, cole) ->
 	       if not conf then
 	       (*
 		 We are inside a hunk and lines have been removed.
@@ -214,10 +214,14 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	       *)
 		 check_next verbose strict conf prefix depth vlist diffs correl bugs bug (0,colb,cole)
 	       else
-		 begin
-		   n.Ast_org.def <- Some (None);
-		   (1, []) (* Considered as an automatic correlation *)
-		 end
+		 if cont then
+		   (* Considered as uncorrelated. Continuation will check with the alternative algorithm. *)
+		   (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
+		 else
+		   begin
+		     n.Ast_org.def <- Some (None);
+		     (1, []) (* Considered as an automatic correlation *)
+		   end
 	     | (Ast_diff.Unlink, _, _) ->
 	         (*
 		   File has been removed.
@@ -315,8 +319,12 @@ let compute_org verbose strict prefix depth vlist diffs correl (annots:Ast_org.o
        let (initial_count, ks) = compute_bug_chain verbose strict prefix depth 0 vlist diffs correl orgs in
        (* Update gumtree cache with missing files *)
        let (cmds, ks2) = List.split ks in
-       let cleaned_cmds = List.filter (fun x -> x <> "") cmds in
-       if verbose then prerr_endline ("*** UPDATING GUMTREE CACHE ***");
+       let cleaned_cmds =
+	 List.fold_left
+	   (fun list x -> if not (List.mem x list) && x <> "" then x::list else list)
+	   [] cmds
+       in
+       if verbose then prerr_endline ("*** UPDATING GUMTREE CACHE *** "^ string_of_int (List.length cleaned_cmds) ^" item(s).");
        Parmap.pariter
 	 (fun cmd ->
 	   if verbose then prerr_endline ("Run "^cmd);
@@ -330,7 +338,7 @@ let compute_org verbose strict prefix depth vlist diffs correl (annots:Ast_org.o
 	 )
 	 (Parmap.L cleaned_cmds);
 	(*	*)
-       if verbose then prerr_endline ("*** CORRELATION - PHASE 2 ***");
+       if verbose then prerr_endline ("*** CORRELATION - PHASE 2 *** " ^ string_of_int (List.length ks2) ^ " item(s).");
        let count =
 	 List.fold_left
 	   (fun acc (f, bug) ->

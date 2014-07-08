@@ -52,6 +52,7 @@ let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.line
       let diffs = Gnudiff.parse_diff !verbose (!gnudiff^Filename.dir_sep) gnufile in
       let (_, new_pos) as gnures = Gnudiff.compute_new_pos_with_findhunk diffs file ver pos in
       match new_pos with
-	  (Ast_diff.Deleted, 0, 0) -> alt_new_pos diffs file ver pos
+	  (* This will force the execution of 'alt_new_pos diffs file ver pos' during the second phase. *)
+	  (Ast_diff.Deleted false, 0, 0) -> (true, (Ast_diff.Deleted true, 0, 0))
 	| _ -> gnures
     )

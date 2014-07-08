@@ -188,7 +188,7 @@ let compute_new_pos_with_hunks hunks line colb cole =
 	    We are IN the hunk.
 	  *)
     if asize = 0 then
-      (Ast_diff.Deleted, 0, 0)
+      (Ast_diff.Deleted false, 0, 0)
     else
 	    (*
 	      We are maybe in the set of replacing lines !?
