@@ -92,7 +92,7 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 	      else Org.emptyarray vlist
 	    in
 	    let strict = ((Config.get_correl_mode v1 patt) = Ast_config.Strict) in
-	    let ((count,new_bugs), orgs2) = Occ_correl.compute_org v3 strict prefix depth vlist diffs1 correl2 annots orgs1 in 
+	    let ((count,new_bugs), orgs2) = Occ_correl.compute_org v3 cpucore strict prefix depth vlist diffs1 correl2 annots orgs1 in 
 	    let todos = Correl.correlate v1 strict prefix vlist correlfile prefix correl2 orgs2 in
 	    let ccount =  List.length correl2 in
 	    let todostr =

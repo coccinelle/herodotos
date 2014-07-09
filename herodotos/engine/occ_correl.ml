@@ -311,23 +311,96 @@ let unique_file_list orgarray =
 	 Misc.unique_list file_list
     )
 
-let compute_org verbose strict prefix depth vlist diffs correl (annots:Ast_org.orgarray) (orgs:Ast_org.orgarray) :
+let run_pariter f cmd : int =
+  let pid = Unix.fork () in
+    if pid = 0 then (* I'm a slave *)
+      begin
+	let pid = Unix.getpid() in
+	if !Misc.debug then prerr_endline ("New child "^ string_of_int pid^ " for "^cmd);
+	let status = f cmd in
+	if !Misc.debug then prerr_endline ("Job done for child "^ string_of_int pid);
+	let msg = Debug.profile_diagnostic () in
+	if msg <> "" then prerr_endline msg;
+	exit status
+      end
+    else (* I'm the master *)
+      pid
+
+let dispatch_pariter cpucore f (perr, pidlist) cmd : int * int list =
+  let (error, newlist) =
+    if List.length pidlist > cpucore then
+      let (death, status) = Unix.wait () in
+      if !Misc.debug then
+	prerr_endline ("Master: Job done for child "^ string_of_int death);
+      let error = match status with
+	  Unix.WEXITED 0 -> perr
+	| _              -> perr + 1
+      in
+      (error, List.filter (fun x -> x <> death) pidlist)
+    else
+      (perr, pidlist)
+  in
+  let pid = run_pariter f cmd in
+  (error, pid::newlist)
+
+let pariter cpucore f cmds : unit =
+  Debug.profile_code_silent "pariter"
+    (fun () ->
+      let error =
+	if cpucore = 1 then
+	  (List.iter (fun x -> ignore (f x)) cmds;  0)
+	else
+	  let (err, pidlist) =
+	    List.fold_left
+	      (dispatch_pariter cpucore f)
+	      (0, [])
+	      cmds
+	  in
+	  let res = List.map (fun x ->
+	    let (death, status) = Unix.wait () in
+	    if !Misc.debug then
+	      prerr_endline ("Master: Job done for child "^ string_of_int death);
+	    match status with
+		Unix.WEXITED 0 -> 0
+	      | _ -> 1
+	  ) pidlist
+	  in
+	  List.fold_left (+) err res
+      in
+      if error <> 0 then
+	prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the cache update.")
+    )
+
+let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:Ast_org.orgarray) (orgs:Ast_org.orgarray) :
     (int * int) * ((Ast_diff.path * Ast_org.bugs list) list) =
   Debug.profile_code_silent "compute_org"
     (fun () ->
       if verbose then prerr_endline ("*** CORRELATION - PHASE 1 ***");
        let (initial_count, ks) = compute_bug_chain verbose strict prefix depth 0 vlist diffs correl orgs in
        (* Update gumtree cache with missing files *)
+       let re = Str.regexp_string "&&" in
        let (cmds, ks2) = List.split ks in
-       let cleaned_cmds =
+       let (dirs, cleaned_cmds) =
 	 List.fold_left
-	   (fun list x -> if not (List.mem x list) && x <> "" then x::list else list)
-	   [] cmds
+	   (fun (dir_list, cmd_list) x ->
+	     if x <> "" then
+	       let (dir, cmd) = match Str.split re x with
+		   dir::[cmd] -> (dir, cmd)
+		 | _ -> failwith ("Wrong command: x")
+	       in
+	       let dirs = if not (List.mem dir dir_list) then
+		   dir::dir_list else dir_list
+	       in
+	       let cmds = if not (List.mem cmd cmd_list) then
+		   cmd::cmd_list else cmd_list
+	       in (dirs, cmds)
+	     else
+	       (dir_list, cmd_list)
+	   )
+	   ([],[]) cmds
        in
        if verbose then prerr_endline ("*** UPDATING GUMTREE CACHE *** "^ string_of_int (List.length cleaned_cmds) ^" item(s).");
-       Parmap.pariter
-	 (fun cmd ->
-	   if verbose then prerr_endline ("Run "^cmd);
+       List.iter (fun cmd ->
 	   match
 	     Unix.system cmd
 	   with
@@ -335,8 +408,23 @@ let compute_org verbose strict prefix depth vlist diffs correl (annots:Ast_org.o
 	     | Unix.WEXITED 1 -> ()
 	     | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
 	     | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
-	 )
-	 (Parmap.L cleaned_cmds);
+       ) dirs;
+       pariter cpucore (fun cmd ->
+	 if verbose then prerr_endline ("Run "^cmd);
+	 let status =
+	   match
+	     Unix.system cmd
+	   with
+	       Unix.WEXITED 0 -> true
+	     | Unix.WEXITED 1 -> false
+	     | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd); false
+	     | _ -> prerr_endline ("*** FAILURE *** " ^cmd); false
+	 in
+	 if status then
+	   Unix.execv "/bin/true" (Array.of_list [])
+	 else
+	   Unix.execv "/bin/false" (Array.of_list [])
+       ) cleaned_cmds;
 	(*	*)
        if verbose then prerr_endline ("*** CORRELATION - PHASE 2 *** " ^ string_of_int (List.length ks2) ^ " item(s).");
        let count =

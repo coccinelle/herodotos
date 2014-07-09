@@ -195,16 +195,42 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
   let file = get_difffile difffile in
   let pair = Misc.unique_list (gen_diff prefix vlist orgs) in
   let (outfiles, cmds) = gen_cmd v prefix pair orgstat difffile in
+  let re = Str.regexp_string "&&" in
+  let (dirs, cleaned_cmds) =
+    List.fold_left
+      (fun (dir_list, cmd_list) x ->
+	let (dir, cmd) = match Str.split re x with
+	    dir::[cmd] -> (dir, cmd)
+	  | _ -> failwith ("Wrong command: x")
+	in
+	let dirs = if not (List.mem dir dir_list) then
+	    dir::dir_list else dir_list
+	in
+	let cmds = if not (List.mem cmd cmd_list) then
+	    cmd::cmd_list else cmd_list
+	in (dirs, cmds)
+      )
+      ([],[]) cmds
+  in
+  List.iter (fun cmd ->
+    match
+      Unix.system cmd
+    with
+	Unix.WEXITED 0 -> ()
+      | Unix.WEXITED 1 -> ()
+      | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
+      | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
+  ) dirs;
   let error =
     if cpucore = 1 then
-      let errs = List.map (get_diff_nofail v prefix difffile) cmds in
+      let errs = List.map (get_diff_nofail v prefix difffile) cleaned_cmds in
       List.fold_left (+) 0 errs
     else
       let (err, pidlist) =
 	List.fold_left
 	  (dispatch_get_diff_job v cpucore prefix difffile)
 	  (0, [])
-	  cmds
+	  cleaned_cmds
       in
       let res = List.map (fun x ->
 	let (death, status) = Unix.wait () in
