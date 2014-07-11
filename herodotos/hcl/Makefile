@@ -5,10 +5,20 @@ PARSER_SOURCES = config_parser.mly
 SOURCES = setup.ml compute_size_and_date.ml $(PARSER_SOURCES:.mly=.ml) $(LEXER_SOURCES:.mll=.ml) config.ml 
 #MENHIR_PATH=../menhirlib
 #INCLUDES = -I $(MENHIR_PATH) -I ../commons
-INCLUDES = -I ../commons
+TOPLIB = commons
+LIBNAMES=bolt
 
 # Automatic computation
+OCAMLFIND=ocamlfind
+
 -include ../Makefile.config
+
+LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+P4=bolt
+P4DIR=$(shell $(OCAMLFIND) query $(P4))
+P4FLAG=-pp 'camlp4o $(P4DIR)/bolt_pp.cmo'
+
+INCLUDES=$(LIBDIR:%=-I %) $(TOPLIB:%=-I ../%)
 
 OBJS = $(SOURCES:.ml=.cmo)
 OPTOBJS = $(OBJS:.cmo=.cmx)
@@ -22,11 +32,11 @@ MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 
 # The Caml compilers.
 OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
-OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
-OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES)
+OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES) $(P4FLAG)
+OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES) $(P4FLAG)
 OCAMLLEX = ocamllex$(OPTBIN)
 OCAMLYACC= menhir $(OCAMLYACCOPT) 
-OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
+OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES) $(P4FLAG)
 
 all: $(LIB)
 all.opt: $(OPTLIB)

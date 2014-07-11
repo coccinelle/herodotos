@@ -15,7 +15,7 @@ SOURCES = occ_correl.ml \
 INTFS =
 TOPLIB=commons hcl exists org diff graph html scm database
 
-LIBNAMES=postgresql parmap
+LIBNAMES=postgresql parmap bolt
 P4=bolt
 # Automatic computation
 OCAMLFIND=ocamlfind
