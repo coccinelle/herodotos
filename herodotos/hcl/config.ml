@@ -200,10 +200,10 @@ let show_attr attr : string =
     | Ast_config.NotExistColor (r,g,b) -> ("notexistcolor = "^Misc.string_of_rgb (r,g,b))
     | Ast_config.Version (_, vs) ->
       (try
-	 "version = {\n" ^
-	   let m = get_vers_min vs in
-	   String.concat "\n" (List.map (show_version m) vs)
-	   ^"\n}"
+	 LOG "version = {" LEVEL TRACE;
+	 let m = get_vers_min vs in
+	 List.iter (fun v -> LOG "%s" (show_version m v) LEVEL TRACE) vs;
+	 "}"
        with _ -> "No version set !"
       )
     | Ast_config.VMin (s) -> ("vmin = \""^s^"\"")
@@ -905,20 +905,20 @@ let show_curve atts curve =
 	 try
 	   let d_list = get_pattern false atts pattern catts in
 	     if d_list = [] then
-	       LOG "No need to compute data on bugs for this curve." LEVEL DEBUG
+	       LOG "No need to compute data on bugs for this curve." LEVEL TRACE
 	     else
 	       begin
 		 let p = get_project (catts@atts) project in
 		   List.iter (fun d ->
-		     LOG "Curve with p:%s and d:%s " p d LEVEL DEBUG
+		     LOG "Curve with p:%s and d:%s " p d LEVEL TRACE
 			     ) d_list;
 		   List.iter (fun d ->
 				let data = locate_data p d Global.origext in
-				LOG "Reading data from: %s" data LEVEL DEBUG
+				LOG "Reading data from: %s" data LEVEL TRACE
 			     ) d_list
 	       end;
 	     List.iter (fun x ->
-			  LOG "\t%s" (show_attr x) LEVEL DEBUG
+			  LOG "\t%s" (show_attr x) LEVEL TRACE
 		       )
 	       catts;
 	 with
@@ -927,17 +927,17 @@ let show_curve atts curve =
     )
 
 let show_global () =
-  LOG "Prefix = %s" !Setup.prefix LEVEL INFO;
-  LOG "Cocci files in %s" !Setup.smatchdir LEVEL INFO;
-  LOG "Project source code in %s" !Setup.projectsdir LEVEL INFO;
-  LOG "Analysis results in %s" !Setup.resultsdir LEVEL INFO;
-  LOG "FindCmd = \"%s\"" !Setup.findcmd LEVEL INFO;
-  LOG "Flags = \"%s\"" !Setup.spflags LEVEL INFO;
+  LOG "Prefix = %s" !Setup.prefix LEVEL DEBUG;
+  LOG "Cocci files in %s" !Setup.smatchdir LEVEL DEBUG;
+  LOG "Project source code in %s" !Setup.projectsdir LEVEL DEBUG;
+  LOG "Analysis results in %s" !Setup.resultsdir LEVEL DEBUG;
+  LOG "FindCmd = \"%s\"" !Setup.findcmd LEVEL DEBUG;
+  LOG "Flags = \"%s\"" !Setup.spflags LEVEL DEBUG;
   match !Setup.cpucore with
       None ->
-	LOG "CPU core = <undefined: assuming %d>" (Misc.get_number_of_cores ()) LEVEL INFO
+	LOG "CPU core = <undefined: assuming %d>" (Misc.get_number_of_cores ()) LEVEL DEBUG
     | Some cpucore ->
-	LOG "CPU core = %d" cpucore LEVEL INFO
+	LOG "CPU core = %d" cpucore LEVEL DEBUG
 
 let show_config () =
   Debug.profile_code "Config.show_config"
@@ -945,20 +945,20 @@ let show_config () =
        show_global ();
        Setup.PrjTbl.iter
 	 (fun name (_,atts) ->
-	   LOG "Project %s" name LEVEL INFO;
-	   List.iter (fun a -> LOG "%s" (show_attr a) LEVEL DEBUG) atts
+	   LOG "Project %s" name LEVEL DEBUG;
+	   List.iter (fun a -> LOG "%s" (show_attr a) LEVEL TRACE) atts
 	 )
 	 Setup.projects;
        Setup.DftTbl.iter
 	 (fun name atts ->
-	   LOG "Pattern %s" name LEVEL INFO;
-	   List.iter (fun a -> LOG "%s" (show_attr a) LEVEL DEBUG) atts
+	   LOG "Pattern %s" name LEVEL DEBUG;
+	   List.iter (fun a -> LOG "%s" (show_attr a) LEVEL TRACE) atts
 	 )
 	 Setup.smatchs;
        Setup.GphTbl.iter
 	 (fun name (atts, subgraph) ->
-	   LOG "Graph %s" name LEVEL INFO;
-	   List.iter (fun a -> LOG "%s" (show_attr a) LEVEL DEBUG) atts;
+	   LOG "Graph %s" name LEVEL DEBUG;
+	   List.iter (fun a -> LOG "%s" (show_attr a) LEVEL TRACE) atts;
 	   match subgraph with
 	       Ast_config.Curves curves ->
 		 List.iter (show_curve atts) curves
