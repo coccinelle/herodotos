@@ -7,25 +7,27 @@ SOURCES =
 SUBDIRS = commons exists hcl org diff scm graph html database engine
 MENHIR_PATH=../menhirLib
 DEPDIRS = $(MENHIR_PATH)
-EXTLIBS=postgresql parmap # xml-light
+EXTLIBS=postgresql parmap bolt # xml-light
+P4=bolt
 
 OCAMLFIND=ocamlfind
 
-OCAMLLIBS=str.cma unix.cma threads.cma bigarray.cma $(EXTLIBS:%=%.cma)
+OCAMLLIBS=str.cma unix.cma threads.cma bigarray.cma dynlink.cma $(EXTLIBS:%=%.cma)
 FLAG=
 
 # ocamlmktop -custom -thread  -o threadedocaml unix.cma threads.cma -cclib -lthreads
 # Automatic computation
 OCAMLFIND=ocamlfind
 
-LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
+P4DIR=$(shell $(OCAMLFIND) query $(P4))
+P4FLAG=-pp 'camlp4o $(P4DIR)/bolt_pp.cmo'
 DEPDIRS = $(MENHIR_PATH)
 INCLUDES=$(SUBDIRS:%=-I %) $(LIBDIR:%=-I %)
 
 OBJS = $(SOURCES:.ml=.cmo)
 ROOTLIB = $(TARGET).cmo
-LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
-FLAGS=$(LIBDIR:%=-I %) $(INCLUDES)
+FLAGS= $(INCLUDES) $(FLAG) $(P4FLAG)
 LIBS = $(SUBDIRS:%=%.cma)
 ALLLIBS = $(LIBS) $(ROOTLIB)
 
@@ -43,7 +45,7 @@ MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 
 # The Caml compilers.
 CFLAGS ?= -g -dtypes -thread $(FLAGS)
-OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
+OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES) $(P4FLAG)
 ifeq ("$(OPTBIN)",".opt")
 OCAMLC=$(OCAMLFIND) ocamlc -predicates native
 OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates native

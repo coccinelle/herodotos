@@ -3,8 +3,9 @@ TARGET = diff
 INTFS=ast_diff.mli diff_type.mli
 SOURCES =  gumtree.ml gnudiff.ml hybrid.ml diff.ml churn.ml
 INCLUDEDIRS = commons exists org hcl
+P4=bolt
 
-LIBNAMES=parmap  #xml-light
+LIBNAMES=parmap bolt #xml-light
 
 # Automatic computation
 -include ../Makefile.config
@@ -13,15 +14,17 @@ OCAMLFIND=ocamlfind
 OBJS = $(SOURCES:.ml=.cmo)
 OPTOBJS = $(OBJS:.cmo=.cmx)
 LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+P4DIR=$(shell $(OCAMLFIND) query $(P4))
 INCLUDES=$(LIBDIR:%=-I %) $(INCLUDEDIRS:%=-I ../%)
 LIB=$(TARGET).cma
 OPTLIB=$(LIB:.cma=.cmxa)
+P4FLAG=-pp 'camlp4o $(P4DIR)/bolt_pp.cmo'
 
 # The Caml compilers.
 OCAMLCFLAGS ?= -g -dtypes
-OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
-OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES)
-OCAMLDEP = ocamldep$(OPTBIN) #$(INCLUDES)
+OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES) $(P4FLAG)
+OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES) $(P4FLAG)
+OCAMLDEP = ocamldep$(OPTBIN) $(P4FLAG) #$(INCLUDES)
 
 all: $(LIB)
 all.opt: $(OPTLIB)

@@ -16,12 +16,15 @@ INTFS =
 TOPLIB=commons hcl exists org diff graph html scm database
 
 LIBNAMES=postgresql parmap
+P4=bolt
 # Automatic computation
 OCAMLFIND=ocamlfind
 
 -include ../Makefile.config
 
 LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+P4DIR=$(shell $(OCAMLFIND) query $(P4))
+P4FLAG=-pp 'camlp4o $(P4DIR)/bolt_pp.cmo'
 INCLUDES=$(LIBDIR:%=-I %) $(TOPLIB:%=-I ../%)
 
 OBJS = $(SOURCES:.ml=.cmo)
@@ -31,9 +34,9 @@ OPTLIB=$(LIB:.cma=.cmxa)
 
 # The Caml compilers.
 OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
-OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
-OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES)
-OCAMLDEP = ocamldep$(OPTBIN) #$(INCLUDES)
+OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES) $(P4FLAG)
+OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES) $(P4FLAG)
+OCAMLDEP = ocamldep$(OPTBIN) $(P4FLAG) #$(INCLUDES)
 
 all: $(LIB)
 all.opt: $(OPTLIB)
