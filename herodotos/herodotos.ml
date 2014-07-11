@@ -126,7 +126,7 @@ let main aligned =
 	  match running_mode with
 	      Version ->
 		print_endline ("Herodotos version "^ Global.version);
-		print_endline ("CPU: " ^ (string_of_int (Parmap.get_default_ncores ())))
+		LOG "CPU: %d" (Parmap.get_default_ncores ()) LEVEL DEBUG
 	    | Help | Longhelp ->
 	      Arg.usage aligned usage_msg;
 	      
@@ -236,6 +236,7 @@ let anon_fun = fun
       freearg := x
 
 let _ =
+  LOG "*** START ***" LEVEL TRACE;
   let aligned = Arg.align options in
     (try
       Arg.parse_argv Sys.argv aligned anon_fun usage_msg;
@@ -243,7 +244,8 @@ let _ =
       (prerr_string msg; exit 0));
     main aligned;
     if !Debug.profile <> Debug.PNONE then
-      prerr_endline (Debug.profile_diagnostic ())
+      prerr_endline (Debug.profile_diagnostic ());
+    LOG "*** END ***" LEVEL TRACE
 
 
 (* For ratio computation *)

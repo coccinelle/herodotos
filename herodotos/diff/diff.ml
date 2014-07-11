@@ -145,17 +145,16 @@ let dispatch_get_diff_job v cpucore prefix difffile (perr, pidlist) cmd =
     (error, pid::newlist)
 
 let gen_cmd_basic v prefix pair orgstat difffile =
-  prerr_endline ("*** CHECK CACHE *** " ^ (get_difffile difffile));
+  LOG "*** CHECK CACHE *** %s" (get_difffile difffile) LEVEL INFO;
   Parmap.parfold (fun file_pair (outlist, cmdlist) ->
     let (ofile, nfile) = file_pair in
     let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
-    if v then prerr_string ("Checking ("^(string_of_int (Unix.getpid ()))^") " ^outfile);
     let patchstat = get_basetime orgstat outfile in
     if orgstat > patchstat then
-      (if v then prerr_endline " - Keep";
+      (LOG "Checking (%d) %s - Keep" (Unix.getpid ()) outfile LEVEL TRACE;
        (outfile::outlist,(outfile, cmd)::cmdlist))
     else
-      (if v then prerr_endline " - Skip";
+      (LOG "Checking (%d) %s - Skip" (Unix.getpid ()) outfile LEVEL TRACE;
        (outfile::outlist,cmdlist))
   ) (Parmap.L pair)
     ([],[])                                  (* Init. *)
