@@ -48,8 +48,8 @@ let  print_cache out_channel prj_cache =
 
 let preinit v1 v2 v3 configfile =
   ignore(Config.parse_config configfile);
-  if v2 then prerr_endline "Config parsing OK!";
-  if v1 then Config.show_config v2 v3;
+  LOG "Config parsing OK!" LEVEL INFO;
+  Config.show_config ();
   let cache_file = ".projects_"^configfile in
   let cache =
     if Sys.file_exists cache_file then

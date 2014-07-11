@@ -744,17 +744,17 @@ let draw vb debug name grdft (atts, curves) allbugs =
     (fun () ->
        let (msg, xdft, ydft, fdft, xmax, ymax, scm, evolfunc) = grdft in
        let vers = Config.get_grversinfos atts curves in
-	 if debug then Array.iter (Config.show_versinfo) vers;
-	 let gname = !Setup.prefix ^"/"^ name in
-	 let grinfo = get_info debug name atts xdft ydft fdft in
-	 let evols = build_evolutions vb debug name grinfo scm atts curves allbugs evolfunc in
-	 let (_,_,mindate,_) = Array.get vers 0 in
-	 let xmin = Config.get_xmin debug name atts in
-	 let xmax = xmax vers evols in
-	 let ymax = ymax evols in
-	 let vmins = mark_vmin debug name atts curves in
-	 let outch = Misc.create_dir_and_open debug gname in
-	   prerr_endline ("Drawing "^gname);
+       Array.iter (fun v -> LOG "%s" (Config.show_versinfo v) LEVEL DEBUG) vers;
+       let gname = !Setup.prefix ^"/"^ name in
+       let grinfo = get_info debug name atts xdft ydft fdft in
+       let evols = build_evolutions vb debug name grinfo scm atts curves allbugs evolfunc in
+       let (_,_,mindate,_) = Array.get vers 0 in
+       let xmin = Config.get_xmin debug name atts in
+       let xmax = xmax vers evols in
+       let ymax = ymax evols in
+       let vmins = mark_vmin debug name atts curves in
+       let outch = Misc.create_dir_and_open debug gname in
+       prerr_endline ("Drawing "^gname);
 	   draw_header outch xmin xmax ymax grinfo vers;
 	   List.iter (draw_vmin outch ymax) vmins;
 	   mark_zero_once := false;

@@ -298,8 +298,8 @@ let compute_makefile () =
 
 let init_env v1 v2 v3 configfile cvs =
   ignore(Config.parse_config configfile);
-  if v2 then prerr_endline "Config parsing OK!";
-  if v1 then Config.show_config v2 v3;
+  LOG "Config parsing OK!" LEVEL INFO;
+  Config.show_config ();
   let (prjs, patts) = compute_makefile () in
   let err = check_setup v1 prjs patts in
   if err = [] then

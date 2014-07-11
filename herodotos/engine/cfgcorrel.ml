@@ -185,8 +185,8 @@ let dispatch_correl_job v1 v2 v3 cpucore diffalgo (perr, pidlist) file :int*int 
 
 let correl v1 v2 v3 configfile diffalgo filter =
   ignore(Config.parse_config configfile);
-  if v2 then prerr_endline "Config parsing OK!";
-  if v1 then Config.show_config v2 v3;
+  LOG "Config parsing OK!" LEVEL INFO;
+  Config.show_config ();
   let unorder_bugfiles = (Cfghelper.get_bugset_gen filter) in
   let size_of = List.map map_to_size unorder_bugfiles in   
   let order = List.sort (fun a b -> -(compare (fst a) (fst b))) size_of in

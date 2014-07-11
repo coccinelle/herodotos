@@ -158,9 +158,9 @@ let gen_graph_nofail v1 v2 pdf png web bugs name graph =
 let graph_gen v1 v2 v3 configfile pdf png web freearg =
   begin
     ignore(Config.parse_config configfile);
-    if v1 then prerr_endline "Config parsing OK!";
+    LOG "Config parsing OK!" LEVEL INFO;
     Config.fixcolor ();
-    if v1 then Config.show_config v2 v3;
+    Config.show_config ();
     let bugs = Cfghelper.compute_graphs v2 freearg in
       Cfghelper.genMakefile ();
       if web || png then Misc.create_dir v2 !Setup.websitedir;
