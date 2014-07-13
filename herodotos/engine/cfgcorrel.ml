@@ -38,7 +38,7 @@ let map_to_size bugfile_ext =
 let clean_file exist editfile =
   if Sys.file_exists editfile then
     begin
-      if exist then prerr_endline ("*** INFO *** "^editfile^" is thus removed.");
+      if exist then LOG "*** INFO *** %s is thus removed." editfile LEVEL INFO;
       Sys.remove editfile
     end
 
@@ -100,29 +100,29 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 	      then " *** "^correlfile^" ***"
 	      else ""
 	    in
-	    let msg = Printf.sprintf "%- 10s %- 16s\t% 5d / % 6d (% 5d TODO)%s" p patt ccount count todos todostr  in
 	    let bug_msg =
 	      if new_bugs = 0
 	      then ""
 	      else "" (* " "^string_of_int new_bugs^ " new REPORTS (potential BUGS)." *)
 	    in
-	      prerr_endline (msg^bug_msg); flush stderr;
+	    let msg = Printf.sprintf "%- 10s %- 16s\t% 5d / % 6d (% 5d TODO)%s%s" p patt ccount count todos todostr bug_msg in
+	      LOG "%s" msg LEVEL INFO;
 	      Org.show_correlation v3 correl2;
 	      Diff.show_diff v3 vlist diffs1;
 	      Org.show_org v2 prefix orgs2;
 	      if todos = 0 then
 		if not (Sys.file_exists bugfile_ext)
 		then (write_org bugfile_ext prefix orgs2; (*edition du .new.org *)
-		      prerr_endline ("*** NEW FILE TO EDIT *** "^bugfile_ext))  
+		      LOG "*** NEW FILE TO EDIT *** %s" bugfile_ext LEVEL INFO)  
 		else
 		  let exist = Sys.file_exists editfile in
 		  let cleanorgs = reparse_org editfile prefix depth vlist orgs2 in
 		    Org.sort annots;
  		    if not (cleanorgs = annots) then
-		      prerr_endline ("*** NEW FILE TO EDIT *** "^editfile)
+		      LOG "*** NEW FILE TO EDIT *** %s" editfile LEVEL INFO
 		    else
 		      begin
-			prerr_endline ("*** INFO *** "^bugfile_ext^" is up to date.");
+			LOG "*** INFO *** %s is up to date." bugfile_ext LEVEL INFO;
 			if not !Misc.debug
 			then clean_file exist editfile
 			else
@@ -130,7 +130,7 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 			    let ch = open_out editfile in
 			    let cleanlist = Org.list_of_bug_array annots in
 			      Org.print_bugs_raw ch prefix cleanlist;
-			      prerr_endline ("*** INFO *** "^editfile^" contains a sorted version.");
+			      LOG "*** INFO *** %s contains a sorted version." editfile LEVEL INFO;
 			  end
 		      end
 	      else
@@ -138,17 +138,17 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 		  write_org editfile prefix orgs2
 	  end
 	else
-	  prerr_endline ("*** NO CORREL *** "^ orgfile)
+	  LOG "*** NO CORREL *** %s" orgfile LEVEL INFO
     else
       if Config.get_format patt = Ast_config.Org then
-	prerr_endline ("*** SKIP (NOT FOUND) *** "^ orgfile)
+	LOG "*** SKIP (NOT FOUND) *** %s" orgfile LEVEL WARN
 
 let correl_patt_prj_nofail v1 v2 v3 cpucore diffalgo file =
   try
     correl_patt_prj v1 v2 v3 cpucore diffalgo file;
     0
   with Config.Warning msg ->
-    prerr_endline ("*** WARNING *** " ^ msg);
+    LOG "*** WARNING *** %s" msg LEVEL WARN;
     1
 
 let run_correl_job v1 v2 v3 cpucore diffalgo file =
@@ -156,11 +156,11 @@ let run_correl_job v1 v2 v3 cpucore diffalgo file =
     if pid = 0 then (* I'm a slave *)
       begin
 	let pid = Unix.getpid() in
-	  if !Misc.debug then prerr_endline ("New child "^ string_of_int pid^ " on "^file);
+	  LOG "New child %d on %s" pid file LEVEL TRACE;
 	  let ret = correl_patt_prj_nofail v1 v2 v3 cpucore diffalgo file in
-	    if !Misc.debug then prerr_endline ("Job done for child "^ string_of_int pid);
+	    LOG "Job done for child %d" pid LEVEL TRACE;
 	    let msg = Debug.profile_diagnostic () in
-	      if msg <> "" then prerr_endline msg;
+	      if msg <> "" then LOG msg LEVEL TRACE;
 	    exit ret
       end
     else (* I'm the master *)
@@ -170,8 +170,7 @@ let dispatch_correl_job v1 v2 v3 cpucore diffalgo (perr, pidlist) file :int*int 
   let (error, newlist) =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
-	if !Misc.debug then
-	  prerr_endline ("Master: Job done for child "^ string_of_int death);
+      LOG "Master: Job done for child %d" death LEVEL TRACE;
 	let error = match status with
 	    Unix.WEXITED 0 -> perr
 	  | _              -> perr + 1
@@ -190,7 +189,7 @@ let correl v1 v2 v3 configfile diffalgo filter =
   let unorder_bugfiles = (Cfghelper.get_bugset_gen filter) in
   let size_of = List.map map_to_size unorder_bugfiles in   
   let order = List.sort (fun a b -> -(compare (fst a) (fst b))) size_of in
-    if v1 then List.iter (fun (s, n) -> prerr_endline (string_of_int s^ " "^n)) order;
+  List.iter (fun (s, n) -> LOG "%d %s" s n LEVEL DEBUG) order;
   let bugfiles = snd (List.split order) in 
   let cpucore = Setup.getCPUcore () in
   let error =
@@ -201,17 +200,16 @@ let correl v1 v2 v3 configfile diffalgo filter =
       let (err, pidlist) = List.fold_left (dispatch_correl_job v1 v2 v3 cpucore diffalgo) (0, []) bugfiles in
       let res = List.map (fun x ->
 			    let (death, status) = Unix.wait () in
-			      if !Misc.debug then
-				prerr_endline ("Master: Job done for child "^ string_of_int death);
-			      match status with
-				  Unix.WEXITED 0 -> 0
-				| _ -> 1
-			 ) pidlist
+			    LOG "Master: Job done for child %d " death LEVEL TRACE;
+			    match status with
+				Unix.WEXITED 0 -> 0
+			      | _ -> 1
+      ) pidlist
       in
 	List.fold_left (+) err res
   in
     if error <> 0 then
-      prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the correlation.")
+      LOG ("*** ERROR *** %d error(s) during the correlation.") error LEVEL ERROR
 
 
 
