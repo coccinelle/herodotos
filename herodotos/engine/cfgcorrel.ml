@@ -155,14 +155,21 @@ let run_correl_job v1 v2 v3 cpucore diffalgo file =
   let pid = Unix.fork () in
     if pid = 0 then (* I'm a slave *)
       begin
-	let pid = Unix.getpid() in
-	  LOG "New child %d on %s" pid file LEVEL TRACE;
-	  let ret = correl_patt_prj_nofail v1 v2 v3 cpucore diffalgo file in
-	    LOG "Job done for child %d" pid LEVEL TRACE;
-	    let msg = Debug.profile_diagnostic () in
-	      if msg <> "" then
-		Debug.trace msg;
-	    exit ret
+	(if !Misc.debug then
+	    let pid = Unix.getpid() in
+	    LOG "New child %d on %s" pid file LEVEL TRACE
+	 else
+	    LOG "New child on %s" file LEVEL TRACE);
+	let ret = correl_patt_prj_nofail v1 v2 v3 cpucore diffalgo file in
+	(if !Misc.debug then
+	    LOG "Job done for child %d" pid LEVEL TRACE
+	 else
+	    LOG "Job done for child" LEVEL TRACE
+	);
+	let msg = Debug.profile_diagnostic () in
+	if msg <> "" then
+	  Debug.trace msg;
+	exit ret
       end
     else (* I'm the master *)
       pid
@@ -171,8 +178,12 @@ let dispatch_correl_job v1 v2 v3 cpucore diffalgo (perr, pidlist) file :int*int 
   let (error, newlist) =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
-      LOG "Master: Job done for child %d" death LEVEL TRACE;
-	let error = match status with
+      (if !Misc.debug then
+	  LOG "Master: Job done for child %d" death LEVEL TRACE
+       else
+	  LOG "Master: Job done for child" LEVEL TRACE
+      );
+      let error = match status with
 	    Unix.WEXITED 0 -> perr
 	  | _              -> perr + 1
 	in
@@ -200,11 +211,15 @@ let correl v1 v2 v3 configfile diffalgo filter =
     else
       let (err, pidlist) = List.fold_left (dispatch_correl_job v1 v2 v3 cpucore diffalgo) (0, []) bugfiles in
       let res = List.map (fun x ->
-			    let (death, status) = Unix.wait () in
-			    LOG "Master: Job done for child %d " death LEVEL TRACE;
-			    match status with
-				Unix.WEXITED 0 -> 0
-			      | _ -> 1
+	let (death, status) = Unix.wait () in
+	(if !Misc.debug then
+	    LOG "Master: Job done for child %d" death LEVEL TRACE
+	 else
+	    LOG "Master: Job done for child" LEVEL TRACE
+	);
+	match status with
+	    Unix.WEXITED 0 -> 0
+	  | _ -> 1
       ) pidlist
       in
 	List.fold_left (+) err res

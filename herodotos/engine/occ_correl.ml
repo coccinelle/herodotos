@@ -329,9 +329,17 @@ let run_pariter f cmd : int =
   let pid = Unix.fork () in
     if pid = 0 then (* I'm a slave *)
       begin
-	LOG "New child %d for %s" (Unix.getpid ()) cmd LEVEL TRACE;
+	(if !Misc.debug then
+	    LOG "New child %d for %s" (Unix.getpid ()) cmd LEVEL TRACE
+	 else
+	    LOG "New child for %s" cmd LEVEL TRACE
+	);
 	let status = f cmd in
-	LOG "Job done for child %d" (Unix.getpid ()) LEVEL TRACE;
+	(if !Misc.debug then
+	    LOG "Job done for child %d" (Unix.getpid ()) LEVEL TRACE
+	 else
+	    LOG "Job done for child" LEVEL TRACE
+	 );
 	let msg = Debug.profile_diagnostic () in
 	if msg <> "" then Debug.trace msg;
 	exit status
@@ -343,7 +351,11 @@ let dispatch_pariter cpucore f (perr, pidlist) cmd : int * int list =
   let (error, newlist) =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
-      LOG "Master: Job done for child %d" death LEVEL TRACE;
+      (if !Misc.debug then
+	  LOG "Master: Job done for child %d" death LEVEL TRACE
+       else
+	  LOG "Master: Job done for child" LEVEL TRACE
+      );
       let error = match status with
 	  Unix.WEXITED 0 -> perr
 	| _              -> perr + 1
@@ -370,7 +382,11 @@ let pariter cpucore f cmds : unit =
 	  in
 	  let res = List.map (fun x ->
 	    let (death, status) = Unix.wait () in
-	    LOG "Master: Job done for child %d" death LEVEL TRACE;
+	    (if !Misc.debug then
+		LOG "Master: Job done for child %d" death LEVEL TRACE
+	     else
+		LOG "Master: Job done for child" LEVEL TRACE
+	    );
 	    match status with
 		Unix.WEXITED 0 -> 0
 	      | _ -> 1
