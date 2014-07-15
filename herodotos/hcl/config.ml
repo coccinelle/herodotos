@@ -43,7 +43,7 @@ let parse_projects_versions versions_file =
      let ast = Config_parser.parse_versions Config_lexer.token lexbuf in
        close_in in_ch;
        ast
-  with _->prerr_string ("File "^versions_file^" does not exit, run make preinit.\n")   
+  with _-> LOG "File %s does not exit, run make preinit." versions_file LEVEL ERROR   
 
 let parse_config file : unit =
  parse_projects_versions (".projects_"^file);
@@ -419,7 +419,7 @@ let get_xmin db g atts =
 	Ast_config.XMin v -> v
       | _ -> raise Unrecoverable
   with _ ->
-    if db then prerr_endline ("XMin of "^g^" is not defined. Assuming 0.");
+    LOG "XMin of %s is not defined. Assuming 0." g LEVEL DEBUG;
     0.0
 
 let get_xtype g atts =
@@ -499,7 +499,7 @@ let get_correl_mode verbose pattern =
 		    ) atts
 	with
 	    Ast_config.Correl s ->
-	      if verbose then prerr_endline ("Pattern "^pattern^" has correlation mode: "^s);
+	      LOG "Pattern %s has correlation mode: %s" pattern s LEVEL TRACE;
 	      (match s with
 		   "strict"  -> Ast_config.Strict
 		 | "none"    -> Ast_config.Nocorrel
@@ -509,7 +509,7 @@ let get_correl_mode verbose pattern =
 	      )
 	  | _ -> raise Unrecoverable
       with _ ->
-	if verbose then prerr_endline ("Pattern "^pattern^" has no correlation mode set: default assumed");
+	LOG "Pattern %s has no correlation mode set: default assumed" pattern LEVEL TRACE;
 	Ast_config.Default
   with Not_found ->
     raise (Misconfiguration ("pattern '"^pattern^"' is not declared"))
@@ -1001,9 +1001,8 @@ let fixcolor_of_graph name (atts, subgraph) =
 		 (crv_wc +1, crv_woc, (r,v,b)::colors)
 	     with Misconfiguration msg
 	       | Misconfigurationat (msg, _) ->
-		   if !Misc.debug then
-		     prerr_endline (msg^" Automatically picking one...");
-		   (crv_wc, curve::crv_woc, colors)
+		 LOG "%s Automatically picking one..." msg LEVEL ERROR;
+		 (crv_wc, curve::crv_woc, colors)
 	  ) (0,[],[]) curves
 	in
 	let count = crv_wc + (List.length crv_woc) in
