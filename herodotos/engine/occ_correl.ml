@@ -8,13 +8,10 @@ let match_bug strict prefix bug1 bug2 =
       && (if strict then
 	    let new_t = Org.clean_link_text prefix v f pos t in
 	    let new_tb = Org.clean_link_text prefix v f pos tb in
-	      if !Misc.debug then
-		begin
-		  prerr_string ("MATCH_BUG: \""^ new_t^ "\"");
-		  prerr_endline (" <-> \""^ new_tb^ "\"");
-		  prerr_endline "Auto-correlation OK\n=========";
-		end;
-	      new_t = new_tb
+	    LOG "match_bug: \"%s\" <-> \"%s\"" new_t new_tb LEVEL TRACE;
+	    LOG "Automatic correlation OK" LEVEL TRACE;
+	    LOG "=========" LEVEL TRACE;
+	    new_t = new_tb
 	  else true)
 
 let rec get_chain (bug:Ast_org.bug) =
@@ -65,7 +62,7 @@ let update_nohead bug =
 let manual_check_next verbose strict prefix correl subbugs bug =
   let (l, s, r, f, v, p, face, t, h, n, _) = bug in
   let t = if strict then (Org.clean_link_text prefix v f p t) else "" in
-  if verbose then prerr_endline ("Trying manual correlation of "^f^" ver. "^v);
+  LOG "Trying manual correlation of %s ver. %s" f v LEVEL TRACE;
   try
     let correlb = List.find (fun b ->
       let (st, file, ver, pos, _, _, _, ctext) = b in
@@ -76,12 +73,9 @@ let manual_check_next verbose strict prefix correl subbugs bug =
 	    && (if strict
 	      then
 		let new_t = Org.clean_link_text prefix v f pos ctext in
-		if !Misc.debug then
-		  begin
-		    prerr_string ("\""^ new_t^ "\"");
-		    prerr_endline (" <-> \""^ t^ "\"");
-		    prerr_endline "Auto-correlation OK\n=========";
-		  end;
+		LOG "manual_check_next: \"%s\" <-> \"%s\"" new_t t LEVEL TRACE;
+		LOG "Automatic correlation OK" LEVEL TRACE;
+		LOG "=========" LEVEL TRACE;
 		new_t = t
 	      else true
 	    )
@@ -92,14 +86,17 @@ let manual_check_next verbose strict prefix correl subbugs bug =
        let next = get_bug strict prefix check subbugs in
        n.Ast_org.def <- Some (Some next);
        update_nohead next;
-       if verbose then prerr_endline "Manual correlation OK\n=========";
+       LOG "Manual correlation OK" LEVEL TRACE;
+       LOG "=========" LEVEL TRACE;
        0 (* No automatic correlation performed *)
      with Not_found ->
-       if verbose then prerr_endline "Manual correlation KO\n=========";
+       LOG "Manual correlation KO" LEVEL TRACE;
+       LOG "=========" LEVEL TRACE;
        0 (* No automatic correlation performed *)
     )
   with Not_found ->
-    if verbose then prerr_endline "Manual correlation KO - KO\n=========";
+    LOG "Manual correlation KO - KO" LEVEL TRACE;
+    LOG "=========" LEVEL TRACE;
     0 (* No automatic correlation performed *)
 
 let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug : int =
@@ -120,7 +117,8 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	  n.Ast_org.def <- Some (None);
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Unlink, _, _) -> (* File has been removed. *)
-	  if !Misc.debug then prerr_endline "Auto-correlation OK\n=========";
+	  LOG "Automatic correlation OK" LEVEL TRACE;
+	  LOG "=========" LEVEL TRACE;
 	  n.Ast_org.def <- Some (None);
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
@@ -389,7 +387,7 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
 	     | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR
        ) dirs;
        pariter cpucore (fun cmd ->
-	 if verbose then prerr_endline ("Run "^cmd);
+	 LOG "Run %s" cmd LEVEL TRACE;
 	 let status =
 	   match
 	     Unix.system cmd

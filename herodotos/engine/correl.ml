@@ -209,7 +209,7 @@ let correlate verbose strict prefix vlist correlfile prefix rev_correl orgs =
 		       (Org.make_orglinkbug true prefix bug)
 		       (Org.make_orglinkbug true prefix nbug)
 		     else
-		       prerr_endline "*** INFO *** Drop an old SAME entry of a now non-existing bug"
+		       LOG "*** INFO *** Drop an old SAME entry of a now non-existing bug" LEVEL INFO
 	      ) correl;
     Printf.fprintf ch "\n* org config\n#+SEQ_TODO: TODO | SAME UNRELATED\n";
     close_out ch;
