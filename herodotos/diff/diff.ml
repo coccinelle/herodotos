@@ -95,21 +95,21 @@ let gen_diff prefix vlist (orgarray: Ast_org.orgarray) : (string * string) list 
        ) [] orgarray
 
 let get_diff_job v prefix difffile cmd =
-  if v then prerr_endline ("Running: " ^cmd);
+  LOG "Running: %s" cmd LEVEL TRACE;
   match
     Unix.system cmd
   with
       Unix.WEXITED 0 -> ()
     | Unix.WEXITED 1 -> ()
-    | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
-    | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
+    | Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR
+    | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR
 
 let get_diff_nofail v prefix difffile cmd =
   try
     get_diff_job v prefix difffile cmd;
     0
   with Config.Warning msg ->
-    prerr_endline ("*** WARNING *** " ^ msg);
+    LOG "*** WARNING *** %s" msg LEVEL WARN;
     1
 
 let run_get_diff_job v prefix difffile cmd =
@@ -117,12 +117,12 @@ let run_get_diff_job v prefix difffile cmd =
     if pid = 0 then (* I'm a slave *)
       begin
 	let pid = Unix.getpid() in
-	  if !Misc.debug then prerr_endline ("New child "^ string_of_int pid^ " on "^cmd);
-	  let ret = get_diff_nofail v prefix difffile cmd in
-	    if !Misc.debug then prerr_endline ("Job done for child "^ string_of_int pid);
-	    let msg = Debug.profile_diagnostic () in
-	      if msg <> "" then prerr_endline msg;
-	    exit ret
+	LOG "New child %d for %s" (Unix.getpid ()) cmd LEVEL TRACE;
+	let ret = get_diff_nofail v prefix difffile cmd in
+	LOG "Job done for child %d" (Unix.getpid ()) LEVEL TRACE;
+	let msg = Debug.profile_diagnostic () in
+	if msg <> "" then Debug.trace msg;
+	exit ret
       end
     else (* I'm the master *)
       pid
@@ -131,13 +131,12 @@ let dispatch_get_diff_job v cpucore prefix difffile (perr, pidlist) cmd =
   let (error, newlist) =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
-	if !Misc.debug then
-	  prerr_endline ("Master: Job done for child "^ string_of_int death);
-	let error = match status with
-	    Unix.WEXITED 0 -> perr
-	  | _              -> perr + 1
-	in
-	(error, List.filter (fun x -> x <> death) pidlist)
+      LOG "Master: Job done for child %d" death LEVEL TRACE;
+      let error = match status with
+	  Unix.WEXITED 0 -> perr
+	| _              -> perr + 1
+      in
+      (error, List.filter (fun x -> x <> death) pidlist)
     else
       (perr, pidlist)
   in
@@ -176,7 +175,7 @@ let gen_cmd v prefix pair orgstat difffile =
 let mkdir_cache_basic file =
   if not (Sys.file_exists file) then
     (Unix.mkdir file 0o770;
-     prerr_endline ("*** CREATING DIRECTORY *** " ^file))
+     LOG "*** CREATING DIRECTORY *** %s" file LEVEL INFO)
 
 let mkdir_cache resultsdir pdir vlist orgfile difffile =
   let file = get_difffile difffile in
@@ -217,8 +216,8 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
     with
 	Unix.WEXITED 0 -> ()
       | Unix.WEXITED 1 -> ()
-      | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
-      | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
+      | Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR
+      | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR
   ) dirs;
   let error =
     if cpucore = 1 then
@@ -233,8 +232,7 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
       in
       let res = List.map (fun x ->
 	let (death, status) = Unix.wait () in
-	if !Misc.debug then
-	  prerr_endline ("Master: Job done for child "^ string_of_int death);
+	LOG "Master: Job done for child %d" death LEVEL TRACE;
 	match status with
 	    Unix.WEXITED 0 -> 0
 	  | _ -> 1
@@ -243,7 +241,7 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
       List.fold_left (+) err res
   in
   if error <> 0 then
-    prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the diff.");
+    LOG "*** ERROR *** %d error(s) during the diff." error LEVEL ERROR;
   List.flatten (
     List.map (fun x ->
       try
@@ -251,7 +249,7 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
 	    GNUDiff _ -> parse_diff v (file^Filename.dir_sep) (GNUDiff x)
 	  | Gumtree _ -> parse_diff v (file^Filename.dir_sep) (Gumtree x)
 	  | Hybrid _ -> Hybrid.parse_config v file; []
-      with e -> prerr_endline ("Error parsing "^ x); raise e
+      with e -> LOG "Error parsing %s" x LEVEL ERROR; raise e
     ) outfiles
   )
 
@@ -270,32 +268,18 @@ let compute_new_pos (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.line
     )
 
 let show_gnudiff hunks =
-  List.iter (fun ((bl,bsize),(al,asize)) ->
-    prerr_int bl;
-    prerr_string "(";
-    prerr_int bsize;
-    prerr_string ") -> ";
-    prerr_int al;
-    prerr_string "(";
-    prerr_int asize;
-    prerr_string "), "
-  ) hunks
+  String.concat ", "
+    (List.map (fun ((bl,bsize),(al,asize)) ->
+      Printf.sprintf "%d(%d) -> %d(%d)" bl bsize al asize
+     ) hunks
+    )
 
 let show_diff verbose vlist ast =
-  if verbose then
-    begin
-      prerr_endline "SHOW DIFF";
-      List.iter (fun ((ver, file), difftype) ->
-		   prerr_string file;
-		   prerr_string " from ";
-		   prerr_string ver;
-		   prerr_string " to ";
-		   prerr_string (Misc.get_next_version vlist ver);
-		   prerr_endline "";
-		   (match difftype with
-		       Ast_diff.GNUDiff hunks -> show_gnudiff hunks
-		     | Ast_diff.Gumtree root -> if !Misc.debug then Gumtree.show_gumtree true 0 root
-		     | Ast_diff.DeletedFile -> prerr_string "(deleted)");
-		   prerr_endline ""
-		) ast
-    end
+  LOG "SHOW DIFF" LEVEL TRACE;
+  List.iter (fun ((ver, file), difftype) ->
+    LOG "%s from %s to %s" file ver (Misc.get_next_version vlist ver) LEVEL TRACE;
+    match difftype with
+	Ast_diff.GNUDiff hunks -> LOG "%s" (show_gnudiff hunks) LEVEL TRACE
+      | Ast_diff.Gumtree root -> Gumtree.show_gumtree true 0 root
+      | Ast_diff.DeletedFile -> LOG "(deleted)" LEVEL TRACE;
+  ) ast

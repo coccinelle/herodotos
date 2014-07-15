@@ -103,18 +103,14 @@ let rec read_diff prefix file in_ch =
       *)
       else
 	begin
-	  prerr_endline
-	    ("Error: Desynchronized? no more diff found in "^file
-	     ^ " at line "^Int64.to_string !line);
-	  prerr_endline
-	    ("Expects a \"---\" line. Got \""^line_rm0^"\"");
-	  prerr_endline
-	    ("Looking for filename in \""^line_rm^"\"");
+	  LOG "Error: Desynchronized? no more diff found in %s at line %s" file (Int64.to_string !line) LEVEL ERROR;
+	  LOG "Expects a \"---\" line. Got \"%s\"" line_rm0 LEVEL ERROR;
+	  LOG "Looking for filename in \"%s\"" line_rm LEVEL ERROR;
 	  match lookfor_minusline in_ch with
 	      None ->
-		prerr_endline ("Unable to re-synchronize"); []
+		LOG "Unable to re-synchronize" LEVEL ERROR; []
 	    | Some l ->
-		prerr_endline ("Re-synchronize on "^l);
+		LOG "Re-synchronize on %s" l LEVEL INFO;
 		match lookfor_minusline in_ch with
 		    None   -> []
 		  | Some l ->
@@ -128,7 +124,7 @@ let parse_diff v prefix file : Ast_diff.diffs =
     let ver_file = Misc.strip_prefix prefix file in
     if Sys.file_exists file then
       begin
-	if !Misc.debug then Printf.eprintf "Parsing GNU Diff: %s\n" file;
+	LOG "Parsing GNU Diff: %s" file LEVEL TRACE;
 	let in_ch = open_in file in
 	try
 	  line := Int64.zero;
@@ -137,22 +133,22 @@ let parse_diff v prefix file : Ast_diff.diffs =
 	  [(ver_file, Ast_diff.GNUDiff ast)]
 	with
 	    Misc.Strip msg ->
-	      prerr_endline ("Strip: "^msg);
+	      LOG "Strip: %s" msg LEVEL ERROR;
 	      close_in in_ch;
 	      raise (Unexpected msg)
 	  | (Unexpected msg) ->
-	    prerr_endline ("Unexpected token: "^msg);
+	    LOG "Unexpected token: %s" msg LEVEL ERROR;
 	    close_in in_ch;
 	    raise (Unexpected msg)
 	  | End_of_file ->
-	    if !Misc.debug then prerr_endline ("*** DEBUG *** "^file^" is empty !");
+	    LOG "*** DEBUG *** %s is empty !" file LEVEL DEBUG;
 	    close_in in_ch;
 	  []
       end
     else
       [(ver_file, Ast_diff.DeletedFile)]
   with Sys_error msg ->
-    prerr_endline ("*** WARNING *** "^msg);
+    LOG "*** WARNING *** %s" msg LEVEL WARN;
     []
 
 let compute_new_pos_with_hunks hunks line colb cole =
