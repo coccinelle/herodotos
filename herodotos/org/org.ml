@@ -306,7 +306,7 @@ let get_string_new_pos diffcheck_pos =
 
 let show_bug verbose bug =
   let (_, _, _, _, ver, pos, _, _,_, _, _) = bug in
-  ver ^ (if verbose then get_string_pos pos else "")
+  ver ^ get_string_pos pos
 
 let flat_link prefix depth link =
   let (p, ops, t) = link in
@@ -425,7 +425,7 @@ let count = ref 0
 let show_buglist verbose bugs =
   count := 0;
   List.iter (fun bug ->
-    LOG "#%d %s" !count (show_bug verbose bug) LEVEL TRACE;
+    LOG "#%03d %s" !count (show_bug verbose bug) LEVEL TRACE;
     count := !count + 1;
   ) bugs
 
@@ -439,7 +439,8 @@ let show_org verbose prefix (orgs: (string*Ast_org.bugs  list) list) =
       let vers = String.concat " -> "
 	(List.map (show_bug verbose) bugs)
       in
-      LOG "#%d in vers. %s" !count vers LEVEL TRACE
+      LOG "#%03d in vers. %s" !count vers LEVEL TRACE;
+      count := !count + 1
     ) bugslist;
     LOG "" LEVEL TRACE
   ) orgs
