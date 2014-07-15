@@ -4,17 +4,21 @@ LEXER_SOURCES = org_lexer.mll
 PARSER_SOURCES = org_parser.mly
 SOURCES = org_helper.ml $(PARSER_SOURCES:.mly=.ml) $(LEXER_SOURCES:.mll=.ml) \
 	  org.ml bugs.ml orgfilter.ml
-EXTLIBS=parmap
-INCLUDEDIRS= ../commons
+EXTLIBS=parmap bolt
+P4=bolt
+TOPLIB=commons diff
 
 # Automatic computation
+OCAMLFIND=ocamlfind
+
 -include ../Makefile.config
 
 GENERATED= $(LEXER_SOURCES:.mll=.ml) \
 	   $(PARSER_SOURCES:.mly=.ml) $(PARSER_SOURCES:.mly=.mli)
-OCAMLFIND=ocamlfind
 LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
-INCLUDES =$(INCLUDEDIRS:%=-I %) $(LIBDIR:%=-I %)
+P4DIR=$(shell $(OCAMLFIND) query $(P4))
+P4FLAG=-pp 'camlp4o $(P4DIR)/bolt_pp.cmo'
+INCLUDES =$(TOPLIB:%=-I ../%) $(LIBDIR:%=-I %)
 OBJS = $(SOURCES:.ml=.cmo)
 LIB=$(TARGET).cma
 OPTOBJS = $(OBJS:.cmo=.cmx)
@@ -25,11 +29,11 @@ MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 
 # The Caml compilers.
 OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
-OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
-OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES)
+OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES) $(P4FLAG)
+OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES) $(P4FLAG)
 OCAMLLEX = ocamllex$(OPTBIN)
 OCAMLYACC= menhir $(OCAMLYACCOPT)
-OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
+OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES) $(P4FLAG)
 
 all: $(LIB)
 all.opt: $(OPTLIB)

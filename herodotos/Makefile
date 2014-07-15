@@ -55,7 +55,7 @@ OCAMLOPT=$(OCAMLFIND) ocamlopt
 endif
 
 .PHONY:: all all.opt clean distclean debclean $(DEP)
-.PHONY:: depend install sudo_install deploy
+.PHONY:: .depend depend install sudo_install deploy
 .PHONY:: test debian debians
 
 all: init bytecode
@@ -63,7 +63,7 @@ opt: all.opt
 all.opt: init native-noopt
 world: init bytecode native
 
-init: check-config depend scripts/Makefile.inc
+init: check-config .depend scripts/Makefile.inc
 bytecode: $(EXEC)
 native: $(EXEC).opt
 native-noopt: native
@@ -193,9 +193,10 @@ distclean: localclean
 debclean:
 	rm -rf build-stamp install-stamp my-very-own-patch-stamp
 
-depend:
+depend: .depend
+.depend:
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
-	$(OCAMLDEP) *.mli *.ml > .depend
+	$(OCAMLDEP) *.mli *.ml > $@
 
 -include .depend
 
