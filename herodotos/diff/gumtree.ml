@@ -125,5 +125,8 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : bool * (
 	      end
 	  | Ast_diff.DeletedFile -> (true, (Ast_diff.Unlink, 0, 0))
 	  | _ -> raise (Unexpected "Wrong diff type")
-      with Not_found -> (false, (Ast_diff.Sing line, colb, cole))
+      with Not_found ->
+	let msg = "No gumtree diff for "^ file ^ " in vers. " ^ ver in
+	LOG msg LEVEL FATAL;
+	raise (Unexpected msg)
     )

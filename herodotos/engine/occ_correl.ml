@@ -9,8 +9,6 @@ let match_bug strict prefix bug1 bug2 =
 	    let new_t = Org.clean_link_text prefix v f pos t in
 	    let new_tb = Org.clean_link_text prefix v f pos tb in
 	    LOG "match_bug: \"%s\" <-> \"%s\"" new_t new_tb LEVEL TRACE;
-	    LOG "Automatic correlation OK" LEVEL TRACE;
-	    LOG "=========" LEVEL TRACE;
 	    new_t = new_tb
 	  else true)
 
@@ -109,11 +107,13 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
       match diffcheck_pos with
 	  (Ast_diff.Sing line,colb,cole) ->
 	    ignore(check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole));
-	    if n.Ast_org.def = Some (None) then
+	    if n.Ast_org.def = None then
 	      manual_check_next verbose strict prefix correl subbugs bug
 	    else
 	      1 (* Automatic correlation performed *)
 	| (Ast_diff.Deleted _, colb,cole) ->
+	  LOG "Automatic correlation OK" LEVEL TRACE;
+	  LOG "=========" LEVEL TRACE;
 	  n.Ast_org.def <- Some (None);
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Unlink, _, _) -> (* File has been removed. *)
@@ -123,14 +123,17 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
 	  let rec fold line =
-	    let (res, _) = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+	    let (res, ks) = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
 	    if res = 0 then        (* Nothing at line 'line' *)
 	      if line < linee then (* Check next lines until 'linee' *)
 		fold (line+1)
-	      else 0
-	    else 1                 (* Found something. Stop there. *)
-	  in ignore(fold lineb);   (* Start looking for next bug at line 'lineb' *)
-	  if n.Ast_org.def = Some (None) then
+	      else (0, ks)
+	    else (1, [])           (* Found something. Stop there. *)
+	  in
+	  let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
+	  if ks <> [] then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
+	  if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
+	  if n.Ast_org.def = None || n.Ast_org.def = Some (None) then
 	    manual_check_next verbose strict prefix correl subbugs bug
 	  else
 	    1 (* Automatic correlation performed *)
@@ -162,6 +165,8 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	  let next = get_bug strict prefix check subbugs in
 	  if (n.Ast_org.def = None) then
 	    begin
+	      LOG "Automatic correlation OK" LEVEL TRACE;
+	      LOG "=========" LEVEL TRACE;
 	      n.Ast_org.def <- Some (Some next);
 	      update_nohead next;
 	      (1, []) (* One automatic correlation performed *)
@@ -177,7 +182,11 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	      (1, []) (* Automatic correlation performed *)
 	    end
 	  else
-	    (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
+	    begin
+	      LOG "Will try with an alternative method..." LEVEL TRACE;
+	      LOG "=========" LEVEL TRACE;
+	      (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
+	    end
     )
 
 let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
@@ -218,6 +227,8 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		 (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
 	       else
 		 begin
+		   LOG "Automatic correlation OK" LEVEL TRACE;
+		   LOG "=========" LEVEL TRACE;
 		   n.Ast_org.def <- Some (None);
 		   (1, []) (* Considered as an automatic correlation *)
 		 end
@@ -236,13 +247,13 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		 Just check for manual correlation.
 	       *)
 	     let rec fold line =
-	       let (res, _) = check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+	       let (res, ks) = check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole) in
 	       if res = 0 then
 		 if line < linee then
 		   fold (line+1)
-		 else 0
-	       else 1
-	     in (fold lineb, [])
+		 else (0, ks)
+	       else (1, [])
+	     in fold lineb
     )
 
 let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs =
