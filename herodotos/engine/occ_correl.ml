@@ -51,9 +51,9 @@ let get_bug strict prefix (bug: Ast_org.bug) (bugs: Ast_org.bug list) : Ast_org.
 
 let get_next_list vlist bugs f vidx =
   let (_, tbl) = Array.get bugs (vidx+1) in
-    try
-      Hashtbl.find tbl f
-    with Not_found -> []
+  try
+    Hashtbl.find tbl f
+  with Not_found -> []
 
 let update_nohead bug =
   let (l, s, r, f, v, p, face, t, h, n, subs) = bug in
@@ -150,26 +150,34 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
       LOG "List:" LEVEL TRACE;
       List.iter (fun bug -> LOG "%s" (Org.show_bug true bug) LEVEL TRACE) subbugs;
       LOG "" LEVEL TRACE;
-      try
-	let next = get_bug strict prefix check subbugs in
-	if (n.Ast_org.def = None) then
-	  begin
-	    n.Ast_org.def <- Some (Some next);
-	    update_nohead next;
-	    (1, []) (* One automatic correlation performed *)
-	  end
-	else
-	  failwith "Already defined next !" (* No automatic correlation performed *)
-      with Not_found ->
-	if conf then
-	  begin
-	    LOG "Automatic correlation OK" LEVEL TRACE;
-	    LOG "=========" LEVEL TRACE;
-	    n.Ast_org.def <- Some (None);
-	    (1, []) (* Automatic correlation performed *)
-	  end
-	else
-	  (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
+      if subbugs = [] then
+	begin
+	  LOG "Automatic correlation OK" LEVEL TRACE;
+	  LOG "=========" LEVEL TRACE;
+	  n.Ast_org.def <- Some (None);
+	  (1, []) (* Automatic correlation performed *)
+	end
+      else
+	try
+	  let next = get_bug strict prefix check subbugs in
+	  if (n.Ast_org.def = None) then
+	    begin
+	      n.Ast_org.def <- Some (Some next);
+	      update_nohead next;
+	      (1, []) (* One automatic correlation performed *)
+	    end
+	  else
+	    failwith "Already defined next !" (* No automatic correlation performed *)
+	with Not_found ->
+	  if conf then
+	    begin
+	      LOG "Automatic correlation OK" LEVEL TRACE;
+	      LOG "=========" LEVEL TRACE;
+	      n.Ast_org.def <- Some (None);
+	      (1, []) (* Automatic correlation performed *)
+	    end
+	  else
+	    (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
     )
 
 let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
@@ -177,77 +185,92 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
     (fun () ->
        let (l, s, r, f, v, p, face, t, h, n, _) = bug in
        LOG "%s" (Org.show_bug true bug) LEVEL TRACE;
-       let (conf, diffcheck_pos) = Diff.compute_new_pos diffs f v p in
-       LOG "%s as new pos: %s"
-	 (Org.get_string_pos p)
-	 (Org.get_string_new_pos diffcheck_pos)
-	 LEVEL TRACE;
-       match diffcheck_pos with
-	   (Ast_diff.Sing line,colb,cole) -> (* We are between two hunks. *)
-	     check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole)
-	 | (Ast_diff.Deleted cont, colb, cole) ->
-	   if not conf then
-		 (*
-		   We are inside a hunk and lines have been removed.
-		   Check for manual correlation.
-		 *)
-	     check_next verbose strict conf prefix depth vlist diffs correl bugs bug (0,colb,cole)
-	   else
-	     if cont then
-		   (* Considered as uncorrelated. Continuation will check with the alternative algorithm. *)
-	       (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
-	     else
-	       begin
-		 n.Ast_org.def <- Some (None);
-		 (1, []) (* Considered as an automatic correlation *)
-	       end
-	 | (Ast_diff.Unlink, _, _) ->
-	       (*
-		 File has been removed.
-	       *)
-	   LOG "Automatic correlation OK" LEVEL TRACE;
+       (* Short path when there is no bug in next version *)
+       let vidx = Misc.get_idx_of_version vlist v in
+       let subbugs = get_next_list vlist bugs f vidx in
+       if subbugs = [] then
+	 begin
+	   LOG "No bug in version %s of %s. Skip." (Misc.get_next_version vlist v) f LEVEL TRACE;
 	   LOG "=========" LEVEL TRACE;
 	   n.Ast_org.def <- Some (None);
 	   (1, []) (* Considered as an automatic correlation *)
-	 | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
+	 end
+       else
+	 (* Normal path *)
+	 let (conf, diffcheck_pos) = Diff.compute_new_pos diffs f v p in
+	 LOG "%s as new pos: %s"
+	   (Org.get_string_pos p)
+	   (Org.get_string_new_pos diffcheck_pos)
+	   LEVEL TRACE;
+	 match diffcheck_pos with
+	     (Ast_diff.Sing line,colb,cole) -> (* We are between two hunks. *)
+	       check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole)
+	   | (Ast_diff.Deleted cont, colb, cole) ->
+	     if not conf then
+	     (*
+	       We are inside a hunk and lines have been removed.
+	       Check for manual correlation.
+	     *)
+	       check_next verbose strict conf prefix depth vlist diffs correl bugs bug (0,colb,cole)
+	     else
+	       if cont then
+	       (* Considered as uncorrelated. Continuation will check with the alternative algorithm. *)
+		 (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
+	       else
+		 begin
+		   n.Ast_org.def <- Some (None);
+		   (1, []) (* Considered as an automatic correlation *)
+		 end
+	   | (Ast_diff.Unlink, _, _) ->
+	   (*
+	     File has been removed.
+	   *)
+	     LOG "Automatic correlation OK" LEVEL TRACE;
+	     LOG "=========" LEVEL TRACE;
+	     n.Ast_org.def <- Some (None);
+	     (1, []) (* Considered as an automatic correlation *)
+	   | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
 	       (*
 		 Could we do something for bugs inside a hunk ?
-		   It seems to be impossible and worthless.
-		   Just check for manual correlation.
-		 *)
-	       let rec fold line =
-		 let (res, _) = check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole) in
-		 if res = 0 then
-		   if line < linee then
-		     fold (line+1)
-		   else 0
-		 else 1
-	       in (fold lineb, [])
+		 It seems to be impossible and worthless.
+		 Just check for manual correlation.
+	       *)
+	     let rec fold line =
+	       let (res, _) = check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+	       if res = 0 then
+		 if line < linee then
+		   fold (line+1)
+		 else 0
+	       else 1
+	     in (fold lineb, [])
     )
-
-(*
-Parmap.parmap ~ncores:nc' ~chunksize: cs' pixel (Parmap.L tasks)
-*)
 
 let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs =
   Debug.profile_code_silent "compute_bug_chain"
     (fun () ->
-      Array.fold_left
-	(fun acc (flist, tbl) ->
-	  begin
-	    List.fold_left
-	      (fun acc file ->
-		let subbugs = Hashtbl.find tbl file in
-(**)
-		List.fold_left
-		  (fun (res_acc, ks_acc) bug ->
-		    let (res, ks) = compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug in
-		    (res_acc + res, ks_acc @ ks)
-		  ) acc subbugs
-(**)
-	      ) acc flist
-	  end
-	) (0, []) bugs
+      let bound = ((Array.length vlist) - 1) in
+      snd (
+	Array.fold_left
+	  (fun (i, acc) (flist, tbl) ->
+	    if i < bound then (* Skip last version - there is **no next bug** to match against ! *)
+	      (i+1,
+	       begin
+		 List.fold_left
+		   (fun acc file ->
+		     let subbugs = Hashtbl.find tbl file in
+		     (**)
+		     List.fold_left
+		       (fun (res_acc, ks_acc) bug ->
+			 let (res, ks) = compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug in
+			 (res_acc + res, ks_acc @ ks)
+		       ) acc subbugs
+		   (**)
+		   ) acc flist
+	       end
+	      )
+	    else (i+1, acc)
+	  ) (0, (0, [])) bugs
+      )
     )
 
 let find_all_org_in org orgs =
