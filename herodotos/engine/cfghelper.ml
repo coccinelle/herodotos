@@ -185,19 +185,19 @@ let retrieve_exists verbose prjname mode bugsetfile vlist filelist =
       then
 	try
 	  let ret = Some (Exists.parse_exist existfile) in
-	    if verbose then prerr_endline ("Cache file "^ existfile^" was used.");
-	    ret
+	  LOG "Cache file %s was used." existfile LEVEL DEBUG;
+	  ret
 	with
 	    Sys_error msg -> prerr_endline msg; None
 	  | Exists.BadFormat -> None
     else
-      (if verbose then prerr_endline ("Cache file "^ existfile^" is obsolete or does not exist.");
+      (LOG "Cache file %s is obsolete or does not exist." existfile LEVEL DEBUG;
        None)
   in
     match fromfile with
 	Some ast -> ast
       | None ->
-	  prerr_endline ("*** INFO *** Compute "^existfile^" from repository "^ !Setup.projectsdir ^ prjdir ^".");
+	  LOG "*** INFO *** Compute %s from repository %s." existfile (!Setup.projectsdir ^ prjdir) LEVEL INFO;
 	  let ast = Exists.analyze_rep project vlist filelist in
 	    Exists.print_to existfile ast;
 	    ast
@@ -241,10 +241,9 @@ let compute_pbugs verbose prjname allbugs =
 		       process_csv verbose prjname bsf varray
 	      ) bugs
 	   )
-  with Config.Warning msg
-    | Error msg ->
-	prerr_endline msg;
-	None
+  with
+      Config.Warning msg -> LOG msg LEVEL WARN; None
+    | Error msg -> LOG msg LEVEL ERROR; None
 
 let compute_bugs verbose bugfile =
   try
@@ -269,7 +268,7 @@ let compute_bugs verbose bugfile =
       else
 	if Sys.file_exists bugfile && format = Ast_config.Org
 	then
-	  (if verbose then prerr_endline ("Analyzing "^bugfile  ^ " in project " ^ p ^ " with subproject depth "^string_of_int depth ^ ".");
+	  (LOG "Analyzing %s in project %s with subproject depth %d." bugfile p depth LEVEL TRACE;
 	   let orgbugs = Org.parse_org false bugfile in
 	   let bugs = Org2bug.convert prefix depth orgbugs in
 	     bugs
@@ -285,7 +284,7 @@ let compute_bugs verbose bugfile =
 		  List.map (Correl.fast_bug prefix vlist) orgs
 	      end
 	    else
-	      (prerr_endline ("*** ERROR *** No file " ^bugfile);
+	      (LOG "*** ERROR *** No file %s" bugfile LEVEL ERROR;
 	       []
 	      )
 	  end
@@ -303,10 +302,10 @@ let compute_bugs verbose bugfile =
 		 (count, report::acc)
 	  ) (0, []) bugs
 	in
-	  if count <> 0 then
-	    prerr_endline ("*** WARNING *** Dropping "^string_of_int count^" bug report(s) of "^bugfile^" (No interesting version) !");
-	  let bfl = Bugs.sort unsortedbfl in
-	    Some (p, ((format, mode, bugfile), bfl))
+	if count <> 0 then
+	  LOG "*** WARNING *** Dropping %d bug report(s) of %s (No interesting version) !" count bugfile LEVEL WARN;
+	let bfl = Bugs.sort unsortedbfl in
+	Some (p, ((format, mode, bugfile), bfl))
 
 (*
 with
@@ -319,36 +318,33 @@ with
 	)
 *)
   with Config.Warning msg ->
-    prerr_endline ("*** WARNING *** " ^ msg);
+    LOG "*** WARNING *** %s" msg LEVEL WARN;
     None
 
 let compute_graphs verbose graph =
   Debug.profile_code "Cfghelper.compute_graphs"
     (fun () ->
        let bugfiles = get_bugset graph in
-	 if verbose then
-	   begin
-	     prerr_endline "==========================";
-	     List.iter (fun d -> prerr_endline d) bugfiles;
-	     prerr_endline "=========================="
-	   end;
-	 let pbugs =
-	   List.fold_left (fun pbugs bugfile ->
-			     match compute_bugs verbose bugfile with
-				 Some v -> v::pbugs
-			       | None -> pbugs
-			  ) [] bugfiles
-	 in
-	   List.flatten (
-	     Setup.PrjTbl.fold
-	       (fun name _ set ->
-		  match compute_pbugs verbose name pbugs with
-		      Some v -> v::set
-		    | None -> set
-	       ) Setup.projects []
-	   )
+       LOG "==========================" LEVEL TRACE;
+       List.iter (fun d -> LOG d LEVEL TRACE) bugfiles;
+       LOG "==========================" LEVEL TRACE;
+       let pbugs =
+	 List.fold_left (fun pbugs bugfile ->
+	   match compute_bugs verbose bugfile with
+	       Some v -> v::pbugs
+	     | None -> pbugs
+	 ) [] bugfiles
+       in
+       List.flatten (
+	 Setup.PrjTbl.fold
+	   (fun name _ set ->
+	     match compute_pbugs verbose name pbugs with
+		 Some v -> v::set
+	       | None -> set
+	   ) Setup.projects []
+       )
     )
-
+    
 let genMakefile () =
   Debug.profile_code "Cfghelper.genMakefile"
     (fun () ->

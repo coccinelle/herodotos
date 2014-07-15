@@ -18,7 +18,7 @@ let fast_hash_bug prefix vlist (flist, tbl)=
 
 let may_have_changed strict prefix vlist bfl bug =
   let (_, s, _, file, ver, pos, _, t, _, next, _) = bug in
-  if !Misc.debug && next = {Ast_org.def = None} then prerr_endline "may_have_changed: no next computed";
+  if next = {Ast_org.def = None} then LOG "may_have_changed: no next computed" LEVEL TRACE;
   next = {Ast_org.def = None}
   && List.exists
       (fun (_, _, _, file2, ver2, pos2, _, t2, head, _, _) ->
@@ -61,12 +61,8 @@ let find_all_next strict prefix vlist (orgs:Ast_org.bugs) correl bug =
 	     && (if strict then
 		   let new_t = Org.clean_link_text prefix ver file pos t in
 		   let new_tb = Org.clean_link_text prefix ver2 file pos2 t2 in
-		     if !Misc.debug then
-		       begin
-			 prerr_string ("FIND_ALL: \""^ new_t^ "\"");
-			 prerr_endline (" <-> \""^ new_tb^ "\"");
-		       end;
-		     new_t = new_tb
+		   LOG "find_all_next: \"%s\" <-> \"%s\"" new_t new_tb LEVEL TRACE;
+		   new_t = new_tb
 		 else true)
 	     && not (is_SAME_as_next_in_correl correl file vn pos2)
 	     (*
@@ -116,12 +112,8 @@ let get_all_correl strict prefix correl bugs bug =
 		 let new_t = Org.clean_link_text prefix ver file pos t in
 		 let new_tb = Org.clean_link_text prefix ver file pos bug_t in
 		 let new_nt = Org.clean_link_text prefix cnver file cnpos next_t in
-		   if !Misc.debug then
-		     begin
-		       prerr_string ("get_all_correl: \""^ new_t^ "\"");
-		       prerr_endline (" <-> \""^ new_tb^ "\"");
-		     end;
-		   new_t = new_tb && new_t = new_nt
+		 LOG "get_all_correl: \"%s\" <-> \"%s\"" new_t new_tb LEVEL TRACE;
+		 new_t = new_tb && new_t = new_nt
 	       else true)
     ) correl
 
@@ -131,7 +123,7 @@ let gen_todo ch strict vlist prefix orgs correl bug =
     For remaining disappearing bugs, propose correlation with
     every available bug in next.
   *)
-  if !Misc.debug then prerr_endline "gen_todo called";
+  LOG "gen_todo called" LEVEL TRACE;
   let next = find_all_next strict prefix vlist orgs correl bug in
   List.iter (fun nbug ->
 	       Printf.fprintf ch "* TODO %s\n %s\n"
@@ -150,14 +142,11 @@ let correlate verbose strict prefix vlist correlfile prefix rev_correl orgs =
   let correl = Misc.unique_list (List.rev rev_correl) in
   let buglist = List.flatten (List.map (fun x -> List.flatten (snd x)) orgs) in
   let disps = find_disappeared strict prefix vlist buglist in
-  if !Misc.debug then
-    begin
-      prerr_endline "------------------";
-      Org.show_correlation true correl;
-      prerr_endline "------------------";
-      Org.show_buglist true disps;
-      prerr_endline "------------------"
-    end;
+  LOG "------------------" LEVEL TRACE;
+  Org.show_correlation true correl;
+  LOG "------------------" LEVEL TRACE;
+  Org.show_buglist true disps;
+  LOG "------------------" LEVEL TRACE;
   let todo = List.map (fun bug ->
 		 try
 		   (*

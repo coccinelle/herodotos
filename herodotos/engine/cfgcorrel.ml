@@ -106,7 +106,7 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 	      else "" (* " "^string_of_int new_bugs^ " new REPORTS (potential BUGS)." *)
 	    in
 	    let msg = Printf.sprintf "%- 10s %- 16s\t% 5d / % 6d (% 5d TODO)%s%s" p patt ccount count todos todostr bug_msg in
-	      LOG "%s" msg LEVEL INFO;
+	      LOG msg LEVEL INFO;
 	      Org.show_correlation v3 correl2;
 	      Diff.show_diff v3 vlist diffs1;
 	      Org.show_org v2 prefix orgs2;
@@ -160,7 +160,8 @@ let run_correl_job v1 v2 v3 cpucore diffalgo file =
 	  let ret = correl_patt_prj_nofail v1 v2 v3 cpucore diffalgo file in
 	    LOG "Job done for child %d" pid LEVEL TRACE;
 	    let msg = Debug.profile_diagnostic () in
-	      if msg <> "" then LOG msg LEVEL TRACE;
+	      if msg <> "" then
+		Debug.trace msg;
 	    exit ret
       end
     else (* I'm the master *)

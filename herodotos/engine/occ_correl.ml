@@ -147,17 +147,11 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
       let subbugs = get_next_list vlist bugs f vidx in
       let vn = Misc.get_version_name vlist (vidx+1) in
       let check = (l, s, r, f, vn, check_pos, face, t, {Ast_org.is_head=true}, {Ast_org.def=None}, []) in
-      if verbose then
-	(
-	  prerr_string "check_next of ";
-	  Org.show_bug true bug;
-	  prerr_string (" at ");
-	  Org.show_bug true check;
-	  prerr_newline ();
-	  prerr_endline ("List:");
-	  List.iter (Org.show_bug true) subbugs;
-	  prerr_newline ();
-	);
+      LOG "check_next of %s at %s" (Org.show_bug true bug) (Org.show_bug true check) LEVEL TRACE;
+	  (*      LOG  *)
+      LOG "List:" LEVEL TRACE;
+      List.iter (fun bug -> LOG "%s" (Org.show_bug true bug) LEVEL TRACE) subbugs;
+      LOG "" LEVEL TRACE;
       try
 	let next = get_bug strict prefix check subbugs in
 	if (n.Ast_org.def = None) then
@@ -171,7 +165,8 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
       with Not_found ->
 	if conf then
 	  begin
-	    if verbose then prerr_endline "Automatic correlation OK\n=========";
+	    LOG "Automatic correlation OK" LEVEL TRACE;
+	    LOG "=========" LEVEL TRACE;
 	    n.Ast_org.def <- Some (None);
 	    (1, []) (* Automatic correlation performed *)
 	  end
@@ -183,55 +178,42 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
   Debug.profile_code_silent "compute_bug_next"
     (fun () ->
        let (l, s, r, f, v, p, face, t, h, n, _) = bug in
-	 if verbose then
-	   (
-	     Org.show_bug true bug;
-	     prerr_newline ()
-	   );
-	 let (conf, diffcheck_pos) = Diff.compute_new_pos diffs f v p in
-	   if verbose then
-	     (prerr_string (Org.get_string_pos p);
-	      prerr_string " as new pos: ";
-	      match diffcheck_pos with
-		  (Ast_diff.Sing line,colb,cole) ->
-		    let check_pos = (line, colb, cole) in
-		      prerr_endline (Org.get_string_pos check_pos)
-		| (Ast_diff.Deleted _, _,_) ->
-		    prerr_endline "Deleted line"
-		| (Ast_diff.Unlink, _,_) ->
-		    prerr_endline "Deleted file"
-		| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
-		    prerr_endline "Somewhere"
-	     );
-	   match diffcheck_pos with
-	       (Ast_diff.Sing line,colb,cole) -> (* We are between two hunks. *)
-		 check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole)
-	     | (Ast_diff.Deleted cont, colb, cole) ->
-	       if not conf then
-	       (*
-		 We are inside a hunk and lines have been removed.
-		 Check for manual correlation.
-	       *)
-		 check_next verbose strict conf prefix depth vlist diffs correl bugs bug (0,colb,cole)
-	       else
-		 if cont then
-		   (* Considered as uncorrelated. Continuation will check with the alternative algorithm. *)
-		   (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
-		 else
-		   begin
-		     n.Ast_org.def <- Some (None);
-		     (1, []) (* Considered as an automatic correlation *)
-		   end
-	     | (Ast_diff.Unlink, _, _) ->
-	         (*
-		   File has been removed.
-		 *)
-	       if !Misc.debug then prerr_endline "Auto-correlation OK\n=========";
-	       n.Ast_org.def <- Some (None);
-	       (1, []) (* Considered as an automatic correlation *)
-	     | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
+       LOG "%s" (Org.show_bug true bug) LEVEL TRACE;
+       let (conf, diffcheck_pos) = Diff.compute_new_pos diffs f v p in
+       LOG "%s as new pos: %s"
+	 (Org.get_string_pos p)
+	 (Org.get_string_new_pos diffcheck_pos)
+	 LEVEL TRACE;
+       match diffcheck_pos with
+	   (Ast_diff.Sing line,colb,cole) -> (* We are between two hunks. *)
+	     check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole)
+	 | (Ast_diff.Deleted cont, colb, cole) ->
+	   if not conf then
 		 (*
-		   Could we do something for bugs inside a hunk ?
+		   We are inside a hunk and lines have been removed.
+		   Check for manual correlation.
+		 *)
+	     check_next verbose strict conf prefix depth vlist diffs correl bugs bug (0,colb,cole)
+	   else
+	     if cont then
+		   (* Considered as uncorrelated. Continuation will check with the alternative algorithm. *)
+	       (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
+	     else
+	       begin
+		 n.Ast_org.def <- Some (None);
+		 (1, []) (* Considered as an automatic correlation *)
+	       end
+	 | (Ast_diff.Unlink, _, _) ->
+	       (*
+		 File has been removed.
+	       *)
+	   LOG "Automatic correlation OK" LEVEL TRACE;
+	   LOG "=========" LEVEL TRACE;
+	   n.Ast_org.def <- Some (None);
+	   (1, []) (* Considered as an automatic correlation *)
+	 | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
+	       (*
+		 Could we do something for bugs inside a hunk ?
 		   It seems to be impossible and worthless.
 		   Just check for manual correlation.
 		 *)
@@ -315,12 +297,11 @@ let run_pariter f cmd : int =
   let pid = Unix.fork () in
     if pid = 0 then (* I'm a slave *)
       begin
-	let pid = Unix.getpid() in
-	if !Misc.debug then prerr_endline ("New child "^ string_of_int pid^ " for "^cmd);
+	LOG "New child %d for %s" (Unix.getpid ()) cmd LEVEL TRACE;
 	let status = f cmd in
-	if !Misc.debug then prerr_endline ("Job done for child "^ string_of_int pid);
+	LOG "Job done for child %d" (Unix.getpid ()) LEVEL TRACE;
 	let msg = Debug.profile_diagnostic () in
-	if msg <> "" then prerr_endline msg;
+	if msg <> "" then Debug.trace msg;
 	exit status
       end
     else (* I'm the master *)
@@ -330,8 +311,7 @@ let dispatch_pariter cpucore f (perr, pidlist) cmd : int * int list =
   let (error, newlist) =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
-      if !Misc.debug then
-	prerr_endline ("Master: Job done for child "^ string_of_int death);
+      LOG "Master: Job done for child %d" death LEVEL TRACE;
       let error = match status with
 	  Unix.WEXITED 0 -> perr
 	| _              -> perr + 1
@@ -358,8 +338,7 @@ let pariter cpucore f cmds : unit =
 	  in
 	  let res = List.map (fun x ->
 	    let (death, status) = Unix.wait () in
-	    if !Misc.debug then
-	      prerr_endline ("Master: Job done for child "^ string_of_int death);
+	    LOG "Master: Job done for child %d" death LEVEL TRACE;
 	    match status with
 		Unix.WEXITED 0 -> 0
 	      | _ -> 1
@@ -368,46 +347,46 @@ let pariter cpucore f cmds : unit =
 	  List.fold_left (+) err res
       in
       if error <> 0 then
-	prerr_endline ("*** ERROR *** "^string_of_int error ^" error(s) during the cache update.")
+	LOG "*** ERROR *** %d error(s) during the cache update." error LEVEL ERROR
     )
 
 let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:Ast_org.orgarray) (orgs:Ast_org.orgarray) :
     (int * int) * ((Ast_diff.path * Ast_org.bugs list) list) =
   Debug.profile_code_silent "compute_org"
     (fun () ->
-      if verbose then prerr_endline ("*** CORRELATION - PHASE 1 ***");
-       let (initial_count, ks) = compute_bug_chain verbose strict prefix depth 0 vlist diffs correl orgs in
-       (* Update gumtree cache with missing files *)
-       let re = Str.regexp_string "&&" in
-       let (cmds, ks2) = List.split ks in
-       let (dirs, cleaned_cmds) =
-	 List.fold_left
-	   (fun (dir_list, cmd_list) x ->
-	     if x <> "" then
-	       let (dir, cmd) = match Str.split re x with
-		   dir::[cmd] -> (dir, cmd)
-		 | _ -> failwith ("Wrong command: x")
-	       in
-	       let dirs = if not (List.mem dir dir_list) then
-		   dir::dir_list else dir_list
-	       in
-	       let cmds = if not (List.mem cmd cmd_list) then
-		   cmd::cmd_list else cmd_list
-	       in (dirs, cmds)
-	     else
-	       (dir_list, cmd_list)
-	   )
-	   ([],[]) cmds
-       in
-       if verbose then prerr_endline ("*** UPDATING GUMTREE CACHE *** "^ string_of_int (List.length cleaned_cmds) ^" item(s).");
-       List.iter (fun cmd ->
-	   match
+      LOG "*** CORRELATION - PHASE 1 ***" LEVEL INFO;
+      let (initial_count, ks) = compute_bug_chain verbose strict prefix depth 0 vlist diffs correl orgs in
+      (* Update gumtree cache with missing files *)
+      let re = Str.regexp_string "&&" in
+      let (cmds, ks2) = List.split ks in
+      let (dirs, cleaned_cmds) =
+	List.fold_left
+	  (fun (dir_list, cmd_list) x ->
+	    if x <> "" then
+	      let (dir, cmd) = match Str.split re x with
+		  dir::[cmd] -> (dir, cmd)
+		| _ -> failwith ("Wrong command: x")
+	      in
+	      let dirs = if not (List.mem dir dir_list) then
+		  dir::dir_list else dir_list
+	      in
+	      let cmds = if not (List.mem cmd cmd_list) then
+		  cmd::cmd_list else cmd_list
+	      in (dirs, cmds)
+	    else
+	      (dir_list, cmd_list)
+	  )
+	  ([],[]) cmds
+      in
+      LOG "*** UPDATING GUMTREE CACHE *** %d item(s)." (List.length cleaned_cmds) LEVEL INFO;
+      List.iter (fun cmd ->
+	match
 	     Unix.system cmd
 	   with
 	       Unix.WEXITED 0 -> ()
 	     | Unix.WEXITED 1 -> ()
-	     | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd)
-	     | _ -> prerr_endline ("*** FAILURE *** " ^cmd)
+	     | Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR
+	     | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR
        ) dirs;
        pariter cpucore (fun cmd ->
 	 if verbose then prerr_endline ("Run "^cmd);
@@ -417,16 +396,16 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
 	   with
 	       Unix.WEXITED 0 -> true
 	     | Unix.WEXITED 1 -> false
-	     | Unix.WEXITED i -> prerr_endline ("*** FAILURE *** Code:" ^(string_of_int i) ^" "^ cmd); false
-	     | _ -> prerr_endline ("*** FAILURE *** " ^cmd); false
+	     | Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR; false
+	     | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR; false
 	 in
 	 if status then
 	   Unix.execv "/bin/true" (Array.of_list [])
 	 else
 	   Unix.execv "/bin/false" (Array.of_list [])
        ) cleaned_cmds;
-	(*	*)
-       if verbose then prerr_endline ("*** CORRELATION - PHASE 2 *** " ^ string_of_int (List.length ks2) ^ " item(s).");
+       (*	*)
+       LOG "*** CORRELATION - PHASE 2 *** %d item(s)." (List.length ks2) LEVEL INFO;
        let count =
 	 List.fold_left
 	   (fun acc (f, bug) ->
@@ -437,13 +416,13 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
        let (new_bugs, correlorg) =
 	 List.split (
 	   List.map (fun file ->
-		       if !Misc.debug then prerr_endline ("COMPUTE ORG - Processing file " ^file);
-			 (* 		  let sorted = sort_bugs strict prefix bugs in *)
-		       let sorted = extract_chain file orgs in
-		       let (stats, updbugs) = List.split (List.map (update_status vlist annots) sorted) in
- 		       let new_bugs = List.fold_left (+) 0 stats in
-			 (new_bugs), (file, updbugs))
-	     (unique_file_list orgs)
+	     LOG "COMPUTE ORG - Processing file %s" file LEVEL DEBUG;
+	     (* 		  let sorted = sort_bugs strict prefix bugs in *)
+	     let sorted = extract_chain file orgs in
+	     let (stats, updbugs) = List.split (List.map (update_status vlist annots) sorted) in
+ 	     let new_bugs = List.fold_left (+) 0 stats in
+	     (new_bugs), (file, updbugs)
+	   ) (unique_file_list orgs)
 	 )
        in
        let new_bug_count = List.fold_left (+) 0 new_bugs in

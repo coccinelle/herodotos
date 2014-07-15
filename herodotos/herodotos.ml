@@ -65,7 +65,7 @@ let options = [
   "--hacks", Arg.Set Global.hacks, " Enable hacks (to perform customized studies)";
   "--parse_org", Arg.Set_string orgfile, "file path to an Org file to parse (test)";
   "--prefix", Arg.Set_string prefix, "path prefix of the source directories (test)";
-  "--profile", Arg.Unit (fun () -> prerr_endline "*** PROFILING ENABLED ***";
+  "--profile", Arg.Unit (fun () -> LOG "*** PROFILING ENABLED ***" LEVEL TRACE;
 			   Debug.profile := Debug.PALL), " gather timing information about the main functions";
   "--eps", Arg.Clear pdf, " disable the (default) generation of PDF with 'epstopdf'";
   "--png", Arg.Set png, " enable the generation of png images (in default mode)";
@@ -154,10 +154,9 @@ let main aligned =
 		    | Graph ->
 		      Debug.profile_code "graph generation"
 			(fun () ->
-			  print_endline ("Herodotos version "^ Global.version);
-			  prerr_endline ("Processing "^ !configfile);
+			  LOG "Herodotos version %s" Global.version LEVEL INFO;
+			  LOG "Processing %s" !configfile LEVEL INFO;
 			  Cfgmode.graph_gen !verbose1 !verbose2 !verbose3 !configfile !pdf !png !web !freearg;
-			  prerr_newline ()
 			)
 		    | Erase ->
 		      Debug.profile_code "erase env."
@@ -241,12 +240,11 @@ let _ =
     (try
       Arg.parse_argv Sys.argv aligned anon_fun usage_msg;
     with Arg.Bad msg ->
-      (prerr_string msg; exit 0));
+      (LOG msg LEVEL FATAL; exit 0));
     main aligned;
     if !Debug.profile <> Debug.PNONE then
-      prerr_endline (Debug.profile_diagnostic ());
+      Debug.trace (Debug.profile_diagnostic ());
     LOG "*** END ***" LEVEL TRACE
-
 
 (* For ratio computation *)
 (*

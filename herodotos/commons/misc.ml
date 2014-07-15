@@ -30,7 +30,7 @@ let getpos pos ofs =
 let dummy_pos = getpos Lexing.dummy_pos 0
 
 let print_error pos str =
-  prerr_endline ((print_pos pos) ^ str)
+  LOG "%s" ((print_pos pos) ^ str) LEVEL FATAL
 
 let report_error pos str =
   print_error pos str;

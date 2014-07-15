@@ -11,7 +11,7 @@ let gen_cvsignore_prj v1 (p, _) =
   let (_, varr) = Config.get_versinfos p in
   let cvsignore = !Setup.resultsdir ^ prjdir^"/.cvsignore" in
     if not (Sys.file_exists cvsignore) then
-      if v1 then prerr_endline ("Generating "^ cvsignore);
+      LOG "Generating %s" cvsignore LEVEL INFO;
       let cvsch = open_out cvsignore in
 	Printf.fprintf cvsch "*%s\n" Global.correlext;
 	Printf.fprintf cvsch "*%s\n" Global.listext;
@@ -24,7 +24,7 @@ let gen_cvsignore v1 prjs =
   let cvsignore = !Setup.prefix ^"/.cvsignore" in
     List.iter (gen_cvsignore_prj v1) prjs;
     if not (Sys.file_exists cvsignore) then
-      if v1 then prerr_endline ("Generating "^ cvsignore);
+      LOG "Generating %s" cvsignore LEVEL INFO;
       let cvsch = open_out cvsignore in
 	Printf.fprintf cvsch ".depend\n";
 	Printf.fprintf cvsch ".depend.patterns\n";
@@ -40,74 +40,74 @@ let gen_makefile_cpu depch (target, cmd) =
 
 let gen_makefile_vers verbose depch verscmds =
   List.fold_left (fun targets (target, (cmd, cpucmds)) ->
-		    Misc.create_dir verbose (Filename.dirname target);
-		    if cpucmds <> [] then
-		      let cputargets = List.map (gen_makefile_cpu depch) cpucmds in
-			Printf.fprintf depch "%s: %s #PER-PRJ-PATT-VERS\n" target (String.concat " " cputargets);
-		    else
-		      Printf.fprintf depch "%s: #PER-PRJ-PATT-VERS\n" target;
-		    Printf.fprintf depch "\t%s\n" cmd;
-		    target::targets
-		 ) [] verscmds
-
+    Misc.create_dir verbose (Filename.dirname target);
+    if cpucmds <> [] then
+      let cputargets = List.map (gen_makefile_cpu depch) cpucmds in
+      Printf.fprintf depch "%s: %s #PER-PRJ-PATT-VERS\n" target (String.concat " " cputargets);
+    else
+      Printf.fprintf depch "%s: #PER-PRJ-PATT-VERS\n" target;
+    Printf.fprintf depch "\t%s\n" cmd;
+    target::targets
+  ) [] verscmds
+    
 let gen_makefile_patt verbose depch cmds =
   List.fold_left (fun datalist (data, verscmds) ->
-		    if verbose then prerr_endline ("make will generate data in "^data);
-		    let targets = gen_makefile_vers verbose depch verscmds in
-		      Misc.create_dir verbose (Filename.dirname data);
-		      Printf.fprintf depch "%s: %s #PER-PRJ-PATT\n" data (String.concat " " targets);
-                      if targets <> [] then
-			Printf.fprintf depch "\tcat $^ > $@\n\t-cat $(^:%%.orig.org=%%.log) > $(@:%%.orig.org=%%.log)\n"
-		      else
-			Printf.fprintf depch "\ttouch $@\n";
-		      data::datalist
-		 ) [] cmds
+    LOG "make will generate data in %s" data LEVEL INFO;
+    let targets = gen_makefile_vers verbose depch verscmds in
+    Misc.create_dir verbose (Filename.dirname data);
+    Printf.fprintf depch "%s: %s #PER-PRJ-PATT\n" data (String.concat " " targets);
+    if targets <> [] then
+      Printf.fprintf depch "\tcat $^ > $@\n\t-cat $(^:%%.orig.org=%%.log) > $(@:%%.orig.org=%%.log)\n"
+    else
+      Printf.fprintf depch "\ttouch $@\n";
+    data::datalist
+  ) [] cmds
 
 let gen_makefile v1 v2 prjs patts =
   let deps = List.map
     (fun (p, cmds) ->
        let prjdir = Config.get_prjdir p in
-	 if prjdir = "" then prerr_endline ("*** WARNING *** project dir is not set for " ^ p);
-	 let depend = !Setup.resultsdir ^ prjdir ^"/.depend."^p in
-	 let depch = Misc.create_dir_and_open v1 depend in
-	   if v1 then prerr_endline ("Generating "^ depend);
-	   let datalist = gen_makefile_patt v2 depch cmds in
-	     Printf.fprintf depch "%s: %s\n" p (String.concat " " datalist);
-	     close_out depch;
-	     depend
+       if prjdir = "" then LOG "*** WARNING *** project dir is not set for %s" p LEVEL WARN;
+       let depend = !Setup.resultsdir ^ prjdir ^"/.depend."^p in
+       let depch = Misc.create_dir_and_open v1 depend in
+       LOG "Generating %s" depend LEVEL INFO;
+       let datalist = gen_makefile_patt v2 depch cmds in
+       Printf.fprintf depch "%s: %s\n" p (String.concat " " datalist);
+       close_out depch;
+       depend
     ) prjs
   in
   let pattdepend = !Setup.prefix ^"/.depend.patterns" in
   let pattdepch = open_out pattdepend in
-    if v1 then prerr_endline ("Generating "^ pattdepend);
-    List.iter (fun (patt, data) ->
-		 let datalist = String.concat " " data in
-		   Printf.fprintf pattdepch "%s: %s\n" patt datalist;
-	      ) patts;
-    close_out pattdepch;
+  LOG "Generating %s" pattdepend LEVEL INFO;
+  List.iter (fun (patt, data) ->
+    let datalist = String.concat " " data in
+    Printf.fprintf pattdepch "%s: %s\n" patt datalist;
+  ) patts;
+  close_out pattdepch;
   let gphdepend = !Setup.prefix ^"/.depend.graphs" in
   let gphdepch = open_out gphdepend in
-    if v1 then prerr_endline ("Generating "^ gphdepend);
-    let gphlist = Setup.GphTbl.fold (fun name _ l -> name::l) Setup.graphs [] in
-    let gphs = String.concat " " gphlist in
-      Printf.fprintf gphdepch ".PHONY:: %s\n" gphs;
-      Printf.fprintf gphdepch "%s: $(CONF)\n" gphs;
-      Printf.fprintf gphdepch "\t$(HERODOTOS) $(FLAGS) -c $(CONF) $@\n";
-      close_out gphdepch;
-      let depend = !Setup.prefix ^"/.depend" in
-      let depch = open_out depend in
-	if v1 then prerr_endline ("Generating "^ depend);
-	Printf.fprintf depch ".PHONY::";
-	List.iter (fun (p,_) -> Printf.fprintf depch " %s" p) prjs;
-	Printf.fprintf depch "\n\n";
-	Printf.fprintf depch "projects: update ";
-	List.iter (fun (p,_) -> Printf.fprintf depch " %s" p) prjs;
-	Printf.fprintf depch "\n";
-	List.iter (Printf.fprintf depch "-include %s\n") deps;
-	Printf.fprintf depch "-include .depend.patterns\n";
-	Printf.fprintf depch "-include .depend.erase\n";
-	Printf.fprintf depch "-include .depend.graphs\n";
-	close_out depch
+  LOG "Generating %s" gphdepend LEVEL INFO;
+  let gphlist = Setup.GphTbl.fold (fun name _ l -> name::l) Setup.graphs [] in
+  let gphs = String.concat " " gphlist in
+  Printf.fprintf gphdepch ".PHONY:: %s\n" gphs;
+  Printf.fprintf gphdepch "%s: $(CONF)\n" gphs;
+  Printf.fprintf gphdepch "\t$(HERODOTOS) $(FLAGS) -c $(CONF) $@\n";
+  close_out gphdepch;
+  let depend = !Setup.prefix ^"/.depend" in
+  let depch = open_out depend in
+  LOG "Generating %s" depend LEVEL INFO;
+  Printf.fprintf depch ".PHONY::";
+  List.iter (fun (p,_) -> Printf.fprintf depch " %s" p) prjs;
+  Printf.fprintf depch "\n\n";
+  Printf.fprintf depch "projects: update ";
+  List.iter (fun (p,_) -> Printf.fprintf depch " %s" p) prjs;
+  Printf.fprintf depch "\n";
+  List.iter (Printf.fprintf depch "-include %s\n") deps;
+  Printf.fprintf depch "-include .depend.patterns\n";
+  Printf.fprintf depch "-include .depend.erase\n";
+  Printf.fprintf depch "-include .depend.graphs\n";
+  close_out depch
 
 (* Generation of .depend.erase *)
 let erase_file_vers verbose verscmds =
@@ -128,35 +128,36 @@ let erase_file_patt verbose cmds =
 let erase_file v1 v2 prjs patts =
   let depend = !Setup.prefix ^"/.depend.erase" in
   let depch = open_out depend in
-    if v1 then prerr_endline ("Generating "^ depend);
-    let targetlist =
-    List.flatten (List.map
-      (fun (p, cmds) ->
-	 let datalist = erase_file_patt v2 cmds in
-	 let (data, targets) = List.split datalist in
-	 let flat_targets = List.flatten targets in
-	 let data_cmds = List.map (fun x -> "\trm -f "^ x) data in
-	 let target_cmds = List.map (fun x -> "\trm -f "^ x) flat_targets in
+  LOG "Generating %s" depend LEVEL INFO;
+  let targetlist =
+    List.flatten
+      (List.map
+	 (fun (p, cmds) ->
+	   let datalist = erase_file_patt v2 cmds in
+	   let (data, targets) = List.split datalist in
+	   let flat_targets = List.flatten targets in
+	   let data_cmds = List.map (fun x -> "\trm -f "^ x) data in
+	   let target_cmds = List.map (fun x -> "\trm -f "^ x) flat_targets in
 	   Printf.fprintf depch "erase-%s:\n%s" p (String.concat "\n" data_cmds);
 	   Printf.fprintf depch "\n%s\n" (String.concat "\n" target_cmds);
 	   datalist
-      ) prjs)
+	 ) prjs)
   in
   List.iter (fun (patt, data) ->
-	       let datalist = List.map (fun x -> "\trm -f "^ x) data in
-		 Printf.fprintf depch "erase-%s:\n%s\n" patt (String.concat "\n" datalist);
-		 List.iter (fun d ->
-			      let targets = List.assoc d targetlist in
-			      let cmds = List.map (fun x -> "\trm -f "^ x) targets in
-				Printf.fprintf depch "%s\n" (String.concat "\n" cmds)
-			   ) data;
-	    ) patts;
-    close_out depch
+    let datalist = List.map (fun x -> "\trm -f "^ x) data in
+    Printf.fprintf depch "erase-%s:\n%s\n" patt (String.concat "\n" datalist);
+    List.iter (fun d ->
+      let targets = List.assoc d targetlist in
+      let cmds = List.map (fun x -> "\trm -f "^ x) targets in
+      Printf.fprintf depch "%s\n" (String.concat "\n" cmds)
+    ) data;
+  ) patts;
+  close_out depch
 
 (* Check if a project is correctly configured *)
 let check_prj vb p =
   let prjdir = Config.get_prjdir p in
-  if prjdir = "" then prerr_endline ("*** WARNING *** project dir is not set for " ^ p);
+  if prjdir = "" then LOG "*** WARNING *** project dir is not set for %s" p LEVEL WARN;
   let project = !Setup.projectsdir ^ prjdir in
   let (depth, versions) = Config.get_versions p in
   List.fold_left (fun l v ->
@@ -168,8 +169,7 @@ let check_prj vb p =
       ("Unable to access " ^ prj)::l
     else
       (
-	if vb then
-	  prerr_endline (prj ^ " - OK");
+	LOG "%s - OK" prj LEVEL TRACE;
 	l
       )
   ) [] versions
@@ -182,8 +182,7 @@ let check_pat vb d =
     [("Unable to access " ^ cocci)]
   else
     (
-      if vb then
-	prerr_endline (cocci ^ " - OK");
+      LOG "%s - OK" cocci LEVEL TRACE;
       []
     )
 
@@ -310,7 +309,7 @@ let init_env v1 v2 v3 configfile cvs =
     )
   else
     (
-      prerr_endline " *** KNOWN PROBLEMS ***";
-	List.iter (fun msg -> prerr_endline msg) err;
-      prerr_endline " *** END OF REPORT ***"
+      LOG " *** KNOWN PROBLEMS ***" LEVEL ERROR;
+      List.iter (fun msg -> LOG msg LEVEL ERROR) err;
+      LOG " *** END OF REPORT ***" LEVEL ERROR
     )
