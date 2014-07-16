@@ -279,7 +279,13 @@ let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs 
 		   ) acc flist
 	       end
 	      )
-	    else (i+1, acc)
+	    else
+	      let (res, ks) = acc in
+	      let last_report_count = List.fold_left
+		(fun acc file -> acc + List.length (Hashtbl.find tbl file))
+		res flist
+	      in
+	      (i+1, (last_report_count, ks))
 	  ) (0, (0, [])) bugs
       )
     )
@@ -404,6 +410,7 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
     (fun () ->
       LOG "*** CORRELATION - PHASE 1 ***" LEVEL INFO;
       let (initial_count, ks) = compute_bug_chain verbose strict prefix depth 0 vlist diffs correl orgs in
+      LOG "*** CORRELATION - PHASE 1 *** %d automatic correlations so far" initial_count LEVEL INFO;
       (* Update gumtree cache with missing files *)
       let re = Str.regexp_string "&&" in
       let (cmds, ks2) = List.split ks in
@@ -426,53 +433,57 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
 	  )
 	  ([],[]) cmds
       in
-      LOG "*** UPDATING GUMTREE CACHE *** %d item(s)." (List.length cleaned_cmds) LEVEL INFO;
-      List.iter (fun cmd ->
-	match
-	     Unix.system cmd
-	   with
-	       Unix.WEXITED 0 -> ()
-	     | Unix.WEXITED 1 -> ()
-	     | Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR
-	     | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR
-       ) dirs;
-       pariter cpucore (fun cmd ->
-	 LOG "Run %s" cmd LEVEL TRACE;
-	 let status =
-	   match
-	     Unix.system cmd
-	   with
-	       Unix.WEXITED 0 -> true
-	     | Unix.WEXITED 1 -> false
-	     | Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR; false
-	     | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR; false
-	 in
-	 if status then
-	   Unix.execv "/bin/true" (Array.of_list [])
-	 else
-	   Unix.execv "/bin/false" (Array.of_list [])
-       ) cleaned_cmds;
-       (*	*)
-       LOG "*** CORRELATION - PHASE 2 *** %d item(s)." (List.length ks2) LEVEL INFO;
-       let count =
-	 List.fold_left
-	   (fun acc (f, bug) ->
-	     acc + f bug
-	   ) initial_count ks2
+      if cleaned_cmds <> [] then
+	begin
+	  LOG "*** UPDATING GUMTREE CACHE *** %d item(s)." (List.length cleaned_cmds) LEVEL INFO;
+	  List.iter (fun cmd ->
+	    match
+	      Unix.system cmd
+	    with
+		Unix.WEXITED 0 -> ()
+	      | Unix.WEXITED 1 -> ()
+	      | Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR
+	      | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR
+	  ) dirs;
+	  pariter cpucore (fun cmd ->
+	    LOG "Run %s" cmd LEVEL TRACE;
+	    let status =
+	      match
+		Unix.system cmd
+	      with
+		  Unix.WEXITED 0 -> true
+		| Unix.WEXITED 1 -> false
+		| Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR; false
+		| _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR; false
+	    in
+	    if status then
+	      Unix.execv "/bin/true" (Array.of_list [])
+	    else
+	      Unix.execv "/bin/false" (Array.of_list [])
+	  ) cleaned_cmds;
+	end;
+      (*	*)
+      LOG "*** CORRELATION - PHASE 2 *** %d item(s)." (List.length ks2) LEVEL INFO;
+      let count =
+	List.fold_left
+	  (fun acc (f, bug) ->
+	    acc + f bug
+	  ) initial_count ks2
        in
-	(*	*)
-       let (new_bugs, correlorg) =
-	 List.split (
-	   List.map (fun file ->
-	     LOG "COMPUTE ORG - Processing file %s" file LEVEL DEBUG;
+      LOG "*** CORRELATION - PHASE 2 *** %d automatic correlations" count LEVEL INFO;
+      (*	*)
+      let (new_bugs, correlorg) =
+	List.split (
+	  List.map (fun file ->
+	    LOG "COMPUTE ORG - Processing file %s" file LEVEL DEBUG;
 	     (* 		  let sorted = sort_bugs strict prefix bugs in *)
-	     let sorted = extract_chain file orgs in
-	     let (stats, updbugs) = List.split (List.map (update_status vlist annots) sorted) in
- 	     let new_bugs = List.fold_left (+) 0 stats in
-	     (new_bugs), (file, updbugs)
-	   ) (unique_file_list orgs)
-	 )
-       in
-       let new_bug_count = List.fold_left (+) 0 new_bugs in
-	 ((count, new_bug_count), correlorg)
+	    let sorted = extract_chain file orgs in
+	    let (stats, updbugs) = List.split (List.map (update_status vlist annots) sorted) in
+ 	    let new_bugs = List.fold_left (+) 0 stats in
+	    (new_bugs), (file, updbugs)
+	  ) (unique_file_list orgs)
+	)
+      in
+      let new_bug_count = List.fold_left (+) 0 new_bugs in
+      ((count, new_bug_count), correlorg)
     )
