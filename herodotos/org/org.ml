@@ -471,16 +471,23 @@ let print_bugs ch prefix orgs =
   Printf.fprintf ch "%s" orgtail
 
 let compute_correlation prefix depth correl =
-  let list = List.map (flat_org prefix depth) correl in
+  LOG "compute_correlation: start" LEVEL TRACE;
+  try
+    let list = List.map (flat_org prefix depth) correl in
     List.fold_left (fun correllist b ->
-		 let (_, s, _, file, ver, pos, _, t, _, _,sub) = b in
-		   try
-		     let l = extract_link (List.hd sub) in
-		     let new_t = clean_link_text prefix ver file pos t in
-		     let (nfile, nver, npos, _, _) = flat_link prefix depth l in
-		       (s, file, ver, pos, nfile, nver, npos, new_t)::correllist
-		   with Failure _ -> correllist
-		   ) [] list
+      let (_, s, _, file, ver, pos, _, t, _, _,sub) = b in
+      try
+	let l = extract_link (List.hd sub) in
+	let new_t = clean_link_text prefix ver file pos t in
+	let (nfile, nver, npos, _, _) = flat_link prefix depth l in
+	(s, file, ver, pos, nfile, nver, npos, new_t)::correllist
+      with Failure msg ->
+	LOG "compute_correlation: failure with %s" msg LEVEL FATAL;
+	correllist
+    ) [] list
+  with Misc.Strip msg ->
+    LOG "compute_correlation: failure with %s" msg LEVEL FATAL;
+    []
 
 let show_correlation verbose correl =
   LOG "SHOW CORRELATION" LEVEL TRACE;

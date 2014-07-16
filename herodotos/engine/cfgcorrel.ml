@@ -162,9 +162,9 @@ let run_correl_job v1 v2 v3 cpucore diffalgo file =
 	    LOG "New child on %s" file LEVEL TRACE);
 	let ret = correl_patt_prj_nofail v1 v2 v3 cpucore diffalgo file in
 	(if !Misc.debug then
-	    LOG "Job done for child %d" pid LEVEL TRACE
+	    LOG "Job done for child %d - exit %d" pid ret LEVEL TRACE
 	 else
-	    LOG "Job done for child" LEVEL TRACE
+	    LOG "Job done for child - exit %d" ret LEVEL TRACE
 	);
 	let msg = Debug.profile_diagnostic () in
 	if msg <> "" then
