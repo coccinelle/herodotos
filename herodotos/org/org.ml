@@ -305,8 +305,8 @@ let get_string_new_pos diffcheck_pos =
       "Somewhere"
 
 let show_bug verbose bug =
-  let (_, _, _, _, ver, pos, _, _,_, _, _) = bug in
-  ver ^ get_string_pos pos
+  let (_, _, _, file, ver, pos, _, _,_, _, _) = bug in
+  ver ^(if verbose then "/" ^file else "") ^ get_string_pos pos
 
 let flat_link prefix depth link =
   let (p, ops, t) = link in

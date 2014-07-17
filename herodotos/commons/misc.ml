@@ -145,11 +145,11 @@ let get_idx_of_version vlist v =
   try
     get_idx_of_version_sub vlist v 0
   with NoNext v ->
-  (* *)
-  prerr_endline ("No next version found for "^ v);
+    (* *)
+    prerr_endline ("No next version found for "^ v);
     Array.iter (fun (x, _, _, _) -> prerr_endline ("V: "^ x)) vlist;
-(*  *)
-  -1
+    (*  *)
+    -2
 
 let get_version_name vlist idx =
   let (vname, _, _, _) = Array.get vlist idx in

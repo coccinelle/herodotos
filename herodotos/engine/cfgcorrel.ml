@@ -93,7 +93,7 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 	    in
 	    let strict = ((Config.get_correl_mode v1 patt) = Ast_config.Strict) in
 	    let ((count,new_bugs), orgs2) = Occ_correl.compute_org v3 cpucore strict prefix depth vlist diffs1 correl2 annots orgs1 in 
-	    let todos = Correl.correlate v1 strict prefix vlist correlfile prefix correl2 orgs2 in
+	    let todos = Correl.correlate v1 strict prefix vlist correlfile prefix correl2 orgs1 orgs2 in
 	    let ccount =  List.length correl2 in
 	    let todostr =
 	      if todos <> 0
@@ -106,36 +106,36 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 	      else "" (* " "^string_of_int new_bugs^ " new REPORTS (potential BUGS)." *)
 	    in
 	    let msg = Printf.sprintf "%- 10s %- 16s\t% 5d / % 6d (% 5d TODO)%s%s" p patt ccount count todos todostr bug_msg in
-	      LOG msg LEVEL INFO;
-	      Org.show_correlation v3 correl2;
-	      Diff.show_diff v3 vlist diffs1;
-	      Org.show_org v2 prefix orgs2;
-	      if todos = 0 then
-		if not (Sys.file_exists bugfile_ext)
-		then (write_org bugfile_ext prefix orgs2; (*edition du .new.org *)
-		      LOG "*** NEW FILE TO EDIT *** %s" bugfile_ext LEVEL INFO)  
+	    LOG msg LEVEL INFO;
+	    if !Misc.debug then
+	      (Diff.show_diff v3 vlist diffs1;
+	       Org.show_org v2 prefix orgs2);
+	    if todos = 0 then
+	      if not (Sys.file_exists bugfile_ext)
+	      then (write_org bugfile_ext prefix orgs2; (*edition du .new.org *)
+		    LOG "*** NEW FILE TO EDIT *** %s" bugfile_ext LEVEL INFO)  
+	      else
+		let exist = Sys.file_exists editfile in
+		let cleanorgs = reparse_org editfile prefix depth vlist orgs2 in
+		Org.sort annots;
+ 		if not (cleanorgs = annots) then
+		  LOG "*** NEW FILE TO EDIT *** %s" editfile LEVEL INFO
 		else
-		  let exist = Sys.file_exists editfile in
-		  let cleanorgs = reparse_org editfile prefix depth vlist orgs2 in
-		    Org.sort annots;
- 		    if not (cleanorgs = annots) then
-		      LOG "*** NEW FILE TO EDIT *** %s" editfile LEVEL INFO
+		  begin
+		    LOG "*** INFO *** %s is up to date." bugfile_ext LEVEL INFO;
+		    if not !Misc.debug
+		    then clean_file exist editfile
 		    else
 		      begin
-			LOG "*** INFO *** %s is up to date." bugfile_ext LEVEL INFO;
-			if not !Misc.debug
-			then clean_file exist editfile
-			else
-			  begin
-			    let ch = open_out editfile in
-			    let cleanlist = Org.list_of_bug_array annots in
-			      Org.print_bugs_raw ch prefix cleanlist;
-			      LOG "*** INFO *** %s contains a sorted version." editfile LEVEL INFO;
-			  end
+			let ch = open_out editfile in
+			let cleanlist = Org.list_of_bug_array annots in
+			Org.print_bugs_raw ch prefix cleanlist;
+			LOG "*** INFO *** %s contains a sorted version." editfile LEVEL INFO;
 		      end
-	      else
-		if !Misc.debug then
-		  write_org editfile prefix orgs2
+		  end
+	    else
+	      if !Misc.debug then
+		write_org editfile prefix orgs2
 	  end
 	else
 	  LOG "*** NO CORREL *** %s" orgfile LEVEL INFO
