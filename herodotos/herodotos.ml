@@ -5,7 +5,7 @@ exception Misconfigured
 let configfile = ref "study.hc"
 let help = ref false
 let longhelp = ref false
-let diffalgo = ref "diff"
+let diffalgo = ref "gnudiff"
 let orgfile = ref ""
 let prefix = ref ""
 let extract = ref ""
@@ -60,7 +60,7 @@ let options = [
   "--config", Arg.Set_string configfile, "file Configuration file describing the requested data";
   "--cvs", Arg.Set cvs, " Generation of .cvsignore files (in init mode)";
   "--debug", Arg.Set Misc.debug, " Debug mode";
-  "--diff", Arg.Set_string diffalgo, " Diff algorithm (e.g. 'diff' or 'gumtree:file.xml')";
+  "--diff", Arg.Set_string diffalgo, " Diff algorithm (e.g. 'gnudiff' or 'gumtree:file.xml')";
   "--extract", Arg.Set_string extract, "version Gives the version to extract from a correlated report";
   "--hacks", Arg.Set Global.hacks, " Enable hacks (to perform customized studies)";
   "--parse_org", Arg.Set_string orgfile, "file path to an Org file to parse (test)";

@@ -48,13 +48,13 @@ let parse_diff v prefix difffile : Ast_diff.diffs =
 let select_diff diffalgo project : difftype =
   let (proto, file) =
     match Str.split (Str.regexp_string ":") diffalgo with
-	[] -> ("diff", diffalgo)
+	[] -> ("gnudiff", diffalgo)
       | proto::fileparts ->
 	let file = String.concat "" fileparts in
 	(proto, file)
   in
   match proto with
-      "diff" ->
+      "gnudiff" ->
 	if file = "" then GNUDiff (project ^ Global.patchext)
 	else GNUDiff file
     | "gumtree" ->
