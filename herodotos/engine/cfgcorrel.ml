@@ -145,11 +145,22 @@ let correl_patt_prj v1 v2 v3 cpucore diffalgo bugfile_ext =
 
 let correl_patt_prj_nofail v1 v2 v3 cpucore diffalgo file =
   try
-    correl_patt_prj v1 v2 v3 cpucore diffalgo file;
-    0
-  with Config.Warning msg ->
-    LOG "*** WARNING *** %s" msg LEVEL WARN;
-    1
+    try
+      correl_patt_prj v1 v2 v3 cpucore diffalgo file;
+      0
+    with Config.Warning msg ->
+      LOG "*** WARNING *** %s" msg LEVEL WARN;
+      1
+  with
+      Misc.Strip msg ->
+	LOG "*** FATAL *** Precessing %s" file LEVEL FATAL;
+	LOG "*** FATAL *** %s" msg LEVEL FATAL;
+	Debug.trace (Printexc.get_backtrace ());
+	1
+    | e ->
+      LOG "*** FATAL *** %s" (Printexc.to_string e) LEVEL FATAL;
+      Debug.trace (Printexc.get_backtrace ());
+      1
 
 let run_correl_job v1 v2 v3 cpucore diffalgo file =
   let pid = Unix.fork () in
@@ -178,16 +189,17 @@ let dispatch_correl_job v1 v2 v3 cpucore diffalgo (perr, pidlist) file :int*int 
   let (error, newlist) =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
+      let child_err = match status with
+	  Unix.WEXITED 0 -> false
+	| _ -> true
+      in
       (if !Misc.debug then
-	  LOG "Master: Job done for child %d" death LEVEL TRACE
+	  LOG "Master: Job done for child %d - error status %b" death child_err LEVEL TRACE
        else
-	  LOG "Master: Job done for child" LEVEL TRACE
+	  LOG "Master: Job done for child - error status %b" child_err LEVEL TRACE
       );
-      let error = match status with
-	    Unix.WEXITED 0 -> perr
-	  | _              -> perr + 1
-	in
-	(error, List.filter (fun x -> x <> death) pidlist)
+      let error = if child_err then perr + 1 else perr in
+	  (error, List.filter (fun x -> x <> death) pidlist)
     else
       (perr, pidlist)
   in
@@ -212,14 +224,16 @@ let correl v1 v2 v3 configfile diffalgo filter =
       let (err, pidlist) = List.fold_left (dispatch_correl_job v1 v2 v3 cpucore diffalgo) (0, []) bugfiles in
       let res = List.map (fun x ->
 	let (death, status) = Unix.wait () in
+	let child_err = match status with
+	    Unix.WEXITED 0 -> false
+	  | _ -> true
+	in
 	(if !Misc.debug then
-	    LOG "Master: Job done for child %d" death LEVEL TRACE
+	    LOG "Master: Job done for child %d - error status %b" death child_err LEVEL TRACE
 	 else
-	    LOG "Master: Job done for child" LEVEL TRACE
+	    LOG "Master: Job done for child - error status %b" child_err LEVEL TRACE
 	);
-	match status with
-	    Unix.WEXITED 0 -> 0
-	  | _ -> 1
+	if child_err then 1 else 0
       ) pidlist
       in
 	List.fold_left (+) err res
