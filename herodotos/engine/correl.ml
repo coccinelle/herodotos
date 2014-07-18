@@ -192,13 +192,13 @@ let gen_todo ch strict vlist prefix orgs correl bug =
     next;
     List.length next
 
-let correlate verbose strict prefix vlist correlfile prefix rev_correl orgsarray orgs =
+let correlate verbose strict prefix vlist correlfile prefix unclean_correl orgsarray orgs =
   (try
      Unix.rename correlfile (correlfile^".bk");
    with _ -> ()
   );
   let ch = open_out correlfile in
-  let correl = Misc.unique_list (List.rev rev_correl) in
+  let correl = Misc.unique_list unclean_correl in
   (* let buglist = List.flatten (List.map (fun x -> List.flatten (snd x)) orgs) in *)
   let disps = find_disappeared strict prefix vlist orgsarray in
   LOG "------------------" LEVEL TRACE;
@@ -228,7 +228,7 @@ let correlate verbose strict prefix vlist correlfile prefix rev_correl orgsarray
 	  (fun (s, file, ver, pos, nfile, nver, npos, t) ->
 	    LOG "correlate: Start nested map" LEVEL TRACE;
 	    let nbug =
-	      (max_int, s, t, nfile, nver, npos, "ovl-face1", "", {Ast_org.is_head = false}, {Ast_org.def = None},[]) in
+	      (max_int, s, "", nfile, nver, npos, "ovl-face1", "", {Ast_org.is_head = false}, {Ast_org.def = None},[]) in
 	    (* We have a TODO from the correlation file *)
 	    if s = Ast_org.TODO then
 	      begin
