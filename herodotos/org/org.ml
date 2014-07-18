@@ -214,7 +214,7 @@ let rec parse_line_opt v file olnum ch =
 	    if Str.string_match re line 0 then
 	      parse_line_opt v file lnum ch
 	    else
-	      (LOG line LEVEL TRACE;
+	      (if !Misc.debug then LOG line LEVEL TRACE;
 	       (lnum, parse_line file lnum line))
 
 (*
