@@ -17,7 +17,7 @@ let rec get_chain (bug:Ast_org.bug) =
     match n.Ast_org.def with
 	None -> [bug]
       | Some (None) -> [bug]
-      | Some (Some nbug) -> bug::get_chain nbug
+      | Some (Some (nbug, _)) -> bug::get_chain nbug
 
 let is_head bug =
   let (l, s, r, f, v, pos, face, t, h, n, sub) = bug in
@@ -82,7 +82,7 @@ let manual_check_next verbose strict prefix correl subbugs bug =
     let check = (l, s, r, nfile, nver, next_pos, "", t, {Ast_org.is_head=true}, {Ast_org.def=None}, []) in
     (try
        let next = get_bug strict prefix check subbugs in
-       n.Ast_org.def <- Some (Some next);
+       n.Ast_org.def <- Some (Some (next, false));
        update_nohead next;
        LOG "Manual correlation OK" LEVEL TRACE;
        LOG "=========" LEVEL TRACE;
@@ -167,7 +167,7 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	    begin
 	      LOG "Automatic correlation OK" LEVEL TRACE;
 	      LOG "=========" LEVEL TRACE;
-	      n.Ast_org.def <- Some (Some next);
+	      n.Ast_org.def <- Some (Some (next, true));
 	      update_nohead next;
 	      (1, []) (* One automatic correlation performed *)
 	    end

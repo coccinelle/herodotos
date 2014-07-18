@@ -61,18 +61,19 @@ let find_disappeared strict prefix vlist (orgs:Ast_org.orgarray) : Ast_org.bugs 
 	) head flist
     ) [] orgs
 
-let is_SAME_as_next_in_correl correl file ver pos =
-  LOG "is_SAME_as_next_in_correl: start - %s/%s" ver file LEVEL TRACE;
+let is_STATUS_as_next_in_correl status correl file ver pos =
+  LOG "is_STATUS_as_next_in_correl: start - %s/%s for status %s"
+    ver file (Org_helper.get_status status) LEVEL TRACE;
   let res =
     List.exists
       (fun (cs, _, _, _, cnfile, cnver, cnpos, _) ->
-	cs = Ast_org.SAME
+	cs = status
 	&& cnfile = file
 	  && cnver  = ver
 	    && cnpos  = pos
       ) correl
   in
-  LOG "is_SAME_as_next_in_correl: %s/%s %b" ver file res LEVEL TRACE;
+  LOG "is_STATUS_as_next_in_correl: %s/%s %b" ver file res LEVEL TRACE;
   res
 
 let find_all_next strict prefix vlist (orgsarray:Ast_org.orgarray) correl bug =
@@ -102,18 +103,25 @@ let find_all_next strict prefix vlist (orgsarray:Ast_org.orgarray) correl bug =
 		   LOG "find_all_next: \"%s\" <-> \"%s\"" new_t new_tb LEVEL TRACE;
 		   new_t = new_tb
 		 else true)
-	     && not (is_SAME_as_next_in_correl correl file vn pos2)
+	     && not (is_STATUS_as_next_in_correl Ast_org.SAME correl file vn pos2)
+	     && not (is_STATUS_as_next_in_correl Ast_org.UNRELATED correl file vn pos2)
 	     (*
 	       We then remove bugs already in relation with another one.
 	     *)
 	     && not (List.exists
 		       (fun (_, _, _, pfile, pver, ppos, _, _, _, next, _) ->
 			 LOG "find_all_next: check %s/%s%s def:%s" pver pfile (Org.get_string_pos ppos) (show_opt next.Ast_org.def) LEVEL TRACE;
-			 next = {Ast_org.def = Some (Some next2)}
+			 next = {Ast_org.def = Some (Some (next2, true))}
 				&& not (file = pfile && ver = pver && pos = ppos)
 		       )
 		       orgs)
       ) orgs
+
+let is_auto bug =
+  let (_, _, _, _, _, _, _, _, _, next, _) = bug in
+  match next.Ast_org.def with
+      Some (Some (_, true)) -> true
+    | _ -> false
 
 let exists_bug_for_correl vlist orgs cbug =
   let (cs, cfile, cver, cpos, _, cnver, cnpos,_) = cbug in
@@ -126,6 +134,7 @@ let exists_bug_for_correl vlist orgs cbug =
     LOG "exists_bug_for_correl: %s def:%s" (Org.show_bug true bug) (show_opt next.Ast_org.def) LEVEL TRACE;
     cpos = pos
     && cs = Ast_org.SAME
+      && not (is_auto bug)
   ) (get_bugs_of vlist orgs cver cfile)
  
 let get_t_of_bug_for_next_correl strict prefix vlist orgs cbug =
@@ -140,6 +149,10 @@ let get_t_of_bug_for_next_correl strict prefix vlist orgs cbug =
   let new_t = Org.clean_link_text prefix cver cfile cpos t in
   LOG "get_t_of_bug_for_next_correl: check \"%s\" <-> \"%s\"" ct new_t LEVEL TRACE;
   new_t
+
+let status_is org_type cbug =
+  let (cs, cfile, cver, cpos, cnfile, cnver, cnpos, t) = cbug in
+  cs = org_type
 
 let get_all_correl strict prefix vlist correl orgs bug =
   let (_, _, _, file, ver, pos, _, bug_t, _, _, _) = bug in
@@ -215,10 +228,12 @@ let correlate verbose strict prefix vlist correlfile prefix rev_correl orgsarray
 	  (fun (s, file, ver, pos, nfile, nver, npos, t) ->
 	    LOG "correlate: Start nested map" LEVEL TRACE;
 	    let nbug =
-	      (max_int, s, "", nfile, nver, npos, "ovl-face1", "", {Ast_org.is_head = false}, {Ast_org.def = None},[]) in
+	      (max_int, s, t, nfile, nver, npos, "ovl-face1", "", {Ast_org.is_head = false}, {Ast_org.def = None},[]) in
+	    (* We have a TODO from the correlation file *)
 	    if s = Ast_org.TODO then
 	      begin
-		if not (is_SAME_as_next_in_correl correl file nver npos)
+		(* If a next report is used for a SAME, drop the other correlations relatd to it *)
+		if not (is_STATUS_as_next_in_correl Ast_org.SAME correl file nver npos)
 		then
 		  (Printf.fprintf ch "* TODO %s\n %s\n"
 		     (Org.make_orglinkbug true prefix bug)
@@ -228,17 +243,28 @@ let correlate verbose strict prefix vlist correlfile prefix rev_correl orgsarray
 		  false
 	      end
 	    else
+	      (*
+		We filter the correlations which have been resolved
+		automatically.
+	      *)
 	      begin
-		let status = Org_helper.get_status s in
-		Printf.fprintf ch "* %s %s\n %s\n"
-		  status
-		  (Org.make_orglinkbug true prefix bug)
-		  (Org.make_orglinkbug true prefix nbug);
+		if not (is_auto bug) then
+		  begin
+		    let status = Org_helper.get_status s in
+		    Printf.fprintf ch "* %s %s\n %s\n"
+		      status
+		      (Org.make_orglinkbug true prefix bug)
+		      (Org.make_orglinkbug true prefix nbug);		    
+		  end;
 		false
 	      end
-		
 	  ) bug_correl in
-	List.length (List.filter (fun x -> x) todo)
+	let new_todo =
+	  if List.for_all (status_is Ast_org.UNRELATED) bug_correl then
+	    gen_todo ch strict vlist prefix orgsarray correl bug
+	  else 0
+	in
+	new_todo + List.length (List.filter (fun x -> x) todo)
     with e ->
       LOG "EXN %s" (Printexc.to_string e) LEVEL FATAL;
       Debug.trace (Printexc.get_backtrace ());

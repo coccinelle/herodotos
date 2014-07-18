@@ -32,7 +32,7 @@ type is_head = {mutable is_head: bool}
 type bug = int * status * text * path * vname * pos * string * text * is_head * next * orgs
 and next = {
  (* None denotes with undefined next, Some (None) denotes tail bug, Some (Some) denotes linked bugs *)
-  mutable def: bug option option
+  mutable def: (bug * bool) option option
 }
 
 type bugs = bug list
