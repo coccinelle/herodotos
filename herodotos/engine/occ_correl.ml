@@ -128,18 +128,18 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	      if line < linee then (* Check next lines until 'linee' *)
 		fold (line+1)
 	      else (0, ks)
-	    else (1, [])           (* Found something. Stop there. *)
+	    else (1, None)           (* Found something. Stop there. *)
 	  in
 	  let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
-	  if ks <> [] then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
+	  if ks <> None then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
 	  if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
-	  if n.Ast_org.def = None || n.Ast_org.def = Some (None) then
+	  if n.Ast_org.def = None then
 	    manual_check_next verbose strict prefix correl subbugs bug
 	  else
 	    1 (* Automatic correlation performed *)
 
 and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos
-    : int * (string * ((Ast_org.bug -> int) * Ast_org.bug)) list =
+    : int * (string * ((Ast_org.bug -> int) * Ast_org.bug)) option =
   Debug.profile_code_silent "check_next"
     (fun () ->
       let (l, s, r, f, v, p, face, t, h, n, _) = bug in
@@ -158,7 +158,7 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	  LOG "Automatic correlation OK" LEVEL TRACE;
 	  LOG "=========" LEVEL TRACE;
 	  n.Ast_org.def <- Some (None);
-	  (1, []) (* Automatic correlation performed *)
+	  (1, None) (* Automatic correlation performed *)
 	end
       else
 	try
@@ -169,23 +169,24 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	      LOG "=========" LEVEL TRACE;
 	      n.Ast_org.def <- Some (Some (next, true));
 	      update_nohead next;
-	      (1, []) (* One automatic correlation performed *)
+	      (1, None) (* One automatic correlation performed *)
 	    end
 	  else
 	    failwith "Already defined next !" (* No automatic correlation performed *)
 	with Not_found ->
 	  if conf then
 	    begin
+	      LOG "No next found, but confidence set" LEVEL TRACE;
 	      LOG "Automatic correlation OK" LEVEL TRACE;
 	      LOG "=========" LEVEL TRACE;
 	      n.Ast_org.def <- Some (None);
-	      (1, []) (* Automatic correlation performed *)
+	      (1, None) (* Automatic correlation performed *)
 	    end
 	  else
 	    begin
 	      LOG "Will try with an alternative method..." LEVEL TRACE;
 	      LOG "=========" LEVEL TRACE;
-	      (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
+	      (0, Some (Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug)))
 	    end
     )
 
@@ -202,7 +203,7 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	   LOG "No bug in version %s of %s. Skip." (Misc.get_next_version vlist v) f LEVEL TRACE;
 	   LOG "=========" LEVEL TRACE;
 	   n.Ast_org.def <- Some (None);
-	   (1, []) (* Considered as an automatic correlation *)
+	   (1, None) (* Considered as an automatic correlation *)
 	 end
        else
 	 (* Normal path *)
@@ -224,13 +225,13 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	     else
 	       if cont then
 	       (* Considered as uncorrelated. Continuation will check with the alternative algorithm. *)
-		 (0, [(Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug))])
+		 (0, Some (Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug)))
 	       else
 		 begin
 		   LOG "Automatic correlation OK" LEVEL TRACE;
 		   LOG "=========" LEVEL TRACE;
 		   n.Ast_org.def <- Some (None);
-		   (1, []) (* Considered as an automatic correlation *)
+		   (1, None) (* Considered as an automatic correlation *)
 		 end
 	   | (Ast_diff.Unlink, _, _) ->
 	   (*
@@ -239,7 +240,7 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	     LOG "Automatic correlation OK" LEVEL TRACE;
 	     LOG "=========" LEVEL TRACE;
 	     n.Ast_org.def <- Some (None);
-	     (1, []) (* Considered as an automatic correlation *)
+	     (1, None) (* Considered as an automatic correlation *)
 	   | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
 	       (*
 		 Could we do something for bugs inside a hunk ?
@@ -252,7 +253,7 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		 if line < linee then
 		   fold (line+1)
 		 else (0, ks)
-	       else (1, [])
+	       else (1, None)
 	     in fold lineb
     )
 
@@ -272,8 +273,13 @@ let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs 
 		     (**)
 		     List.fold_left
 		       (fun (res_acc, ks_acc) bug ->
-			 let (res, ks) = compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug in
-			 (res_acc + res, ks_acc @ ks)
+			 let (res, ksopt) = compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug in
+			 let (l, s, r, f, v, p, face, t, h, n, _) = bug in
+			 if n.Ast_org.def = Some (None) then
+			   LOG "No next found. Even with alternative method." LEVEL WARN;
+			 match ksopt with
+			     None -> (res_acc + res, ks_acc)
+			   | Some ks -> (res_acc + res, ks::ks_acc)
 		       ) acc subbugs
 		   (**)
 		   ) acc flist
