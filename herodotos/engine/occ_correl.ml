@@ -178,7 +178,7 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	with Not_found ->
 	  if conf then
 	    begin
-	      LOG "No next found, but confidence set" LEVEL TRACE;
+	      LOG "No next found, but confidence set" LEVEL WARN;
 	      LOG "Automatic correlation OK" LEVEL TRACE;
 	      LOG "=========" LEVEL TRACE;
 	      n.Ast_org.def <- Some (None);
@@ -276,9 +276,6 @@ let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs 
 		     List.fold_left
 		       (fun (res_acc, ks_acc) bug ->
 			 let (res, ksopt) = compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug in
-			 let (l, s, r, f, v, p, face, t, h, n, _) = bug in
-			 if n.Ast_org.def = Some (None) then
-			   LOG "No next found. Even with alternative method." LEVEL WARN;
 			 match ksopt with
 			     None -> (res_acc + res, ks_acc)
 			   | Some ks -> (res_acc + res, ks::ks_acc)
