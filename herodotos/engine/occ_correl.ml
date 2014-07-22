@@ -72,8 +72,6 @@ let manual_check_next verbose strict prefix correl subbugs bug =
 	      then
 		let new_t = Org.clean_link_text prefix v f pos ctext in
 		LOG "manual_check_next: \"%s\" <-> \"%s\"" new_t t LEVEL TRACE;
-		LOG "Automatic correlation OK" LEVEL TRACE;
-		LOG "=========" LEVEL TRACE;
 		new_t = t
 	      else true
 	    )
@@ -102,11 +100,15 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
   let vidx = Misc.get_idx_of_version vlist v in
   let subbugs = get_next_list vlist bugs f vidx in
   match Diff.alt_new_pos diffs f v p with
-      None -> manual_check_next verbose strict prefix correl subbugs bug
+      None ->
+	LOG "No alternative position" LEVEL TRACE;
+	manual_check_next verbose strict prefix correl subbugs bug
     | Some (_, diffcheck_pos) ->
       match diffcheck_pos with
 	  (Ast_diff.Sing line,colb,cole) ->
-	    ignore(check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole));
+	    let (res, ks) = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+	    if ks <> None then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
+	    if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
 	    if n.Ast_org.def = None then
 	      manual_check_next verbose strict prefix correl subbugs bug
 	    else
