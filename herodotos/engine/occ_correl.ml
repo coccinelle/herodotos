@@ -47,10 +47,18 @@ let extract_chain ext_file (bugs: Ast_org.orgarray) : Ast_org.bugs list =
 let get_bug strict prefix (bug: Ast_org.bug) (bugs: Ast_org.bug list) : Ast_org.bug =
   List.find (match_bug strict prefix bug) bugs
 
-let get_next_list vlist bugs f vidx =
+let get_next_list strict prefix vlist bugs f vidx old_t =
   let (_, tbl) = Array.get bugs (vidx+1) in
   try
-    Hashtbl.find tbl f
+    let buglist = Hashtbl.find tbl f in
+    if strict then
+      List.filter (fun bug ->
+	let (l, s, r, f, v, p, face, t, h, n, _) = bug in
+	let t = Org.clean_link_text prefix v f p t in
+	old_t = t
+      ) buglist
+    else
+      buglist
   with Not_found -> []
 
 let update_nohead bug =
@@ -97,8 +105,9 @@ let manual_check_next verbose strict prefix correl subbugs bug =
 
 let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug : int =
   let (l, s, r, f, v, p, face, t, h, n, _) = bug in
+  let t = if strict then (Org.clean_link_text prefix v f p t) else "" in
   let vidx = Misc.get_idx_of_version vlist v in
-  let subbugs = get_next_list vlist bugs f vidx in
+  let subbugs = get_next_list strict prefix vlist bugs f vidx t in
   match Diff.alt_new_pos diffs f v p with
       None ->
 	LOG "No alternative position" LEVEL TRACE;
@@ -147,7 +156,7 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
       let (l, s, r, f, v, p, face, t, h, n, _) = bug in
       let t = if strict then (Org.clean_link_text prefix v f p t) else "" in
       let vidx = Misc.get_idx_of_version vlist v in
-      let subbugs = get_next_list vlist bugs f vidx in
+      let subbugs = get_next_list strict prefix vlist bugs f vidx t in
       let vn = Misc.get_version_name vlist (vidx+1) in
       let check = (l, s, r, f, vn, check_pos, face, t, {Ast_org.is_head=true}, {Ast_org.def=None}, []) in
       LOG "check_next of %s at %s" (Org.show_bug true bug) (Org.show_bug true check) LEVEL TRACE;
@@ -196,10 +205,11 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
   Debug.profile_code_silent "compute_bug_next"
     (fun () ->
        let (l, s, r, f, v, p, face, t, h, n, _) = bug in
+       let t = if strict then (Org.clean_link_text prefix v f p t) else "" in
        LOG "%s" (Org.show_bug true bug) LEVEL TRACE;
        (* Short path when there is no bug in next version *)
        let vidx = Misc.get_idx_of_version vlist v in
-       let subbugs = get_next_list vlist bugs f vidx in
+       let subbugs = get_next_list strict prefix vlist bugs f vidx t in
        if subbugs = [] then
 	 begin
 	   LOG "No bug in version %s of %s. Skip." (Misc.get_next_version vlist v) f LEVEL TRACE;
