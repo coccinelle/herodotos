@@ -235,6 +235,8 @@ let anon_fun = fun
       freearg := x
 
 let _ =
+  Bolt.Logger.register "" Bolt.Level.INFO "all" "default" (Bolt.Mode.direct ())
+    "file" ("<stderr>", {Bolt.Output.seconds_elapsed = None; Bolt.Output.signal_caught = None});
   LOG "*** START ***" LEVEL TRACE;
   let aligned = Arg.align options in
     (try
