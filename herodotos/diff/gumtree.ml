@@ -74,21 +74,25 @@ let found tree =
 let match_tree pos (tree:Ast_diff.tree) =
   let (line, colb, cole) = pos in
   let (_, _, bl, bc, el, ec)  = get_pos_before tree in
-  if line > bl && line <= el then
+  if line > bl && (line < el || line = el && cole <= ec) then
     (* Match a node that start before, but may end at the right line, or after *)
-    found tree
+    (if !Misc.debug then LOG "match_tree: case 1" LEVEL TRACE;
+     found tree)
   else if line = bl && line < el
        && colb >= bc then
     (* Match a *large* node that start at the right line. The begin column must be right too. *)
-    found tree
+    (if !Misc.debug then LOG "match_tree: case 2" LEVEL TRACE;
+     found tree)
   else if line = bl && line = el
 	       && colb >= bc && cole <= ec then
     (* The perfect line matching is not capture in the previous case.
        We check it here, and also check the columns.
     *)
-    found tree
+    (if !Misc.debug then LOG "match_tree: case 3" LEVEL TRACE;
+     found tree)
   else
-    false
+    (if !Misc.debug then LOG "match_tree: case 4" LEVEL TRACE;
+     false)
 
 let rec lookup_tree pos (tree:Ast_diff.tree) : Ast_diff.tree =
   Debug.profile_code_silent "Gumtree.lookup_tree"
@@ -97,10 +101,13 @@ let rec lookup_tree pos (tree:Ast_diff.tree) : Ast_diff.tree =
       try
 	let candidate = List.find (match_tree pos) children in
 	if is_perfect pos candidate then
-	  candidate
+	  (LOG "lookup_tree: perfect" LEVEL TRACE;
+	   candidate)
 	else
-	  lookup_tree pos candidate
+	  (LOG "lookup_tree: !perfect - recurse" LEVEL TRACE;
+	   lookup_tree pos candidate)
       with Not_found ->
+	LOG "lookup_tree: Not_found - Return current element" LEVEL FATAL;
 	tree
     )
 
