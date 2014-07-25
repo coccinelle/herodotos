@@ -236,8 +236,12 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	       check_next verbose strict conf prefix depth vlist diffs correl bugs bug (0,colb,cole)
 	     else
 	       if cont then
-	       (* Considered as uncorrelated. Continuation will check with the alternative algorithm. *)
-		 (0, Some (Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug)))
+		 (* Considered as uncorrelated. Continuation will check with the alternative algorithm. *)
+		 begin
+		   LOG "Will try with an alternative method..." LEVEL TRACE;
+		   LOG "=========" LEVEL TRACE;
+		   (0, Some (Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug)))
+		 end
 	       else
 		 begin
 		   LOG "Automatic correlation OK" LEVEL TRACE;
