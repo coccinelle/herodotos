@@ -51,14 +51,14 @@ let get_next_list strict prefix vlist bugs f vidx old_t =
   let (_, tbl) = Array.get bugs (vidx+1) in
   try
     let buglist = Hashtbl.find tbl f in
-    if strict then
-      List.filter (fun bug ->
-	let (l, s, r, f, v, p, face, t, h, n, _) = bug in
-	let t = Org.clean_link_text prefix v f p t in
-	old_t = t
-      ) buglist
-    else
-      buglist
+    List.filter (fun bug ->
+      let (l, s, r, f, v, p, face, t, h, n, _) = bug in
+      h.Ast_org.is_head = true
+      && if strict then
+	  let t = Org.clean_link_text prefix v f p t in
+	  old_t = t
+	else true
+    ) buglist
   with Not_found -> []
 
 let update_nohead bug =
