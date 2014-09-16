@@ -53,17 +53,27 @@ versionPreinit:
 let build_updated_cache cache_projects =
   Setup.PrjTbl.fold 
     (fun key data cache ->
-      cache
+      LOG "Processing %s for cache" key LEVEL INFO;
+      try
+	let cacheddata = List.assoc key cache_projects in
+	(key, cacheddata)::cache
+      with Not_found ->
+	let versinfos = Array.to_list (snd (Config.get_versinfos key)) in
+	let data = List.map (fun (name, days, date, size) -> (name, date, size)) versinfos in
+	(key, data)::cache
     )
     Setup.projects []
 
 let  print_cache out_channel prj_cache =
   let (prj, vl) = prj_cache in
-  Printf.fprintf out_channel "%s {" prj;
-  List.iter (fun (name, date, size) ->
-    Printf.fprintf out_channel "(%s, %s, %d)" name (Misc.string_of_date date) size
+  Printf.fprintf out_channel "%s {\n" prj;
+  List.iter (fun (name, date_opt, size) ->
+    match date_opt with
+	Some date ->
+	  Printf.fprintf out_channel "(\"%s\", %s, %d)\n" name (Misc.string_of_date date) size
+      | None -> failwith ("No date for " ^ prj)
   ) vl;
-  Printf.fprintf out_channel "}"
+  Printf.fprintf out_channel "}\n"
 
 let preinit v1 v2 v3 configfile =
   ignore(Config.parse_config_no_cache configfile);
