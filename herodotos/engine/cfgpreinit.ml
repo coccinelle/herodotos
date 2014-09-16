@@ -29,6 +29,25 @@ versionPreinit:
         "("^"\""^name^"\""^","^ date ^","^(string_of_int size)^")"
   }
 
+versionPreinit:
+  TLPAR name=TSTRING TCOMMA d=datePreinit  size=suitePreinit TRPAR {
+    (* FIXME: Should not be in parser !!! *)
+    ignore(Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!repository_git) (!repository_git));
+    let date =
+      if d = "" then 
+        (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!repository_git))
+      else d
+    in
+    let corrected_size =
+      if size = 0 then    
+	Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name)
+      else
+	size
+    in
+    "("^"\""^name^"\""^","^ date^","^(string_of_int corrected_size)^")"
+  }
+
+
 *)
 
 let build_updated_cache cache_projects =
