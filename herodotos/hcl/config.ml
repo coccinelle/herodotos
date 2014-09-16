@@ -631,8 +631,25 @@ let get_versions p =
 	with
 	    Ast_config.Version (depth, v) ->
 	      (depth, List.map (fun (n, _, _) -> n) v)
-	  | _ -> (0, [])
+	  | _ -> raise Unrecoverable
       with _ -> (0, [])
+  with Not_found ->
+    raise (Misconfiguration ("project "^p^" is not declared"))
+
+let get_versionsRE p =
+  try
+    let atts = snd (Setup.PrjTbl.find Setup.projects p) in
+      try
+	match
+	  List.find (fun x ->
+		       match x with
+			   Ast_config.VersionRE _ -> true
+			 | _ -> false
+		    ) atts
+	with
+	    Ast_config.VersionRE re -> re
+	  | _ -> raise Unrecoverable
+      with _ -> "" (* No RE defined *)
   with Not_found ->
     raise (Misconfiguration ("project "^p^" is not declared"))
 
