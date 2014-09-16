@@ -56,11 +56,22 @@ let build_updated_cache cache_projects =
       LOG "Processing %s for cache" key LEVEL INFO;
       try
 	let cacheddata = List.assoc key cache_projects in
+	LOG "Data found in the cache" LEVEL INFO;
 	(key, cacheddata)::cache
       with Not_found ->
 	let versinfos = Array.to_list (snd (Config.get_versinfos key)) in
-	let data = List.map (fun (name, days, date, size) -> (name, date, size)) versinfos in
-	(key, data)::cache
+	if versinfos = [] then
+	  begin
+	    (* There is no info. TODO: Need to check for a RE *)
+	    LOG "No data in cache and no data provided. Use regexp and compute" LEVEL INFO;
+	    cache
+	  end
+	else
+	  begin
+	    let data = List.map (fun (name, days, date, size) -> (name, date, size)) versinfos in
+	    LOG "No data in cache. Use provided data" LEVEL INFO;
+	    (key, data)::cache
+	  end
     )
     Setup.projects []
 
