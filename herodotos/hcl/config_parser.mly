@@ -17,10 +17,6 @@
        (* Will be normalized by mktime *)
        Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
       })
-
-  let versions_string = ref ""
-
-  let repository_git = ref "" (* FIXME: To remove. Replace with PUBLIC_SCM attribut *)
 %}
 
 // TCOLEQ TLAB TRAB
