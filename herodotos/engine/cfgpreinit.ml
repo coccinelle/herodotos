@@ -66,7 +66,7 @@ let  print_cache out_channel prj_cache =
   Printf.fprintf out_channel "}"
 
 let preinit v1 v2 v3 configfile =
-  ignore(Config.parse_config configfile);
+  ignore(Config.parse_config_no_cache configfile);
   LOG "Config parsing OK!" LEVEL INFO;
   Config.show_config ();
   let cache_file = ".projects_"^configfile in

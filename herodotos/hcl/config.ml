@@ -38,8 +38,7 @@ let parse_cache cache_file =
   with _ -> LOG "File %s does not exit, run make preinit." cache_file LEVEL ERROR;
     failwith ("File "^cache_file^" does not exit, run make preinit.")
 
-let parse_config file : unit =
- let cache = parse_cache (".projects_"^file) in
+let parse_config_no_cache file : unit =
  let in_ch = open_in file in
   let lexbuf = Lexing.from_channel in_ch  in
   try
@@ -64,6 +63,12 @@ let parse_config file : unit =
 	      Ast.colfr = pos.pos_cnum - pos.pos_bol;
  	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
 	    ("Config Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
+
+let parse_config file : unit =
+ let cache = parse_cache (".projects_"^file) in
+ let ast = parse_config_no_cache file in
+ ast
+   (* TODO: Merge cache and ast *)
 
 let get_date d = match d with
     Some d -> d
