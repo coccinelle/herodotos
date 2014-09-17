@@ -90,13 +90,13 @@ Here is a summary of the most commonly used options:
 .B --config \fI<configfile>\fP
 the Herodotos configuration file
 .TP
-.B --init
+.B init
 initialize the environment
 .TP
-.B --correl
+.B correl
 launch the automatic correlation process
 .TP
-.B --stat --statcorrel --statfp
+.B stat statcorrel statfp
 compute the statistics, either related to the correlation, the false
 positives or both.
 .TP
@@ -108,21 +108,24 @@ show the list of options.
 
 .SH EXAMPLES
 
-  herodotos -c <hcl.file> --init
+  herodotos -c <hcl.file> init
 .br
-  herodotos -c <hcl.file> --correl
+  herodotos -c <hcl.file> correl
 .br
   herodotos -c <hcl.file> --web
+.br
+  herodotos extract --tag <version> --orgfile <file> --prefix <path>
 
 .SH AUTHOR
-\fBherodotos\fP was written by Nicolas Palix <npalix@diku.dk>.
+\fBherodotos\fP was written by Nicolas Palix <nicolas.palix@imag.fr>.
 .PP
-This manual page was written by Nicolas Palix <npalix@diku.dk>.
+This manual page was written by Nicolas Palix <nicolas.palix@imag.fr>.
 
 .SH REPORTING BUGS
-Send a mail to <npalix@diku.dk>
+Send a mail to <nicolas.palix@imag.fr>
 
 .SH COPYRIGHT
+Copyright 2012--2014, University of Grenoble - Alps.
 Copyright 2009, 2010, University of Copenhagen DIKU and INRIA.
 herodotos is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
