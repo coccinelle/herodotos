@@ -24,6 +24,7 @@ type hmode =
 | PreInit
 | Init
 | Correl
+| Extract
 | Graph
 | Stat
 | Statcorrel
