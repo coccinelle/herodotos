@@ -29,18 +29,18 @@ herodotos \- tracking occurrences of code patterns across several project versio
 .B herodotos
 .B -c
 .I <configfile>
-.B --init
+.B init
 .RB [ --cvs ]
 .br
 .B herodotos
 .B -c
 .I <configfile>
-.B --correl
+.B correl
 .br
 .B herodotos
 .B -c
 .I <configfile>
-.RB [ --stat | --statcorrel | --statfp ]
+.RB [ stat | statcorrel | statfp ]
 .br
 .B herodotos
 .B -c
@@ -53,7 +53,7 @@ herodotos \- tracking occurrences of code patterns across several project versio
 .B herodotos
 .B -c
 .I <configfile>
-.B --erase
+.B erase
 .RB [
 .I pattern
 .RB |
@@ -88,17 +88,20 @@ Here is a summary of the most commonly used options:
 .B -c \fI<configfile>\fP
 .TP
 .B --config \fI<configfile>\fP
-the Herodotos configuration file
+The Herodotos configuration file
 .TP
 .B init
-initialize the environment
+Initialize the environment
 .TP
 .B correl
-launch the automatic correlation process
+Launch the automatic correlation process
 .TP
 .B stat statcorrel statfp
-compute the statistics, either related to the correlation, the false
+Compute the statistics, either related to the correlation, the false
 positives or both.
+.TP
+.B extract
+Extract a particular version with annotated reports from correlated file. 
 .TP
 .B --longhelp
 see all the available options
