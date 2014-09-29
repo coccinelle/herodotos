@@ -7,6 +7,7 @@ let help = ref false
 let longhelp = ref false
 let diffalgo = ref "gnudiff"
 let orgfile = ref ""
+let outfile = ref ""
 let prefix = ref ""
 let extract = ref ""
 let version_incr = ref ""
@@ -65,6 +66,8 @@ let options = [
   "--tag", Arg.Set_string extract, "version Gives the version to extract from a correlated report";
   "--hacks", Arg.Set Global.hacks, " Enable hacks (to perform customized studies)";
   "--orgfile", Arg.Set_string orgfile, "file path to an Org file";
+  "-o", Arg.Set_string outfile, "file path to an output file";
+  "--outfile", Arg.Set_string outfile, "file path to an output file";
   "--prefix", Arg.Set_string prefix, "path prefix of the source directories (to properly parse Org files)";
   "--profile", Arg.Unit (fun () -> LOG "*** PROFILING ENABLED ***" LEVEL TRACE;
 			   Debug.profile := Debug.PALL), " gather timing information about the main functions";
@@ -183,8 +186,12 @@ let main aligned =
 					(LOG "Extracting version tagged '%s'" !extract LEVEL INFO;
 					 Orgfilter.filter_version !extract !prefix formatted)
 				    in
-				    Org.print_orgs_raw stdout !prefix filtered;
-				    LOG "Done!" LEVEL INFO
+				    try
+				      let out = if !outfile = "" then stdout else open_out !outfile in
+				      Org.print_orgs_raw out !prefix filtered;
+				      if !outfile <> "" then close_out out;
+				      LOG "Done!" LEVEL INFO
+				    with _ -> LOG "Fail to write to %s" !outfile LEVEL ERROR;
 				end
 			    ) else (
 			      LOG "*** ERROR *** Prefix not set" LEVEL ERROR;
