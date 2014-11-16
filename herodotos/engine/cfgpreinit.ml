@@ -29,25 +29,65 @@ versionPreinit:
         "("^"\""^name^"\""^","^ date ^","^(string_of_int size)^")"
   }
 
+versionPreinit:
+  TLPAR name=TSTRING TCOMMA d=datePreinit  size=suitePreinit TRPAR {
+    (* FIXME: Should not be in parser !!! *)
+    ignore(Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!repository_git) (!repository_git));
+    let date =
+      if d = "" then 
+        (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!repository_git))
+      else d
+    in
+    let corrected_size =
+      if size = 0 then    
+	Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name)
+      else
+	size
+    in
+    "("^"\""^name^"\""^","^ date^","^(string_of_int corrected_size)^")"
+  }
+
+
 *)
 
 let build_updated_cache cache_projects =
   Setup.PrjTbl.fold 
     (fun key data cache ->
-      cache
+      LOG "Processing %s for cache" key LEVEL INFO;
+      try
+	let cacheddata = List.assoc key cache_projects in
+	LOG "Data found in the cache" LEVEL INFO;
+	(key, cacheddata)::cache
+      with Not_found ->
+	let versinfos = Array.to_list (snd (Config.get_versinfos key)) in
+	if versinfos = [] then
+	  begin
+	    (* There is no info. TODO: Need to check for a RE *)
+	    LOG "No data in cache and no data provided. Use regexp and compute" LEVEL INFO;
+	    cache
+	  end
+	else
+	  begin
+	    let data = List.map (fun (name, days, date, size) -> (name, date, size)) versinfos in
+	    LOG "No data in cache. Use provided data" LEVEL INFO;
+	    (key, data)::cache
+	  end
     )
     Setup.projects []
 
 let  print_cache out_channel prj_cache =
   let (prj, vl) = prj_cache in
-  Printf.fprintf out_channel "%s {" prj;
-  List.iter (fun (name, date, size) ->
-    Printf.fprintf out_channel "(%s, %s, %d)" name (Misc.string_of_date date) size
+  Printf.fprintf out_channel "%s {\n" prj;
+  List.iter (fun (name, date_opt, size) ->
+    match date_opt with
+	Some date ->
+	  Printf.fprintf out_channel "(\"%s\", %s, %d)\n" name (Misc.string_of_date date) size
+      | None -> failwith ("No date for " ^ prj)
   ) vl;
-  Printf.fprintf out_channel "}"
+  Printf.fprintf out_channel "}\n"
 
 let preinit v1 v2 v3 configfile =
-  ignore(Config.parse_config configfile);
+  ignore(Config.parse_config_no_cache configfile);
   LOG "Config parsing OK!" LEVEL INFO;
   Config.show_config ();
   let cache_file = ".projects_"^configfile in

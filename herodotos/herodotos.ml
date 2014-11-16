@@ -5,8 +5,9 @@ exception Misconfigured
 let configfile = ref "study.hc"
 let help = ref false
 let longhelp = ref false
-let diffalgo = ref "diff"
+let diffalgo = ref "gnudiff"
 let orgfile = ref ""
+let outfile = ref ""
 let prefix = ref ""
 let extract = ref ""
 let version_incr = ref ""
@@ -38,6 +39,7 @@ let modes = [
   "graph", Arg.Unit (fun () -> mode := Some Graph), " Generate the graphs";
   "blame", Arg.Unit (fun () -> mode := Some Blame), " Annotate reports with author name";
   "export-history", Arg.Unit (fun () -> mode := Some ExpHistory), " Export scm history to SQL DB (currently date and author of commits)";
+  "extract", Arg.Unit (fun () -> mode := Some Extract), " Extract a <tag> version from a correlated report";
   "stat", Arg.Unit (fun () -> mode := Some Stat), " Compute statistics";
   "statcorrel", Arg.Unit (fun () -> mode := Some Statcorrel), " Compute statistics about correlations";
   "statfp", Arg.Unit (fun () -> mode := Some StatFP), " Compute statistics about false positives";
@@ -60,11 +62,13 @@ let options = [
   "--config", Arg.Set_string configfile, "file Configuration file describing the requested data";
   "--cvs", Arg.Set cvs, " Generation of .cvsignore files (in init mode)";
   "--debug", Arg.Set Misc.debug, " Debug mode";
-  "--diff", Arg.Set_string diffalgo, " Diff algorithm (e.g. 'diff' or 'gumtree:file.xml')";
-  "--extract", Arg.Set_string extract, "version Gives the version to extract from a correlated report";
+  "--diff", Arg.Set_string diffalgo, " Diff algorithm (e.g. 'gnudiff' or 'gumtree:file.xml')";
+  "--tag", Arg.Set_string extract, "version Gives the version to extract from a correlated report";
   "--hacks", Arg.Set Global.hacks, " Enable hacks (to perform customized studies)";
-  "--parse_org", Arg.Set_string orgfile, "file path to an Org file to parse (test)";
-  "--prefix", Arg.Set_string prefix, "path prefix of the source directories (test)";
+  "--orgfile", Arg.Set_string orgfile, "file path to an Org file";
+  "-o", Arg.Set_string outfile, "file path to an output file";
+  "--outfile", Arg.Set_string outfile, "file path to an output file";
+  "--prefix", Arg.Set_string prefix, "path prefix of the source directories (to properly parse Org files)";
   "--profile", Arg.Unit (fun () -> LOG "*** PROFILING ENABLED ***" LEVEL TRACE;
 			   Debug.profile := Debug.PALL), " gather timing information about the main functions";
   "--eps", Arg.Clear pdf, " disable the (default) generation of PDF with 'epstopdf'";
@@ -151,6 +155,53 @@ let main aligned =
 		    | Correl ->
 		      Debug.profile_code "correlation"
 			(fun () -> Cfgcorrel.correl !verbose1 !verbose2 !verbose3 !configfile !diffalgo !freearg)
+		    | Extract ->
+		      Debug.profile_code "extract"
+			(fun () -> 
+			  if ((String.length !orgfile) <> 0)
+			  then (
+			    if ((String.length !prefix) <> 0) then (
+			      let ast = Org.parse_org !verbose1 !orgfile in
+			      if ast = [] then
+				LOG "Empty Org file: %s" !orgfile LEVEL WARN
+			      else
+				begin
+				  LOG "Checking %d elements..." (List.length ast) LEVEL INFO;
+				  let formatted =
+				    try
+				      Org.format_orgs !prefix 1 ast
+				    with Misc.Strip msg ->
+				      LOG "Error: %s" msg LEVEL FATAL;
+				      failwith msg
+				  in
+				  LOG "Converting %d elements..."  (List.length formatted) LEVEL INFO;
+				  if formatted = [] then
+				    LOG "Conversion failed!" LEVEL ERROR
+				  else
+				    let filtered =
+				      if !extract = "" then
+					(LOG "No extraction to perform" LEVEL INFO;
+					 formatted)
+				      else
+					(LOG "Extracting version tagged '%s'" !extract LEVEL INFO;
+					 Orgfilter.filter_version !extract !prefix formatted)
+				    in
+				    try
+				      let out = if !outfile = "" then stdout else open_out !outfile in
+				      Org.print_orgs_raw out !prefix filtered;
+				      if !outfile <> "" then close_out out;
+				      LOG "Done!" LEVEL INFO
+				    with _ -> LOG "Fail to write to %s" !outfile LEVEL ERROR;
+				end
+			    ) else (
+			      LOG "*** ERROR *** Prefix not set" LEVEL ERROR;
+			      failwith "No prefix set"
+			    )
+			  ) else (
+			    LOG "*** ERROR *** Org file not set" LEVEL ERROR;
+			    failwith "No org file set"
+			  )
+			)
 		    | Graph ->
 		      Debug.profile_code "graph generation"
 			(fun () ->
@@ -235,7 +286,10 @@ let anon_fun = fun
       freearg := x
 
 let _ =
+  Bolt.Logger.register "" Bolt.Level.INFO "all" "default" (Bolt.Mode.direct ())
+    "file" ("<stderr>", {Bolt.Output.seconds_elapsed = None; Bolt.Output.signal_caught = None});
   LOG "*** START ***" LEVEL TRACE;
+  Array.iteri (fun i opt -> LOG "Option %d: %s" i opt LEVEL TRACE) Sys.argv;
   let aligned = Arg.align options in
     (try
       Arg.parse_argv Sys.argv aligned anon_fun usage_msg;

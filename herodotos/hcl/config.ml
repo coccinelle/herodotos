@@ -8,45 +8,37 @@ exception Misconfiguration of string
 exception BadDate of string
 exception Misconfigurationat of string * Ast.pos
 
+(* Parse the .projects_configfile to recover each project versions *)  
 let parse_cache cache_file =
-  let in_ch = open_in cache_file in
-  let lexbuf = Lexing.from_channel in_ch in
-  try   
-    Misc.init cache_file lexbuf;
-    let ast = Config_parser.projects_cache Config_lexer.token lexbuf in
-    close_in in_ch;
-    ast
-  with
-      (Config_lexer.Lexical msg) ->
-	let pos = lexbuf.lex_curr_p in
+  try
+    let in_ch = open_in cache_file in
+    let lexbuf = Lexing.from_channel in_ch in
+    try   
+      Misc.init cache_file lexbuf;
+      let ast = Config_parser.projects_cache Config_lexer.token lexbuf in
+      close_in in_ch;
+      ast
+    with
+	(Config_lexer.Lexical msg) ->
+	  let pos = lexbuf.lex_curr_p in
 	  Misc.report_error
 	    { Ast.file  = cache_file;
 	      Ast.line  = pos.pos_lnum;
 	      Ast.colfr = pos.pos_cnum - pos.pos_bol;
 	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
 	    ("Config Lexer Error: " ^ msg);
-    | Config_parser.Error ->
+      | Config_parser.Error ->
 	let pos = lexbuf.lex_curr_p in
-	  Misc.report_error
-	    { Ast.file  = cache_file;
-	      Ast.line  = pos.pos_lnum;
-	      Ast.colfr = pos.pos_cnum - pos.pos_bol;
- 	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
-	    ("Config Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
+	Misc.report_error
+	  { Ast.file  = cache_file;
+	    Ast.line  = pos.pos_lnum;
+	    Ast.colfr = pos.pos_cnum - pos.pos_bol;
+ 	    Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
+	  ("Config Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
+  with _ -> LOG "File %s does not exit, run make preinit." cache_file LEVEL ERROR;
+    failwith ("File "^cache_file^" does not exit, run make preinit.")
 
-(*parse the .projects_configfile to recover each project versions *)  
-let parse_projects_versions versions_file =
-  try   
-    let in_ch = open_in versions_file in
-     let lexbuf = Lexing.from_channel in_ch in
-       Misc.init versions_file lexbuf;
-     let ast = Config_parser.parse_versions Config_lexer.token lexbuf in
-       close_in in_ch;
-       ast
-  with _-> LOG "File %s does not exit, run make preinit." versions_file LEVEL ERROR   
-
-let parse_config file : unit =
- parse_projects_versions (".projects_"^file);
+let parse_config_no_cache file : unit =
  let in_ch = open_in file in
   let lexbuf = Lexing.from_channel in_ch  in
   try
@@ -72,17 +64,15 @@ let parse_config file : unit =
  	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
 	    ("Config Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
 
+let parse_config file : unit =
+ let cache = parse_cache (".projects_"^file) in
+ let ast = parse_config_no_cache file in
+ ast
+   (* TODO: Merge cache and ast *)
+
 let get_date d = match d with
     Some d -> d
   | None -> raise(BadDate "Date is not defined")
-
-let parse_preinit file:string = 
-  let in_ch = open_in file in
-  let lexbuf = Lexing.from_channel in_ch  in
-    Misc.init file lexbuf;    
-    let ast = Config_parser.preinit Config_lexer.token lexbuf in
-      close_in in_ch;
-      ast
 
 let get_abs_days_of tm =
   (* 60.0 (s) *. 60.0 (mn) *. 24.0  (h) = 86400.0 *)
@@ -641,8 +631,25 @@ let get_versions p =
 	with
 	    Ast_config.Version (depth, v) ->
 	      (depth, List.map (fun (n, _, _) -> n) v)
-	  | _ -> (0, [])
+	  | _ -> raise Unrecoverable
       with _ -> (0, [])
+  with Not_found ->
+    raise (Misconfiguration ("project "^p^" is not declared"))
+
+let get_versionsRE p =
+  try
+    let atts = snd (Setup.PrjTbl.find Setup.projects p) in
+      try
+	match
+	  List.find (fun x ->
+		       match x with
+			   Ast_config.VersionRE _ -> true
+			 | _ -> false
+		    ) atts
+	with
+	    Ast_config.VersionRE re -> re
+	  | _ -> raise Unrecoverable
+      with _ -> "" (* No RE defined *)
   with Not_found ->
     raise (Misconfiguration ("project "^p^" is not declared"))
 

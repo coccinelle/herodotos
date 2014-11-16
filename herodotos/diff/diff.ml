@@ -48,13 +48,13 @@ let parse_diff v prefix difffile : Ast_diff.diffs =
 let select_diff diffalgo project : difftype =
   let (proto, file) =
     match Str.split (Str.regexp_string ":") diffalgo with
-	[] -> ("diff", diffalgo)
+	[] -> ("gnudiff", diffalgo)
       | proto::fileparts ->
 	let file = String.concat "" fileparts in
 	(proto, file)
   in
   match proto with
-      "diff" ->
+      "gnudiff" ->
 	if file = "" then GNUDiff (project ^ Global.patchext)
 	else GNUDiff file
     | "gumtree" ->
@@ -242,16 +242,24 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
   in
   if error <> 0 then
     LOG "*** ERROR *** %d error(s) during the diff." error LEVEL ERROR;
-  List.flatten (
-    List.map (fun x ->
-      try
-	match difffile with
-	    GNUDiff _ -> parse_diff v (file^Filename.dir_sep) (GNUDiff x)
-	  | Gumtree _ -> parse_diff v (file^Filename.dir_sep) (Gumtree x)
-	  | Hybrid _ -> Hybrid.parse_config v file; []
-      with e -> LOG "Error parsing %s" x LEVEL ERROR; raise e
-    ) outfiles
-  )
+  match difffile with
+      GNUDiff _ ->
+	List.flatten (
+	  Parmap.parmap (fun x ->
+	    try
+	      parse_diff v (file^Filename.dir_sep) (GNUDiff x)
+	    with e -> LOG "Error parsing %s" x LEVEL ERROR; raise e
+	  ) (Parmap.L outfiles)
+	)
+    | Gumtree _ -> 
+      List.flatten (
+	Parmap.parmap (fun x ->
+	  try
+	    parse_diff v (file^Filename.dir_sep) (Gumtree x)
+	  with e -> LOG "Error parsing %s" x LEVEL ERROR; raise e
+	) (Parmap.L outfiles)
+      )
+    | Hybrid _ -> Hybrid.parse_config v file; []
 
 let alt_new_pos (diffs: Ast_diff.diffs) file ver pos : (bool * (Ast_diff.lineprediction * int * int)) option =
   Debug.profile_code_silent "Diff.alt_new_pos"

@@ -56,10 +56,7 @@ let gen_makefile_patt verbose depch cmds =
     let targets = gen_makefile_vers verbose depch verscmds in
     Misc.create_dir verbose (Filename.dirname data);
     Printf.fprintf depch "%s: %s #PER-PRJ-PATT\n" data (String.concat " " targets);
-    if targets <> [] then
-      Printf.fprintf depch "\tcat $^ > $@\n\t-cat $(^:%%.orig.org=%%.log) > $(@:%%.orig.org=%%.log)\n"
-    else
-      Printf.fprintf depch "\ttouch $@\n";
+    Printf.fprintf depch "\ttouch $@\n";
     data::datalist
   ) [] cmds
 

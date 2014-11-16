@@ -53,8 +53,9 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 	    (* Should we get information about bugs *)
 	    let orgs = if cinfo && fpinfo
 	    then
-	      let orgfile = bugfile ^ Global.origext in
-		Org.format_orgs_to_arr prefix depth vlist (Org.parse_org false orgfile)
+		let orgfile = file ^ Global.origext in
+		(* Org.format_orgs_to_arr prefix depth vlist (Org.parse_org false orgfile) *)
+		Org.build_org_arr prefix depth !Setup.resultsdir pdir orgfile vlist
 	    else Org.emptyarray vlist
 	    in
 	    let bugs =
