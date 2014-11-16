@@ -46,18 +46,18 @@ let retrieve_correlated_bugs v1 v2 conn (prjname:string) =
 
 let blame v1 v2 v3 configfile filter =
   ignore(Config.parse_config configfile);
-  if v2 then prerr_endline "Config parsing OK!";
-  if v1 then Config.show_config v2 v3;
+  LOG "Config parsing OK!" LEVEL INFO;
+  Config.show_config ();
   try
-    if v1 then prerr_endline ("Connecting to "^ !Setup.dbconn);
+    LOG "Connecting to %s" !Setup.dbconn LEVEL INFO;
     let conn = Database.open_db v1 !Setup.dbconn in
-    if v1 then prerr_endline "Connection - OK !";
+    LOG "Connection - OK !" LEVEL DEBUG;
     if filter = "" then
       Setup.PrjTbl.iter (fun p _ -> retrieve_correlated_bugs v1 v2 conn p) Setup.projects
     else retrieve_correlated_bugs v1 v2 conn filter;
-    if v1 then prerr_endline "Disconnecting...";
+    LOG "Disconnecting..." LEVEL DEBUG;
     Database.close_db conn;
-    if v1 then prerr_endline "Done."
+    LOG "Done." LEVEL DEBUG
   with exp ->
-    if v1 then prerr_endline "Connection - KO !";
-    prerr_endline (Printexc.to_string exp)
+    LOG "Connection - KO !" LEVEL ERROR; 
+    LOG "%s" (Printexc.to_string exp) LEVEL ERROR

@@ -150,29 +150,29 @@ let make_flat_org prefix org =
 let parse_line file lnum line : (int * Ast_org.org) option =
   try
     let lexbuf = Lexing.from_string line in
-      try
-	Misc.init_line file lnum lexbuf;
-	let ast = Org_parser.oneline Org_lexer.token lexbuf in
-	  Some ast
-      with
-	  (Org_lexer.Lexical msg) ->
-	    let pos = lexbuf.lex_curr_p in
-	      Misc.report_error
-		{ Ast.file  = file;
-		  Ast.line  = pos.pos_lnum;
-		  Ast.colfr = pos.pos_cnum - pos.pos_bol;
-		  Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
-		("Org Lexer Error: " ^ msg);
-	| Org_parser.Error ->
-	    let pos = lexbuf.lex_curr_p in
-	      Misc.report_error
-		{ Ast.file  = file;
-		  Ast.line  = pos.pos_lnum;
-		  Ast.colfr = pos.pos_cnum - pos.pos_bol;
-		  Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
-		("Org Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
+    try
+      Misc.init_line file lnum lexbuf;
+      let ast = Org_parser.oneline Org_lexer.token lexbuf in
+      Some ast
+    with
+	(Org_lexer.Lexical msg) ->
+	  let pos = lexbuf.lex_curr_p in
+	  Misc.report_error
+	    { Ast.file  = file;
+	      Ast.line  = pos.pos_lnum;
+	      Ast.colfr = pos.pos_cnum - pos.pos_bol;
+	      Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
+	    ("Org Lexer Error: " ^ msg);
+      | Org_parser.Error ->
+	let pos = lexbuf.lex_curr_p in
+	Misc.report_error
+	  { Ast.file  = file;
+	    Ast.line  = pos.pos_lnum;
+	    Ast.colfr = pos.pos_cnum - pos.pos_bol;
+	    Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
+	  ("Org Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
   with Sys_error msg ->
-    prerr_endline ("*** WARNING *** "^msg);
+    LOG "*** WARNING *** %s" msg LEVEL WARN;
     None
 
 let push_stack stack org =
@@ -214,7 +214,7 @@ let rec parse_line_opt v file olnum ch =
 	    if Str.string_match re line 0 then
 	      parse_line_opt v file lnum ch
 	    else
-	      (if v then prerr_endline line;
+	      (LOG line LEVEL TRACE;
 	       (lnum, parse_line file lnum line))
 
 (*
@@ -281,7 +281,7 @@ let parse_org v file : Ast_org.orgs =
 	   close_in in_ch;
 	   ast
        with Sys_error msg ->
-	 prerr_endline ("*** WARNING *** "^msg);
+	 LOG "*** WARNING *** %s" msg LEVEL WARN;
 	 []
     )
 
@@ -292,10 +292,21 @@ let get_string_pos (line, cb, ce) =
   let snpos = "("^sline  ^"@"^ scb ^"-"^ sce ^ ")" in
     snpos
 
+let get_string_new_pos diffcheck_pos =
+  match diffcheck_pos with
+      (Ast_diff.Sing line,colb,cole) ->
+	let check_pos = (line, colb, cole) in
+	get_string_pos check_pos
+    | (Ast_diff.Deleted _, _,_) ->
+      "Deleted line"
+    | (Ast_diff.Unlink, _,_) ->
+      "Deleted file"
+    | (Ast_diff.Cpl (lineb,linee),colb, cole) ->
+      "Somewhere"
+
 let show_bug verbose bug =
-  let (_, _, _, _, ver, pos, _, _,_, _, _) = bug in
-    prerr_string ver;
-    if verbose then prerr_string (get_string_pos pos)
+  let (_, _, _, file, ver, pos, _, _,_, _, _) = bug in
+  ver ^(if verbose then "/" ^file else "") ^ get_string_pos pos
 
 let flat_link prefix depth link =
   let (p, ops, t) = link in
@@ -388,17 +399,19 @@ let format_orgs prefix depth orgs =
        filter_orgs flat_orgs_to_filter
     )
 
+let build_org_fct prefix depth resultsdir pdir orgfile vers =
+  let (vname,i,tm,i2) = vers in
+  let file = resultsdir ^ pdir ^ "/" ^ vname ^ "/" ^ orgfile in
+  (* if !Misc.debug then Printf.eprintf "Parsing Org file %s\n" file; *)
+  let orgs = parse_org false file in
+  List.fold_left (fun arrayelt org ->
+    flat_org_for_arrBis prefix depth arrayelt org
+  ) ([], Hashtbl.create 97) orgs
 
 let build_org_arr prefix depth resultsdir pdir orgfile vlist : Ast_org.orgarray =
-  Array.map (fun vers ->
-    let (vname,i,tm,i2) = vers in
-    let file = resultsdir ^ pdir ^ "/" ^ vname ^ "/" ^ orgfile in
-    (* if !Misc.debug then Printf.eprintf "Parsing Org file %s\n" file; *)
-    let orgs = parse_org false file in
-    List.fold_left (fun arrayelt org ->
-      flat_org_for_arrBis prefix depth arrayelt org
-    ) ([], Hashtbl.create 97) orgs
-  ) vlist
+  let f = build_org_fct prefix depth resultsdir pdir orgfile in
+  Array.of_list (Parmap.parmap f (Parmap.A vlist))
+  (* Array.map f vlist *)
 
 let format_orgs_to_arr prefix depth vlist (orgs:Ast_org.orgs ) : Ast_org.orgarray =
    Debug.profile_code_silent "format_orgs_to_arr"
@@ -412,40 +425,25 @@ let count = ref 0
 let show_buglist verbose bugs =
   count := 0;
   List.iter (fun bug ->
-    prerr_string "#";
-    prerr_int !count;
+    LOG "#%03d %s" !count (show_bug verbose bug) LEVEL TRACE;
     count := !count + 1;
-    prerr_string " ";
-    show_bug verbose bug;
-    prerr_newline ()
   ) bugs
 
-let show_org verbose prefix (orgs: (string*Ast_org.bugs  list)list) =
+let show_org verbose prefix (orgs: (string*Ast_org.bugs  list) list) =
   count := 0;
-  if verbose then
-    begin
-      prerr_endline ("SHOW ORG\nPrefix used: " ^ prefix);
-      List.iter (fun (file, bugslist) ->
-		   prerr_string file;
-		   prerr_newline ();
-		   List.iter (fun bugs ->
-				prerr_string "#";
-				prerr_int !count;
-				count := !count + 1;
-				prerr_string " in vers. ";
-				List.iter
-				  (fun  bug ->
-				     show_bug verbose bug;
-				     prerr_string " -> "
-				  )
-				  bugs;
-		   		prerr_newline ()
-			     )
-		     bugslist;
-		   prerr_newline ()
-		)
-	orgs
-    end
+  LOG "SHOW ORG" LEVEL TRACE;
+  LOG "Prefix used: %s" prefix LEVEL TRACE;
+  List.iter (fun (file, bugslist) ->
+    LOG file LEVEL TRACE;
+    List.iter (fun bugs ->
+      let vers = String.concat " -> "
+	(List.map (show_bug verbose) bugs)
+      in
+      LOG "#%03d in vers. %s" !count vers LEVEL TRACE;
+      count := !count + 1
+    ) bugslist;
+    LOG "" LEVEL TRACE
+  ) orgs
 
 let print_orgs_raw ch prefix orgs =
   List.iter
@@ -473,36 +471,34 @@ let print_bugs ch prefix orgs =
   Printf.fprintf ch "%s" orgtail
 
 let compute_correlation prefix depth correl =
-  let list = List.map (flat_org prefix depth) correl in
+  LOG "compute_correlation: start" LEVEL TRACE;
+  try
+    let list = List.map (flat_org prefix depth) correl in
     List.fold_left (fun correllist b ->
-		 let (_, s, _, file, ver, pos, _, t, _, _,sub) = b in
-		   try
-		     let l = extract_link (List.hd sub) in
-		     let new_t = clean_link_text prefix ver file pos t in
-		     let (nfile, nver, npos, _, _) = flat_link prefix depth l in
-		       (s, file, ver, pos, nfile, nver, npos, new_t)::correllist
-		   with Failure _ -> correllist
-		   ) [] list
+      let (_, s, _, file, ver, pos, _, t, _, _,sub) = b in
+      try
+	let l = extract_link (List.hd sub) in
+	let new_t = clean_link_text prefix ver file pos t in
+	let (nfile, nver, npos, _, _) = flat_link prefix depth l in
+	(s, file, ver, pos, nfile, nver, npos, new_t)::correllist
+      with Failure msg ->
+	LOG "compute_correlation: failure with %s" msg LEVEL FATAL;
+	correllist
+    ) [] list
+  with Misc.Strip msg ->
+    LOG "compute_correlation: failure with %s" msg LEVEL FATAL;
+    []
 
 let show_correlation verbose correl =
-  if verbose then
-    begin
-      prerr_endline "SHOW CORRELATION";
-      List.iter (fun b ->
-		   let (s, file, ver, pos, nfile, nver, next, t) = b in
-		     prerr_string (Org_helper.get_status s ^ " ");
-		     prerr_string (file ^" ");
-		     prerr_string ver;
-		     prerr_string " ";
-		     prerr_string (get_string_pos pos);
-		     prerr_string " -> ";
-		     prerr_string (nfile ^" ");
-		     prerr_string nver;
-		     prerr_string " ";
-		     prerr_string (get_string_pos next);
-		     prerr_newline ()
-		) correl
-    end
+  LOG "SHOW CORRELATION" LEVEL TRACE;
+  List.iter (fun b ->
+    let (s, file, ver, pos, nfile, nver, next, t) = b in
+    LOG "%s %s %s %s -> %s %s %s"
+      (Org_helper.get_status s)
+      file ver (get_string_pos pos)
+      nfile nver (get_string_pos next)
+      LEVEL TRACE
+  ) correl
 
 let sort_bug bug1 bug2 =
   let (l1, s1, r1, f1, v1, pos1, _, t1, _, _, sub1) = bug1 in

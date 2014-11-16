@@ -43,7 +43,7 @@ let parse_projects_versions versions_file =
      let ast = Config_parser.parse_versions Config_lexer.token lexbuf in
        close_in in_ch;
        ast
-  with _->prerr_string ("File "^versions_file^" does not exit, run make preinit.\n")   
+  with _-> LOG "File %s does not exit, run make preinit." versions_file LEVEL ERROR   
 
 let parse_config file : unit =
  parse_projects_versions (".projects_"^file);
@@ -98,10 +98,10 @@ let get_versinfo dm (name, date, size) =
     (name, days, date, size)
 
 let show_versinfo (name, days, date, size) =
-  prerr_endline ("Version "^name ^
-		   " released the "^ Misc.string_of_date (get_date date) ^
-		   " -- " ^ (string_of_int days) ^
-		   " ("^ (string_of_int size) ^" LOC)")
+  ("Version "^name ^
+      " released the "^ Misc.string_of_date (get_date date) ^
+      " -- " ^ (string_of_int days) ^
+      " ("^ (string_of_int size) ^" LOC)")
 
 let show_version dm (name, tm, size) =
   let info = get_versinfo dm (name, tm, size) in
@@ -164,65 +164,55 @@ let rec get_expression e : string =
     | Ast_config.Mul     (e1, e2) -> "("^ (get_expression e1) ^ " * " ^(get_expression e2)^ ")"
     | Ast_config.Div     (e1, e2) -> "("^ (get_expression e1) ^ " / " ^(get_expression e2)^ ")"
 
-let show_attr attr =
-  if !Misc.debug then
-    match attr with
-	Ast_config.Color (r,g,b) -> prerr_endline ("color = "^Misc.string_of_rgb (r,g,b))
-      | Ast_config.Correl mode -> prerr_endline ("correl = "^mode)
-      | Ast_config.CleanColor (r,g,b) -> prerr_endline ("cleancolor = "^Misc.string_of_rgb (r,g,b))
-      | Ast_config.PatternColor (r,g,b) -> prerr_endline ("patterncolor = "^Misc.string_of_rgb (r,g,b))
-      | Ast_config.DftPattern (s) -> prerr_endline ("pattern = "^s)
-      | Ast_config.Data (e) -> prerr_endline ("data = "^ get_expression e)
-      | Ast_config.Dir (s) -> prerr_endline ("dir = "^s)
-      | Ast_config.SubDir (s) -> prerr_endline ("subdir = "^s)
-      | Ast_config.Factor (f) -> prerr_endline ("factor = "^string_of_float f)
-      | Ast_config.File (sopt) ->
-	  (match sopt with
-	       None -> prerr_endline ("file = none")
-	     | Some s -> prerr_endline ("file = \""^s^"\"")
-	  )
-      | Ast_config.Filename b -> prerr_endline ("filename = "^Misc.string_of_bool b)
-      | Ast_config.Footer f -> prerr_endline ("footer = \""^f^"\"")
-      | Ast_config.Format mode -> prerr_endline ("format = "^mode)
-      | Ast_config.Author (b) -> prerr_endline ("author = "^Misc.string_of_bool b)
-      | Ast_config.Info b -> prerr_endline ("info = "^Misc.string_of_bool b)
-      | Ast_config.DftProject (s) -> prerr_endline ("project = "^s)
-      | Ast_config.Legend (s) -> prerr_endline ("legend = \""^s^"\"")
-      | Ast_config.XLegend (s) -> prerr_endline ("xlegend = \""^s^"\"")
-      | Ast_config.YLegend (s) -> prerr_endline ("ylegend = \""^s^"\"")
-      | Ast_config.YLegendFactor (s) -> prerr_endline (" = "^s)
-      | Ast_config.LineType (s) -> prerr_endline ("linetype = "^s)
-      | Ast_config.MarkType (s) -> prerr_endline ("marktype = "^s)
-      | Ast_config.MarkSize (v) -> prerr_endline ("marksize = "^string_of_float v)
-      | Ast_config.XMin (v) -> prerr_endline ("xmin = "^string_of_float v)
-      | Ast_config.XAxis (s) -> prerr_endline ("xaxis = "^s)
-      | Ast_config.YAxis (s) -> prerr_endline ("yaxis = "^s)
-      | Ast_config.Ratio b -> prerr_endline ("ratio = "^Misc.string_of_bool b)
-      | Ast_config.NotExistColor (r,g,b) -> prerr_endline ("notexistcolor = "^Misc.string_of_rgb (r,g,b))
-      | Ast_config.Version (_, vs) ->
-	  (try
-	     prerr_endline "version = {";
-	     let m = get_vers_min vs in
-	       List.iter (show_version m) vs;
-	   with _ -> prerr_endline "No version set !"
-	  );
-	  prerr_endline "}"
-      | Ast_config.VMin (s) -> prerr_endline ("vmin = \""^s^"\"")
-      | Ast_config.Prune (b) -> prerr_endline ("prune = "^Misc.string_of_bool b)
-      | Ast_config.SPFlags (s) -> prerr_endline ("flags = \""^s^"\"")
-      | Ast_config.LOCALSCM (s) -> prerr_endline ("scm = \""^s^"\"")
-      | Ast_config.Size (x,y) -> prerr_endline ("size = "^string_of_float x ^ "x" ^ string_of_float y)
-      | Ast_config.Sort b -> prerr_endline ("sort = "^Misc.string_of_bool b)
-      |_ -> ()
-  else
-    match attr with
-      | Ast_config.Version (_, vs) ->
-	  (try
-	    let m = get_vers_min vs in
-	      List.iter (show_version m) vs
-	  with _ -> prerr_endline "\tNo version set !"
-	  )
-      |_ -> ()
+let show_attr attr : string =
+  match attr with
+      Ast_config.Color (r,g,b) -> ("color = "^Misc.string_of_rgb (r,g,b))
+    | Ast_config.Correl mode -> ("correl = "^mode)
+    | Ast_config.CleanColor (r,g,b) -> ("cleancolor = "^Misc.string_of_rgb (r,g,b))
+    | Ast_config.PatternColor (r,g,b) -> ("patterncolor = "^Misc.string_of_rgb (r,g,b))
+    | Ast_config.DftPattern (s) -> ("pattern = "^s)
+    | Ast_config.Data (e) -> ("data = "^ get_expression e)
+    | Ast_config.Dir (s) -> ("dir = "^s)
+    | Ast_config.SubDir (s) -> ("subdir = "^s)
+    | Ast_config.Factor (f) -> ("factor = "^string_of_float f)
+    | Ast_config.File (sopt) ->
+      (match sopt with
+	  None -> ("file = none")
+	| Some s -> ("file = \""^s^"\"")
+      )
+    | Ast_config.Filename b -> ("filename = "^Misc.string_of_bool b)
+    | Ast_config.Footer f -> ("footer = \""^f^"\"")
+    | Ast_config.Format mode -> ("format = "^mode)
+    | Ast_config.Author (b) -> ("author = "^Misc.string_of_bool b)
+    | Ast_config.Info b -> ("info = "^Misc.string_of_bool b)
+    | Ast_config.DftProject (s) -> ("project = "^s)
+    | Ast_config.Legend (s) -> ("legend = \""^s^"\"")
+    | Ast_config.XLegend (s) -> ("xlegend = \""^s^"\"")
+    | Ast_config.YLegend (s) -> ("ylegend = \""^s^"\"")
+    | Ast_config.YLegendFactor (s) -> (" = "^s)
+    | Ast_config.LineType (s) -> ("linetype = "^s)
+    | Ast_config.MarkType (s) -> ("marktype = "^s)
+    | Ast_config.MarkSize (v) -> ("marksize = "^string_of_float v)
+    | Ast_config.XMin (v) -> ("xmin = "^string_of_float v)
+    | Ast_config.XAxis (s) -> ("xaxis = "^s)
+    | Ast_config.YAxis (s) -> ("yaxis = "^s)
+    | Ast_config.Ratio b -> ("ratio = "^Misc.string_of_bool b)
+    | Ast_config.NotExistColor (r,g,b) -> ("notexistcolor = "^Misc.string_of_rgb (r,g,b))
+    | Ast_config.Version (_, vs) ->
+      (try
+	 LOG "version = {" LEVEL TRACE;
+	 let m = get_vers_min vs in
+	 List.iter (fun v -> LOG "%s" (show_version m v) LEVEL TRACE) vs;
+	 "}"
+       with _ -> "No version set !"
+      )
+    | Ast_config.VMin (s) -> ("vmin = \""^s^"\"")
+    | Ast_config.Prune (b) -> ("prune = "^Misc.string_of_bool b)
+    | Ast_config.SPFlags (s) -> ("flags = \""^s^"\"")
+    | Ast_config.LOCALSCM (s) -> ("scm = \""^s^"\"")
+    | Ast_config.Size (x,y) -> ("size = "^string_of_float x ^ "x" ^ string_of_float y)
+    | Ast_config.Sort b -> ("sort = "^Misc.string_of_bool b)
+    |_ -> ""
 
 let rec extract_patterns acc e =
   match e with
@@ -429,7 +419,7 @@ let get_xmin db g atts =
 	Ast_config.XMin v -> v
       | _ -> raise Unrecoverable
   with _ ->
-    if db then prerr_endline ("XMin of "^g^" is not defined. Assuming 0.");
+    LOG "XMin of %s is not defined. Assuming 0." g LEVEL DEBUG;
     0.0
 
 let get_xtype g atts =
@@ -509,7 +499,7 @@ let get_correl_mode verbose pattern =
 		    ) atts
 	with
 	    Ast_config.Correl s ->
-	      if verbose then prerr_endline ("Pattern "^pattern^" has correlation mode: "^s);
+	      LOG "Pattern %s has correlation mode: %s" pattern s LEVEL TRACE;
 	      (match s with
 		   "strict"  -> Ast_config.Strict
 		 | "none"    -> Ast_config.Nocorrel
@@ -519,7 +509,7 @@ let get_correl_mode verbose pattern =
 	      )
 	  | _ -> raise Unrecoverable
       with _ ->
-	if verbose then prerr_endline ("Pattern "^pattern^" has no correlation mode set: default assumed");
+	LOG "Pattern %s has no correlation mode set: default assumed" pattern LEVEL TRACE;
 	Ast_config.Default
   with Not_found ->
     raise (Misconfiguration ("pattern '"^pattern^"' is not declared"))
@@ -908,28 +898,27 @@ let rec get_cmdList p pattern_list: ((string * string) *(string * (string * (str
 (*
   Helper functions to pretty print
 *)
-let show_curve verb atts curve =
+let show_curve atts curve =
   Debug.profile_code "Config.show_curve"
     (fun () ->
        let (project, pattern, catts, pos) = curve in
 	 try
 	   let d_list = get_pattern false atts pattern catts in
 	     if d_list = [] then
-	       prerr_endline ("No need to compute data on bugs for this curve.")
+	       LOG "No need to compute data on bugs for this curve." LEVEL TRACE
 	     else
 	       begin
 		 let p = get_project (catts@atts) project in
 		   List.iter (fun d ->
-				prerr_endline ("Curve with p:"^p ^ " and d:"^d)
+		     LOG "Curve with p:%s and d:%s " p d LEVEL TRACE
 			     ) d_list;
 		   List.iter (fun d ->
 				let data = locate_data p d Global.origext in
-				  prerr_endline ("Reading data from: " ^ data)
+				LOG "Reading data from: %s" data LEVEL TRACE
 			     ) d_list
 	       end;
 	     List.iter (fun x ->
-			  if !Misc.debug then prerr_string "\t";
-			  show_attr x
+			  LOG "\t%s" (show_attr x) LEVEL TRACE
 		       )
 	       catts;
 	 with
@@ -938,63 +927,44 @@ let show_curve verb atts curve =
     )
 
 let show_global () =
-  prerr_endline ("Prefix = " ^ !Setup.prefix);
-  prerr_endline ("Cocci files in " ^ !Setup.smatchdir);
-  prerr_endline ("Project source code in " ^ !Setup.projectsdir);
-  prerr_endline ("Analysis results in " ^ !Setup.resultsdir);
-  prerr_endline ("FindCmd = \"" ^ !Setup.findcmd ^ "\"");
-  prerr_endline ("Flags = \"" ^ !Setup.spflags ^ "\"");
+  LOG "Prefix = %s" !Setup.prefix LEVEL DEBUG;
+  LOG "Cocci files in %s" !Setup.smatchdir LEVEL DEBUG;
+  LOG "Project source code in %s" !Setup.projectsdir LEVEL DEBUG;
+  LOG "Analysis results in %s" !Setup.resultsdir LEVEL DEBUG;
+  LOG "FindCmd = \"%s\"" !Setup.findcmd LEVEL DEBUG;
+  LOG "Flags = \"%s\"" !Setup.spflags LEVEL DEBUG;
   match !Setup.cpucore with
       None ->
-	let cores = string_of_int (Misc.get_number_of_cores ()) in
-	prerr_endline ("CPU core = <undefined: assuming "^cores^">")
+	LOG "CPU core = <undefined: assuming %d>" (Misc.get_number_of_cores ()) LEVEL DEBUG
     | Some cpucore ->
-	prerr_endline ("CPU core = " ^ string_of_int cpucore)
+	LOG "CPU core = %d" cpucore LEVEL DEBUG
 
-let show_config v1 v2 =
+let show_config () =
   Debug.profile_code "Config.show_config"
     (fun () ->
        show_global ();
-       if not v1 then prerr_string ("Project");
        Setup.PrjTbl.iter
 	 (fun name (_,atts) ->
-	    if not v1 then
-	      prerr_string (" "^name)
-	    else
-	      (
-		prerr_endline ("Project "^name);
-		List.iter show_attr atts
-	      )
+	   LOG "Project %s" name LEVEL DEBUG;
+	   List.iter (fun a -> LOG "%s" (show_attr a) LEVEL TRACE) atts
 	 )
 	 Setup.projects;
-       prerr_string ("\nPattern");
        Setup.DftTbl.iter
 	 (fun name atts ->
-	    prerr_string (" "^name);
-	    if v2 then
-	      ( prerr_newline ();
-		List.iter show_attr atts
-	      )
+	   LOG "Pattern %s" name LEVEL DEBUG;
+	   List.iter (fun a -> LOG "%s" (show_attr a) LEVEL TRACE) atts
 	 )
 	 Setup.smatchs;
-       prerr_newline ();
-       if not v1 then prerr_endline ("Graph");
        Setup.GphTbl.iter
 	 (fun name (atts, subgraph) ->
-	    if v1 then
-	      begin
-	      prerr_endline ("Graph "^name);
-		List.iter show_attr atts;
-		match subgraph with
-		    Ast_config.Curves curves ->
-		      List.iter (show_curve v2 atts) curves
-		  | Ast_config.Groups _ -> ()
-	      end
-	    else
-	      prerr_string (" "^name)
+	   LOG "Graph %s" name LEVEL DEBUG;
+	   List.iter (fun a -> LOG "%s" (show_attr a) LEVEL TRACE) atts;
+	   match subgraph with
+	       Ast_config.Curves curves ->
+		 List.iter (show_curve atts) curves
+	     | Ast_config.Groups _ -> ()
 	 )
 	 Setup.graphs;
-       if not v1 then prerr_newline ();
     )
 
 let init_color ct =
@@ -1031,9 +1001,8 @@ let fixcolor_of_graph name (atts, subgraph) =
 		 (crv_wc +1, crv_woc, (r,v,b)::colors)
 	     with Misconfiguration msg
 	       | Misconfigurationat (msg, _) ->
-		   if !Misc.debug then
-		     prerr_endline (msg^" Automatically picking one...");
-		   (crv_wc, curve::crv_woc, colors)
+		 LOG "%s Automatically picking one..." msg LEVEL ERROR;
+		 (crv_wc, curve::crv_woc, colors)
 	  ) (0,[],[]) curves
 	in
 	let count = crv_wc + (List.length crv_woc) in

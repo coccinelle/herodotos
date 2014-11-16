@@ -75,7 +75,8 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 		  let strict = ((Config.get_correl_mode v1 patt) = Ast_config.Strict) in
 		  let _ = if strict then print_endline ("*** INFO *** Strict correlation used for the pattern "^patt) in
 		  let emptyannots = Org.emptyarray vlist in
-		  let ((count,new_bugs), _) = Occ_correl.compute_org v3 strict prefix depth vlist diffs correl2 emptyannots orgs in
+		  let cpucore = Setup.getCPUcore () in
+		  let ((count,new_bugs), _) = Occ_correl.compute_org v3 cpucore strict prefix depth vlist diffs correl2 emptyannots orgs in
 		    count
 		end
 	      else 0

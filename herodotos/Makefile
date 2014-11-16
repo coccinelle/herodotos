@@ -7,25 +7,27 @@ SOURCES =
 SUBDIRS = commons exists hcl org diff scm graph html database engine
 MENHIR_PATH=../menhirLib
 DEPDIRS = $(MENHIR_PATH)
-EXTLIBS=postgresql # xml-light
+EXTLIBS=postgresql parmap bolt # xml-light
+P4=bolt
 
 OCAMLFIND=ocamlfind
 
-OCAMLLIBS=str.cma unix.cma threads.cma bigarray.cma $(EXTLIBS:%=%.cma)
+OCAMLLIBS=str.cma unix.cma threads.cma bigarray.cma dynlink.cma $(EXTLIBS:%=%.cma)
 FLAG=
 
 # ocamlmktop -custom -thread  -o threadedocaml unix.cma threads.cma -cclib -lthreads
 # Automatic computation
 OCAMLFIND=ocamlfind
 
-LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
+P4DIR=$(shell $(OCAMLFIND) query $(P4))
+P4FLAG=-pp 'camlp4o $(P4DIR)/bolt_pp.cmo'
 DEPDIRS = $(MENHIR_PATH)
 INCLUDES=$(SUBDIRS:%=-I %) $(LIBDIR:%=-I %)
 
 OBJS = $(SOURCES:.ml=.cmo)
 ROOTLIB = $(TARGET).cmo
-LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
-FLAGS=$(LIBDIR:%=-I %) $(INCLUDES)
+FLAGS= $(INCLUDES) $(FLAG) $(P4FLAG)
 LIBS = $(SUBDIRS:%=%.cma)
 ALLLIBS = $(LIBS) $(ROOTLIB)
 
@@ -43,7 +45,7 @@ MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 
 # The Caml compilers.
 CFLAGS ?= -g -dtypes -thread $(FLAGS)
-OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
+OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES) $(P4FLAG)
 ifeq ("$(OPTBIN)",".opt")
 OCAMLC=$(OCAMLFIND) ocamlc -predicates native
 OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates native
@@ -53,7 +55,7 @@ OCAMLOPT=$(OCAMLFIND) ocamlopt
 endif
 
 .PHONY:: all all.opt clean distclean debclean $(DEP)
-.PHONY:: depend install sudo_install deploy
+.PHONY:: .depend depend install sudo_install deploy
 .PHONY:: test debian debians
 
 all: init bytecode
@@ -61,7 +63,7 @@ opt: all.opt
 all.opt: init native-noopt
 world: init bytecode native
 
-init: check-config depend scripts/Makefile.inc
+init: check-config .depend scripts/Makefile.inc
 bytecode: $(EXEC)
 native: $(EXEC).opt
 native-noopt: native
@@ -191,9 +193,10 @@ distclean: localclean
 debclean:
 	rm -rf build-stamp install-stamp my-very-own-patch-stamp
 
-depend:
+depend: .depend
+.depend:
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
-	$(OCAMLDEP) *.mli *.ml > .depend
+	$(OCAMLDEP) *.mli *.ml > $@
 
 -include .depend
 
