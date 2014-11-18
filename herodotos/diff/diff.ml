@@ -148,6 +148,7 @@ let gen_cmd_basic v prefix pair orgstat difffile =
   Parmap.parfold (fun file_pair (outlist, cmdlist) ->
     let (ofile, nfile) = file_pair in
     let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
+    (* FIXME: This should not longer be based on get_basetime but on file_exists. *)
     let patchstat = get_basetime orgstat outfile in
     if orgstat > patchstat then
       (LOG "Checking (%d) %s - Keep" (Unix.getpid ()) outfile LEVEL TRACE;
