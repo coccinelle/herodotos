@@ -188,6 +188,7 @@ let show_attr attr : string =
     | Ast_config.YAxis (s) -> ("yaxis = "^s)
     | Ast_config.Ratio b -> ("ratio = "^Misc.string_of_bool b)
     | Ast_config.NotExistColor (r,g,b) -> ("notexistcolor = "^Misc.string_of_rgb (r,g,b))
+    | Ast_config.VersionRE (re) -> ("version = \"" ^re^"\"")
     | Ast_config.Version (_, vs) ->
       (try
 	 LOG "version = {" LEVEL TRACE;
