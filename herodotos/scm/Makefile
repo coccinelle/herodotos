@@ -2,21 +2,29 @@ TARGET = scm
 
 SOURCES = git.ml
 INTFS =
-INCLUDES = -I ../commons -I ../hcl
+TOPLIB = commons hcl
+LIBNAMES=bolt
+P4=bolt
 
 # Automatic computation
+OCAMLFIND=ocamlfind
+
 -include ../Makefile.config
 
+LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
+P4DIR=$(shell $(OCAMLFIND) query $(P4))
+P4FLAG=-pp 'camlp4o $(P4DIR)/bolt_pp.cmo'
 OBJS = $(SOURCES:.ml=.cmo)
 OPTOBJS = $(OBJS:.cmo=.cmx)
 LIB=$(TARGET).cma
 OPTLIB=$(LIB:.cma=.cmxa)
+INCLUDES=$(LIBDIR:%=-I %) $(TOPLIB:%=-I ../%)
 
 # The Caml compilers.
 OCAMLCFLAGS ?= -g -dtypes
-OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES)
-OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES)
-OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES)
+OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES) $(P4FLAG)
+OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES) $(P4FLAG)
+OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES) $(P4FLAG)
 
 all: $(LIB)
 all.opt: $(OPTLIB)

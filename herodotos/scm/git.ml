@@ -6,8 +6,11 @@ let headfmt  = format_of_string "git --git-dir %s log -1"
 
 exception SCMFailure of string
 exception MalformedGitLog
+exception Not_Declared of string
 
-let firstversion = "linux-2.6.0"
+let sys_command (cmd : string) : int =
+  LOG "Execute: '%s'" cmd LEVEL INFO;
+  0
 
 let blamefmt = format_of_string "git --git-dir %s blame --incremental %s -L %d,+1 -- %s"
 let authorsfmt = format_of_string "git --git-dir %s log --date=short --pretty=format:\"%%an;%%ae;%%ad;%%H\" > %s"
@@ -54,9 +57,7 @@ let blame vb (path:string) (vmin:string) (version:string) (file:string) (line:in
     match Unix.close_process_in ch with
 	Unix.WEXITED 0 ->
 	  if vb then prerr_endline (" - OK");
-	  (* let (firstversion, _, _, _) = vmin in *)
-	  let firstversion = vmin in
-	  if is_before vb path sha1 firstversion then
+	  if is_before vb path sha1 vmin then
 	    ("Unknow author", sha1)
 	  else
 	    (author, sha1)
@@ -228,3 +229,47 @@ let prerr_author vlist name version =
     prerr_endline ("Experience at that time: " ^ duration ^
 		     " ("^ string_of_int abspct ^"% abs)"^
 		     " ("^ string_of_int reldays ^" rel. days)")
+
+let get_tags path deposit expression =
+  let in_channel =
+    Unix.open_process_in 
+      ("git --git-dir "^path^"/"^deposit ^ " tag | grep \""^expression   ^"\"" )
+  in
+  let tag_string = String.create (in_channel_length in_channel) in
+  really_input in_channel tag_string 0 (in_channel_length in_channel) ;
+  close_in in_channel ;
+  Str.split (Str.regexp "\n") tag_string
+
+let get_tag version =
+  let num = Str.regexp "[0-9].*" in
+  let start_num = Str.search_forward num version 0 in
+  "v"^(String.sub version start_num ((String.length version)- start_num)) 
+
+let get_date path version deposit =
+  try 
+    let pwd = Sys.getcwd () in 
+    let tag = get_tag version in
+    (* FIXME: Update implementation without tmp files *)
+    let _ = sys_command ("cd "^(path^"/"^deposit)^" ; git log --pretty=raw --format=\"%ci\"  "^tag ^" -1 | cut -f1 -d' ' > "^pwd^"/.date.tmp") in
+    let in_ch_date = open_in ".date.tmp" in 
+    let date = input_line in_ch_date in 
+    let list_comp = Str.split (Str.regexp "-") date in
+    close_in in_ch_date ;
+    Sys.remove ".date.tmp";
+    (List.hd(List.tl list_comp))^"/"^(List.hd (List.tl(List.tl list_comp)))^"/"^(List.hd list_comp)
+  with _ -> 
+    raise (Not_Declared "Error in deposit declaration")  
+
+let extract_code path version local_scm origin =
+  let deposit = Str.replace_first (Str.regexp "git:") "" local_scm in
+  if not ((Sys.file_exists (path^"/"^version))
+	  && (Sys.is_directory (path^"/"^version))) then  
+    if ((Sys.file_exists (path^"/"^deposit))
+	&&(Sys.is_directory(path^"/"^deposit))) then
+      ignore(sys_command ("cd "^(path^"/"^deposit)^" && git archive --format=tar --prefix="^version^"/ "^
+                      version^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar"))
+    else
+      ignore (sys_command ("cd "^path^";git clone "^origin^" "^deposit^";cd "^(path^"/"^deposit)^
+		      " && git archive --format=tar --prefix="^version^"/ "^
+                      version^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar"))
+
