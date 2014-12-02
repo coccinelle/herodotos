@@ -59,7 +59,7 @@ let extract_vers_infos prj expression declared_versions =
   if not ((Sys.file_exists scm)
 	  &&(Sys.is_directory scm)) then
     if origin <> "" then
-      ignore(sys_command ("cd "^path^";git clone "^origin^" "^deposit ))
+      ignore(sys_command ("git clone "^origin^" "^path^"/"^deposit ))
     else
       (LOG "No public SCM defined, but %s is not available" deposit LEVEL FATAL;
        failwith "A public SCM is needed."
@@ -70,8 +70,7 @@ let extract_vers_infos prj expression declared_versions =
       if not ((Sys.file_exists (path^"/"^version))
 	      &&(Sys.is_directory(path^"/"^version))) then
         ignore(sys_command
-		 ("cd "^(path^"/"^deposit)^
-		     " && git archive --format=tar --prefix="^version^"/ "^ version
+		 ("git --git-dir "^path^"/"^deposit ^" archive --format=tar --prefix="^version^"/ "^ version
 		  ^" | (cd .. && tar xf -)"))
   ) tag_list;
   List.map (fun version ->
