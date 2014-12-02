@@ -200,7 +200,8 @@ let show_attr attr : string =
     | Ast_config.VMin (s) -> ("vmin = \""^s^"\"")
     | Ast_config.Prune (b) -> ("prune = "^Misc.string_of_bool b)
     | Ast_config.SPFlags (s) -> ("flags = \""^s^"\"")
-    | Ast_config.LOCALSCM (s) -> ("scm = \""^s^"\"")
+    | Ast_config.LOCALSCM (s) -> ("local_scm = \""^s^"\"")
+    | Ast_config.PUBLICSCM (s) -> ("public_scm = \""^s^"\"")
     | Ast_config.Size (x,y) -> ("size = "^string_of_float x ^ "x" ^ string_of_float y)
     | Ast_config.Sort b -> ("sort = "^Misc.string_of_bool b)
     |_ -> ""
@@ -557,6 +558,24 @@ let get_scm prj =
 	  | _ -> raise Unrecoverable
       with _ ->
 	raise (Misconfiguration "project source code repository is not set")
+  with Not_found ->
+	raise (Misconfiguration ("project "^prj^" is not declared"))
+
+let get_public_scm prj =
+  try
+    let atts = snd (Setup.PrjTbl.find Setup.projects prj) in
+      try
+	match
+	  List.find (fun x ->
+		       match x with
+			   Ast_config.PUBLICSCM _ -> true
+			 | _ -> false
+		    ) atts
+	with
+	    Ast_config.PUBLICSCM s -> s
+	  | _ -> raise Unrecoverable
+      with _ ->
+	raise (Misconfiguration "project public source code repository is not set")
   with Not_found ->
 	raise (Misconfiguration ("project "^prj^" is not declared"))
 

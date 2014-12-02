@@ -11,7 +11,8 @@
     let newlinere = Str.regexp_string "\\n" in
     Str.global_replace newlinere "\\\n" s
 
-  let build_date m d y =   snd (Unix.mktime {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
+  let build_date m d y =
+    snd (Unix.mktime {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
        (* Don't care about the time *)
        Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
        (* Will be normalized by mktime *)
@@ -108,7 +109,7 @@ attr:
 | TPATTERN       TEQUAL dft=TId                    { Ast_config.DftPattern(dft)}
 | TPATTERNCOLOR  TEQUAL r=float v=float b=float    { Ast_config.PatternColor(r,v,b)}
 | TDATA          TEQUAL e=expression               { Ast_config.Data(e)}
-| TDIR           TEQUAL d=path                     { Setup.setDir d;Ast_config.Dir(d)}
+| TDIR           TEQUAL d=path                     { Ast_config.Dir(d)}
 | TSUBDIR        TEQUAL d=path                     { Ast_config.SubDir(d)}
 | TFACTOR        TEQUAL f=float                    { Ast_config.Factor(f)}
 | TFILE          TEQUAL f=TSTRING

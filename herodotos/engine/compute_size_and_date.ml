@@ -4,13 +4,6 @@ let sys_command cmd =
 
 let exec_count dir = sys_command ("sloccount "^dir^" > count.tmp")
 
-let get_already_declared version_list version =
-  List.find (
-    fun v ->
-      let (name,date,size) = v in
-      name = version
-  ) version_list
-
 let tag_filter tag_list filter =
   let result = ref [] in 
   List.iter(fun tag -> if Str.string_match (Str.regexp filter) tag 0 then
@@ -57,23 +50,19 @@ let extract_vers_infos path expression local_scm declared_versions origin =
     ignore(sys_command ("cd "^path^";git clone "^origin^" "^deposit ));
   let tag_list = Git.get_tags path deposit expression in
   List.iter (
-    fun tag -> 
-      let version = tag in
+    fun version -> 
       if not ((Sys.file_exists (path^"/"^version))
 	      &&(Sys.is_directory(path^"/"^version))) then
         ignore(sys_command
 		 ("cd "^(path^"/"^deposit)^
-		     " && git archive --format=tar --prefix="^version^"/ "^ tag 
+		     " && git archive --format=tar --prefix="^version^"/ "^ version
 		  ^" | (cd .. && tar xf -)"))
   ) tag_list;
-  List.map(fun tag ->
-    let version = tag in 
+  List.map (fun version ->
     try
-      let v = get_already_declared declared_versions version in
-      let (n,d,s) = v in
-      "(\""^n^"\","^d^","^s^")"
+      List.find (fun (name, date, size) -> name = version) declared_versions
     with _ ->
-      let date = Git.get_date path version deposit in
+      let date = Git.get_version_date path version deposit in
       let size = get_size (path^"/"^version) in
-      "(\""^version^"\","^date^","^(string_of_int size)^")"
+      (version, Some date, size)
   ) tag_list 

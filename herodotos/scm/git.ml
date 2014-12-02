@@ -78,21 +78,23 @@ let sec_to_days sec =
 let tm_to_days tm =
   sec_to_days (fst (Unix.mktime (Config.get_date tm)))
 
-let get_day strdate =
+let get_date strdate = 
   match Str.split (Str.regexp "-") strdate with
       [year;month;day] ->
 	let m = int_of_string month in
 	let d = int_of_string day in
 	let y = int_of_string year in
-	let tm = Unix.mktime
+	Unix.mktime
 	  {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
 	   (* Don't care about the time *)
 	   Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
 	   (* Will be normalized by mktime *)
 	   Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
 	  }
-	in sec_to_days (fst tm)
     | _ -> raise MalformedGitLog
+
+let get_day strdate =
+  sec_to_days (fst (get_date strdate))
 
 let authors = ref (Hashtbl.create 1)
 let update_author name c_email now =
@@ -245,18 +247,18 @@ let get_tag version =
   let start_num = Str.search_forward num version 0 in
   "v"^(String.sub version start_num ((String.length version)- start_num)) 
 
-let get_date path version deposit =
+let get_version_date path version deposit =
   try 
     let pwd = Sys.getcwd () in 
     let tag = get_tag version in
     (* FIXME: Update implementation without tmp files *)
     let _ = sys_command ("cd "^(path^"/"^deposit)^" ; git log --pretty=raw --format=\"%ci\"  "^tag ^" -1 | cut -f1 -d' ' > "^pwd^"/.date.tmp") in
     let in_ch_date = open_in ".date.tmp" in 
-    let date = input_line in_ch_date in 
-    let list_comp = Str.split (Str.regexp "-") date in
+    let date = input_line in_ch_date in  
+    LOG "Date: %s" date LEVEL DEBUG;
     close_in in_ch_date ;
     Sys.remove ".date.tmp";
-    (List.hd(List.tl list_comp))^"/"^(List.hd (List.tl(List.tl list_comp)))^"/"^(List.hd list_comp)
+    snd(get_date date)
   with _ -> 
     raise (Not_Declared "Error in deposit declaration")  
 

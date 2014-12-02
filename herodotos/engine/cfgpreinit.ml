@@ -1,19 +1,9 @@
 
 (*------------------------------------------------------------------------------------------------------------------------------------------------
-(* preinit parsing rules*)
-projectPreinit:
-  TPROJECT name=TId TLCB versions=list(prjattr) TRCB {versions_string:= !versions_string^name^(String.concat "\n" versions)}
-
 (*currently used for preinit parsing *)
-prjattr:
-  | TDIR           TEQUAL d=path                     {Setup.setDir d ;""}
-  | TSUBDIR        TEQUAL path                       {"" }
-  | TVERSIONS      TEQUAL TLCB  vs=list(versionPreinit) TRCB {"{\n"^(String.concat "\n" vs)^"\n}\n"}
   | TVERSIONS TEQUAL exp=TSTRING
       {let vs = Compute_size_and_date.extract_vers_infos (!Setup.projectsdir^"/"^(!Setup.dir)) exp !local_scm !already_declared_versions !public_scm in
         "{\n"^(String.concat "\n" vs)^"\n}\n" }
-  | TLOCALSCM      TEQUAL v=TSTRING                  {local_scm := v;"" }
-  | TPUBLICSCM     TEQUAL v=TSTRING                  {public_scm := v;"" }
 
 versionPreinit:
   TLPAR name=TSTRING  d=datePreinit  size=sizePreinit TRPAR {
@@ -52,7 +42,7 @@ versionPreinit:
 
 let build_updated_cache cache_projects =
   Setup.PrjTbl.fold 
-    (fun key data cache ->
+    (fun key _ cache ->
       LOG "Processing %s for cache" key LEVEL INFO;
       try
 	let cacheddata = List.assoc key cache_projects in
@@ -60,19 +50,36 @@ let build_updated_cache cache_projects =
 	(key, cacheddata)::cache
       with Not_found ->
 	LOG "No data in cache." LEVEL INFO;
-	let versinfos = Array.to_list (snd (Config.get_versinfos key)) in
-	if versinfos = [] then
-	  begin
-	    (* There is no info. TODO: Need to check for a RE *)
-	    LOG "No data provided. Use regexp and compute" LEVEL INFO;
-	    cache
-	  end
+	let versinfos =
+	  try
+	    List.map (fun (name, days, date, size) -> (name, date, size))
+	      (Array.to_list (snd (Config.get_versinfos key)))
+	  with _ ->
+	    LOG "No version information manually provided." LEVEL DEBUG;
+	    []
+	in
+	(* Check for a regular expression *)
+	let re = Config.get_versionsRE key in
+	if re <> "" then
+	  let infos = Compute_size_and_date.extract_vers_infos
+	    (!Setup.projectsdir ^ (Config.get_prjdir key))
+	    re
+	    (Config.get_scm key)
+	    versinfos (* List of already declared versions *)
+	    (Config.get_public_scm key)
+	  in (key, infos)::cache
 	else
-	  begin
-	    LOG "Use provided data" LEVEL INFO;
-	    let data = List.map (fun (name, days, date, size) -> (name, date, size)) versinfos in
-	    (key, data)::cache
-	  end
+	  if versinfos = [] then
+	    begin
+	      (* There is no info. TODO: Need to check for a RE *)
+	      LOG "No data provided. Use regexp and compute" LEVEL INFO;
+	      cache
+	    end
+	  else
+	    begin
+	      LOG "Use provided data" LEVEL INFO;
+	      (key, versinfos)::cache
+	    end
     )
     Setup.projects []
 
