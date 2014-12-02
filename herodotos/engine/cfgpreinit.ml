@@ -59,17 +59,18 @@ let build_updated_cache cache_projects =
 	LOG "Data found in the cache" LEVEL INFO;
 	(key, cacheddata)::cache
       with Not_found ->
+	LOG "No data in cache." LEVEL INFO;
 	let versinfos = Array.to_list (snd (Config.get_versinfos key)) in
 	if versinfos = [] then
 	  begin
 	    (* There is no info. TODO: Need to check for a RE *)
-	    LOG "No data in cache and no data provided. Use regexp and compute" LEVEL INFO;
+	    LOG "No data provided. Use regexp and compute" LEVEL INFO;
 	    cache
 	  end
 	else
 	  begin
+	    LOG "Use provided data" LEVEL INFO;
 	    let data = List.map (fun (name, days, date, size) -> (name, date, size)) versinfos in
-	    LOG "No data in cache. Use provided data" LEVEL INFO;
 	    (key, data)::cache
 	  end
     )
@@ -101,7 +102,3 @@ let preinit v1 v2 v3 configfile =
   let out_channel = open_out (".projects_"^configfile) in
   List.iter (print_cache out_channel) new_cache;
   close_out out_channel
-
-(*
-  prerr_string ("Cache file "^versions_file^" does not exist or has been modified, run make preinit.\n")   
-*)
