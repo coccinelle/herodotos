@@ -42,32 +42,29 @@ versionPreinit:
 
 let build_updated_cache cache_projects =
   Setup.PrjTbl.fold 
-    (fun key _ cache ->
-      LOG "Processing %s for cache" key LEVEL INFO;
+    (fun prj _ cache ->
+      LOG "Processing %s for cache" prj LEVEL INFO;
       try
-	let cacheddata = List.assoc key cache_projects in
+	let cacheddata = List.assoc prj cache_projects in
 	LOG "Data found in the cache" LEVEL INFO;
-	(key, cacheddata)::cache
+	(prj, cacheddata)::cache
       with Not_found ->
 	LOG "No data in cache." LEVEL INFO;
 	let versinfos =
 	  try
 	    List.map (fun (name, days, date, size) -> (name, date, size))
-	      (Array.to_list (snd (Config.get_versinfos key)))
+	      (Array.to_list (snd (Config.get_versinfos prj)))
 	  with _ ->
 	    LOG "No version information manually provided." LEVEL DEBUG;
 	    []
 	in
 	(* Check for a regular expression *)
-	let re = Config.get_versionsRE key in
+	let re = Config.get_versionsRE prj in
 	if re <> "" then
-	  let infos = Compute_size_and_date.extract_vers_infos
-	    (!Setup.projectsdir ^ (Config.get_prjdir key))
+	  let infos = Compute_size_and_date.extract_vers_infos prj
 	    re
-	    (Config.get_scm key)
 	    versinfos (* List of already declared versions *)
-	    (Config.get_public_scm key)
-	  in (key, infos)::cache
+	  in (prj, infos)::cache
 	else
 	  if versinfos = [] then
 	    begin
@@ -78,7 +75,7 @@ let build_updated_cache cache_projects =
 	  else
 	    begin
 	      LOG "Use provided data" LEVEL INFO;
-	      (key, versinfos)::cache
+	      (prj, versinfos)::cache
 	    end
     )
     Setup.projects []

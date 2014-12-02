@@ -43,11 +43,25 @@ let get_size dir =
   size
 
 (* extracts versions information thanks to a regexp describing versions tags *)
-let extract_vers_infos path expression local_scm declared_versions origin =
+let extract_vers_infos prj expression declared_versions =
+  let path = !Setup.projectsdir ^ (Config.get_prjdir prj) in
+  let local_scm = Config.get_scm prj in
+  let origin =
+    try
+      Config.get_public_scm prj
+    with e ->
+      LOG "%s" (Printexc.to_string e) LEVEL ERROR;
+      ""
+  in
   let deposit = Str.replace_first (Str.regexp "git:") "" local_scm in
   if not ((Sys.file_exists (path^"/"^deposit))
 	  &&(Sys.is_directory(path^"/"^deposit))) then
-    ignore(sys_command ("cd "^path^";git clone "^origin^" "^deposit ));
+    if origin <> "" then
+      ignore(sys_command ("cd "^path^";git clone "^origin^" "^deposit ))
+    else
+      (LOG "No public SCM defined, but %s is not available" deposit LEVEL FATAL;
+       failwith "A public SCM is needed."
+      );
   let tag_list = Git.get_tags path deposit expression in
   List.iter (
     fun version -> 
