@@ -2,8 +2,6 @@ let sys_command cmd =
   LOG "Execute: '%s'" cmd LEVEL INFO;
   0
 
-let exec_count dir = sys_command ("sloccount "^dir^" > count.tmp")
-
 let tag_filter tag_list filter =
   let result = ref [] in 
   List.iter(fun tag -> if Str.string_match (Str.regexp filter) tag 0 then
@@ -29,17 +27,18 @@ let rec read_recursive lines in_channel=
     End_of_file->lines
  
 let get_size dir =
-  let _ = exec_count dir in                 
-  let in_channel=open_in "count.tmp" in
-  let lines=read_recursive [] in_channel in
+  let cmd = "sloccount "^dir in
+  LOG "Execute: '%s'" cmd LEVEL DEBUG;
+  let in_channel = Unix.open_process_in cmd in
+  let lines = read_recursive [] in_channel in
   let chaine = String.concat "\n" lines in       
-  let expression=  Str.regexp "ansic: *[0-9]+" in
-  let expNumber= Str.regexp"[0-9]+" in 
+  let expression =  Str.regexp "ansic: *[0-9]+" in
+  let expNumber = Str.regexp"[0-9]+" in 
   let expSep = Str.regexp" +" in
   let _ = Str.search_forward expression chaine 0 in
   let size = int_of_string (string_match_exp expNumber (Str.split expSep (string_match_exp expression lines))) in
   close_in in_channel ;
-  Sys.remove "count.tmp";
+  LOG "Size: %d" size LEVEL DEBUG;
   size
 
 (* extracts versions information thanks to a regexp describing versions tags *)
@@ -53,16 +52,19 @@ let extract_vers_infos prj expression declared_versions =
       LOG "%s" (Printexc.to_string e) LEVEL ERROR;
       ""
   in
+  LOG "Local SCM: %s" local_scm LEVEL DEBUG;
   let deposit = Str.replace_first (Str.regexp "git:") "" local_scm in
-  if not ((Sys.file_exists (path^"/"^deposit))
-	  &&(Sys.is_directory(path^"/"^deposit))) then
+  let scm = path^"/"^deposit in
+  LOG "Checking local SCM: %s" scm LEVEL DEBUG;
+  if not ((Sys.file_exists scm)
+	  &&(Sys.is_directory scm)) then
     if origin <> "" then
       ignore(sys_command ("cd "^path^";git clone "^origin^" "^deposit ))
     else
       (LOG "No public SCM defined, but %s is not available" deposit LEVEL FATAL;
        failwith "A public SCM is needed."
       );
-  let tag_list = Git.get_tags path deposit expression in
+  let tag_list = Git.get_tags scm expression in
   List.iter (
     fun version -> 
       if not ((Sys.file_exists (path^"/"^version))

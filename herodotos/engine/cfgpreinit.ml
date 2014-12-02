@@ -61,10 +61,8 @@ let build_updated_cache cache_projects =
 	(* Check for a regular expression *)
 	let re = Config.get_versionsRE prj in
 	if re <> "" then
-	  let infos = Cpt_scm_stats.extract_vers_infos prj
-	    re
-	    versinfos (* List of already declared versions *)
-	  in (prj, infos)::cache
+	  let infos = Cpt_scm_stats.extract_vers_infos prj re versinfos in
+	  (prj, infos)::cache
 	else
 	  if versinfos = [] then
 	    begin

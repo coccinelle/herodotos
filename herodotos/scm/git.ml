@@ -232,32 +232,28 @@ let prerr_author vlist name version =
 		     " ("^ string_of_int abspct ^"% abs)"^
 		     " ("^ string_of_int reldays ^" rel. days)")
 
-let get_tags path deposit expression =
-  let in_channel =
-    Unix.open_process_in 
-      ("git --git-dir "^path^"/"^deposit ^ " tag | grep \""^expression   ^"\"" )
-  in
-  let tag_string = String.create (in_channel_length in_channel) in
-  really_input in_channel tag_string 0 (in_channel_length in_channel) ;
-  close_in in_channel ;
-  Str.split (Str.regexp "\n") tag_string
-
-let get_tag version =
-  let num = Str.regexp "[0-9].*" in
-  let start_num = Str.search_forward num version 0 in
-  "v"^(String.sub version start_num ((String.length version)- start_num)) 
+let get_tags scmpath expression =
+  let cmd = "git --git-dir "^scmpath ^ " tag -l " ^ expression in
+  LOG "Execute: '%s'" cmd LEVEL DEBUG;
+  let in_channel = Unix.open_process_in cmd in
+  let rec rl () =
+    try
+      let line = input_line in_channel in
+      LOG "Read tag: %s" line LEVEL DEBUG;
+      line ::rl()
+    with End_of_file -> []
+  in rl ()
 
 let get_version_date path version deposit =
   try 
     let pwd = Sys.getcwd () in 
-    let tag = get_tag version in
     (* FIXME: Update implementation without tmp files *)
-    let _ = sys_command ("cd "^(path^"/"^deposit)^" ; git log --pretty=raw --format=\"%ci\"  "^tag ^" -1 | cut -f1 -d' ' > "^pwd^"/.date.tmp") in
-    let in_ch_date = open_in ".date.tmp" in 
+    let cmd = "git --git-dir "^(path^"/"^deposit)^" log --pretty=raw --format=\"%ci\"  "^ version ^" -1 | cut -f1 -d' '" in
+    LOG "Execute: '%s'" cmd LEVEL DEBUG;
+    let in_ch_date = Unix.open_process_in cmd in 
     let date = input_line in_ch_date in  
     LOG "Date: %s" date LEVEL DEBUG;
     close_in in_ch_date ;
-    Sys.remove ".date.tmp";
     snd(get_date date)
   with _ -> 
     raise (Not_Declared "Error in deposit declaration")  
