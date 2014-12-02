@@ -1,45 +1,4 @@
 
-(*------------------------------------------------------------------------------------------------------------------------------------------------
-(*currently used for preinit parsing *)
-  | TVERSIONS TEQUAL exp=TSTRING
-      {let vs = Compute_size_and_date.extract_vers_infos (!Setup.projectsdir^"/"^(!Setup.dir)) exp !local_scm !already_declared_versions !public_scm in
-        "{\n"^(String.concat "\n" vs)^"\n}\n" }
-
-versionPreinit:
-  TLPAR name=TSTRING  d=datePreinit  size=sizePreinit TRPAR {
-    let _ =Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!local_scm) (!public_scm) in
-    let date = if d="" then 
-                         (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!local_scm))
-                      else d in
-    let _ =List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then      
-      
-      let size=Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name) in 
-      "("^"\""^name^"\""^","^ date^","^(string_of_int size)^")"
-     else 
-        "("^"\""^name^"\""^","^ date ^","^(string_of_int size)^")"
-  }
-
-versionPreinit:
-  TLPAR name=TSTRING TCOMMA d=datePreinit  size=suitePreinit TRPAR {
-    (* FIXME: Should not be in parser !!! *)
-    ignore(Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!repository_git) (!repository_git));
-    let date =
-      if d = "" then 
-        (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!repository_git))
-      else d
-    in
-    let corrected_size =
-      if size = 0 then    
-	Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name)
-      else
-	size
-    in
-    "("^"\""^name^"\""^","^ date^","^(string_of_int corrected_size)^")"
-  }
-
-
-*)
-
 let build_updated_cache cache_projects =
   Setup.PrjTbl.fold 
     (fun prj _ cache ->
