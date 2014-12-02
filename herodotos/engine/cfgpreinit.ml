@@ -70,13 +70,12 @@ let build_updated_cache cache_projects =
 	else
 	  if versinfos = [] then
 	    begin
-	      (* There is no info. TODO: Need to check for a RE *)
-	      LOG "No data provided. Use regexp and compute" LEVEL INFO;
-	      cache
+	      LOG "No data source provided." LEVEL FATAL;
+	      failwith "No data source provided."
 	    end
 	  else
 	    begin
-	      LOG "Use provided data" LEVEL INFO;
+	      LOG "Use only user provided data." LEVEL INFO;
 	      (prj, versinfos)::cache
 	    end
     )
