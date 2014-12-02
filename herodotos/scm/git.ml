@@ -236,13 +236,16 @@ let get_tags scmpath expression =
   let cmd = "git --git-dir "^scmpath ^ " tag -l " ^ expression in
   LOG "Execute: '%s'" cmd LEVEL DEBUG;
   let in_channel = Unix.open_process_in cmd in
-  let rec rl () =
-    try
-      let line = input_line in_channel in
-      LOG "Read tag: %s" line LEVEL DEBUG;
-      line ::rl()
-    with End_of_file -> []
-  in rl ()
+  let tag_list =
+    let rec rl () =
+      try
+	let line = input_line in_channel in
+	line ::rl()
+      with End_of_file -> []
+    in rl ()
+  in
+  LOG "Read tags: %s" (String.concat "," tag_list) LEVEL DEBUG;
+  tag_list
 
 let get_version_date path version deposit =
   try 

@@ -44,10 +44,16 @@ let build_updated_cache cache_projects =
   Setup.PrjTbl.fold 
     (fun prj _ cache ->
       LOG "Processing %s for cache" prj LEVEL INFO;
+      (* Check for a regular expression *)
+      let re = Config.get_versionsRE prj in
       try
 	let cacheddata = List.assoc prj cache_projects in
 	LOG "Data found in the cache" LEVEL INFO;
-	(prj, cacheddata)::cache
+	if re <> "" then
+	  let infos = Cpt_scm_stats.extract_vers_infos prj re cacheddata in
+	  (prj, infos)::cache
+	else
+	  (prj, cacheddata)::cache
       with Not_found ->
 	LOG "No data in cache." LEVEL INFO;
 	let versinfos =
@@ -58,8 +64,6 @@ let build_updated_cache cache_projects =
 	    LOG "No version information manually provided." LEVEL DEBUG;
 	    []
 	in
-	(* Check for a regular expression *)
-	let re = Config.get_versionsRE prj in
 	if re <> "" then
 	  let infos = Cpt_scm_stats.extract_vers_infos prj re versinfos in
 	  (prj, infos)::cache
