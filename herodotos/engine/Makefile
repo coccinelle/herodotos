@@ -1,6 +1,6 @@
 TARGET = engine
 
-SOURCES = compute_size_and_date.ml \
+SOURCES = cpt_scm_stats.ml \
 	occ_correl.ml   \
 	org2bug.ml      \
 	correl.ml       \
