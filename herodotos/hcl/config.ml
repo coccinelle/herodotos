@@ -43,9 +43,8 @@ let parse_config_no_cache file : unit =
   let lexbuf = Lexing.from_channel in_ch  in
   try
     Misc.init file lexbuf;
-    let ast = Config_parser.main Config_lexer.token lexbuf in
-      close_in in_ch;
-      ast
+    Config_parser.main Config_lexer.token lexbuf;
+    close_in in_ch;
   with
       (Config_lexer.Lexical msg) ->
 	let pos = lexbuf.lex_curr_p in
@@ -66,9 +65,13 @@ let parse_config_no_cache file : unit =
 
 let parse_config file : unit =
  let cache = parse_cache (".projects_"^file) in
- let ast = parse_config_no_cache file in
- ast
-   (* TODO: Merge cache and ast *)
+ parse_config_no_cache file;
+ Setup.PrjTbl.iter
+   (fun name (_,atts) ->
+     let vers_cache = List.assoc name cache in
+     let newatts = Ast_config.Version (1, vers_cache) in
+     Setup.updPrj name (None, newatts::atts)
+   ) Setup.projects
 
 let get_date d = match d with
     Some d -> d
