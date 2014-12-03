@@ -295,10 +295,14 @@ let _ =
       Arg.parse_argv Sys.argv aligned anon_fun usage_msg;
     with Arg.Bad msg ->
       (LOG msg LEVEL FATAL; exit 0));
-    main aligned;
-    if !Debug.profile <> Debug.PNONE then
-      Debug.trace (Debug.profile_diagnostic ());
-    LOG "*** END ***" LEVEL TRACE
+  (try main aligned
+   with e ->
+     LOG "Exception: %s" (Printexc.to_string e) LEVEL FATAL;
+     Debug.trace (Printexc.get_backtrace ());
+     exit 1);
+  if !Debug.profile <> Debug.PNONE then
+    Debug.trace (Debug.profile_diagnostic ());
+  LOG "*** END ***" LEVEL TRACE
 
 (* For ratio computation *)
 (*

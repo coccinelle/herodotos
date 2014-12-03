@@ -43,9 +43,8 @@ let parse_config_no_cache file : unit =
   let lexbuf = Lexing.from_channel in_ch  in
   try
     Misc.init file lexbuf;
-    let ast = Config_parser.main Config_lexer.token lexbuf in
-      close_in in_ch;
-      ast
+    Config_parser.main Config_lexer.token lexbuf;
+    close_in in_ch;
   with
       (Config_lexer.Lexical msg) ->
 	let pos = lexbuf.lex_curr_p in
@@ -66,9 +65,13 @@ let parse_config_no_cache file : unit =
 
 let parse_config file : unit =
  let cache = parse_cache (".projects_"^file) in
- let ast = parse_config_no_cache file in
- ast
-   (* TODO: Merge cache and ast *)
+ parse_config_no_cache file;
+ Setup.PrjTbl.iter
+   (fun name (_,atts) ->
+     let vers_cache = List.assoc name cache in
+     let newatts = Ast_config.Version (1, vers_cache) in
+     Setup.updPrj name (None, newatts::atts)
+   ) Setup.projects
 
 let get_date d = match d with
     Some d -> d
@@ -188,6 +191,7 @@ let show_attr attr : string =
     | Ast_config.YAxis (s) -> ("yaxis = "^s)
     | Ast_config.Ratio b -> ("ratio = "^Misc.string_of_bool b)
     | Ast_config.NotExistColor (r,g,b) -> ("notexistcolor = "^Misc.string_of_rgb (r,g,b))
+    | Ast_config.VersionRE (re) -> ("version = \"" ^re^"\"")
     | Ast_config.Version (_, vs) ->
       (try
 	 LOG "version = {" LEVEL TRACE;
@@ -199,7 +203,8 @@ let show_attr attr : string =
     | Ast_config.VMin (s) -> ("vmin = \""^s^"\"")
     | Ast_config.Prune (b) -> ("prune = "^Misc.string_of_bool b)
     | Ast_config.SPFlags (s) -> ("flags = \""^s^"\"")
-    | Ast_config.LOCALSCM (s) -> ("scm = \""^s^"\"")
+    | Ast_config.LOCALSCM (s) -> ("local_scm = \""^s^"\"")
+    | Ast_config.PUBLICSCM (s) -> ("public_scm = \""^s^"\"")
     | Ast_config.Size (x,y) -> ("size = "^string_of_float x ^ "x" ^ string_of_float y)
     | Ast_config.Sort b -> ("sort = "^Misc.string_of_bool b)
     |_ -> ""
@@ -556,6 +561,24 @@ let get_scm prj =
 	  | _ -> raise Unrecoverable
       with _ ->
 	raise (Misconfiguration "project source code repository is not set")
+  with Not_found ->
+	raise (Misconfiguration ("project "^prj^" is not declared"))
+
+let get_public_scm prj =
+  try
+    let atts = snd (Setup.PrjTbl.find Setup.projects prj) in
+      try
+	match
+	  List.find (fun x ->
+		       match x with
+			   Ast_config.PUBLICSCM _ -> true
+			 | _ -> false
+		    ) atts
+	with
+	    Ast_config.PUBLICSCM s -> s
+	  | _ -> raise Unrecoverable
+      with _ ->
+	raise (Misconfiguration "project public source code repository is not set")
   with Not_found ->
 	raise (Misconfiguration ("project "^prj^" is not declared"))
 

@@ -6,8 +6,11 @@ let headfmt  = format_of_string "git --git-dir %s log -1"
 
 exception SCMFailure of string
 exception MalformedGitLog
+exception Not_Declared of string
 
-let firstversion = "linux-2.6.0"
+let sys_command (cmd : string) : int =
+  LOG "Execute: '%s'" cmd LEVEL INFO;
+  0
 
 let blamefmt = format_of_string "git --git-dir %s blame --incremental %s -L %d,+1 -- %s"
 let authorsfmt = format_of_string "git --git-dir %s log --date=short --pretty=format:\"%%an;%%ae;%%ad;%%H\" > %s"
@@ -54,9 +57,7 @@ let blame vb (path:string) (vmin:string) (version:string) (file:string) (line:in
     match Unix.close_process_in ch with
 	Unix.WEXITED 0 ->
 	  if vb then prerr_endline (" - OK");
-	  (* let (firstversion, _, _, _) = vmin in *)
-	  let firstversion = vmin in
-	  if is_before vb path sha1 firstversion then
+	  if is_before vb path sha1 vmin then
 	    ("Unknow author", sha1)
 	  else
 	    (author, sha1)
@@ -77,21 +78,23 @@ let sec_to_days sec =
 let tm_to_days tm =
   sec_to_days (fst (Unix.mktime (Config.get_date tm)))
 
-let get_day strdate =
+let get_date strdate = 
   match Str.split (Str.regexp "-") strdate with
       [year;month;day] ->
 	let m = int_of_string month in
 	let d = int_of_string day in
 	let y = int_of_string year in
-	let tm = Unix.mktime
+	Unix.mktime
 	  {Unix.tm_mon=m-1; Unix.tm_mday=d; Unix.tm_year=y-1900;
 	   (* Don't care about the time *)
 	   Unix.tm_sec=0; Unix.tm_min=0; Unix.tm_hour=0;
 	   (* Will be normalized by mktime *)
 	   Unix.tm_wday=0; Unix. tm_yday=0; Unix.tm_isdst=false
 	  }
-	in sec_to_days (fst tm)
     | _ -> raise MalformedGitLog
+
+let get_day strdate =
+  sec_to_days (fst (get_date strdate))
 
 let authors = ref (Hashtbl.create 1)
 let update_author name c_email now =
@@ -228,3 +231,46 @@ let prerr_author vlist name version =
     prerr_endline ("Experience at that time: " ^ duration ^
 		     " ("^ string_of_int abspct ^"% abs)"^
 		     " ("^ string_of_int reldays ^" rel. days)")
+
+let get_tags scmpath expression =
+  let cmd = "git --git-dir "^scmpath ^ " tag -l " ^ expression in
+  LOG "Execute: '%s'" cmd LEVEL DEBUG;
+  let in_channel = Unix.open_process_in cmd in
+  let tag_list =
+    let rec rl () =
+      try
+	let line = input_line in_channel in
+	line ::rl()
+      with End_of_file -> []
+    in rl ()
+  in
+  LOG "Read tags: %s" (String.concat "," tag_list) LEVEL DEBUG;
+  tag_list
+
+let get_version_date path version deposit =
+  try 
+    let pwd = Sys.getcwd () in 
+    (* FIXME: Update implementation without tmp files *)
+    let cmd = "git --git-dir "^(path^"/"^deposit)^" log --pretty=raw --format=\"%ci\"  "^ version ^" -1 | cut -f1 -d' '" in
+    LOG "Execute: '%s'" cmd LEVEL DEBUG;
+    let in_ch_date = Unix.open_process_in cmd in 
+    let date = input_line in_ch_date in  
+    LOG "Date: %s" date LEVEL DEBUG;
+    close_in in_ch_date ;
+    snd(get_date date)
+  with _ -> 
+    raise (Not_Declared "Error in deposit declaration")  
+
+let extract_code path version local_scm origin =
+  let deposit = Str.replace_first (Str.regexp "git:") "" local_scm in
+  if not ((Sys.file_exists (path^"/"^version))
+	  && (Sys.is_directory (path^"/"^version))) then  
+    if ((Sys.file_exists (path^"/"^deposit))
+	&&(Sys.is_directory(path^"/"^deposit))) then
+      ignore(sys_command ("cd "^(path^"/"^deposit)^" && git archive --format=tar --prefix="^version^"/ "^
+                      version^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar"))
+    else
+      ignore (sys_command ("cd "^path^";git clone "^origin^" "^deposit^";cd "^(path^"/"^deposit)^
+		      " && git archive --format=tar --prefix="^version^"/ "^
+                      version^" > ../"^version^".tar; cd .. && tar xf "^version^".tar;rm "^version^".tar"))
+

@@ -1,77 +1,42 @@
 
-(*------------------------------------------------------------------------------------------------------------------------------------------------
-(* preinit parsing rules*)
-projectPreinit:
-  TPROJECT name=TId TLCB versions=list(prjattr) TRCB {versions_string:= !versions_string^name^(String.concat "\n" versions)}
-
-(*currently used for preinit parsing *)
-prjattr:
-  | TDIR           TEQUAL d=path                     {Setup.setDir d ;""}
-  | TSUBDIR        TEQUAL path                       {"" }
-  | TVERSIONS      TEQUAL TLCB  vs=list(versionPreinit) TRCB {"{\n"^(String.concat "\n" vs)^"\n}\n"}
-  | TVERSIONS TEQUAL exp=TSTRING
-      {let vs = Compute_size_and_date.extract_vers_infos (!Setup.projectsdir^"/"^(!Setup.dir)) exp !local_scm !already_declared_versions !public_scm in
-        "{\n"^(String.concat "\n" vs)^"\n}\n" }
-  | TLOCALSCM      TEQUAL v=TSTRING                  {local_scm := v;"" }
-  | TPUBLICSCM     TEQUAL v=TSTRING                  {public_scm := v;"" }
-
-versionPreinit:
-  TLPAR name=TSTRING  d=datePreinit  size=sizePreinit TRPAR {
-    let _ =Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!local_scm) (!public_scm) in
-    let date = if d="" then 
-                         (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!local_scm))
-                      else d in
-    let _ =List.length (Str.split (Str.regexp_string (Str.quote "/")) name) in if size=0 then      
-      
-      let size=Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name) in 
-      "("^"\""^name^"\""^","^ date^","^(string_of_int size)^")"
-     else 
-        "("^"\""^name^"\""^","^ date ^","^(string_of_int size)^")"
-  }
-
-versionPreinit:
-  TLPAR name=TSTRING TCOMMA d=datePreinit  size=suitePreinit TRPAR {
-    (* FIXME: Should not be in parser !!! *)
-    ignore(Compute_size_and_date.extract_code (!Setup.projectsdir^"/"^(!Setup.dir)) name (!repository_git) (!repository_git));
-    let date =
-      if d = "" then 
-        (Compute_size_and_date.get_date (!Setup.projectsdir^"/"^(!Setup.dir))  name (!repository_git))
-      else d
-    in
-    let corrected_size =
-      if size = 0 then    
-	Compute_size_and_date.get_size (!Setup.projectsdir^"/"^(!Setup.dir)^"/"^name)
-      else
-	size
-    in
-    "("^"\""^name^"\""^","^ date^","^(string_of_int corrected_size)^")"
-  }
-
-
-*)
-
 let build_updated_cache cache_projects =
   Setup.PrjTbl.fold 
-    (fun key data cache ->
-      LOG "Processing %s for cache" key LEVEL INFO;
+    (fun prj _ cache ->
+      LOG "Processing %s for cache" prj LEVEL INFO;
+      (* Check for a regular expression *)
+      let re = Config.get_versionsRE prj in
       try
-	let cacheddata = List.assoc key cache_projects in
+	let cacheddata = List.assoc prj cache_projects in
 	LOG "Data found in the cache" LEVEL INFO;
-	(key, cacheddata)::cache
-      with Not_found ->
-	let versinfos = Array.to_list (snd (Config.get_versinfos key)) in
-	if versinfos = [] then
-	  begin
-	    (* There is no info. TODO: Need to check for a RE *)
-	    LOG "No data in cache and no data provided. Use regexp and compute" LEVEL INFO;
-	    cache
-	  end
+	if re <> "" then
+	  let infos = Cpt_scm_stats.extract_vers_infos prj re cacheddata in
+	  (prj, infos)::cache
 	else
-	  begin
-	    let data = List.map (fun (name, days, date, size) -> (name, date, size)) versinfos in
-	    LOG "No data in cache. Use provided data" LEVEL INFO;
-	    (key, data)::cache
-	  end
+	  (prj, cacheddata)::cache
+      with Not_found ->
+	LOG "No data in cache." LEVEL INFO;
+	let versinfos =
+	  try
+	    List.map (fun (name, days, date, size) -> (name, date, size))
+	      (Array.to_list (snd (Config.get_versinfos prj)))
+	  with _ ->
+	    LOG "No version information manually provided." LEVEL DEBUG;
+	    []
+	in
+	if re <> "" then
+	  let infos = Cpt_scm_stats.extract_vers_infos prj re versinfos in
+	  (prj, infos)::cache
+	else
+	  if versinfos = [] then
+	    begin
+	      LOG "No data source provided." LEVEL FATAL;
+	      failwith "No data source provided."
+	    end
+	  else
+	    begin
+	      LOG "Use only user provided data." LEVEL INFO;
+	      (prj, versinfos)::cache
+	    end
     )
     Setup.projects []
 
@@ -89,7 +54,7 @@ let  print_cache out_channel prj_cache =
 let preinit v1 v2 v3 configfile =
   ignore(Config.parse_config_no_cache configfile);
   LOG "Config parsing OK!" LEVEL INFO;
-  Config.show_config ();
+  (*  Config.show_config ();*)
   let cache_file = ".projects_"^configfile in
   let cache =
     if Sys.file_exists cache_file then
@@ -101,7 +66,3 @@ let preinit v1 v2 v3 configfile =
   let out_channel = open_out (".projects_"^configfile) in
   List.iter (print_cache out_channel) new_cache;
   close_out out_channel
-
-(*
-  prerr_string ("Cache file "^versions_file^" does not exist or has been modified, run make preinit.\n")   
-*)

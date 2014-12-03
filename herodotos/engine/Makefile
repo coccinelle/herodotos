@@ -1,6 +1,7 @@
 TARGET = engine
 
-SOURCES = occ_correl.ml \
+SOURCES = cpt_scm_stats.ml \
+	occ_correl.ml   \
 	org2bug.ml      \
 	correl.ml       \
 	cfghelper.ml    \

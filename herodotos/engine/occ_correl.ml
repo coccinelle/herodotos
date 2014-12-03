@@ -1,4 +1,3 @@
-
 let match_bug strict prefix bug1 bug2 =
   let (_, s, _, f, v, pos, _, t, h, _, _) = bug1 in
   let (_, sb, _, fb, vb, posb, _, tb, hb, _, _) = bug2 in
@@ -133,6 +132,8 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	  n.Ast_org.def <- Some (None);
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
+	  manual_check_next verbose strict prefix correl subbugs bug
+(*
 	  let rec fold line =
 	    let (res, ks) = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
 	    if res = 0 then        (* Nothing at line 'line' *)
@@ -140,7 +141,9 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 		fold (line+1)
 	      else (0, ks)
 	    else (1, None)           (* Found something. Stop there. *)
-	  in
+	  in fold lineb
+
+(*
 	  let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
 	  if ks <> None then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
 	  if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
@@ -148,6 +151,8 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	    manual_check_next verbose strict prefix correl subbugs bug
 	  else
 	    1 (* Automatic correlation performed *)
+*)
+*)
 
 and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos
     : int * (string * ((Ast_org.bug -> int) * Ast_org.bug)) option =
@@ -263,6 +268,8 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		 It seems to be impossible and worthless.
 		 Just check for manual correlation.
 	       *)
+	     (manual_check_next verbose strict prefix correl subbugs bug, None)
+(*
 	     let rec fold line =
 	       let (res, ks) = check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole) in
 	       if res = 0 then
@@ -270,8 +277,16 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 		   fold (line+1)
 		 else (0, ks)
 	       else (1, None)
-	     in fold lineb
-    )
+	     in
+	     let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
+  (* Check ks is empty, run manual otherwise *)
+	     if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
+	     if n.Ast_org.def = None then
+	       manual_check_next verbose strict prefix correl subbugs bug
+	     else
+	       1 (* Automatic correlation performed *)
+*)
+  )
 
 let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs =
   Debug.profile_code_silent "compute_bug_chain"

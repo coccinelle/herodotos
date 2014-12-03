@@ -26,7 +26,7 @@ UPDATES=$(PRJS:%=update-%)
 -include .depend
 
 preinit init correl web stat statfp: check-conf $(CONF)
-	$(HERODOTOS) $(FLAGS) -c $(CONF) $@
+	BOLT_CONFIG=$(BOLT_CONFIG) $(HERODOTOS) $(FLAGS) -c $(CONF) $@
 	@if [ "$@" = "init" ]; then echo "NEXT: make all [-jX]"; fi
 	@if [ "$@" = "init" ]; then echo "OR: dmake X (if you stand on the shoulders of giants !)"; fi
 	@if [ "$@" = "correl" ]; then echo "NEXT: Check for manual correlation. Then run 'make correl'"; fi

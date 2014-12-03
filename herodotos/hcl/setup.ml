@@ -8,7 +8,6 @@ let resultsdir = ref ""
 let websitedir = ref ""
 let findcmd = ref ""
 let spflags = ref ""
-let dir = ref ""
 let cpucore = ref None
 let findchild = ref None
 let dbconn = ref ""
@@ -17,7 +16,6 @@ type project = string
 type defect = string
 type graph = string
 type experience = string
-type versions = string
 
 module Prj =
 struct
@@ -25,7 +23,6 @@ struct
   let equal = (=)
   let hash = Hashtbl.hash
 end
-
 
 module Dft =
 struct
@@ -48,14 +45,6 @@ struct
   let hash = Hashtbl.hash
 end 
 
-module Vers = 
-struct
-  type t = versions
-  let equal = (=)
-  let hash = Hashtbl.hash
-end
-
-
 module PrjTbl = Hashtbl.Make (Prj)
 
 module DftTbl = Hashtbl.Make (Dft)
@@ -63,8 +52,6 @@ module DftTbl = Hashtbl.Make (Dft)
 module GphTbl = Hashtbl.Make (Gph)
 
 module ExpTbl = Hashtbl.Make (Exp)
-
-
 
 let projects = PrjTbl.create 5
 let smatchs = DftTbl.create 11
@@ -94,7 +81,6 @@ let setPrjDir p = setRef p projectsdir "projects directory is already set"
 let setResultsDir p = setRef p resultsdir "results directory is already set"
 let setWebsiteDir p = setRef p websitedir "website directory is already set"
 let setDBConn db = setRef db dbconn "Database connexion information is already set"
-let setDir p = dir := p
 
 let setFindCmd c = setRef c findcmd "pattern matching tool is already set"
 let setFindChild (c: int) = findchild := Some c
