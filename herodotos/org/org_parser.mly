@@ -107,6 +107,7 @@ textelm_nospecial:
  |  TEQUAL                              { "="             }
  |  THASHPLUS                           { "#+"            }
  |  TIGNORED                            { "IGNORED"       }
+ |  TVIEW                               { "view"          }
 (* |  s=status_elm                        { Org_helper.get_status s    } *)
 
 status_elm:
