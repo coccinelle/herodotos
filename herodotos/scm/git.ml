@@ -244,7 +244,7 @@ let get_tags scmpath expression =
       with End_of_file -> []
     in rl ()
   in
-  LOG "Read tags: %s" (String.concat "," tag_list) LEVEL DEBUG;
+  List.iter (fun tag -> LOG "Tag: %s" tag LEVEL DEBUG) tag_list;
   tag_list
 
 let get_version_date path version deposit =

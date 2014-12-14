@@ -7,14 +7,14 @@ let build_updated_cache cache_projects =
       let re = Config.get_versionsRE prj in
       try
 	let cacheddata = List.assoc prj cache_projects in
-	LOG "Data found in the cache" LEVEL INFO;
+	LOG "Data found in the cache for %s" prj LEVEL INFO;
 	if re <> "" then
 	  let infos = Cpt_scm_stats.extract_vers_infos prj re cacheddata in
 	  (prj, infos)::cache
 	else
 	  (prj, cacheddata)::cache
       with Not_found ->
-	LOG "No data in cache." LEVEL INFO;
+	LOG "No data in cache for %s" prj LEVEL INFO;
 	let versinfos =
 	  try
 	    List.map (fun (name, days, date, size) -> (name, date, size))
