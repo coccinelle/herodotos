@@ -1,6 +1,8 @@
 let sys_command cmd =
   LOG "Execute: '%s'" cmd LEVEL INFO;
-  0
+  let status = Sys.command cmd in
+  LOG "Status: %d" status LEVEL INFO;
+  status
 
 let tag_filter tag_list filter =
   let result = ref [] in 
@@ -66,12 +68,12 @@ let extract_vers_infos prj expression declared_versions =
       );
   let tag_list = Git.get_tags scm expression in
   List.iter (
-    fun version -> 
+    fun version ->
       if not ((Sys.file_exists (path^"/"^version))
 	      &&(Sys.is_directory(path^"/"^version))) then
         ignore(sys_command
 		 ("git --git-dir "^path^"/"^deposit ^" archive --format=tar --prefix="^version^"/ "^ version
-		  ^" | (cd .. && tar xf -)"))
+		  ^" | (cd "^path^" && tar xf -)"))
   ) tag_list;
   List.map (fun version ->
     try
