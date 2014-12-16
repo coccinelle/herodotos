@@ -148,7 +148,7 @@ let gen_cmd_basic v prefix pair difffile =
   Parmap.parfold (fun file_pair (outlist, cmdlist) ->
     let (ofile, nfile) = file_pair in
     let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
-    if Sys.file_exists outfile then
+    if not (Sys.file_exists outfile) then
       (LOG "Checking (%d) %s - Keep" (Unix.getpid ()) outfile LEVEL TRACE;
        (outfile::outlist,(outfile, cmd)::cmdlist))
     else
