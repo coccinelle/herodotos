@@ -19,9 +19,14 @@ let get_cmd gumfile =
   if not (Sys.file_exists gumfile) then
     try
       List.assoc gumfile !gumtree_cmd
-    with Not_found -> ""
+    with Not_found ->
+      LOG "Fail to find command for %s" gumfile LEVEL FATAL;
+      failwith "Fails to find a GumTree command"
   else
-    ""
+    (
+      LOG "Fail to find command for %s" gumfile LEVEL FATAL;
+      failwith "Fails to find a GumTree command"
+    )
 
 let get_cmd2 file ver =
   let gumfile = make_path !gumtree ver file in
@@ -41,7 +46,10 @@ let alt_new_pos (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.linepred
 	 | Unix.WEXITED 1 -> ()
 	 | Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR
 	 | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR
-     with Not_found -> ());
+     with Not_found ->
+       LOG "Fail to find command for %s" gumfile LEVEL FATAL;
+       failwith "Fails to find a GumTree command"
+    );
   let diffs = Gumtree.parse_diff !verbose (!gumtree^Filename.dir_sep) gumfile in
   Gumtree.compute_new_pos_with_gumtree diffs file ver pos
 

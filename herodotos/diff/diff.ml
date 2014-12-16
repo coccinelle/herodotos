@@ -117,9 +117,9 @@ let run_get_diff_job v prefix difffile cmd =
     if pid = 0 then (* I'm a slave *)
       begin
 	let pid = Unix.getpid() in
-	LOG "New child %d for %s" (Unix.getpid ()) cmd LEVEL TRACE;
+	LOG "New child %d for %s" pid cmd LEVEL TRACE;
 	let ret = get_diff_nofail v prefix difffile cmd in
-	LOG "Job done for child %d" (Unix.getpid ()) LEVEL TRACE;
+	LOG "Job done for child %d" pid LEVEL TRACE;
 	let msg = Debug.profile_diagnostic () in
 	if msg <> "" then Debug.trace msg;
 	exit ret
