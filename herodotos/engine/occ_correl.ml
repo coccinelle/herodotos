@@ -155,7 +155,7 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 *)
 
 and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos
-    : int * (string * ((Ast_org.bug -> int) * Ast_org.bug)) option =
+    : int * (string option * ((Ast_org.bug -> int) * Ast_org.bug)) option =
   Debug.profile_code_silent "check_next"
     (fun () ->
       let (l, s, r, f, v, p, face, t, h, n, _) = bug in
@@ -450,8 +450,9 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
       let (cmds, ks2) = List.split ks in
       let (dirs, cleaned_cmds) =
 	List.fold_left
-	  (fun (dir_list, cmd_list) x ->
-	    if x <> "" then
+	  (fun (dir_list, cmd_list) x_opt ->
+	    match x_opt with
+	      Some x ->
 	      let (dir, cmd) = match Str.split re x with
 		  dir::[cmd] -> (dir, cmd)
 		| _ -> failwith ("Wrong command: x")
@@ -462,7 +463,7 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
 	      let cmds = if not (List.mem cmd cmd_list) then
 		  cmd::cmd_list else cmd_list
 	      in (dirs, cmds)
-	    else
+	    | None ->
 	      (dir_list, cmd_list)
 	  )
 	  ([],[]) cmds
