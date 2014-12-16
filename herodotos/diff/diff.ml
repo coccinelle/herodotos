@@ -8,11 +8,6 @@ let selected_compute_new_pos = ref Gnudiff.compute_new_pos_with_findhunk
 
 let selected_alt_new_pos = ref None
 
-let get_basetime orgstat patchfile =
-  if Sys.file_exists patchfile
-  then (Unix.stat patchfile).Unix.st_mtime
-  else neg_infinity (* To force diff-ing tool *)
-
 let is_GNUdiff difffile =
   match difffile with
       GNUDiff _ -> true
