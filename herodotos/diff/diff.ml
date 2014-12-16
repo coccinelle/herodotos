@@ -180,9 +180,8 @@ let mkdir_cache resultsdir pdir vlist orgfile difffile =
   let file = get_difffile difffile in
   if is_hybrid difffile then
     let file = get_difffile difffile in
-    let orgstatpatch = mkdir_cache_basic (file^ Global.patchext) in
-    let orgstatgumtree = mkdir_cache_basic (file^ Global.gumtreeext) in
-    max orgstatgumtree orgstatpatch
+    mkdir_cache_basic (file^ Global.patchext);
+    mkdir_cache_basic (file^ Global.gumtreeext)
   else
     mkdir_cache_basic file
 
