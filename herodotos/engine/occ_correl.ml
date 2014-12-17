@@ -132,8 +132,6 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	  n.Ast_org.def <- Some (None);
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
-	  manual_check_next verbose strict prefix correl subbugs bug
-(*
 	  let rec fold line =
 	    let (res, ks) = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
 	    if res = 0 then        (* Nothing at line 'line' *)
@@ -141,9 +139,7 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 		fold (line+1)
 	      else (0, ks)
 	    else (1, None)           (* Found something. Stop there. *)
-	  in fold lineb
-
-(*
+	  in
 	  let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
 	  if ks <> None then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
 	  if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
@@ -151,8 +147,6 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	    manual_check_next verbose strict prefix correl subbugs bug
 	  else
 	    1 (* Automatic correlation performed *)
-*)
-*)
 
 and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos
     : int * (string option * ((Ast_org.bug -> int) * Ast_org.bug)) option =
@@ -165,7 +159,6 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
       let vn = Misc.get_version_name vlist (vidx+1) in
       let check = (l, s, r, f, vn, check_pos, face, t, {Ast_org.is_head=true}, {Ast_org.def=None}, []) in
       LOG "check_next of %s at %s" (Org.show_bug true bug) (Org.show_bug true check) LEVEL TRACE;
-	  (*      LOG  *)
       LOG "List:" LEVEL TRACE;
       List.iter (fun bug -> LOG "%s" (Org.show_bug true bug) LEVEL TRACE) subbugs;
       LOG "" LEVEL TRACE;
@@ -266,10 +259,9 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	       (*
 		 Could we do something for bugs inside a hunk ?
 		 It seems to be impossible and worthless.
-		 Just check for manual correlation.
+		 Just check for manual correlation for pure GNU Diff.
+		 Try GumTree with the hybrid strategy.
 	       *)
-	     (manual_check_next verbose strict prefix correl subbugs bug, None)
-(*
 	     let rec fold line =
 	       let (res, ks) = check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole) in
 	       if res = 0 then
@@ -279,13 +271,12 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	       else (1, None)
 	     in
 	     let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
-  (* Check ks is empty, run manual otherwise *)
+	     (* Check ks is empty, run manual otherwise *)
 	     if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
 	     if n.Ast_org.def = None then
-	       manual_check_next verbose strict prefix correl subbugs bug
+		 (0, Some (Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug)))
 	     else
-	       1 (* Automatic correlation performed *)
-*)
+	       (1, None) (* Automatic correlation performed *)
   )
 
 let compute_bug_chain verbose strict prefix depth count vlist diffs correl bugs =
@@ -453,18 +444,18 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
 	  (fun (dir_list, cmd_list) x_opt ->
 	    match x_opt with
 	      Some x ->
-	      let (dir, cmd) = match Str.split re x with
-		  dir::[cmd] -> (dir, cmd)
-		| _ -> failwith ("Wrong command: x")
-	      in
-	      let dirs = if not (List.mem dir dir_list) then
-		  dir::dir_list else dir_list
-	      in
-	      let cmds = if not (List.mem cmd cmd_list) then
-		  cmd::cmd_list else cmd_list
-	      in (dirs, cmds)
-	    | None ->
-	      (dir_list, cmd_list)
+		let (dir, cmd) = match Str.split re x with
+		    dir::[cmd] -> (dir, cmd)
+		  | _ -> failwith ("Wrong command: x")
+		in
+		let dirs = if not (List.mem dir dir_list) then
+		    dir::dir_list else dir_list
+		in
+		let cmds = if not (List.mem cmd cmd_list) then
+		    cmd::cmd_list else cmd_list
+		in (dirs, cmds)
+	      | None ->
+		(dir_list, cmd_list)
 	  )
 	  ([],[]) cmds
       in
