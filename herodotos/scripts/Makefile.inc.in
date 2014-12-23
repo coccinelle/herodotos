@@ -35,7 +35,7 @@ preinit init correl web stat statfp: check-conf $(CONF)
 	@if [ "$@" = "correl" ]; then echo "OR: Generate graphs with 'make [graph|web]'"; fi
 
 statcorrel: check-conf $(CONF)
-	$(HERODOTOS) $(FLAGS) -c $(CONF) $@ 2> /dev/null
+	BOLT_CONFIG=$(BOLT_CONFIG) $(HERODOTOS) $(FLAGS) -c $(CONF) $@
 
 all:: projects
 	@echo "NEXT: 'make correl'"
