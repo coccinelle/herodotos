@@ -1,5 +1,5 @@
 (* Use "-rcX" for release candidates *)
-let version="0.7.0-rc1"
+let version="0.8.0"
 
 let cocciext  = ".cocci"
 let origext   = ".orig.org"
