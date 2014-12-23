@@ -29,11 +29,6 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
   in
   if Config.get_format patt = Ast_config.Org then
     let pdir = Config.get_prjdir p in
-	(*let (pdir, file_ext) = Misc.strip_prefix (!Setup.resultsdir^"/") bugfile_ext in
-	  let pfile = (Filename.chop_suffix file_ext Global.bugext) ^ Global.cocciext in
-	  let p = Config.rev_prjdir pdir in
-	  let patt = Config.rev_pattfile pfile in
-	*)
     let duple = Printf.sprintf "%- 10s %- 16s" p patt in
     if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
       try
@@ -54,7 +49,6 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 	    let orgs = if cinfo && fpinfo
 	      then
 		let orgfile = file ^ Global.origext in
-		(* Org.format_orgs_to_arr prefix depth vlist (Org.parse_org false orgfile) *)
 		Org.build_org_arr prefix depth !Setup.resultsdir pdir orgfile vlist
 	      else Org.emptyarray vlist
 	    in
