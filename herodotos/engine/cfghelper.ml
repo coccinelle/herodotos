@@ -49,29 +49,28 @@ let rec get_all_bugset_of_patt patts p:string list= let (Ast_config.ExpProject p
                                           |_ ->raise (Error "Error parapeter type")
                                        
 
-let rec get_all_bugset_of_exp (exp:Ast_config.experience):string list list =let (st1,st2) = exp in 
-                                         match st1 with
-                                         Ast_config.ObjPatt patts->
-                                                                begin
-                                                                 match st2 with
-                                                                   |(Ast_config.ObjProj lp)-> 
-                                                                     begin
-                                                                       match lp with
-                                                                        []->[]
-                                                                       |p::projects->(get_all_bugset_of_patt st1 p)::
-                                                                          (get_all_bugset_of_exp (st1,(Ast_config.ObjProj projects)))
-                                                                     end
-                                                                   |_ -> raise (Error "A project list should be defined in this case")
-                                                                end  
-                                        |Ast_config.ObjProj projs->
-                                                                begin
-                                                                  match projs with
-                                                                    []->[]
-                                                                   |p::projects->(get_all_bugset_of_patt st2 p)::
-                                                                      (get_all_bugset_of_exp (st2,(Ast_config.ObjProj projects)))
-                                                                end 
-                                          
-
+let rec get_all_bugset_of_exp (exp:Ast_config.experience):string list list =
+  let (st1,st2) = exp in 
+  match st1 with
+      Ast_config.ObjPatt patts->
+        begin
+          match st2 with
+            |(Ast_config.ObjProj lp)-> 
+              begin
+                match lp with
+                    []->[]
+                  |p::projects->(get_all_bugset_of_patt st1 p)::
+                    (get_all_bugset_of_exp (st1,(Ast_config.ObjProj projects)))
+              end
+            |_ -> raise (Error "A project list should be defined in this case")
+        end  
+    |Ast_config.ObjProj projs->
+      begin
+        match projs with
+            []->[]
+          |p::projects->(get_all_bugset_of_patt st2 p)::
+            (get_all_bugset_of_exp (st2,(Ast_config.ObjProj projects)))
+      end 
 
 let get_bugset_of_exp name = 
   try 
@@ -87,8 +86,9 @@ let listExp():Ast_config.experience list=
     fun name exp liste -> (find name Setup.experiences) :: liste 
   ) Setup.experiences []                                                                                
 
-let get_all_bugset_exp ():string list =let liste= List.map(fun exp->get_all_bugset_of_exp exp)(listExp()) in
-                            List.flatten(List.flatten liste) 
+let get_all_bugset_exp () : string list =
+  let liste = List.map (fun exp -> get_all_bugset_of_exp exp) (listExp())
+  in List.flatten (List.flatten liste) 
 
 
 (*imprimer des studies  *)
@@ -125,13 +125,9 @@ let check_filter filter file =
    with Not_found -> false
   )
 
-
-
-
-
 let get_bugset filter : string list =
     if filter = "" then
-      Misc.unique_list (snd (get_all_bugset ()))
+      Misc.unique_list (snd (get_all_bugset ()) @ (get_all_bugset_exp ()))
     else
       try
 	let datagraph = Setup.GphTbl.find Setup.graphs filter in

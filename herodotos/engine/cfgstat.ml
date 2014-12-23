@@ -27,16 +27,16 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 	[] -> raise (Malformed ("Malformed bug filename: "^bugfile_ext))
       | p::tail -> (p,String.concat Global.sep tail)
   in
-    if Config.get_format patt = Ast_config.Org then
-      let pdir = Config.get_prjdir p in
+  if Config.get_format patt = Ast_config.Org then
+    let pdir = Config.get_prjdir p in
 	(*let (pdir, file_ext) = Misc.strip_prefix (!Setup.resultsdir^"/") bugfile_ext in
 	  let pfile = (Filename.chop_suffix file_ext Global.bugext) ^ Global.cocciext in
 	  let p = Config.rev_prjdir pdir in
 	  let patt = Config.rev_pattfile pfile in
 	*)
-      let duple = Printf.sprintf "%- 10s %- 16s" p patt in
-	if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
-	  try
+    let duple = Printf.sprintf "%- 10s %- 16s" p patt in
+    if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
+      try
 	    let (depth, vlist) = Config.get_versinfos p in
 	    let prefix = !Setup.projectsdir ^ pdir ^"/" in
 	    let bugfile = Filename.chop_suffix bugfile_ext Global.bugext in
@@ -52,11 +52,11 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 
 	    (* Should we get information about bugs *)
 	    let orgs = if cinfo && fpinfo
-	    then
+	      then
 		let orgfile = file ^ Global.origext in
 		(* Org.format_orgs_to_arr prefix depth vlist (Org.parse_org false orgfile) *)
 		Org.build_org_arr prefix depth !Setup.resultsdir pdir orgfile vlist
-	    else Org.emptyarray vlist
+	      else Org.emptyarray vlist
 	    in
 	    let bugs =
 	      if fpinfo && Sys.file_exists bugfile_ext
@@ -74,7 +74,7 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 		  let difffile = Diff_type.GNUDiff (bugfile ^ Global.patchext) in (* TODO: FIXME for gumtree *)
 		  let diffs  = Diff.parse_diff v1 prefix difffile in
 		  let strict = ((Config.get_correl_mode v1 patt) = Ast_config.Strict) in
-		  let _ = if strict then print_endline ("*** INFO *** Strict correlation used for the pattern "^patt) in
+		  let _ = if strict then LOG "*** INFO *** Strict correlation used for the pattern %s" patt LEVEL INFO in
 		  let emptyannots = Org.emptyarray vlist in
 		  let cpucore = Setup.getCPUcore () in
 		  let ((count,new_bugs), _) = Occ_correl.compute_org v3 cpucore strict prefix depth vlist diffs correl2 emptyannots orgs in
@@ -82,44 +82,40 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 		end
 	      else 0
 	    in
-	      print_string duple;
-	      if cinfo && fpinfo then print_string (" R:" ^ (Printf.sprintf "% 6d" (Org.length orgs)));
+	    let reports = if cinfo && fpinfo then Org.length orgs else 0 in
+	    let correl =
 	      if cinfo then
-		begin
-		  print_string (" (T:" ^ (Printf.sprintf "% 5d" todo));
-		  print_string (" S:" ^ (Printf.sprintf "% 5d" same));
-		  print_string (" U:" ^ (Printf.sprintf "% 5d" unrelated));
-		  print_string (" O:" ^ (Printf.sprintf "% 5d" other));
-		  print_string (")" ^ (Printf.sprintf "% 5d" (List.length correl2)))
-		end;
-	      if cinfo && fpinfo then
-		begin
-		  if v1 then print_string (" /" ^ (Printf.sprintf "% 6d" count))
-		  else print_string (" / ?????");
-		  print_string (" -> ");
-		end;
+		Printf.sprintf "(T:% 5d S:% 5d U:% 5d O:% 5d)% 5d" todo same unrelated other (List.length correl2)
+	      else ""
+	    in
+	    let fp = 
 	      if fpinfo then
 		begin
 		  let bugcount = List.length bugs in
 		  let fpratio = (float_of_int (fp*100)) /. (float_of_int bugcount) in
-		    print_string ("(T:" ^ (Printf.sprintf "% 5d" todo_bug));
-		    print_string (" B:" ^ (Printf.sprintf "% 5d" bug));
-		    print_string (" F:" ^ (Printf.sprintf "% 5d [% 5.1f]" fp fpratio));
-		    print_string (" O:" ^ (Printf.sprintf "% 5d" other_bug));
-		    print_string (")" ^ (Printf.sprintf "% 5d" bugcount));
-		end;
-	      print_newline ()
-		(*    ;Org.auto_correl := 0 *)
-	  with err ->
-	    print_endline (duple ^" Skipping...");
+		  Printf.sprintf "(T:% 5d  B:% 5d F:% 5d [% 5.1f] O:% 5d)% 5d" todo_bug bug fp fpratio other_bug bugcount
+		end
+	      else ""
+	    in
+	      if cinfo && fpinfo then
+		let auto =  if v1 then Printf.sprintf "% 6d" count else "?????" in
+		LOG "%s R:% 6d %s / %s -> %s" duple reports correl auto fp LEVEL INFO
+	      else
+		if cinfo then
+		  LOG "%s %s" duple correl LEVEL INFO
+		else
+		  LOG "%s %s" duple fp LEVEL INFO
+      with err ->
+	    LOG "%s Skipping..." duple LEVEL ERROR;
 	    if !Misc.debug then raise err;
 	else
-	  print_endline (duple ^" (no correlation requested) Skipping...")
+	  LOG "%s (no correlation requested) Skipping..." duple LEVEL ERROR
 
 let stats v1 v2 v3 configfile graph statmode =
   let correl = if statmode = Global.Stat || statmode = Global.Statcorrel then true else false in
   let fp =  if statmode = Global.Stat || statmode = Global.StatFP then true else false in
   (* If correl and fp are both set to false, we request both... and more ! *)
   ignore(Config.parse_config configfile);
+  LOG "Running in stat mode: correl stat %b / fp stat %b" correl fp LEVEL INFO;
   let bugfiles = Cfghelper.get_bugset graph in
-    List.iter (stat_patt_prj v1 v2 v3 (correl || not fp) (fp || not correl)) bugfiles
+  List.iter (stat_patt_prj v1 v2 v3 (correl || not fp) (fp || not correl)) bugfiles
