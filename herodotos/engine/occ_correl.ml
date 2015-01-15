@@ -132,21 +132,24 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	  n.Ast_org.def <- Some (None);
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
-	  let rec fold line =
-	    let (res, ks) = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
-	    if res = 0 then        (* Nothing at line 'line' *)
-	      if line < linee then (* Check next lines until 'linee' *)
-		fold (line+1)
-	      else (0, ks)
-	    else (1, None)           (* Found something. Stop there. *)
-	  in
-	  let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
-	  if ks <> None then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
-	  if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
-	  if n.Ast_org.def = None then
+	  if true then
 	    manual_check_next verbose strict prefix correl subbugs bug
-	  else
-	    1 (* Automatic correlation performed *)
+	  else (* TODO: See later if there is something to do here... *)
+	    let rec fold line =
+	      let (res, ks) = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
+	      if res = 0 then        (* Nothing at line 'line' *)
+		if line < linee then (* Check next lines until 'linee' *)
+		  fold (line+1)
+		else (0, ks)
+	      else (1, None)           (* Found something. Stop there. *)
+	    in
+	    let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
+	    if ks <> None then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
+	    if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
+	    if n.Ast_org.def = None then
+	      manual_check_next verbose strict prefix correl subbugs bug
+	    else
+	      1 (* Automatic correlation performed *)
 
 and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org.orgarray) (bug:Ast_org.bug) check_pos
     : int * (string option * ((Ast_org.bug -> int) * Ast_org.bug)) option =
@@ -256,6 +259,9 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	     n.Ast_org.def <- Some (None);
 	     (1, None) (* Considered as an automatic correlation *)
 	   | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
+	     if true then
+	       (0, Some (Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug)))
+	     else  (* TODO: See later if there is something to do here... *)
 	       (*
 		 Could we do something for bugs inside a hunk ?
 		 It seems to be impossible and worthless.
