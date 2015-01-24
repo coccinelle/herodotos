@@ -96,7 +96,7 @@ let find_all_next strict prefix vlist (orgsarray:Ast_org.orgarray) correl bug =
 		So, a buggy pattern should not be edited,
 		but the line may have been edited.
 	     *)
-	     && (ce-cb) = (ce2-cb2)
+	     && (if false then (ce-cb) = (ce2-cb2) else true)
 	     && (if strict then
 		   let new_t = Org.clean_link_text prefix ver file pos t in
 		   let new_tb = Org.clean_link_text prefix ver2 file pos2 t2 in
