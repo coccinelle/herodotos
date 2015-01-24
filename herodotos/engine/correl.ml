@@ -83,7 +83,7 @@ let find_all_next strict prefix vlist (orgsarray:Ast_org.orgarray) correl bug =
   let (_, cb, ce) = pos in
   LOG "find_all_next: checking for %s/%s%s - %s"
     ver file (Org.get_string_pos pos) (Org.clean_link_text prefix ver file pos t) LEVEL TRACE;
-   (*
+    (*
       First, we find all bugs in next version with the same
       pattern size.
     *)
@@ -111,7 +111,7 @@ let find_all_next strict prefix vlist (orgsarray:Ast_org.orgarray) correl bug =
 	     && not (List.exists
 		       (fun (_, _, _, pfile, pver, ppos, _, _, _, next, _) ->
 			 LOG "find_all_next: check %s/%s%s def:%s" pver pfile (Org.get_string_pos ppos) (show_opt next.Ast_org.def) LEVEL TRACE;
-			 next = {Ast_org.def = Some (Some (next2, true))}
+			 next = {Ast_org.def = Some (Some (next2, true))} (* Check against automatically correlated reports only *)
 				&& not (file = pfile && ver = pver && pos = ppos)
 		       )
 		       orgs)
@@ -232,7 +232,7 @@ let correlate verbose strict prefix vlist correlfile prefix unclean_correl orgsa
 	    (* We have a TODO from the correlation file *)
 	    if s = Ast_org.TODO then
 	      begin
-		(* If a next report is used for a SAME, drop the other correlations relatd to it *)
+		(* If a next report is used for a SAME, drop the other correlations related to it *)
 		if not (is_STATUS_as_next_in_correl Ast_org.SAME correl file nver npos)
 		then
 		  (Printf.fprintf ch "* TODO %s\n %s\n"
