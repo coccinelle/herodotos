@@ -63,6 +63,6 @@ let preinit v1 v2 v3 configfile =
       []
   in
   let new_cache = build_updated_cache cache in
-  let out_channel = open_out (".projects_"^configfile) in
+  let out_channel = open_out cache_file in
   List.iter (print_cache out_channel) new_cache;
   close_out out_channel
