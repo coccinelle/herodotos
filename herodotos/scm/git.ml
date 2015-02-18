@@ -248,10 +248,12 @@ let get_tags scmpath expression =
   tag_list
 
 let get_version_date path version deposit =
-  try 
+  let gitpath = path ^ "/" ^ deposit in
+  try
+    LOG "Retrieving information about version %s from %s" version gitpath LEVEL INFO;
     let pwd = Sys.getcwd () in 
     (* FIXME: Update implementation without tmp files *)
-    let cmd = "git --git-dir "^(path^"/"^deposit)^" log --pretty=raw --format=\"%ci\"  "^ version ^" -1 | cut -f1 -d' '" in
+    let cmd = "git --git-dir "^ gitpath ^" log --pretty=raw --format=\"%ci\"  "^ version ^" -1 | cut -f1 -d' '" in
     LOG "Execute: '%s'" cmd LEVEL DEBUG;
     let in_ch_date = Unix.open_process_in cmd in 
     let date = input_line in_ch_date in  
