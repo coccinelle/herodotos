@@ -29,6 +29,7 @@ let rec read_recursive lines in_channel=
     End_of_file->lines
  
 let get_size dir =
+  LOG "Retrieving C code size of %s" dir LEVEL INFO;
   let cmd = "sloccount "^dir in
   LOG "Execute: '%s'" cmd LEVEL DEBUG;
   let in_channel = Unix.open_process_in cmd in
