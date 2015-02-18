@@ -38,8 +38,14 @@ let get_size dir =
   let expression =  Str.regexp "ansic: *[0-9]+" in
   let expNumber = Str.regexp"[0-9]+" in 
   let expSep = Str.regexp" +" in
-  let _ = Str.search_forward expression chaine 0 in
-  let size = int_of_string (string_match_exp expNumber (Str.split expSep (string_match_exp expression lines))) in
+  let size =
+    try
+      let _ = Str.search_forward expression chaine 0 in
+      int_of_string (string_match_exp expNumber (Str.split expSep (string_match_exp expression lines)))
+    with Not_found ->
+      LOG "Error while retrieving the ansi C code size" LEVEL ERROR;
+      0
+  in
   close_in in_channel ;
   LOG "Size: %d" size LEVEL DEBUG;
   size
@@ -79,7 +85,7 @@ let extract_vers_infos prj expression declared_versions =
   List.map (fun version ->
     try
       List.find (fun (name, date, size) -> name = version) declared_versions
-    with _ ->
+    with Not_found ->
       let date = Git.get_version_date path version deposit in
       let size = get_size (path^"/"^version) in
       (version, Some date, size)
