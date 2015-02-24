@@ -8,6 +8,7 @@
  * menhirlib, the menhir runtime library
  * PostgreSQL-ocaml library (libpostgresql-ocaml-dev)
  * XML-light (libxml-light-ocaml-dev)
+ * Bolt (http://bolt.x9c.fr/)
 
  For EPS generation
 ====================

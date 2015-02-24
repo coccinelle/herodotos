@@ -1,4 +1,8 @@
 
+ ** PREREQUISITE **
+
+ See the README file
+
  ** INSTALL **
 
 	./configure --prefix=/usr
@@ -10,3 +14,4 @@
 
  To build the native version replace "make" by "make opt".
  If you want both, you may use "make world".
+
