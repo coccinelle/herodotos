@@ -94,7 +94,7 @@ let match_tree pos (tree:Ast_diff.tree) =
     (if !Misc.debug then LOG "match_tree: case 4" LEVEL TRACE;
      false)
 
-let rec lookup_tree file pos (tree:Ast_diff.tree) : Ast_diff.tree =
+let rec lookup_tree ver file pos (tree:Ast_diff.tree) : Ast_diff.tree =
   Debug.profile_code_silent "Gumtree.lookup_tree"
     (fun () ->
       let children = get_children tree in
@@ -105,9 +105,9 @@ let rec lookup_tree file pos (tree:Ast_diff.tree) : Ast_diff.tree =
 	   candidate)
 	else
 	  (LOG "lookup_tree: !perfect - recurse" LEVEL TRACE;
-	   lookup_tree file pos candidate)
+	   lookup_tree ver file pos candidate)
       with Not_found ->
-	LOG "lookup_tree: Not_found - Return current element (%s)" file LEVEL FATAL;
+	LOG "lookup_tree: Not_found - Return current element (%s/%s)" ver file LEVEL FATAL;
 	tree
     )
 
@@ -119,7 +119,7 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : bool * (
 	match List.assoc (ver, file) diffs with
 	    Ast_diff.Gumtree root ->
 	      begin
-		let matched_tree = lookup_tree file pos root in
+		let matched_tree = lookup_tree ver file pos root in
 		show_gumtree true 0 matched_tree;
 		LOG "-----------------" LEVEL TRACE;
 		match get_pos_after matched_tree with
