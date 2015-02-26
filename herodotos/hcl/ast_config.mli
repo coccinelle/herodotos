@@ -70,5 +70,5 @@ type expProject = ExpProject of string
 
 type studies = ObjPatt of expPattern list | ObjProj of expProject list
  
-type experience=studies * studies
+type experiment = studies * studies
 

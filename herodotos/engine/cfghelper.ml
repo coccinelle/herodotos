@@ -35,7 +35,7 @@ let get_all_bugset ():string list*string list =
     (graphs, List.flatten bugsets)
 
 
-(*  for experiences*)
+(*  for experiments*)
 let rec get_all_bugset_of_patt patts p:string list= let (Ast_config.ExpProject prj)=p in                                
                                         match patts with
                                           |Ast_config.ObjPatt pl ->
@@ -49,7 +49,7 @@ let rec get_all_bugset_of_patt patts p:string list= let (Ast_config.ExpProject p
                                           |_ ->raise (Error "Error parapeter type")
                                        
 
-let rec get_all_bugset_of_exp (exp:Ast_config.experience):string list list =
+let rec get_all_bugset_of_exp (exp:Ast_config.experiment):string list list =
   let (st1,st2) = exp in 
   match st1 with
       Ast_config.ObjPatt patts->
@@ -74,17 +74,17 @@ let rec get_all_bugset_of_exp (exp:Ast_config.experience):string list list =
 
 let get_bugset_of_exp name = 
   try 
-    let exp = Setup.ExpTbl.find Setup.experiences name in 
+    let exp = Setup.ExpTbl.find Setup.experiments name in 
     List.flatten (get_all_bugset_of_exp exp)
-  with Not_found->raise (NotFound ("Experience "^name^" is not declared"))
+  with Not_found->raise (NotFound ("Experiment "^name^" is not declared"))
  
 (*changement de l'ordre des paramètres ,utile pour la suite *) 
 let find exp tbl = Setup.ExpTbl.find tbl exp
-(*fonction qui retourne la liste des experiences *)  
-let listExp():Ast_config.experience list=
+(*fonction qui retourne la liste des experiments *)  
+let listExp():Ast_config.experiment list=
   Setup.ExpTbl.fold(
-    fun name exp liste -> (find name Setup.experiences) :: liste 
-  ) Setup.experiences []                                                                                
+    fun name exp liste -> (find name Setup.experiments) :: liste 
+  ) Setup.experiments []                                                                                
 
 let get_all_bugset_exp () : string list =
   let liste = List.map (fun exp -> get_all_bugset_of_exp exp) (listExp())
@@ -100,7 +100,7 @@ let print_studies st= match st with
 
 (*fin_impression--ça se passe comme attendu *)
 
-(*end for experiences *)
+(*end for experiments *)
 
 
 
@@ -142,17 +142,17 @@ let get_bugset_exp filter =
       Misc.unique_list (get_all_bugset_exp ())
     else
       try
-	let experience = Setup.ExpTbl.find Setup.experiences filter in
-	  Misc.unique_list(List.flatten(get_all_bugset_of_exp experience))
+	let experiment = Setup.ExpTbl.find Setup.experiments filter in
+	  Misc.unique_list(List.flatten(get_all_bugset_of_exp experiment))
       with Not_found ->
 	Misc.unique_list(List.filter(check_filter filter) (get_all_bugset_exp ()))
       
-(*bug set involving graphs and experiences *)	
+(*bug set involving graphs and experiments *)	
 let get_bugset_gen filter=let orgs=Misc.unique_list((get_bugset filter)@ (get_bugset_exp filter)) in
   if orgs <> [] then
     orgs
   else
-    raise (Error("*** ERROR *** No graph,file, or experience named "^filter))
+    raise (Error("*** ERROR *** No graph,file, or experiment named "^filter))
     
 
 let by_project p bug =

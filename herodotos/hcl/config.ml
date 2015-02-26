@@ -914,7 +914,7 @@ let rec get_origs cli=match cli with
                       []->[]
                      |cl::q->let (org,reste)=cl in org::(get_origs q)
 
-(* get a command list from an experience*)
+(* get a command list from an experiment*)
 let rec get_cmdList p pattern_list: ((string * string) *(string * (string * (string * (string * string) list)) list))list=
   match pattern_list with
       []->[]

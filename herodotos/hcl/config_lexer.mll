@@ -58,7 +58,7 @@ rule token = parse
   | "dbconn"                  { P.TDBCONN        }
   | "dir"                     { P.TDIR           }
   | "empty"                   { P.TEMPTY         }
-  | "experience"              { P.TEXPERIENCE    }
+  | "experiment"              { P.TEXPERIMENT    }
   | "factor"                  { P.TFACTOR        }
   | "file"                    { P.TFILE          }
   | "filename"                { P.TFILENAME      }

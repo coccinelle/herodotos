@@ -82,28 +82,24 @@ let gen_makefile v1 v2 prjs patts =
     Printf.fprintf pattdepch "%s: %s\n" patt datalist;
   ) patts;
   close_out pattdepch;
-  let gphdepend = !Setup.prefix ^"/.depend.graphs" in
-  let gphdepch = open_out gphdepend in
-  LOG "Generating %s" gphdepend LEVEL INFO;
   let gphlist = Setup.GphTbl.fold (fun name _ l -> name::l) Setup.graphs [] in
   let gphs = String.concat " " gphlist in
-  Printf.fprintf gphdepch ".PHONY:: %s\n" gphs;
-  Printf.fprintf gphdepch "%s: $(CONF)\n" gphs;
-  Printf.fprintf gphdepch "\t$(HERODOTOS) $(FLAGS) -c $(CONF) $@\n";
-  close_out gphdepch;
+  let explist = Setup.ExpTbl.fold (fun name _ l -> name::l) Setup.experiments [] in
+  let exps = String.concat " " explist in
   let depend = !Setup.prefix ^"/.depend" in
   let depch = open_out depend in
   LOG "Generating %s" depend LEVEL INFO;
-  Printf.fprintf depch ".PHONY::";
+  Printf.fprintf depch ".PHONY:: %s %s" gphs exps;
   List.iter (fun (p,_) -> Printf.fprintf depch " %s" p) prjs;
   Printf.fprintf depch "\n\n";
+  Printf.fprintf depch "%s %s: $(CONF)\n" gphs exps;
+  Printf.fprintf depch "\t$(HERODOTOS) $(FLAGS) -c $(CONF) $@\n";
   Printf.fprintf depch "projects: update ";
   List.iter (fun (p,_) -> Printf.fprintf depch " %s" p) prjs;
   Printf.fprintf depch "\n";
   List.iter (Printf.fprintf depch "-include %s\n") deps;
   Printf.fprintf depch "-include .depend.patterns\n";
   Printf.fprintf depch "-include .depend.erase\n";
-  Printf.fprintf depch "-include .depend.graphs\n";
   close_out depch
 
 (* Generation of .depend.erase *)
@@ -237,9 +233,9 @@ let comp_makefile_for_group atts group =
 	in comp_makefile_for_curves atts dummy_curves
 
 
-(*equivalent for experiences *)
-let comp_makefile_for_exp (experience:Ast_config.experience) =
-  let (se1,se2) = experience in
+(*equivalent for experiments *)
+let comp_makefile_for_exp (experiment:Ast_config.experiment) =
+  let (se1,se2) = experiment in
   match se1 with
       Ast_config.ObjPatt patts ->
 	let lpatts=List.map(get_pattern_name) patts in
@@ -260,8 +256,8 @@ let comp_makefile_for_exp (experience:Ast_config.experience) =
               Config.get_cmdList p lpatts) lprojs 
         |_ -> raise (Misconfiguration "A pattern list must be given")
 
-let comp_makefile_for_experiences experience =
-  List.flatten (comp_makefile_for_exp experience)
+let comp_makefile_for_experiments experiment =
+  List.flatten (comp_makefile_for_exp experiment)
 
 let compute_makefile () =
   let cmdslist =  Setup.GphTbl.fold
@@ -279,8 +275,8 @@ let compute_makefile () =
     ) Setup.graphs []
   in
   let cmdslist_exp = Setup.ExpTbl.fold
-    (fun name_exp exp cmds-> (comp_makefile_for_experiences (Setup.ExpTbl.find Setup.experiences name_exp))::cmds)
-    Setup.experiences [] in
+    (fun name_exp exp cmds-> (comp_makefile_for_experiments (Setup.ExpTbl.find Setup.experiments name_exp))::cmds)
+    Setup.experiments [] in
   let cmdslist=cmdslist@cmdslist_exp in
   let cmds = List.flatten cmdslist in
   let prjpatt = fst (List.split (cmds)) in

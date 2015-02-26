@@ -56,7 +56,7 @@ module ExpTbl = Hashtbl.Make (Exp)
 let projects = PrjTbl.create 5
 let smatchs = DftTbl.create 11
 let graphs = GphTbl.create 97
-let experiences = ExpTbl.create 97
+let experiments = ExpTbl.create 97
 
 let setRef p r msg =
   if (String.length !r) = 0 then
@@ -122,13 +122,13 @@ let addGph (name: string) (gph: Ast_config.gph) =
 let updGph (name: string) (gph: Ast_config.gph) =
     GphTbl.replace graphs name gph
 
-(* for experiences*)
-let addExp (name: string) (exp: Ast_config.experience) =
-  if ExpTbl.mem experiences name then
-    raise (BadConfiguration ("experience "^name^" is already declared."))
+(* for experiments*)
+let addExp (name: string) (exp: Ast_config.experiment) =
+  if ExpTbl.mem experiments name then
+    raise (BadConfiguration ("experiment "^name^" is already declared."))
   else
-    ExpTbl.add experiences name exp
+    ExpTbl.add experiments name exp
 
-let updExp (name: string) (exp: Ast_config.experience) =
-    ExpTbl.replace experiences name exp
+let updExp (name: string) (exp: Ast_config.experiment) =
+    ExpTbl.replace experiments name exp
 

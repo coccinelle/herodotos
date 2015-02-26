@@ -25,7 +25,7 @@
 %token EOF
 %token TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS
 %token TLCB TRCB TLPAR TRPAR
-%token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE TEXPERIENCE
+%token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE TEXPERIMENT
 %token TPREFIX TCOCCI TPROJECTS TRESULTS TWEBSITE TFINDCMD TSPFLAGS TCPUCORE TDBCONN
 %token TFINDCHILD
 %token TLOCALSCM TPUBLICSCM TDATA TDIR TSUBDIR TLINESTYLE TMARKTYPE TMARKSIZE TVERSIONS TCORREL TFORMAT 
@@ -62,7 +62,7 @@ toplevel:
   gbattr  {}
 | project {}
 | pattern {}
-| experience {}
+| experiment {}
 | graph   {}
 
 project:
@@ -80,8 +80,8 @@ gbattr:
 | TCPUCORE     TEQUAL c=TInt           { Setup.setCPUcore(c)}
 | TDBCONN      TEQUAL s=TSTRING        { Setup.setDBConn(s)}
 
-experience:
-   TEXPERIENCE name=TId descExperience=objects    {Setup.addExp name (descExperience)}  
+experiment:
+   TEXPERIMENT name=TId descExperiment=objects    {Setup.addExp name (descExperiment)}  
 
 objects:
    TON TPATTERN name=TId patterns= list(patternobj) TWITH TPROJECT name2=TId projects= list(projectsub) 
