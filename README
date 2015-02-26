@@ -9,6 +9,7 @@
  * PostgreSQL-ocaml library (libpostgresql-ocaml-dev)
  * XML-light (libxml-light-ocaml-dev)
  * Bolt (http://bolt.x9c.fr/) -- This needs camlp4-extra
+ * Parmap (https://github.com/rdicosmo/parmap.git)
 
  For EPS generation
 ====================
