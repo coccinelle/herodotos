@@ -5,10 +5,10 @@
    * For instance, Coccinelle (spatch)
  * menhir, a O'Caml parser generator
    * Only for building Herodotos
- * menhirlib, the menhir runtime library
+ * menhirlib, the menhir runtime library (libmenhir-ocaml-dev)
  * PostgreSQL-ocaml library (libpostgresql-ocaml-dev)
  * XML-light (libxml-light-ocaml-dev)
- * Bolt (http://bolt.x9c.fr/)
+ * Bolt (http://bolt.x9c.fr/) -- This needs camlp4-extra
 
  For EPS generation
 ====================
