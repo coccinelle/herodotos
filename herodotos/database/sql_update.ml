@@ -89,29 +89,6 @@ let insert_report_orgs prefix bug version =
        reqs := !reqs ^ Printf.sprintf "INSERT INTO reports (%s)\n\tSELECT %s FROM correlation_idx;\n" fields values) orgs_interest; 
       !reqs
 
-let insert_report_single prefix bug version =
-  let (_,_,_,path,vname,pos1,_,text,_,n,orgs) = bug in  
-  let (line1, colb1, cole1) = pos1 in
-  let org = Org.org_version bug version in 
-  let Ast_org.Org(l, s, r, link, sub) = org in
-  let (file, ver, pos2, face, t) = Org.flat_link prefix 1 link in
-  let text = Org.clean_link_text prefix ver file pos2 t in
-  let (line2, colb2, cole2) = pos2 in
-  let file_id = "get_file('"^version^"', '"^prefix^version^"/"^path^"')" in
-  let file_id_for_correl = "get_file('"^vname^"', '"^prefix^ver^"/"^file^"')" in
-  let fields = "correlation_id, file_id, line_no, column_start, column_end, text_link" in
-  let correlation_id = "get_corr_id("^file_id_for_correl^","^string_of_int line1^","^string_of_int colb1^")" in
-  let values = String.concat ", " 
-     [correlation_id;
-      file_id;
-      string_of_int line2;
-      string_of_int colb2;
-      string_of_int cole2;
-      s2s text]
-  in
-    Printf.sprintf "INSERT INTO reports (%s)\n\tSELECT %s FROM correlation_idx;\n" fields values
-
-
 let insert_report prefix org =
   let Ast_org.Org(l, s, r, link, sub) = org in
   let (file, ver, pos, face, t) = Org.flat_link prefix 1 link in
