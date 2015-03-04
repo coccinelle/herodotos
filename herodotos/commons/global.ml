@@ -33,3 +33,4 @@ type hmode =
 | Erase
 | Blame
 | ExpHistory
+| ExpReports

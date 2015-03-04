@@ -39,6 +39,7 @@ let modes = [
   "graph", Arg.Unit (fun () -> mode := Some Graph), " Generate the graphs";
   "blame", Arg.Unit (fun () -> mode := Some Blame), " Annotate reports with author name";
   "export-history", Arg.Unit (fun () -> mode := Some ExpHistory), " Export scm history to SQL DB (currently date and author of commits)";
+  "export-reports", Arg.Unit (fun () -> mode := Some ExpReports), " Export reports to SQL DB (the correlated reports from the new.org files)";
   "extract", Arg.Unit (fun () -> mode := Some Extract), " Extract a <tag> version from a correlated report";
   "stat", Arg.Unit (fun () -> mode := Some Stat), " Compute statistics";
   "statcorrel", Arg.Unit (fun () -> mode := Some Statcorrel), " Compute statistics about correlations";
@@ -219,59 +220,60 @@ let main aligned =
 		      Debug.profile_code "export scm history"
 			( fun () -> () )
 			(* (fun () -> Cfgscm.history !verbose1 !verbose2 !verbose3 !configfile !freearg) *)
+		    | ExpReports ->
+		      Debug.profile_code "export reports"
+			( fun () ->
+			  (* For Org file parsing *)
+			  (* For converting Org file to SQL entries *)
+			  if ((String.length !orgfile) <> 0) then
+			    begin
+			      if ((String.length !prefix) = 0) then LOG "*** WARNING *** Prefix not set" LEVEL WARN;
+			      LOG "Parsing...\n" LEVEL INFO;
+			      let ast = Org.parse_org false !orgfile in
+			      if ast = [] then
+				LOG "Empty Org file" LEVEL WARN
+			      else
+				begin
+				  LOG "Checking... (%d elements)" (List.length ast) LEVEL INFO;
+				  if !Misc.debug then
+				    (Misc.print_stack (List.map (Org.make_org "") ast);
+				     prerr_newline ()
+				    );
+				  let (msg, formatted) =
+				    try
+				      ("", Org.format_orgs !prefix 1 ast)
+				    with Misc.Strip msg -> (msg, [])
+				  in
+				  LOG "Converting... (%d elements)" (List.length formatted) LEVEL INFO;
+ 				  if msg <> "" then LOG "%s" msg LEVEL ERROR;
+				  if formatted = [] then
+				    LOG "Failed!" LEVEL FATAL
+				  else
+				    (if !sql then
+					Sql.print_orgs stdout !prefix !orgfile formatted
+				     else if !sqlnotes then
+				       Sql.print_orgs_as_notes stdout !prefix !orgfile formatted
+				     else if !sql_update then
+                                       Sql_update.print_orgs stdout !prefix !orgfile formatted !version_incr
+				     else ()
+				    )
+				end;
+			    end
+			  else ()
+			)
+(* 				     else
+				       let filtered =
+					 if !extract = "" then formatted
+					 else Orgfilter.filter_version !extract !prefix formatted
+				       in
+				       Org.print_orgs_raw stdout !prefix filtered;
+				       LOG "Done!" LEVEL INFO
+*)
 		    | Version|Longhelp|Help -> () (* The ones have been match before. *)
 		end
 	end
     | None ->
       Arg.usage aligned usage_msg
-		(*
-		  else
-		(* For Org file parsing *)
-		(* For converting Org file to SQL entries *)
-		  if ((String.length !orgfile) <> 0)
-		  then
-		  begin
-			let vb = !extract = "" && not !sql in
-			if ((String.length !prefix) = 0) then prerr_endline "*** WARNING *** Prefix not set";
-			if vb then prerr_endline " Parsing...\n";
-			let ast = Org.parse_org vb !orgfile in
-			if ast = [] then
-			prerr_endline "Empty Org file"
-			else
-			begin
-		  if vb then prerr_endline ("\nChecking... ("^string_of_int (List.length ast)^" elements)");
-			  if !Misc.debug then
-			    (Misc.print_stack (List.map (Org.make_org "") ast);
-			     prerr_newline ();
-			    );
-			  let (msg, formatted) =
-			    try
-			      ("", Org.format_orgs !prefix 1 ast)
-			    with Misc.Strip msg -> (msg, [])
-			  in
-			    if vb then
-			      prerr_endline ("\nConverting... ("^string_of_int (List.length formatted)^" elements)\n");
- 			    if msg <> "" then prerr_endline msg;
-			    if formatted = [] then
-			      prerr_endline "Failed!"
-			    else
-			      (if !sql then
-				 if !sqlnotes then
-				   Sql.print_orgs_as_notes stdout !prefix !orgfile formatted
-				 else
-				     Sql.print_orgs stdout !prefix !orgfile formatted
-                               else if !sql_update then
-                                     Sql_update.print_orgs stdout !prefix !orgfile formatted !version_incr                                  
- 			       else
-				 let filtered =
-				   if !extract = "" then formatted
-				   else Orgfilter.filter_version !extract !prefix formatted
-				 in
-				   Org.print_orgs_raw stdout !prefix filtered;
-				   if vb then prerr_endline "\nDone!")
-			end
-			end
-		      *)
 
 let anon_fun = fun
   x ->
