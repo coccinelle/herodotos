@@ -1,5 +1,24 @@
 
 -*- org -*-
+ 
+ * 0.9.0
+ - Disable recursive lookup in GNU Diff hunk
+ - Replace 'experience' keyword by 'experiment'
+ - Enable SQL for export or new.org files
+ - Add the generation of targets for experiments
+
+ * 0.8.0
+ - Add use of GumTree
+ - Add hybrid strategy with GNU Diff and GumTree
+ - Improve cache of delta files
+ - Use Bolt for logging
+ - Use Parmap to parallelize delta file computations and correlation
+ - Change how the fonctionning mode is specified
+
+ * 0.7.0
+ - Add incremental SQL queries
+ - Add 'experiment' statement
+ - Add preinit mode with automatic computation of release date and project size
 
  * 0.6.0
  - Allow "strict" correlation where the link text
