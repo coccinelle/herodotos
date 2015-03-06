@@ -60,7 +60,7 @@ let gen_makefile_patt verbose depch cmds =
     data::datalist
   ) [] cmds
 
-let gen_makefile v1 v2 prjs patts =
+let gen_makefile v1 v2 prjs patts exps =
   let deps = List.map
     (fun (p, cmds) ->
        let prjdir = Config.get_prjdir p in
@@ -84,22 +84,27 @@ let gen_makefile v1 v2 prjs patts =
   close_out pattdepch;
   let gphlist = Setup.GphTbl.fold (fun name _ l -> name::l) Setup.graphs [] in
   let gphs = String.concat " " gphlist in
-  let explist = Setup.ExpTbl.fold (fun name _ l -> name::l) Setup.experiments [] in
-  let exps = String.concat " " explist in
+  let expnames = String.concat " " (fst (List.split exps)) in
   let depend = !Setup.prefix ^"/.depend" in
   let depch = open_out depend in
   LOG "Generating %s" depend LEVEL INFO;
-  Printf.fprintf depch ".PHONY:: %s %s" gphs exps;
+  Printf.fprintf depch ".PHONY:: %s %s" gphs expnames;
   List.iter (fun (p,_) -> Printf.fprintf depch " %s" p) prjs;
   Printf.fprintf depch "\n\n";
-  Printf.fprintf depch "%s %s: $(CONF)\n" gphs exps;
-  Printf.fprintf depch "\t$(HERODOTOS) $(FLAGS) -c $(CONF) $@\n";
+  if gphlist <> [] then (
+    Printf.fprintf depch "%s: $(CONF)\n" gphs;
+    Printf.fprintf depch "\t$(HERODOTOS) $(FLAGS) -c $(CONF) graph $@\n\n"
+  );
   Printf.fprintf depch "projects: update ";
   List.iter (fun (p,_) -> Printf.fprintf depch " %s" p) prjs;
   Printf.fprintf depch "\n";
   List.iter (Printf.fprintf depch "-include %s\n") deps;
   Printf.fprintf depch "-include .depend.patterns\n";
-  Printf.fprintf depch "-include .depend.erase\n";
+  Printf.fprintf depch "-include .depend.erase\n\n";
+  List.iter (fun (name, cmds) ->
+    let deps = String.concat " " cmds in
+    Printf.fprintf depch "%s: $(CONF) %s\n\n" name deps
+  ) exps;
   close_out depch
 
 (* Generation of .depend.erase *)
@@ -202,7 +207,7 @@ let compute_make_for_data (dtlist: (string * (string * (string * (string * strin
     (data, targetset)
 
 (* Prune redondant patt org target *)
-let compute_make_for_prj (cmds: ((string * string) * (string * (string * (string * (string * string) list)) list)) list) prj =
+let compute_make_for_prj (cmds: ((Setup.PrjTbl.key * Setup.DftTbl.key) * (string * (string * (string * (string * string) list)) list)) list) prj =
   let prjcmds = List.find_all (fun ((prjdir,_), _) -> prj = prjdir) cmds in
   let datatuplelist = snd (List.split prjcmds) in
   let datalist = fst (List.split datatuplelist) in
@@ -211,12 +216,20 @@ let compute_make_for_prj (cmds: ((string * string) * (string * (string * (string
     (prj, data)
 
 (* Prune redondant prj org target *)
-let compute_make_for_patt (cmds: ((string * string) * (string * (string * (string * (string * string) list)) list)) list) patt =
+let compute_make_for_patt (cmds: ((Setup.PrjTbl.key * Setup.DftTbl.key)  * (string * (string * (string * (string * string) list)) list)) list) patt =
   let pattcmds = List.find_all (fun ((_, pattname), _) -> patt = pattname) cmds in
   let datatuplelist = snd (List.split pattcmds) in
   let datalist = fst (List.split datatuplelist) in
   let data = Misc.unique_list datalist in
     (patt, data)
+
+(* Prune redondant org target*)
+let compute_make_for_exp (exp: (Setup.ExpTbl.key * ((Setup.PrjTbl.key * Setup.DftTbl.key)  * (string * (string * (string * (string * string) list)) list)) list)) : string * string list =
+  let (name, cmds) = exp in
+  let datatuplelist = snd (List.split cmds) in
+  let datalist = fst (List.split datatuplelist) in
+  let data = Misc.unique_list datalist in
+    (name, data)
 
 (* Prune redondant prj org target *)
 let comp_makefile_for_curves atts curves =
@@ -233,27 +246,25 @@ let comp_makefile_for_group atts group =
 	in comp_makefile_for_curves atts dummy_curves
 
 
-(*equivalent for experiments *)
+(* Equivalent for experiments *)
 let comp_makefile_for_exp (experiment:Ast_config.experiment) =
-  let (se1,se2) = experiment in
+  let (se1, se2) = experiment in
   match se1 with
       Ast_config.ObjPatt patts ->
-	let lpatts=List.map(get_pattern_name) patts in
+	let lpatts = List.map get_pattern_name patts in
         begin
           match se2 with 
               Ast_config.ObjProj projs ->
-		let lprojs=List.map(get_project_name) projs in
-                List.map(fun p->
-                  Config.get_cmdList p lpatts) lprojs
+		let lprojs = List.map get_project_name projs in
+                List.map (fun p -> Config.get_cmdList p lpatts) lprojs
             |_ -> raise (Misconfiguration "A pattern list must be given")
         end
     | Ast_config.ObjProj projs ->
-      let lprojs = List.map(get_project_name) projs in
+      let lprojs = List.map get_project_name projs in
       match se2 with
           Ast_config.ObjPatt patts ->
-	    let lpatts=List.map(get_pattern_name) patts in
-            List.map(fun p->
-              Config.get_cmdList p lpatts) lprojs 
+	    let lpatts = List.map get_pattern_name patts in
+            List.map (fun p -> Config.get_cmdList p lpatts) lprojs 
         |_ -> raise (Misconfiguration "A pattern list must be given")
 
 let comp_makefile_for_experiments experiment =
@@ -274,10 +285,12 @@ let compute_makefile () =
 	       end
     ) Setup.graphs []
   in
-  let cmdslist_exp = Setup.ExpTbl.fold
-    (fun name_exp exp cmds-> (comp_makefile_for_experiments (Setup.ExpTbl.find Setup.experiments name_exp))::cmds)
-    Setup.experiments [] in
-  let cmdslist=cmdslist@cmdslist_exp in
+  let named_cmdslist_exp = Setup.ExpTbl.fold
+    (fun name_exp exp cmds-> (name_exp, comp_makefile_for_experiments exp)::cmds)
+    Setup.experiments []
+  in
+  let cmdslist_exp = snd (List.split named_cmdslist_exp) in
+  let cmdslist = cmdslist @ cmdslist_exp in
   let cmds = List.flatten cmdslist in
   let prjpatt = fst (List.split (cmds)) in
   let (fullprjs, fullpatts) = List.split prjpatt in
@@ -285,18 +298,19 @@ let compute_makefile () =
   let patts = Misc.unique_list fullpatts in
     (
       List.map (compute_make_for_prj cmds) prjs,
-      List.map (compute_make_for_patt cmds) patts
+      List.map (compute_make_for_patt cmds) patts,
+      List.map compute_make_for_exp named_cmdslist_exp
     )
 
 let init_env v1 v2 v3 configfile cvs =
   ignore(Config.parse_config configfile);
   LOG "Config parsing OK!" LEVEL INFO;
   Config.show_config ();
-  let (prjs, patts) = compute_makefile () in
+  let (prjs, patts, exps) = compute_makefile () in
   let err = check_setup v1 prjs patts in
   if err = [] then
     (
-      gen_makefile v1 v2 prjs patts;
+      gen_makefile v1 v2 prjs patts exps;
       erase_file v1 v2 prjs patts;
       if cvs then gen_cvsignore v1 prjs
     )
