@@ -16,7 +16,7 @@
 // TCOLEQ TLAB TRAB
 
 %token EOF
-%token TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS
+%token TEQUAL TCOMMA TSTAR TSLASH TPLUS TMINUS TDOTDOT
 %token TLCB TRCB TLPAR TRPAR TLT TGT TSC TCOLON TDCOLON
 %token TPROJECT TPATTERN TGRAPH TCURVE TEMPTY TNONE
 %token TPREFIX TPROJECTS TWEBSITE TFLAGS TCPUCORE TSQL TDBCONN
@@ -202,6 +202,7 @@ gid:
 | TYLEGEND                 { "ylegend"       }
 | TYLEGENDFACTOR           { "ylegendfactor" }
 | b=TBOOL                  { if b then "true" else "false" }
+| TDOTDOT                  { ".."            }
 
 expression:
   TPATTERN d=TId                     { Ast_config.Pattern d     }

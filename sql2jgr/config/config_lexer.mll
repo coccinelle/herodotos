@@ -113,6 +113,7 @@ rule token = parse
   | "<>"                      { P.TSQLOP(tok lexbuf)   }
   | "<="                      { P.TSQLOP(tok lexbuf)   }
   | ">="                      { P.TSQLOP(tok lexbuf)   }
+  | ".."                      { P.TDOTDOT              }
   | "."                       { P.TSQLOP(tok lexbuf)   }
   | '='                       { P.TEQUAL }
   | '('                       { P.TLPAR }
