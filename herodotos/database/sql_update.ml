@@ -150,7 +150,7 @@ let print_orgs ch prefix orgfile (orgs:Ast_org.bug list) version =
     List.iter
       (fun o ->
 	 let (_,_,_,_,vname,_,_,_,_,_,orgs) = o in 
-	 let orgstr =if ((Org.is_new o version) or (Org.is_more_recent_v vname version ) )then
+	 let orgstr =if ((Org.is_new o version) || (Org.is_more_recent_v vname version ) )then
                        insert_correl_report prefix basefile patt o
                      else
                        try

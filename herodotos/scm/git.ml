@@ -251,7 +251,6 @@ let get_version_date path version deposit =
   let gitpath = path ^ "/" ^ deposit in
   try
     LOG "Retrieving information about version %s from %s" version gitpath LEVEL INFO;
-    let pwd = Sys.getcwd () in 
     (* FIXME: Update implementation without tmp files *)
     let cmd = "git --git-dir "^ gitpath ^" log --pretty=raw --format=\"%ci\"  "^ version ^" -1 | cut -f1 -d' '" in
     LOG "Execute: '%s'" cmd LEVEL DEBUG;

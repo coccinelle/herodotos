@@ -593,7 +593,7 @@ let rec orgs_version prefix orgs version  =
       []->[]
     |Ast_org.Org(i,s,n,link,o)::orgstail->
       let (file, ver, pos2, face, t) = flat_link prefix 1 link in
-      if(ver = version or (is_more_recent_v ver version)) then
+      if(ver = version || (is_more_recent_v ver version)) then
         ((Ast_org.Org(i,s,n,link,o))::orgstail)
       else
         (orgs_version prefix orgstail version)

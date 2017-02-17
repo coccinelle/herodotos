@@ -24,7 +24,7 @@ let test configfile diffalgo =
   prerr_endline "** RUNNING IN TEST MODE **";
   ignore(Gumtree.parse_diff false "" diffalgo);
   exit 0;
-
+(*
   ignore(Config.parse_config configfile);
   prerr_endline "Config parsing OK!";
   Setup.PrjTbl.iter
@@ -34,4 +34,4 @@ let test configfile diffalgo =
       print_head scmpath
     )
     Setup.projects;
-
+*)
