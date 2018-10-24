@@ -194,11 +194,14 @@ distclean: localclean
 	for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 	-$(MAKE) -C $(MENHIR_PATH) $@
 	$(MAKE) -C demo $@
-	if [ -d test ] ; \
-		then $(MAKE) -C test $@ ;fi
+	$(MAKE) $@-test
 	rm -rf .depend Makefile.config
 	find -name "*~" -delete
 	find -name "\.#*" -delete
+
+distclean-test:
+	for f in `cat test/.gitignore`; do rm -rf test/$$f; done
+	rm -rf test/*.patchset
 
 debclean:
 	rm -rf build-stamp install-stamp my-very-own-patch-stamp
