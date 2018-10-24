@@ -69,7 +69,17 @@ native: $(EXEC).opt
 native-noopt: native
 	mv -f $(EXEC).opt $(EXEC)
 
-test:
+test/Makefile:
+	@echo "Generating basic Makefile"
+	@echo "BOLT_CONFIG=debug.config" > $@
+	@echo "-include $(DESTDIR)$(SHAREDIR)/Makefile.inc" >> $@
+
+test/debug.config:
+	@echo "Generating basic debug/trace config for Bolt"
+	cp scripts/debug.config $@
+
+test: test/Makefile test/debug.config
+	$(MAKE) -C test preinit
 	$(MAKE) -C test init
 	tar xjvf test/orig-org.tbz2 -C test
 	tar xjvf test/correl.tbz2 -C test

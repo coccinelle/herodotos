@@ -25,7 +25,7 @@ UPDATES=$(PRJS:%=update-%)
 
 -include .depend
 
-preinit init correl web stat statfp: check-conf $(CONF)
+preinit init correl stat statfp statcorrel: check-conf $(CONF)
 	BOLT_CONFIG=$(BOLT_CONFIG) $(HERODOTOS) $(FLAGS) -c $(CONF) $@
 	@if [ "$@" = "init" ]; then echo "NEXT: make all [-jX]"; fi
 	@if [ "$@" = "init" ]; then echo "OR: dmake X (if you stand on the shoulders of giants !)"; fi
@@ -34,8 +34,8 @@ preinit init correl web stat statfp: check-conf $(CONF)
 	@if [ "$@" = "correl" ]; then echo "OR: See remaining work with 'make stat'"; fi
 	@if [ "$@" = "correl" ]; then echo "OR: Generate graphs with 'make [graph|web]'"; fi
 
-statcorrel: check-conf $(CONF)
-	BOLT_CONFIG=$(BOLT_CONFIG) $(HERODOTOS) $(FLAGS) -c $(CONF) $@
+web: check-conf $(CONF)
+	BOLT_CONFIG=$(BOLT_CONFIG) $(HERODOTOS) $(FLAGS) -c $(CONF) graph --$@
 
 all:: projects
 	@echo "NEXT: 'make correl'"

@@ -1,9 +1,8 @@
+.projects_test.hc
+debug.config
+full-trace.log
 .jgrfiles
-gr
-website
-results
 Makefile
-Makefile.images
-Makefile.prj
-Makefile.patchset
-.depend.*
+gr
+results/
+website/
