@@ -114,7 +114,6 @@ let rec lookup_tree ver file pos (tree:Ast_diff.tree) : Ast_diff.tree =
 let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.lineprediction * int * int) =
   Debug.profile_code_silent "Gumtree.compute_new_pos_with_gumtree"
     (fun () ->
-      let (line, colb, cole) = pos in
       try
 	match List.assoc (ver, file) diffs with
 	    Ast_diff.Gumtree root ->

@@ -24,7 +24,7 @@ let rec string_match_exp (exp:Str.regexp) (strings:string list) =
 
 let rec read_recursive lines in_channel=
   try
-    Scanf.fscanf in_channel "%[^\r\n]\n" (fun x -> read_recursive (x :: lines) in_channel)
+    Scanf.bscanf in_channel "%[^\r\n]\n" (fun x -> read_recursive (x :: lines) in_channel)
   with
     End_of_file->lines
  
@@ -33,7 +33,7 @@ let get_size dir =
   let cmd = "sloccount "^dir in
   LOG "Execute: '%s'" cmd LEVEL DEBUG;
   let in_channel = Unix.open_process_in cmd in
-  let lines = read_recursive [] in_channel in
+  let lines = read_recursive [] (Scanf.Scanning.from_channel in_channel) in
   let chaine = String.concat "\n" lines in       
   let expression =  Str.regexp "ansic: *[0-9]+" in
   let expNumber = Str.regexp"[0-9]+" in 
