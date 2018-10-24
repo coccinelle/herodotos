@@ -80,6 +80,7 @@ test/debug.config:
 
 test: test/Makefile test/debug.config
 	$(MAKE) -C test preinit
+	cd test ; ./fooldir.sh
 	$(MAKE) -C test init
 	tar xjvf test/orig-org.tbz2 -C test
 	tar xjvf test/correl.tbz2 -C test
