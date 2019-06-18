@@ -1,5 +1,5 @@
 
-let build_updated_cache cache_projects =
+let build_updated_cache cache_projects withsizes =
   Setup.PrjTbl.fold 
     (fun prj _ cache ->
       LOG "Processing %s for cache" prj LEVEL INFO;
@@ -9,7 +9,7 @@ let build_updated_cache cache_projects =
 	let cacheddata = List.assoc prj cache_projects in
 	LOG "Data found in the cache for %s" prj LEVEL INFO;
 	if re <> "" then
-	  let infos = Cpt_scm_stats.extract_vers_infos prj re cacheddata in
+	  let infos = Cpt_scm_stats.extract_vers_infos prj re cacheddata withsizes in
 	  (prj, infos)::cache
 	else
 	  (prj, cacheddata)::cache
@@ -24,7 +24,7 @@ let build_updated_cache cache_projects =
 	    []
 	in
 	if re <> "" then
-	  let infos = Cpt_scm_stats.extract_vers_infos prj re versinfos in
+	  let infos = Cpt_scm_stats.extract_vers_infos prj re versinfos withsizes in
 	  (prj, infos)::cache
 	else
 	  if versinfos = [] then
@@ -51,7 +51,7 @@ let  print_cache out_channel prj_cache =
   ) vl;
   Printf.fprintf out_channel "}\n"
 
-let preinit v1 v2 v3 configfile =
+let preinit v1 v2 v3 configfile withsizes =
   ignore(Config.parse_config_no_cache configfile);
   LOG "Config parsing OK!" LEVEL INFO;
   (*  Config.show_config ();*)
@@ -62,7 +62,7 @@ let preinit v1 v2 v3 configfile =
     else
       []
   in
-  let new_cache = build_updated_cache cache in
+  let new_cache = build_updated_cache cache withsizes in
   let out_channel = open_out cache_file in
   List.iter (print_cache out_channel) new_cache;
   close_out out_channel

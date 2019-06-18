@@ -68,7 +68,7 @@ my $error = 0;
 #---------------------------------------------------------------------
 $error +=
     check_config("ocamlc -version |",
-                 "(3\.09|3\.1[0-9]|4\.[0-9]+)",
+                 "(3\.09|3\.1[0-9]|4\.[0-9]+|5\.[0-9]+)",
                  "OCaml (the wonderful language) is present.",
                  "The program ocaml is missing or is not a good version. We need at least 3.09",
                  );

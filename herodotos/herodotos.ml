@@ -26,6 +26,8 @@ let sql = ref false
 let sqlnotes = ref false
 let sql_update = ref false
 
+let withsizes = ref false
+
 let freearg = ref ""
 
 let usage_msg_headline =
@@ -83,7 +85,9 @@ let options = [
   "-vv", Arg.Set verbose2, " more verbose mode";
   "-vvv", Arg.Set verbose3, " more more verbose mode";
   "-w", Arg.Set web, " generation of the website (in default mode)";
-  "--web", Arg.Set web, " generation of the website (in default mode)"
+  "--web", Arg.Set web, " generation of the website (in default mode)";
+  "+s", Arg.Set withsizes, "enable the compute size of linux versions";
+  "-s", Arg.Clear withsizes, "disable the compute size of linux versions"
 ]
 
 (*
@@ -149,7 +153,7 @@ let main aligned =
 			(fun () -> Cfgstat.stats !verbose1 !verbose2 !verbose3 !configfile !freearg running_mode)
 		    | PreInit ->
 		      Debug.profile_code "pre-initialize env."
-			(fun () -> Cfgpreinit.preinit !verbose1 !verbose2 !verbose3 !configfile)
+			(fun () -> Cfgpreinit.preinit !verbose1 !verbose2 !verbose3 !configfile !withsizes)
 		    | Init->
 		      Debug.profile_code "initialize env."
 			(fun () -> Cfginit.init_env !verbose1 !verbose2 !verbose3 !configfile !cvs)

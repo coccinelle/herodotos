@@ -51,7 +51,7 @@ let get_size dir =
   size
 
 (* extracts versions information thanks to a regexp describing versions tags *)
-let extract_vers_infos prj expression declared_versions =
+let extract_vers_infos prj expression declared_versions withsizes =
   let path = !Setup.projectsdir ^ (Config.get_prjdir prj) in
   let local_scm = Config.get_scm prj in
   let origin =
@@ -87,6 +87,8 @@ let extract_vers_infos prj expression declared_versions =
       List.find (fun (name, date, size) -> name = version) declared_versions
     with Not_found ->
       let date = Git.get_version_date path version deposit in
-      let size = get_size (path^"/"^version) in
+      let size = if withsizes == true then get_size (path^"/"^version)
+                                      else -1
+      in
       (version, Some date, size)
   ) tag_list 
