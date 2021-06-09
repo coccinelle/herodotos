@@ -3,8 +3,8 @@ TARGET = scm
 SOURCES = git.ml
 INTFS =
 TOPLIB = commons hcl
-LIBNAMES=bolt
-P4=bolt
+LIBNAMES=volt
+P4=volt
 
 # Automatic computation
 OCAMLFIND=ocamlfind

@@ -6,7 +6,7 @@ SOURCES = setup.ml $(PARSER_SOURCES:.mly=.ml) $(LEXER_SOURCES:.mll=.ml) config.m
 #MENHIR_PATH=../menhirlib
 #INCLUDES = -I $(MENHIR_PATH) -I ../commons
 TOPLIB = commons
-LIBNAMES=bolt
+LIBNAMES=volt
 
 # Automatic computation
 OCAMLFIND=ocamlfind
@@ -14,7 +14,7 @@ OCAMLFIND=ocamlfind
 -include ../Makefile.config
 
 LIBDIR=$(shell $(OCAMLFIND) query $(LIBNAMES))
-P4=bolt
+P4=volt
 P4DIR=$(shell $(OCAMLFIND) query $(P4))
 P4FLAG=-pp 'camlp4o $(P4DIR)/bolt_pp.cmo'
 

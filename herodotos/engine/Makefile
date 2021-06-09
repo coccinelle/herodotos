@@ -16,8 +16,8 @@ SOURCES = cpt_scm_stats.ml \
 INTFS =
 TOPLIB=commons hcl exists org diff graph html scm database
 
-LIBNAMES=postgresql parmap bolt
-P4=bolt
+LIBNAMES=postgresql parmap volt
+P4=volt
 # Automatic computation
 OCAMLFIND=ocamlfind
 

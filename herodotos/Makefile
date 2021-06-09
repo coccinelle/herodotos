@@ -7,8 +7,8 @@ SOURCES =
 SUBDIRS = commons exists hcl org diff scm graph html database engine
 MENHIR_PATH=../menhirLib
 DEPDIRS = $(MENHIR_PATH)
-EXTLIBS=postgresql parmap bolt # xml-light
-P4=bolt
+EXTLIBS=postgresql parmap volt # xml-light
+P4=volt
 
 OCAMLFIND=ocamlfind
 

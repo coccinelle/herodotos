@@ -4,8 +4,8 @@ SOURCES = misc.ml global.ml versions.ml debug.ml
 INTFS = ast.mli
 TOPLIB =
 
-LIBNAMES=bolt
-P4=bolt
+LIBNAMES=volt
+P4=volt
 
 # Automatic computation
 OCAMLFIND=ocamlfind

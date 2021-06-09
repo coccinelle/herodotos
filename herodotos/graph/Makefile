@@ -13,8 +13,8 @@ SOURCES = graph.ml helper.ml group.ml stats.ml      \
 	user.ml
 INTFS =
 TOPLIB = commons hcl scm org
-LIBNAMES=postgresql parmap bolt
-P4=bolt
+LIBNAMES=postgresql parmap volt
+P4=volt
 
 # Automatic computation
 OCAMLFIND=ocamlfind

@@ -3,9 +3,9 @@ TARGET = diff
 INTFS=ast_diff.mli diff_type.mli
 SOURCES =  gumtree.ml gnudiff.ml hybrid.ml diff.ml churn.ml
 INCLUDEDIRS = commons exists org hcl
-P4=bolt
+P4=volt
 
-LIBNAMES=parmap bolt #xml-light
+LIBNAMES=parmap volt #xml-light
 
 # Automatic computation
 -include ../Makefile.config
