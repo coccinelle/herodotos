@@ -292,7 +292,7 @@ let anon_fun = fun
       freearg := x
 
 let _ =
-  Bolt.Logger.register "" Bolt.Level.INFO "all" "default" (Bolt.Mode.direct ())
+  Bolt.Logger.register "" Bolt.Level.INFO "all" "default" ""(Bolt.Mode.direct ()) (*I set the pass filter nameto "" *)
     "file" ("<stderr>", {Bolt.Output.seconds_elapsed = None; Bolt.Output.signal_caught = None});
   LOG "*** START ***" LEVEL TRACE;
   Array.iteri (fun i opt -> LOG "Option %d: %s" i opt LEVEL TRACE) Sys.argv;

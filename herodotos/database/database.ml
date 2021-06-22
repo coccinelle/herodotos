@@ -187,7 +187,7 @@ let open_db vb conninfo : connection =
   if vb then print_conn_info conn;
   flush stdout;
   conn#set_notice_processor (fun s -> eprintf "postgresql error [%s]\n" s);
-  ignore(Thread.create listener conn);
+  (*ignore(Thread.create listener conn);*)
   conn
 
 let close_db (conn: connection) =
