@@ -12,7 +12,8 @@ P4=volt
 
 OCAMLFIND=ocamlfind
 
-OCAMLLIBS=str.cma unix.cma threads.cma bigarray.cma dynlink.cma $(EXTLIBS:%=%.cma)
+EXTLIBCMA= $(shell $(OCAMLFIND) query -predicates byte -a-format $(EXTLIBS))
+OCAMLLIBS=str.cma unix.cma threads.cma bigarray.cma dynlink.cma $(EXTLIBCMA)#$(EXTLIBS:%=%.cma)
 FLAG=
 
 # ocamlmktop -custom -thread  -o threadedocaml unix.cma threads.cma -cclib -lthreads
@@ -47,11 +48,11 @@ MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 CFLAGS ?= -g -dtypes -thread $(FLAGS)
 OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES) $(P4FLAG)
 ifeq ("$(OPTBIN)",".opt")
-OCAMLC=$(OCAMLFIND) ocamlc -predicates native
+OCAMLC=$(OCAMLFIND) ocamlc -predicates native 
 OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates native
 else
-OCAMLC=$(OCAMLFIND) ocamlc
-OCAMLOPT=$(OCAMLFIND) ocamlopt
+OCAMLC=$(OCAMLFIND) ocamlc -predicates byte 
+OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates byte 
 endif
 
 .PHONY:: all all.opt clean distclean debclean $(DEP)
