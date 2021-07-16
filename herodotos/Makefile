@@ -48,7 +48,7 @@ MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 CFLAGS ?= -g -dtypes -thread $(FLAGS)
 OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES) $(P4FLAG)
 ifeq ("$(OPTBIN)",".opt")
-OCAMLC=$(OCAMLFIND) ocamlc -predicates native 
+OCAMLC=$(OCAMLFIND) ocamlc -predicates native
 OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates native
 else
 OCAMLC=$(OCAMLFIND) ocamlc
