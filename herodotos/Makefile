@@ -51,8 +51,8 @@ ifeq ("$(OPTBIN)",".opt")
 OCAMLC=$(OCAMLFIND) ocamlc -predicates native 
 OCAMLOPT=$(OCAMLFIND) ocamlopt -predicates native
 else
-OCAMLC=$(OCAMLFIND) ocamlc 
-OCAMLOPT=$(OCAMLFIND) ocamlopt 
+OCAMLC=$(OCAMLFIND) ocamlc
+OCAMLOPT=$(OCAMLFIND) ocamlopt
 endif
 
 .PHONY:: all all.opt clean distclean debclean $(DEP)
