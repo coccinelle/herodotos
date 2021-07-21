@@ -37,7 +37,7 @@ OPTLIB=$(LIB:.cma=.cmxa)
 OCAMLCFLAGS ?= -g -dtypes $(FLAGS)
 OCAMLC =ocamlc$(OPTBIN) $(OCAMLCFLAGS) $(INCLUDES) $(P4FLAG)
 OCAMLOPT = ocamlopt$(OPTBIN) $(OPTFLAGS) $(INCLUDES) $(P4FLAG)
-OCAMLDEP = ocamldep$(OPTBIN) $(P4FLAG) #$(INCLUDES)
+OCAMLDEP = ocamldep$(OPTBIN) $(P4FLAG)
 
 all: $(LIB)
 all.opt: $(OPTLIB)
