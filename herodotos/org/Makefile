@@ -18,7 +18,8 @@ GENERATED= $(LEXER_SOURCES:.mll=.ml) \
 LIBDIR=$(shell $(OCAMLFIND) query $(EXTLIBS))
 P4DIR=$(shell $(OCAMLFIND) query $(P4))
 P4FLAG=-pp 'camlp4o $(P4DIR)/bolt_pp.cmo'
-INCLUDES =$(TOPLIB:%=-I ../%) $(LIBDIR:%=-I %)
+INTINCLUDES =$(TOPLIB:%=-I ../%)
+INCLUDES =$(INTINCLUDES) $(LIBDIR:%=-I %)
 OBJS = $(SOURCES:.ml=.cmo)
 LIB=$(TARGET).cma
 OPTOBJS = $(OBJS:.cmo=.cmx)
@@ -33,7 +34,7 @@ OCAMLC =$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(INCLUDES) $(P4FLAG)
 OCAMLOPT =$(OCAMLFIND) ocamlopt $(OPTFLAGS) $(INCLUDES) $(P4FLAG)
 OCAMLLEX = ocamllex$(OPTBIN)
 OCAMLYACC= menhir $(OCAMLYACCOPT)
-OCAMLDEP = ocamldep$(OPTBIN) $(INCLUDES) $(P4FLAG)
+OCAMLDEP = ocamldep$(OPTBIN) $(INTINCLUDES) $(P4FLAG)
 
 
 all: $(LIB)
