@@ -3,7 +3,8 @@ module WXMaxima where
 import Bugs
 
 import Control.Monad.State
-
+import Control.Applicative (Applicative(..))
+import Control.Monad       (liftM, ap)
 import Data.List
 import Utils
 import System.Directory
@@ -20,8 +21,18 @@ type LstZip a = Maybe (LstZipPlus a)
 
 data WXMT a = WXMT { unWXMT :: State (LstZip Entry, String) a}
 
+
+
+-- Monad WXMT
+
+instance Functor WXMT where
+    fmap = liftM
+
+instance Applicative WXMT where
+    pure  = WXMT . return
+    (<*>) = ap
+
 instance Monad WXMT where
-  return         = WXMT . return
   (WXMT m) >>= f = WXMT $ m >>= unWXMT . f
 
 

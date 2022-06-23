@@ -3,10 +3,15 @@ module Psql where
 import Config
 import Utils
 
-import Control.Monad
-import Control.Monad.State
+
+
 import System.Process
 import System.IO
+import Control.Applicative (Applicative(..))
+import Control.Monad       (liftM, ap)
+import Control.Monad.State
+
+
 
 
 
@@ -14,9 +19,16 @@ import System.IO
 
 newtype PsqlM a = PsqlM { unPsqlM :: StateT (Handle,Handle) IO a }
 
+instance Functor PsqlM where
+    fmap = liftM
+
+instance Applicative PsqlM where
+    pure  = PsqlM . return
+    (<*>) = ap
+
+
 
 instance Monad PsqlM where
-  return = PsqlM . return
   (PsqlM m) >>= f = PsqlM $ m >>= (unPsqlM . f)
 
 
