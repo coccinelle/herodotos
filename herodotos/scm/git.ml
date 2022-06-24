@@ -9,7 +9,8 @@ exception MalformedGitLog
 exception Not_Declared of string
 
 let sys_command (cmd : string) : int =
-  LOG "Execute: '%s'" cmd LEVEL INFO;
+  let logmsg=Printf.sprintf "Execute: '%s'" cmd in
+  Bolt.Logger.log "" Bolt.Level.INFO logmsg;
   0
 
 let blamefmt = format_of_string "git --git-dir %s blame --incremental %s -L %d,+1 -- %s"
@@ -234,7 +235,8 @@ let prerr_author vlist name version =
 
 let get_tags scmpath expression =
   let cmd = "git --git-dir "^scmpath ^ " tag -l " ^ expression in
-  LOG "Execute: '%s'" cmd LEVEL DEBUG;
+  let logmsg=Printf.sprintf "Execute: '%s'" cmd in
+  Bolt.Logger.log "" Bolt.Level.DEBUG logmsg;
   let in_channel = Unix.open_process_in cmd in
   let tag_list =
     let rec rl () =
@@ -244,19 +246,22 @@ let get_tags scmpath expression =
       with End_of_file -> []
     in rl ()
   in
-  List.iter (fun tag -> LOG "Tag: %s" tag LEVEL DEBUG) tag_list;
+  List.iter (fun tag -> (let logmsg=Printf.sprintf "Tag: %s" tag in Bolt.Logger.log "" Bolt.Level.DEBUG logmsg)) tag_list;
   tag_list
 
 let get_version_date path version deposit =
   let gitpath = path ^ "/" ^ deposit in
   try
-    LOG "Retrieving information about version %s from %s" version gitpath LEVEL INFO;
+    let logmsg=Printf.sprintf "Retrieving information about version %s from %s" version gitpath in
+    Bolt.Logger.log "" Bolt.Level.INFO logmsg;
     (* FIXME: Update implementation without tmp files *)
     let cmd = "git --git-dir "^ gitpath ^" log --pretty=raw --format=\"%ci\"  "^ version ^" -1 | cut -f1 -d' '" in
-    LOG "Execute: '%s'" cmd LEVEL DEBUG;
+    let logmsg=Printf.sprintf "Execute: '%s'" cmd in
+    Bolt.Logger.log "" Bolt.Level.DEBUG logmsg;
     let in_ch_date = Unix.open_process_in cmd in 
     let date = input_line in_ch_date in  
-    LOG "Date: %s" date LEVEL DEBUG;
+    let logmsg=Printf.sprintf "Date: %s" date in
+    Bolt.Logger.log "" Bolt.Level.DEBUG logmsg;
     close_in in_ch_date ;
     snd(get_date date)
   with _ -> 

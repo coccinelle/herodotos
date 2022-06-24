@@ -1,0 +1,4 @@
+(library
+	(name graph)
+	(wrapped false)
+	(libraries unix str threads dynlink volt parmap postgresql configparser orgparser scm))

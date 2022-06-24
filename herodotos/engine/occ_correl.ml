@@ -7,7 +7,8 @@ let match_bug strict prefix bug1 bug2 =
       && (if strict then
 	    let new_t = Org.clean_link_text prefix v f pos t in
 	    let new_tb = Org.clean_link_text prefix v f pos tb in
-	    LOG "match_bug: \"%s\" <-> \"%s\"" new_t new_tb LEVEL TRACE;
+            let logmsg=Printf.sprintf "match_bug: \"%s\" <-> \"%s\"" new_t new_tb in
+	    Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
 	    new_t = new_tb
 	  else true)
 
@@ -67,7 +68,8 @@ let update_nohead bug =
 let manual_check_next verbose strict prefix correl subbugs bug =
   let (l, s, r, f, v, p, face, t, h, n, _) = bug in
   let t = if strict then (Org.clean_link_text prefix v f p t) else "" in
-  LOG "Trying manual correlation of %s ver. %s" f v LEVEL TRACE;
+  let logmsg=Printf.sprintf "Trying manual correlation of %s ver. %s" f v in
+  Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
   try
     let correlb = List.find (fun b ->
       let (st, file, ver, pos, _, _, _, ctext) = b in
@@ -78,7 +80,8 @@ let manual_check_next verbose strict prefix correl subbugs bug =
 	    && (if strict
 	      then
 		let new_t = Org.clean_link_text prefix v f pos ctext in
-		LOG "manual_check_next: \"%s\" <-> \"%s\"" new_t t LEVEL TRACE;
+                let logmsg=Printf.sprintf "manual_check_next: \"%s\" <-> \"%s\"" new_t t in
+		Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
 		new_t = t
 	      else true
 	    )
@@ -89,17 +92,17 @@ let manual_check_next verbose strict prefix correl subbugs bug =
        let next = get_bug strict prefix check subbugs in
        n.Ast_org.def <- Some (Some (next, false));
        update_nohead next;
-       LOG "Manual correlation OK" LEVEL TRACE;
-       LOG "=========" LEVEL TRACE;
+       Bolt.Logger.log "" Bolt.Level.TRACE "Manual correlation OK";
+       Bolt.Logger.log "" Bolt.Level.TRACE "=========";
        0 (* No automatic correlation performed *)
      with Not_found ->
-       LOG "Manual correlation KO" LEVEL TRACE;
-       LOG "=========" LEVEL TRACE;
+       Bolt.Logger.log "" Bolt.Level.TRACE "Manual correlation KO";
+       Bolt.Logger.log "" Bolt.Level.TRACE "=========";
        0 (* No automatic correlation performed *)
     )
   with Not_found ->
-    LOG "Manual correlation KO - KO" LEVEL TRACE;
-    LOG "=========" LEVEL TRACE;
+    Bolt.Logger.log "" Bolt.Level.TRACE "Manual correlation KO - KO";
+    Bolt.Logger.log "" Bolt.Level.TRACE "=========";
     0 (* No automatic correlation performed *)
 
 let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug : int =
@@ -109,26 +112,26 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
   let subbugs = get_next_list strict prefix vlist bugs f vidx t in
   match Diff.alt_new_pos diffs f v p with
       None ->
-	LOG "No alternative position" LEVEL TRACE;
+	Bolt.Logger.log "" Bolt.Level.TRACE "No alternative position";
 	manual_check_next verbose strict prefix correl subbugs bug
     | Some (_, diffcheck_pos) ->
       match diffcheck_pos with
 	  (Ast_diff.Sing line,colb,cole) ->
 	    let (res, ks) = check_next verbose strict true prefix depth vlist diffs correl bugs bug (line,colb,cole) in
-	    if ks <> None then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
-	    if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
+	    if ks <> None then Bolt.Logger.log "" Bolt.Level.FATAL "There is a continuation to run after alternative method have been called!";
+	    if res = 1 && n.Ast_org.def = None then Bolt.Logger.log "" Bolt.Level.FATAL "check_next reports a success but no next is set!";
 	    if n.Ast_org.def = None then
 	      manual_check_next verbose strict prefix correl subbugs bug
 	    else
 	      1 (* Automatic correlation performed *)
 	| (Ast_diff.Deleted _, colb,cole) ->
-	  LOG "Automatic correlation OK" LEVEL TRACE;
-	  LOG "=========" LEVEL TRACE;
+	  Bolt.Logger.log "" Bolt.Level.TRACE "Automatic correlation OK";
+	  Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 	  n.Ast_org.def <- Some (None);
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Unlink, _, _) -> (* File has been removed. *)
-	  LOG "Automatic correlation OK" LEVEL TRACE;
-	  LOG "=========" LEVEL TRACE;
+	  Bolt.Logger.log "" Bolt.Level.TRACE "Automatic correlation OK";
+	  Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 	  n.Ast_org.def <- Some (None);
 	  1 (* Considered as an automatic correlation *)
 	| (Ast_diff.Cpl (lineb,linee),colb, cole) ->
@@ -144,8 +147,8 @@ let rec check_alt_next verbose strict prefix depth vlist diffs correl bugs bug :
 	      else (1, None)           (* Found something. Stop there. *)
 	    in
 	    let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
-	    if ks <> None then LOG "There is a continuation to run after alternative method have been called!" LEVEL FATAL;
-	    if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
+	    if ks <> None then Bolt.Logger.log "" Bolt.Level.FATAL "There is a continuation to run after alternative method have been called!";
+	    if res = 1 && n.Ast_org.def = None then Bolt.Logger.log "" Bolt.Level.FATAL "check_next reports a success but no next is set!";
 	    if n.Ast_org.def = None then
 	      manual_check_next verbose strict prefix correl subbugs bug
 	    else
@@ -161,14 +164,15 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
       let subbugs = get_next_list strict prefix vlist bugs f vidx t in
       let vn = Misc.get_version_name vlist (vidx+1) in
       let check = (l, s, r, f, vn, check_pos, face, t, {Ast_org.is_head=true}, {Ast_org.def=None}, []) in
-      LOG "check_next of %s at %s" (Org.show_bug true bug) (Org.show_bug true check) LEVEL TRACE;
-      LOG "List:" LEVEL TRACE;
-      List.iter (fun bug -> LOG "%s" (Org.show_bug true bug) LEVEL TRACE) subbugs;
-      LOG "" LEVEL TRACE;
+      let logmsg=Printf.sprintf "check_next of %s at %s" (Org.show_bug true bug) (Org.show_bug true check) in
+      Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+      Bolt.Logger.log "" Bolt.Level.TRACE "List:";
+      List.iter (fun bug -> (let logmsg=Printf.sprintf "%s" (Org.show_bug true bug) in Bolt.Logger.log "" Bolt.Level.TRACE logmsg)) subbugs;
+      Bolt.Logger.log "" Bolt.Level.TRACE "";
       if subbugs = [] then
 	begin
-	  LOG "Automatic correlation OK" LEVEL TRACE;
-	  LOG "=========" LEVEL TRACE;
+	  Bolt.Logger.log "" Bolt.Level.TRACE "Automatic correlation OK";
+	  Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 	  n.Ast_org.def <- Some (None);
 	  (1, None) (* Automatic correlation performed *)
 	end
@@ -177,8 +181,8 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	  let next = get_bug strict prefix check subbugs in
 	  if (n.Ast_org.def = None) then
 	    begin
-	      LOG "Automatic correlation OK" LEVEL TRACE;
-	      LOG "=========" LEVEL TRACE;
+	      Bolt.Logger.log "" Bolt.Level.TRACE "Automatic correlation OK";
+	      Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 	      n.Ast_org.def <- Some (Some (next, true));
 	      update_nohead next;
 	      (1, None) (* One automatic correlation performed *)
@@ -188,16 +192,16 @@ and check_next verbose strict conf prefix depth vlist diffs correl (bugs:Ast_org
 	with Not_found ->
 	  if conf then
 	    begin
-	      LOG "No next found, but confidence set" LEVEL WARN;
-	      LOG "Automatic correlation OK" LEVEL TRACE;
-	      LOG "=========" LEVEL TRACE;
+	      Bolt.Logger.log "" Bolt.Level.WARN "No next found, but confidence set";
+	      Bolt.Logger.log "" Bolt.Level.TRACE "Automatic correlation OK";
+	      Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 	      n.Ast_org.def <- Some (None);
 	      (1, None) (* Automatic correlation performed *)
 	    end
 	  else
 	    begin
-	      LOG "Will try with an alternative method..." LEVEL TRACE;
-	      LOG "=========" LEVEL TRACE;
+	      Bolt.Logger.log "" Bolt.Level.TRACE "Will try with an alternative method...";
+	      Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 	      (0, Some (Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug)))
 	    end
     )
@@ -207,24 +211,25 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
     (fun () ->
        let (l, s, r, f, v, p, face, t, h, n, _) = bug in
        let t = if strict then (Org.clean_link_text prefix v f p t) else "" in
-       LOG "%s" (Org.show_bug true bug) LEVEL TRACE;
+       let logmsg=Printf.sprintf "%s" (Org.show_bug true bug) in 
+       Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
        (* Short path when there is no bug in next version *)
        let vidx = Misc.get_idx_of_version vlist v in
        let subbugs = get_next_list strict prefix vlist bugs f vidx t in
        if subbugs = [] then
 	 begin
-	   LOG "No bug in version %s of %s. Skip." (Misc.get_next_version vlist v) f LEVEL TRACE;
-	   LOG "=========" LEVEL TRACE;
+           let logmsg=Printf.sprintf "No bug in version %s of %s. Skip." (Misc.get_next_version vlist v) f in
+	   Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+	   Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 	   n.Ast_org.def <- Some (None);
 	   (1, None) (* Considered as an automatic correlation *)
 	 end
        else
 	 (* Normal path *)
 	 let (conf, diffcheck_pos) = Diff.compute_new_pos diffs f v p in
-	 LOG "%s as new pos: %s"
-	   (Org.get_string_pos p)
-	   (Org.get_string_new_pos diffcheck_pos)
-	   LEVEL TRACE;
+         let logmsg=Printf.sprintf "%s as new pos: %s" (Org.get_string_pos p) (Org.get_string_new_pos diffcheck_pos) in
+	 Bolt.Logger.log ""
+	   Bolt.Level.TRACE logmsg;
 	 match diffcheck_pos with
 	     (Ast_diff.Sing line,colb,cole) -> (* We are between two hunks. *)
 	       check_next verbose strict conf prefix depth vlist diffs correl bugs bug (line,colb,cole)
@@ -239,14 +244,14 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	       if cont then
 		 (* Considered as uncorrelated. Continuation will check with the alternative algorithm. *)
 		 begin
-		   LOG "Will try with an alternative method..." LEVEL TRACE;
-		   LOG "=========" LEVEL TRACE;
+		   Bolt.Logger.log "" Bolt.Level.TRACE "Will try with an alternative method...";
+		   Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 		   (0, Some (Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug)))
 		 end
 	       else
 		 begin
-		   LOG "Automatic correlation OK" LEVEL TRACE;
-		   LOG "=========" LEVEL TRACE;
+		   Bolt.Logger.log "" Bolt.Level.TRACE "Automatic correlation OK";
+		   Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 		   n.Ast_org.def <- Some (None);
 		   (1, None) (* Considered as an automatic correlation *)
 		 end
@@ -254,8 +259,8 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	   (*
 	     File has been removed.
 	   *)
-	     LOG "Automatic correlation OK" LEVEL TRACE;
-	     LOG "=========" LEVEL TRACE;
+	     Bolt.Logger.log "" Bolt.Level.TRACE "Automatic correlation OK";
+	     Bolt.Logger.log "" Bolt.Level.TRACE "=========";
 	     n.Ast_org.def <- Some (None);
 	     (1, None) (* Considered as an automatic correlation *)
 	   | (Ast_diff.Cpl (lineb,linee),colb, cole) -> (* We are inside a hunk. *)
@@ -278,7 +283,7 @@ let compute_bug_next verbose strict prefix depth vlist diffs correl bugs bug =
 	     in
 	     let (res, ks) = fold lineb in (* Start looking for next bug at line 'lineb' *)
 	     (* Check ks is empty, run manual otherwise *)
-	     if res = 1 && n.Ast_org.def = None then LOG "check_next reports a success but no next is set!" LEVEL FATAL;
+	     if res = 1 && n.Ast_org.def = None then Bolt.Logger.log "" Bolt.Level.FATAL "check_next reports a success but no next is set!";
 	     if n.Ast_org.def = None then
 		 (0, Some (Hybrid.get_cmd2 f v, (check_alt_next verbose strict prefix depth vlist diffs correl bugs, bug)))
 	     else
@@ -367,15 +372,18 @@ let run_pariter f cmd : int =
     if pid = 0 then (* I'm a slave *)
       begin
 	(if !Misc.debug then
-	    LOG "New child %d for %s" (Unix.getpid ()) cmd LEVEL TRACE
+           let logmsg=Printf.sprintf "New child %d for %s" (Unix.getpid ()) cmd in
+	    Bolt.Logger.log "" Bolt.Level.TRACE logmsg
 	 else
-	    LOG "New child for %s" cmd LEVEL TRACE
+           let logmsg=Printf.sprintf "New child for %s" cmd in
+	    Bolt.Logger.log "" Bolt.Level.TRACE logmsg
 	);
 	let status = f cmd in
 	(if !Misc.debug then
-	    LOG "Job done for child %d" (Unix.getpid ()) LEVEL TRACE
+           (let logmsg=Printf.sprintf "Job done for child %d" (Unix.getpid ()) in
+	    Bolt.Logger.log "" Bolt.Level.TRACE logmsg)
 	 else
-	    LOG "Job done for child" LEVEL TRACE
+	    Bolt.Logger.log "" Bolt.Level.TRACE "Job done for child"
 	 );
 	let msg = Debug.profile_diagnostic () in
 	if msg <> "" then Debug.trace msg;
@@ -389,9 +397,10 @@ let dispatch_pariter cpucore f (perr, pidlist) cmd : int * int list =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
       (if !Misc.debug then
-	  LOG "Master: Job done for child %d" death LEVEL TRACE
+         let logmsg=Printf.sprintf "Master: Job done for child %d" death in
+	  Bolt.Logger.log "" Bolt.Level.TRACE logmsg
        else
-	  LOG "Master: Job done for child" LEVEL TRACE
+	  Bolt.Logger.log "" Bolt.Level.TRACE "Master: Job done for child"
       );
       let error = match status with
 	  Unix.WEXITED 0 -> perr
@@ -420,9 +429,10 @@ let pariter cpucore f cmds : unit =
 	  let res = List.map (fun x ->
 	    let (death, status) = Unix.wait () in
 	    (if !Misc.debug then
-		LOG "Master: Job done for child %d" death LEVEL TRACE
+               let logmsg=Printf.sprintf "Master: Job done for child %d" death in
+		Bolt.Logger.log "" Bolt.Level.TRACE logmsg
 	     else
-		LOG "Master: Job done for child" LEVEL TRACE
+		Bolt.Logger.log "" Bolt.Level.TRACE "Master: Job done for child"
 	    );
 	    match status with
 		Unix.WEXITED 0 -> 0
@@ -432,16 +442,18 @@ let pariter cpucore f cmds : unit =
 	  List.fold_left (+) err res
       in
       if error <> 0 then
-	LOG "*** ERROR *** %d error(s) during the cache update." error LEVEL ERROR
+        let logmsg=Printf.sprintf "*** ERROR *** %d error(s) during the cache update." error in
+	Bolt.Logger.log "" Bolt.Level.ERROR logmsg
     )
 
 let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:Ast_org.orgarray) (orgs:Ast_org.orgarray) :
     (int * int) * ((Ast_diff.path * Ast_org.bugs list) list) =
   Debug.profile_code_silent "compute_org"
     (fun () ->
-      LOG "*** CORRELATION - PHASE 1 ***" LEVEL INFO;
+      Bolt.Logger.log "" Bolt.Level.INFO "*** CORRELATION - PHASE 1 ***";
       let (initial_count, ks) = compute_bug_chain verbose strict prefix depth 0 vlist diffs correl orgs in
-      LOG "*** CORRELATION - PHASE 1 *** %d automatic correlations so far" initial_count LEVEL INFO;
+      let logmsg=Printf.sprintf "*** CORRELATION - PHASE 1 *** %d automatic correlations so far" initial_count in
+      Bolt.Logger.log "" Bolt.Level.INFO logmsg;
       (* Update gumtree cache with missing files *)
       let re = Str.regexp_string "&&" in
       let (cmds, ks2) = List.split ks in
@@ -467,26 +479,28 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
       in
       if cleaned_cmds <> [] then
 	begin
-	  LOG "*** UPDATING GUMTREE CACHE *** %d item(s)." (List.length cleaned_cmds) LEVEL INFO;
+          let logmsg=Printf.sprintf "*** UPDATING GUMTREE CACHE *** %d item(s)." (List.length cleaned_cmds) in
+	  Bolt.Logger.log "" Bolt.Level.INFO logmsg;
 	  List.iter (fun cmd ->
 	    match
 	      Unix.system cmd
 	    with
 		Unix.WEXITED 0 -> ()
 	      | Unix.WEXITED 1 -> ()
-	      | Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR
-	      | _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR
+	      | Unix.WEXITED i -> (let logmsg=Printf.sprintf "*** FAILURE *** Code: %d %s" i cmd in Bolt.Logger.log "" Bolt.Level.ERROR logmsg)
+	      | _ -> (let logmsg=Printf.sprintf "*** FAILURE *** %s" cmd in Bolt.Logger.log "" Bolt.Level.ERROR logmsg)
 	  ) dirs;
 	  pariter cpucore (fun cmd ->
-	    LOG "Run %s" cmd LEVEL TRACE;
+              (let logmsg=Printf.sprintf "Run %s" cmd in
+	    Bolt.Logger.log "" Bolt.Level.TRACE logmsg);
 	    let status =
 	      match
 		Unix.system cmd
 	      with
 		  Unix.WEXITED 0 -> true
 		| Unix.WEXITED 1 -> false
-		| Unix.WEXITED i -> LOG "*** FAILURE *** Code: %d %s" i cmd LEVEL ERROR; false
-		| _ -> LOG "*** FAILURE *** %s" cmd LEVEL ERROR; false
+		| Unix.WEXITED i -> (let logmsg=Printf.sprintf "*** FAILURE *** Code: %d %s" i cmd in Bolt.Logger.log "" Bolt.Level.ERROR logmsg); false
+		| _ -> (let logmsg=Printf.sprintf "*** FAILURE *** %s" cmd in Bolt.Logger.log "" Bolt.Level.ERROR logmsg); false
 	    in
 	    if status then
 	      Unix.execv "/bin/true" (Array.of_list [])
@@ -495,19 +509,22 @@ let compute_org verbose cpucore strict prefix depth vlist diffs correl (annots:A
 	  ) cleaned_cmds;
 	end;
       (*	*)
-      LOG "*** CORRELATION - PHASE 2 *** %d item(s)." (List.length ks2) LEVEL INFO;
+      let logmsg=Printf.sprintf "*** CORRELATION - PHASE 2 *** %d item(s)." (List.length ks2) in
+      Bolt.Logger.log "" Bolt.Level.INFO logmsg;
       let count =
 	List.fold_left
 	  (fun acc (f, bug) ->
 	    acc + f bug
 	  ) initial_count ks2
-       in
-      LOG "*** CORRELATION - PHASE 2 *** %d automatic correlations" count LEVEL INFO;
+      in
+      let logmsg=Printf.sprintf "*** CORRELATION - PHASE 2 *** %d automatic correlations" count in
+      Bolt.Logger.log "" Bolt.Level.INFO logmsg;
       (*	*)
       let (new_bugs, correlorg) =
 	List.split (
-	  List.map (fun file ->
-	    LOG "COMPUTE ORG - Processing file %s" file LEVEL DEBUG;
+	    List.map (fun file ->
+                (let logmsg=Printf.sprintf "COMPUTE ORG - Processing file %s" file in
+	    Bolt.Logger.log "" Bolt.Level.DEBUG logmsg);
 	     (* 		  let sorted = sort_bugs strict prefix bugs in *)
 	    let sorted = extract_chain file orgs in
 	    let (stats, updbugs) = List.split (List.map (update_status vlist annots) sorted) in

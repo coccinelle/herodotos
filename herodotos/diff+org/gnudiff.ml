@@ -103,14 +103,18 @@ let rec read_diff prefix file in_ch =
       *)
       else
 	begin
-	  LOG "Error: Desynchronized? no more diff found in %s at line %s" file (Int64.to_string !line) LEVEL ERROR;
-	  LOG "Expects a \"---\" line. Got \"%s\"" line_rm0 LEVEL ERROR;
-	  LOG "Looking for filename in \"%s\"" line_rm LEVEL ERROR;
+          let logmsg=Printf.sprintf "Error: Desynchronized? no more diff found in %s at line %s" file (Int64.to_string !line) in
+	  Bolt.Logger.log "" Bolt.Level.ERROR logmsg;
+          let logmsg2=Printf.sprintf "Expects a \"---\" line. Got \"%s\"" line_rm0 in
+	  Bolt.Logger.log "" Bolt.Level.ERROR logmsg2;
+          let logmsg3=Printf.sprintf "Looking for filename in \"%s\"" line_rm in
+	  Bolt.Logger.log "" Bolt.Level.ERROR logmsg3;
 	  match lookfor_minusline in_ch with
 	      None ->
-		LOG "Unable to re-synchronize" LEVEL ERROR; []
+		Bolt.Logger.log "" Bolt.Level.ERROR "Unable to re-synchronize"; []
 	    | Some l ->
-		LOG "Re-synchronize on %s" l LEVEL INFO;
+               (let logmsg4=Printf.sprintf "Re-synchronize on %s" l in
+		Bolt.Logger.log "" Bolt.Level.INFO logmsg4);
 		match lookfor_minusline in_ch with
 		    None   -> []
 		  | Some l ->
@@ -124,7 +128,8 @@ let parse_diff v prefix file : Ast_diff.diffs =
     let ver_file = Misc.strip_prefix prefix file in
     if Sys.file_exists file then
       begin
-	LOG "Parsing GNU Diff: %s" file LEVEL TRACE;
+        let logmsg=Printf.sprintf "Parsing GNU Diff: %s" file in
+	Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
 	let in_ch = open_in file in
 	try
 	  line := Int64.zero;
@@ -132,23 +137,27 @@ let parse_diff v prefix file : Ast_diff.diffs =
 	  close_in in_ch;
 	  [(ver_file, Ast_diff.GNUDiff ast)]
 	with
-	    Misc.Strip msg ->
-	      LOG "Strip: %s" msg LEVEL ERROR;
+	  Misc.Strip msg ->
+           (let logmsg=Printf.sprintf "Strip: %s" msg in
+	      Bolt.Logger.log "" Bolt.Level.ERROR logmsg);
 	      close_in in_ch;
 	      raise (Unexpected msg)
-	  | (Unexpected msg) ->
-	    LOG "Unexpected token: %s" msg LEVEL ERROR;
+	| (Unexpected msg) ->
+           (let logmsg=Printf.sprintf "Unexpected token: %s" msg in
+	    Bolt.Logger.log "" Bolt.Level.ERROR logmsg);
 	    close_in in_ch;
 	    raise (Unexpected msg)
-	  | End_of_file ->
-	    LOG "*** DEBUG *** %s is empty !" file LEVEL DEBUG;
+	| End_of_file ->
+           (let logmsg=Printf.sprintf "*** DEBUG *** %s is empty !" file in
+	    Bolt.Logger.log "" Bolt.Level.DEBUG logmsg);
 	    close_in in_ch;
 	  []
       end
     else
       [(ver_file, Ast_diff.DeletedFile)]
   with Sys_error msg ->
-    LOG "*** WARNING *** %s" msg LEVEL WARN;
+    (let logmsg=Printf.sprintf "*** WARNING *** %s" msg in
+    Bolt.Logger.log "" Bolt.Level.WARN logmsg);
     []
 
 let compute_new_pos_with_hunks hunks line colb cole =

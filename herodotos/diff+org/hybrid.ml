@@ -28,7 +28,8 @@ let get_cmd2 file ver =
 
 let alt_new_pos (diffs: Ast_diff.diffs) file ver pos : bool * (Ast_diff.lineprediction * int * int) =
   let gumfile = make_path !gumtree ver file in
-  LOG "GNU Diff correlation failed. Trying Gumtree with %s" gumfile LEVEL TRACE;
+  let logmsg=Printf.sprintf "GNU Diff correlation failed. Trying Gumtree with %s" gumfile in
+  Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
   let diffs = Gumtree.parse_diff !verbose (!gumtree^Filename.dir_sep) gumfile in
   Gumtree.compute_new_pos_with_gumtree diffs file ver pos
 

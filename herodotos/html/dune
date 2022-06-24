@@ -1,0 +1,4 @@
+(library
+	(name html)
+	(wrapped false)
+	(libraries unix str threads dynlink volt parmap postgresql configparser orgparser))

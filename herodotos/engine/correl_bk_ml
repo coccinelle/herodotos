@@ -69,7 +69,7 @@ let find_all_next strict prefix vlist orgs correl bug =
 				      next = {Ast_org.def = Some next2}
 				   )
 				   z)
-				   ) z
+				   ) z 
 		)
 	 orgs)
 

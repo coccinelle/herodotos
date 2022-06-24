@@ -29,7 +29,7 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
   in
   if Config.get_format patt = Ast_config.Org then
     let pdir = Config.get_prjdir p in
-    let duple = Printf.sprintf "%- 10s %- 16s" p patt in
+    let duple = Printf.sprintf ("%s 10s %s 16s") p patt in
     if (not ((Config.get_correl_mode v1 patt) = Ast_config.Nocorrel)) then
       try
 	    let (depth, vlist) = Config.get_versinfos p in
@@ -68,7 +68,7 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 		  let difffile = Diff_type.GNUDiff (bugfile ^ Global.patchext) in (* TODO: FIXME for gumtree *)
 		  let diffs  = Diff.parse_diff v1 prefix difffile in
 		  let strict = ((Config.get_correl_mode v1 patt) = Ast_config.Strict) in
-		  let _ = if strict then LOG "*** INFO *** Strict correlation used for the pattern %s" patt LEVEL INFO in
+		  let _ = if strict then (let logmsg=Printf.sprintf "*** INFO *** Strict correlation used for the pattern %s" patt in Bolt.Logger.log "" Bolt.Level.INFO logmsg) in
 		  let emptyannots = Org.emptyarray vlist in
 		  let cpucore = Setup.getCPUcore () in
 		  let ((count,new_bugs), _) = Occ_correl.compute_org v3 cpucore strict prefix depth vlist diffs correl2 emptyannots orgs in
@@ -93,23 +93,29 @@ let stat_patt_prj v1 v2 v3 cinfo fpinfo bugfile_ext =
 	    in
 	      if cinfo && fpinfo then
 		let auto =  if v1 then Printf.sprintf "% 6d" count else "?????" in
-		LOG "%s R:% 6d %s / %s -> %s" duple reports correl auto fp LEVEL INFO
+                let logmsg=Printf.sprintf "%s R:% 6d %s / %s -> %s" duple reports correl auto fp in
+		Bolt.Logger.log "" Bolt.Level.INFO logmsg
 	      else
 		if cinfo then
-		  LOG "%s %s" duple correl LEVEL INFO
+                  let logmsg2=Printf.sprintf "%s %s" duple correl in
+		  Bolt.Logger.log "" Bolt.Level.INFO logmsg2
 		else
-		  LOG "%s %s" duple fp LEVEL INFO
+                  let logmsg2=Printf.sprintf "%s %s" duple fp in
+		  Bolt.Logger.log "" Bolt.Level.INFO logmsg2
       with err ->
-	    LOG "%s Skipping..." duple LEVEL ERROR;
+        let logmsg3=Printf.sprintf "%s Skipping..." duple in
+	    Bolt.Logger.log "" Bolt.Level.ERROR logmsg3;
 	    if !Misc.debug then raise err;
-	else
-	  LOG "%s (no correlation requested) Skipping..." duple LEVEL ERROR
+	    else
+              let logmsg4=Printf.sprintf "%s (no correlation requested) Skipping..." duple in
+	  Bolt.Logger.log "" Bolt.Level.ERROR logmsg4
 
 let stats v1 v2 v3 configfile graph statmode =
   let correl = if statmode = Global.Stat || statmode = Global.Statcorrel then true else false in
   let fp =  if statmode = Global.Stat || statmode = Global.StatFP then true else false in
   (* If correl and fp are both set to false, we request both... and more ! *)
   ignore(Config.parse_config configfile);
-  LOG "Running in stat mode: correl stat %b / fp stat %b" correl fp LEVEL INFO;
+  let logmsg=Printf.sprintf "Running in stat mode: correl stat %b / fp stat %b" correl fp in
+  Bolt.Logger.log "" Bolt.Level.INFO logmsg;
   let bugfiles = Cfghelper.get_bugset graph in
   List.iter (stat_patt_prj v1 v2 v3 (correl || not fp) (fp || not correl)) bugfiles

@@ -1,0 +1,10 @@
+(library
+	(name configparser)
+	(wrapped false)
+	(modules_without_implementation ast_config)
+	(libraries unix str threads dynlink volt parmap postgresql commons))
+
+(ocamllex config_lexer)
+
+(menhir
+ (modules config_parser))    

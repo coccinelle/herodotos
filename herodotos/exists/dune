@@ -1,0 +1,10 @@
+(library
+	(name existparser)
+	(wrapped false)
+	(modules_without_implementation ast_exist)
+	(libraries unix str threads dynlink volt parmap postgresql commons))
+
+(ocamllex exist_lexer)
+
+(menhir
+ (modules exist_parser))    

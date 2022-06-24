@@ -158,7 +158,7 @@ let gen_graph_nofail v1 v2 pdf png web bugs name graph =
 let graph_gen v1 v2 v3 configfile pdf png web freearg =
   begin
     ignore(Config.parse_config configfile);
-    LOG "Config parsing OK!" LEVEL INFO;
+    Bolt.Logger.log "" Bolt.Level.INFO "Config parsing OK!";
     Config.fixcolor ();
     Config.show_config ();
     let bugs = Cfghelper.compute_graphs v2 freearg in

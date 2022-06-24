@@ -106,7 +106,7 @@ let insert_correl_report prefix src patt (org:Ast_org.bug) =
   let (annots, reports) = List.partition filter_annot sub in
   let annotselt = List.map (insert_annot prefix file ver pos) annots in
   let reportselt = List.map (insert_report prefix) reports in
-    "BEGIN;SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;\n"^
+    "BEGIN;SET TRANSACTION ISOLATION Bolt.Level.SERIALIZABLE;\n"^
       (Printf.sprintf "INSERT INTO correlations (%s)\n\tSELECT %s FROM correlation_idx;\n" fields values) ^
       (String.concat "" reportselt)^
       (String.concat "" annotselt)^

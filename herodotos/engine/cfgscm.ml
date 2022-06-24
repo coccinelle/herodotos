@@ -46,18 +46,20 @@ let retrieve_correlated_bugs v1 v2 conn (prjname:string) =
 
 let blame v1 v2 v3 configfile filter =
   ignore(Config.parse_config configfile);
-  LOG "Config parsing OK!" LEVEL INFO;
+  Bolt.Logger.log "" Bolt.Level.INFO "Config parsing OK!";
   Config.show_config ();
   try
-    LOG "Connecting to %s" !Setup.dbconn LEVEL INFO;
+    let logmsg=Printf.sprintf "Connecting to %s" !Setup.dbconn in
+    Bolt.Logger.log "" Bolt.Level.INFO logmsg;
     let conn = Database.open_db v1 !Setup.dbconn in
-    LOG "Connection - OK !" LEVEL DEBUG;
+    Bolt.Logger.log "" Bolt.Level.DEBUG "Connection - OK !";
     if filter = "" then
       Setup.PrjTbl.iter (fun p _ -> retrieve_correlated_bugs v1 v2 conn p) Setup.projects
     else retrieve_correlated_bugs v1 v2 conn filter;
-    LOG "Disconnecting..." LEVEL DEBUG;
+    Bolt.Logger.log "" Bolt.Level.DEBUG "Disconnecting...";
     Database.close_db conn;
-    LOG "Done." LEVEL DEBUG
+    Bolt.Logger.log "" Bolt.Level.DEBUG "Done."
   with exp ->
-    LOG "Connection - KO !" LEVEL ERROR; 
-    LOG "%s" (Printexc.to_string exp) LEVEL ERROR
+    Bolt.Logger.log "" Bolt.Level.ERROR "Connection - KO !";
+    let logmsg2=Printf.sprintf "%s" (Printexc.to_string exp) in
+    Bolt.Logger.log "" Bolt.Level.ERROR logmsg2

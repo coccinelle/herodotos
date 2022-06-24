@@ -172,7 +172,8 @@ let parse_line file lnum line : (int * Ast_org.org) option =
 	    Ast.colto = (Lexing.lexeme_end lexbuf) - pos.pos_bol + 1}
 	  ("Org Parser Error: unexpected token '" ^ (Lexing.lexeme lexbuf) ^"'")
   with Sys_error msg ->
-    LOG "*** WARNING *** %s" msg LEVEL WARN;
+    (let logmsg=Printf.sprintf "*** WARNING *** %s" msg in
+    Bolt.Logger.log "" Bolt.Level.WARN logmsg);
     None
 
 let push_stack stack org =
@@ -214,7 +215,7 @@ let rec parse_line_opt v file olnum ch =
 	    if Str.string_match re line 0 then
 	      parse_line_opt v file lnum ch
 	    else
-	      (if !Misc.debug then LOG line LEVEL TRACE;
+	      (if !Misc.debug then Bolt.Logger.log line Bolt.Level.TRACE "";
 	       (lnum, parse_line file lnum line))
 
 (*
@@ -281,7 +282,8 @@ let parse_org v file : Ast_org.orgs =
 	   close_in in_ch;
 	   ast
        with Sys_error msg ->
-	 LOG "*** WARNING *** %s" msg LEVEL WARN;
+         (let logmsg=Printf.sprintf "*** WARNING *** %s" msg in
+	 Bolt.Logger.log "" Bolt.Level.WARN logmsg);
 	 []
     )
 
@@ -425,24 +427,27 @@ let count = ref 0
 let show_buglist verbose bugs =
   count := 0;
   List.iter (fun bug ->
-    LOG "#%03d %s" !count (show_bug verbose bug) LEVEL TRACE;
+      (let logmsg=Printf.sprintf "#%03d %s" !count (show_bug verbose bug) in
+    Bolt.Logger.log "" Bolt.Level.TRACE logmsg);
     count := !count + 1;
   ) bugs
 
 let show_org verbose prefix (orgs: (string*Ast_org.bugs  list) list) =
   count := 0;
-  LOG "SHOW ORG" LEVEL TRACE;
-  LOG "Prefix used: %s" prefix LEVEL TRACE;
+  Bolt.Logger.log "" Bolt.Level.TRACE "SHOW ORG";
+  let logmsg=Printf.sprintf "Prefix used: %s" prefix in
+  Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
   List.iter (fun (file, bugslist) ->
-    LOG file LEVEL TRACE;
+    Bolt.Logger.log "" Bolt.Level.TRACE file;
     List.iter (fun bugs ->
       let vers = String.concat " -> "
 	(List.map (show_bug verbose) bugs)
       in
-      LOG "#%03d in vers. %s" !count vers LEVEL TRACE;
+      let logmsg=Printf.sprintf "#%03d in vers. %s" !count vers in
+      Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
       count := !count + 1
     ) bugslist;
-    LOG "" LEVEL TRACE
+    Bolt.Logger.log "" Bolt.Level.TRACE ""
   ) orgs
 
 let print_orgs_raw ch prefix orgs =
@@ -471,7 +476,7 @@ let print_bugs ch prefix orgs =
   Printf.fprintf ch "%s" orgtail
 
 let compute_correlation prefix depth correl =
-  LOG "compute_correlation: start" LEVEL TRACE;
+  Bolt.Logger.log "" Bolt.Level.TRACE "compute_correlation: start";
   try
     let list = List.map (flat_org prefix depth) correl in
     List.fold_left (fun correllist b ->
@@ -482,22 +487,25 @@ let compute_correlation prefix depth correl =
 	let (nfile, nver, npos, _, _) = flat_link prefix depth l in
 	(s, file, ver, pos, nfile, nver, npos, new_t)::correllist
       with Failure msg ->
-	LOG "compute_correlation: failure with %s" msg LEVEL FATAL;
+        (let logmsg=Printf.sprintf "compute_correlation: failure with %s" msg in
+	Bolt.Logger.log "" Bolt.Level.FATAL logmsg);
 	correllist
     ) [] list
   with Misc.Strip msg ->
-    LOG "compute_correlation: failure with %s" msg LEVEL FATAL;
+    (let logmsg=Printf.sprintf "compute_correlation: failure with %s" msg in
+    Bolt.Logger.log "" Bolt.Level.FATAL logmsg);
     []
 
 let show_correlation verbose correl =
-  LOG "SHOW CORRELATION" LEVEL TRACE;
+  Bolt.Logger.log "" Bolt.Level.TRACE "SHOW CORRELATION";
   List.iter (fun b ->
-    let (s, file, ver, pos, nfile, nver, next, t) = b in
-    LOG "%s %s %s %s -> %s %s %s"
+      let (s, file, ver, pos, nfile, nver, next, t) = b in
+      (let logmsg=Printf.sprintf "%s %s %s %s -> %s %s %s"
       (Org_helper.get_status s)
       file ver (get_string_pos pos)
-      nfile nver (get_string_pos next)
-      LEVEL TRACE
+      nfile nver (get_string_pos next) in
+    Bolt.Logger.log ""
+      Bolt.Level.TRACE logmsg)
   ) correl
 
 let sort_bug bug1 bug2 =

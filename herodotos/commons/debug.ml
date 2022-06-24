@@ -21,7 +21,7 @@ let (+>) o f = f o
 let pr2 = prerr_endline
 
 let trace msg =
-  List.iter (fun m -> LOG m LEVEL TRACE) (Str.split (Str.regexp_string "\n") msg)
+  List.iter (fun m -> Bolt.Logger.log "" Bolt.Level.TRACE m) (Str.split (Str.regexp_string "\n") msg)
 
 let (with_open_stringbuf: (((string -> unit) * Buffer.t) -> unit) -> string) =
  fun f ->

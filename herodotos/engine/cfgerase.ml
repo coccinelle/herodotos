@@ -24,7 +24,7 @@ let erase_file v1 v2 prjs patts =
 
 let erase_env v1 v2 v3 configfile filter =
   ignore(Config.parse_config configfile);
-  LOG "Config parsing OK!" LEVEL INFO;
+  Bolt.Logger.log "" Bolt.Level.INFO "Config parsing OK!";
   Config.show_config ();
   (* FIXME: experiments could be handled too *)
   let (prjs, patts, _) = Cfginit.compute_makefile () in
