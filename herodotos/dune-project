@@ -6,11 +6,11 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github coccinelle/herodotos))
 
-(authors "Author Name")
+(authors "Nicolas Palix")
 
-(maintainers "Maintainer Name")
+(maintainers "")
 
 (license LICENSE)
 
@@ -18,10 +18,11 @@
 
 (package
  (name herodotos)
- (synopsis "A short synopsis")
- (description "A longer description")
+ (synopsis "Tracking code patterns through software versions")
+ (description "Herodotos is open source and can be freely redistributed under the terms of the GNU General Public
+License version 2. See the file LICENSE in the distribution for licensing information.")
  (depends ocaml dune)
  (tags
-  (topics "to describe" your project)))
+  (coccinelle ocaml menhir volt parmap postgresql dune)))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
