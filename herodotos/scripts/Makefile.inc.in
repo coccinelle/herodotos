@@ -1,6 +1,7 @@
 # Use the default version
 # but this may be the native one on some distro
-HERODOTOS?=$(shell which herodotos.opt herodotos | head -1)
+EXE=$(abspath ../../../herodotos/herodotos/_build/default/herodotos.exe)
+HERODOTOS=dune exec -- $(EXE)
 ifeq ($(D),1)
 FLAGS=--debug -v $(HFLAGS)
 else ifeq ($(D),2)
@@ -12,6 +13,7 @@ FLAGS=$(HFLAGS)
 endif
 
 CONF?=$(shell ls *.hc)
+BOLT_CONFIG=debug.config
 RESULTS=$(shell grep "results=" $(CONF) 2> /dev/null | sed "s|results=\"\([^\"]*\)\"|\1|" 2> /dev/null)
 PRJS=$(shell find $(RESULTS) -mindepth 1 -maxdepth 1 -type d 2> /dev/null | grep -v CVS | grep -v "\.svn" | sed "s|$(RESULTS)||g" 2> /dev/null)
 PROJECTS=$(PRJS:%=$(RESULTS)%)

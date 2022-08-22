@@ -7,12 +7,12 @@ SOURCES =
 SUBDIRS =
 MENHIR_PATH=../menhirLib
 DEPDIRS = $(MENHIR_PATH)
-EXTLIBS=postgresql parmap volt # xml-light
+EXTLIBS=postgresql parmap volt
 P4=volt
 
 OCAMLFIND=ocamlfind
 
-# EXTLIBCMA= $(shell $(OCAMLFIND) query -predicates byte -a-format $(EXTLIBS))
+
 OCAMLLIBS=str.cma unix.cma threads.cma bigarray.cma dynlink.cma $(EXTLIBCMA)#$(EXTLIBS:%=%.cma)
 FLAG=
 
@@ -80,16 +80,12 @@ test/debug.config:
 	cp scripts/debug.config $@
 
 test: test/Makefile test/debug.config
-	#$(MAKE) -C test preinit
 	cd test ; ./fooldir.sh
-	#$(MAKE) -C test init
 	tar xjvf test/orig-org.tbz2 -C test
 	tar xjvf test/correl.tbz2 -C test
 	tar xjvf test/fp-checked.tbz2 -C test
 	tar xjvf test/patchset.tbz2 -C test
-	#$(MAKE) -C test correl
 	tar xjvf test/exist.tbz2 -C test
-	#$(MAKE) -C test web
 
 view:
 	if [ "$(PDFVIEWER)" = "okular" ]; then \
@@ -133,22 +129,12 @@ engine.opt: commons.opt diff.opt exists.opt orgs.opt
 # To compile bytecode version
 #
 
-#$(ROOTLIB): $(OBJS)
-#	$(OCAMLC) -a -o $@ $(OBJS)
-
-#$(EXEC): $(ALLLIBS) $(TARGET).cmo
-#	$(OCAMLC) $(CFLAGS) -o $@ $(OCAMLLIBS) $(MENHIR) $^
-
-#$(LIBS): $(LIBS:%.cma=%)
 $(DEP):
 	$(MAKE) -C $@
 
 #
 # To compile native version
 #
-
-#$(OPTROOTLIB): $(OPTOBJS)
-#	$(OCAMLOPT) -a -o $@ $(OPTOBJS)
 
 $(EXEC).opt: $(OPTALLLIBS)  $(TARGET).cmx
 	$(OCAMLOPT) $(CFLAGS) -o $@ $(OPTOCAMLLIBS) $(MENHIRO) $^
@@ -220,7 +206,7 @@ check-config:
 		echo "\n\tRun ./configure first\n" \
 		exit 1 ; fi
 
-TOLICENSIFY=$(SUBDIRS) scripts #test
+TOLICENSIFY=$(SUBDIRS) scripts
 
 #
 # Automatically called by pack.

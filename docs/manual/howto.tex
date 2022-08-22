@@ -1,6 +1,12 @@
 
 \label{chap:howto}
 
+To compile the dune executable(You need to be in herodotos directory beforehand):
+\begin{lstlisting}[language=bash]
+  $ dune build
+\end{lstlisting}
+
+
 At this point, you must have Herodotos installed. You now have to
 setup your environment and write a Herodotos Configuration file.
 
@@ -21,20 +27,16 @@ setup your environment and write a Herodotos Configuration file.
 \item Recover missing elements in a version description, like a release
   date, the code size, or extract the code from a given repository:
 
-  \texttt{make preinit}
+  \texttt{dune exec -- ./herodotos.exe -c <HC file path> preinit}
   
 \item Initialize the environment:
 
-  \texttt{make init}
-  
-\item Compute raw data:
-
-  \texttt{make -j2}
+  \texttt{dune exec -- ./herodotos.exe -c <HC file path> init}
 
 \item Correlate bug reports and propose an initial set of
   correlations:
 
-  \texttt{make correl}
+  \texttt{dune exec -- ./herodotos.exe -c <HC file path> correl}
 
   Note: Herodotos will automatically compute the changeset.
 
@@ -50,7 +52,7 @@ setup your environment and write a Herodotos Configuration file.
 
 \item Use the new complementary correlation information
 
-  \texttt{make correl} (recompute the correlation and use the
+  \texttt{dune exec -- ./herodotos.exe -c <HC file path> correl} (recompute the correlation and use the
   correlation set manually provided)
 
 \item Check the result:
@@ -67,7 +69,7 @@ setup your environment and write a Herodotos Configuration file.
 
 \item Generate graphs (or website):
 
-  \texttt{make [graph|web]}
+  \texttt{dune exec -- ./herodotos.exe -c <HC file path> [graph|web]}
 
 \item Edit and adjust your HC file\\
 
@@ -75,11 +77,11 @@ setup your environment and write a Herodotos Configuration file.
 
 \item Generate SQL queries from *.new.org files:
   
-  \texttt{herodotos ---prefix prefix/ ---parse\_org results/*/*/*.new.org ---to-sql}
+  \texttt{dune exec -- ./herodotos.exe  ---prefix prefix/ ---parse\_org results/*/*/*.new.org ---to-sql}
   
 \item Generate incremental SQL queries from *.new.org files
 
-  \texttt{herodotos ---prefix prefix/ ---parse\_org results/*/*/*.new.org ---to-sql-update version}
+  \texttt{dune exec -- ./herodotos.exe  ---prefix prefix/ ---parse\_org results/*/*/*.new.org ---to-sql-update version}
   
   Generated queries are used to update a data base containing data
   about all versions preceding the given version, with data about the

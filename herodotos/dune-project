@@ -23,6 +23,7 @@
 License version 2. See the file LICENSE in the distribution for licensing information.")
  (depends ocaml dune)
  (tags
-  (coccinelle ocaml menhir volt parmap postgresql dune)))
+  (coccinelle ocaml menhir volt parmap postgresql dune))
+ (allow_empty))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project

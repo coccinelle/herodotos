@@ -6,6 +6,3 @@
 	(dev
 		(env-vars (BOLT_CONFIG debug.config))
     		(flags (:standard -warn-error -A))))
-    
-
-
