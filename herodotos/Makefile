@@ -161,8 +161,10 @@ install:
 	$(INSTALL_DATA) scripts/Makefile.prj $(DESTDIR)$(SHAREDIR)
 	if [ -f $(TARGET) ]; then $(INSTALL_PROGRAM) $(TARGET) $(DESTDIR)$(BINDIR); fi
 	if [ -f $(TARGET).opt ]; then $(INSTALL_PROGRAM) $(TARGET).opt $(DESTDIR)$(BINDIR); fi
+	if [ -f _build/default/$(TARGET).exe ]; then $(INSTALL_PROGRAM) _build/default/$(TARGET).exe $(DESTDIR)$(BINDIR); fi
 
 uninstall:
+	rm -f $(DESTDIR)$(BINDIR)/$(TARGET).exe
 	rm -f $(DESTDIR)$(BINDIR)/$(TARGET) $(DESTDIR)$(BINDIR)/$(TARGET).opt
 	rm -f $(DESTDIR)$(SHAREDIR)/Makefile.*
 	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(SHAREDIR)
