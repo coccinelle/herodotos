@@ -59,12 +59,14 @@ endif
 .PHONY:: .depend depend install sudo_install deploy
 .PHONY:: test debian debians
 
-all: init
+all: init dune-build
 opt: all.opt
 all.opt: init native-noopt
 world: init bytecode native
 
 init: check-config .depend scripts/Makefile.inc
+dune-build:
+	dune build
 bytecode: $(EXEC)
 native: $(EXEC).opt
 native-noopt: native
