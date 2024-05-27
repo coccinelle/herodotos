@@ -3,7 +3,6 @@ open Lexing
 exception NoNext of string
 exception Strip of string
 
-
 (* To enable debug mode -- Really verbose *)
 let debug = ref false
 
@@ -31,7 +30,7 @@ let dummy_pos = getpos Lexing.dummy_pos 0
 
 let print_error pos str =
   let logmsg=Printf.sprintf "%s" ((print_pos pos) ^ str) in
-  Bolt.Logger.log "" Bolt.Level.FATAL logmsg
+  [%fatal_log logmsg]
 
 let report_error pos str =
   print_error pos str;

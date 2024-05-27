@@ -744,7 +744,7 @@ let draw vb debug name grdft (atts, curves) allbugs =
     (fun () ->
        let (msg, xdft, ydft, fdft, xmax, ymax, scm, evolfunc) = grdft in
        let vers = Config.get_grversinfos atts curves in
-       Array.iter (fun v -> (let logmsg=Printf.sprintf "%s" (Config.show_versinfo v) in Bolt.Logger.log "" Bolt.Level.DEBUG logmsg)) vers;
+       Array.iter (fun v -> (let logmsg=Printf.sprintf "%s" (Config.show_versinfo v) in [%debug_log logmsg])) vers;
        let gname = !Setup.prefix ^"/"^ name in
        let grinfo = get_info debug name atts xdft ydft fdft in
        let evols = build_evolutions vb debug name grinfo scm atts curves allbugs evolfunc in

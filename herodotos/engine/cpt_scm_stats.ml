@@ -1,9 +1,9 @@
 let sys_command cmd =
   let logmsg=Printf.sprintf "Execute: '%s'" cmd in
-  Bolt.Logger.log "" Bolt.Level.INFO logmsg;
+  [%info_log logmsg];
   let status = Sys.command cmd in
   let logmsg2=Printf.sprintf "Status: %d" status in
-  Bolt.Logger.log "" Bolt.Level.INFO logmsg2;
+  [%info_log logmsg2];
   status
 
 let tag_filter tag_list filter =
@@ -32,10 +32,10 @@ let rec read_recursive lines in_channel=
  
 let get_size dir =
   let logmsg=Printf.sprintf "Retrieving C code size of %s" dir in
-  Bolt.Logger.log "" Bolt.Level.INFO logmsg;
+  [%info_log logmsg];
   let cmd = "sloccount "^dir in
   let logmsg=Printf.sprintf "Execute: '%s'" cmd in
-  Bolt.Logger.log "" Bolt.Level.DEBUG logmsg;
+  [%debug_log logmsg];
   let in_channel = Unix.open_process_in cmd in
   let lines = read_recursive [] (Scanf.Scanning.from_channel in_channel) in
   let chaine = String.concat "\n" lines in       
@@ -47,12 +47,12 @@ let get_size dir =
       let _ = Str.search_forward expression chaine 0 in
       int_of_string (string_match_exp expNumber (Str.split expSep (string_match_exp expression lines)))
     with Not_found ->
-      Bolt.Logger.log "" Bolt.Level.ERROR "Error while retrieving the ansi C code size";
+      [%error_log "Error while retrieving the ansi C code size"];
       0
   in
   close_in in_channel ;
   let logmsg=Printf.sprintf "Size: %d" size in
-  Bolt.Logger.log "" Bolt.Level.DEBUG logmsg;
+  [%debug_log logmsg];
   size
 
 (* extracts versions information thanks to a regexp describing versions tags *)
@@ -64,22 +64,22 @@ let extract_vers_infos prj expression declared_versions withsizes =
       Config.get_public_scm prj
     with e ->
       (let logmsg=Printf.sprintf "%s" (Printexc.to_string e) in
-      Bolt.Logger.log "" Bolt.Level.ERROR logmsg);
+      [%error_log logmsg]);
       ""
   in
   let logmsg=Printf.sprintf "Local SCM: %s" local_scm in
-  Bolt.Logger.log "" Bolt.Level.DEBUG logmsg;
+  [%debug_log logmsg];
   let deposit = Str.replace_first (Str.regexp "git:") "" local_scm in
   let scm = path^"/"^deposit in
   let logmsg=Printf.sprintf "Checking local SCM: %s" scm in
-  Bolt.Logger.log "" Bolt.Level.DEBUG logmsg;
+  [%debug_log logmsg];
   if not ((Sys.file_exists scm)
 	  &&(Sys.is_directory scm)) then
     if origin <> "" then
       ignore(sys_command ("git clone "^origin^" "^path^"/"^deposit ))
     else
       (let logmsg=Printf.sprintf "No public SCM defined, but %s is not available" deposit in
-        Bolt.Logger.log "" Bolt.Level.FATAL logmsg;
+        [%fatal_log logmsg];
        failwith "A public SCM is needed."
       );
   let tag_list = Git.get_tags scm expression in

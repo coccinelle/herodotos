@@ -1,4 +1,5 @@
 (library
 	(name engine)
 	(wrapped false)
-	(libraries orgparser graph database html))
+	(libraries orgparser graph database html)
+	(preprocess (pps vlt.ppx)))

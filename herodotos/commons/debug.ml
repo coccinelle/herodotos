@@ -21,7 +21,7 @@ let (+>) o f = f o
 let pr2 = prerr_endline
 
 let trace msg =
-  List.iter (fun m -> Bolt.Logger.log "" Bolt.Level.TRACE m) (Str.split (Str.regexp_string "\n") msg)
+        List.iter (fun m -> [%trace_log m]) (Str.split (Str.regexp_string "\n") msg)
 
 let (with_open_stringbuf: (((string -> unit) * Buffer.t) -> unit) -> string) =
  fun f ->
@@ -93,7 +93,7 @@ let profile_diagnostic () =
     begin
       let xs =
 	Hashtbl.fold (fun k v acc -> (k,v)::acc) _profile_table []
-	+> List.sort (fun (k1, (t1,n1)) (k2, (t2,n2)) -> compare t2 t1)
+	+> List.sort (fun (_, (t1,_)) (_, (t2,_)) -> compare t2 t1)
       in
 	with_open_stringbuf
 	  (fun (pr,_) ->

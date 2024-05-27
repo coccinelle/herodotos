@@ -2,7 +2,8 @@
 	(name orgparser)
 	(wrapped false)
 	(modules_without_implementation ast_bugs ast_diff ast_org diff_type)
-	(libraries unix str threads dynlink volt parmap postgresql commons configparser existparser))
+	(libraries unix str threads dynlink vlt parmap postgresql commons configparser existparser)
+	(preprocess (pps vlt.ppx)))
 
 (ocamllex org_lexer)
 (menhir

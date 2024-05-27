@@ -1,4 +1,5 @@
 (library
 	(name graph)
 	(wrapped false)
-	(libraries unix str threads dynlink volt parmap postgresql configparser orgparser scm))
+	(libraries unix str threads dynlink vlt parmap postgresql configparser orgparser scm)
+	(preprocess (pps vlt.ppx)))

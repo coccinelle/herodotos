@@ -182,21 +182,21 @@ let retrieve_exists verbose prjname mode bugsetfile vlist filelist =
 	try
 	  let ret = Some (Exists.parse_exist existfile) in
           let msg=Printf.sprintf "Cache file %s was used." existfile in
-	  Bolt.Logger.log "" Bolt.Level.DEBUG msg;
+	  [%debug_log msg];
 	  ret
 	with
 	    Sys_error msg -> prerr_endline msg; None
 	  | Exists.BadFormat -> None
     else
       (let msg=Printf.sprintf "Cache file %s is obsolete or does not exist." existfile in
-        Bolt.Logger.log "" Bolt.Level.DEBUG msg;
+        [%debug_log msg];
        None)
   in
     match fromfile with
 	Some ast -> ast
       | None ->
          let logmsg=Printf.sprintf "*** INFO *** Compute %s from repository %s." existfile (!Setup.projectsdir ^ prjdir) in
-	  Bolt.Logger.log "" Bolt.Level.INFO logmsg;
+	  [%info_log logmsg];
 	  let ast = Exists.analyze_rep project vlist filelist in
 	    Exists.print_to existfile ast;
 	    ast
@@ -241,8 +241,8 @@ let compute_pbugs verbose prjname allbugs =
 	      ) bugs
 	   )
   with
-      Config.Warning msg -> Bolt.Logger.log "" Bolt.Level.WARN msg; None
-    | Error msg -> Bolt.Logger.log "" Bolt.Level.ERROR msg; None
+      Config.Warning msg -> [%warn_log msg]; None
+    | Error msg -> [%error_log msg]; None
 
 let compute_bugs verbose bugfile =
   try
@@ -268,7 +268,7 @@ let compute_bugs verbose bugfile =
 	if Sys.file_exists bugfile && format = Ast_config.Org
 	then
 	  (let logmsg=Printf.sprintf "Analyzing %s in project %s with subproject depth %d." bugfile p depth in
-            Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+            [%trace_log logmsg];
 	   let orgbugs = Org.parse_org false bugfile in
 	   let bugs = Org2bug.convert prefix depth orgbugs in
 	     bugs
@@ -285,7 +285,7 @@ let compute_bugs verbose bugfile =
 	      end
 	    else
 	      (let logmsg2=Printf.sprintf "*** ERROR *** No file %s" bugfile in
-                Bolt.Logger.log "" Bolt.Level.ERROR logmsg2;
+                [%error_log logmsg2];
 	       []
 	      )
 	  end
@@ -305,7 +305,7 @@ let compute_bugs verbose bugfile =
 	in
 	if count <> 0 then
           (let logmsg3=Printf.sprintf "*** WARNING *** Dropping %d bug report(s) of %s (No interesting version) !" count bugfile in
-	  Bolt.Logger.log "" Bolt.Level.WARN logmsg3);
+	  [%warn_log logmsg3]);
 	let bfl = Bugs.sort unsortedbfl in
 	Some (p, ((format, mode, bugfile), bfl))
 
@@ -321,16 +321,16 @@ with
 *)
   with Config.Warning msg ->
     (let logmsg=Printf.sprintf "*** WARNING *** %s" msg in
-    Bolt.Logger.log "" Bolt.Level.WARN logmsg);
+    [%warn_log logmsg]);
     None
 
 let compute_graphs verbose graph =
   Debug.profile_code "Cfghelper.compute_graphs"
     (fun () ->
        let bugfiles = get_bugset graph in
-       Bolt.Logger.log "" Bolt.Level.TRACE "==========================";
-       List.iter (fun d -> Bolt.Logger.log "" Bolt.Level.TRACE d) bugfiles;
-       Bolt.Logger.log "" Bolt.Level.TRACE "==========================";
+       [%trace_log "=========================="];
+       List.iter (fun d -> [%trace_log d]) bugfiles;
+       [%trace_log "=========================="];
        let pbugs =
 	 List.fold_left (fun pbugs bugfile ->
 	   match compute_bugs verbose bugfile with

@@ -8,7 +8,7 @@ let parse_diff v prefix file =
   if Sys.file_exists file then
     begin
       let logmsg=Printf.sprintf "Parsing Gumtree diff: %s" file in
-      Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+      [%trace_log logmsg];
       let x = open_in_bin file in
       try
 	let tree = input_value x in
@@ -17,14 +17,14 @@ let parse_diff v prefix file =
       with
 	Misc.Strip msg ->
          (let logmsg=Printf.sprintf "Strip: %s" msg in
-	    Bolt.Logger.log "" Bolt.Level.ERROR logmsg);
+	    [%error_log logmsg]);
 	    close_in x;
 	    raise (Unexpected msg)
 	| e ->
 	  Printexc.print_backtrace stderr;
 	  let newfile = file ^ Global.failed in
           let logmsg=Printf.sprintf "Failed while parsing: check %s" newfile in
-	  Bolt.Logger.log "" Bolt.Level.ERROR logmsg;
+	  [%error_log logmsg];
 	  Sys.rename file newfile;
 	  []
     end
@@ -59,8 +59,7 @@ let rec show_gumtree dorec depth tree =
       | None -> "XXX"
     )
     in
-  Bolt.Logger.log ""
-    Bolt.Level.TRACE logmsg;
+    [%trace_log logmsg];
   if dorec then
     List.iter (show_gumtree dorec (depth +1)) children
 
@@ -73,7 +72,7 @@ let is_perfect pos (tree:Ast_diff.tree) =
 
 let found tree =
   show_gumtree false 0 tree;
-  Bolt.Logger.log "" Bolt.Level.TRACE "-----------------";
+  [%trace_log "-----------------"];
   true
  
 let match_tree pos (tree:Ast_diff.tree) =
@@ -81,22 +80,22 @@ let match_tree pos (tree:Ast_diff.tree) =
   let (_, _, bl, bc, el, ec)  = get_pos_before tree in
   if line > bl && (line < el || line = el && cole <= ec) then
     (* Match a node that start before, but may end at the right line, or after *)
-    (if !Misc.debug then Bolt.Logger.log "" Bolt.Level.TRACE "match_tree: case 1";
+    (if !Misc.debug then [%trace_log "match_tree: case 1"];
      found tree)
   else if line = bl && line < el
        && colb >= bc then
     (* Match a *large* node that start at the right line. The begin column must be right too. *)
-    (if !Misc.debug then Bolt.Logger.log "" Bolt.Level.TRACE "match_tree: case 2";
+    (if !Misc.debug then [%trace_log "match_tree: case 2"];
      found tree)
   else if line = bl && line = el
 	       && colb >= bc && cole <= ec then
     (* The perfect line matching is not capture in the previous case.
        We check it here, and also check the columns.
     *)
-    (if !Misc.debug then Bolt.Logger.log "" Bolt.Level.TRACE "match_tree: case 3";
+    (if !Misc.debug then [%trace_log "match_tree: case 3"];
      found tree)
   else
-    (if !Misc.debug then Bolt.Logger.log "" Bolt.Level.TRACE "match_tree: case 4";
+    (if !Misc.debug then [%trace_log "match_tree: case 4"];
      false)
 
 let rec lookup_tree ver file pos (tree:Ast_diff.tree) : Ast_diff.tree =
@@ -106,14 +105,14 @@ let rec lookup_tree ver file pos (tree:Ast_diff.tree) : Ast_diff.tree =
       try
 	let candidate = List.find (match_tree pos) children in
 	if is_perfect pos candidate then
-	  (Bolt.Logger.log "" Bolt.Level.TRACE "lookup_tree: perfect";
+	  ([%trace_log "lookup_tree: perfect"];
 	   candidate)
 	else
-	  (Bolt.Logger.log "" Bolt.Level.TRACE "lookup_tree: !perfect - recurse";
+	  ([%trace_log "lookup_tree: !perfect - recurse"];
 	   lookup_tree ver file pos candidate)
       with Not_found ->
         (let logmsg=Printf.sprintf "lookup_tree: Not_found - Return current element (%s/%s)" ver file in
-	Bolt.Logger.log "" Bolt.Level.FATAL logmsg);
+	[%fatal_log logmsg]);
 	tree
     )
 
@@ -126,7 +125,7 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : bool * (
 	      begin
 		let matched_tree = lookup_tree ver file pos root in
 		show_gumtree true 0 matched_tree;
-		Bolt.Logger.log "" Bolt.Level.TRACE "-----------------";
+		[%trace_log "-----------------"];
 		match get_pos_after matched_tree with
 		    Some (_, _, bl, bc, el, ec) ->
 		      if bl == el then
@@ -139,6 +138,6 @@ let compute_new_pos_with_gumtree (diffs: Ast_diff.diffs) file ver pos : bool * (
 	  | _ -> raise (Unexpected "Wrong diff type")
       with Not_found ->
 	let msg = "No gumtree diff for "^ file ^ " in vers. " ^ ver in
-	Bolt.Logger.log "" Bolt.Level.FATAL msg;
+	[%fatal_log msg];
 	raise (Unexpected msg)
     )

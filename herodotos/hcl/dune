@@ -2,7 +2,8 @@
 	(name configparser)
 	(wrapped false)
 	(modules_without_implementation ast_config)
-	(libraries unix str threads dynlink volt parmap postgresql commons))
+	(libraries unix str threads dynlink vlt parmap postgresql commons)
+        (preprocess (pps vlt.ppx)))
 
 (ocamllex config_lexer)
 

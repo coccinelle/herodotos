@@ -1,6 +1,7 @@
 (executable
 	(name herodotos)
-	(libraries unix str threads dynlink volt parmap postgresql commons configparser existparser orgparser engine))
+	(libraries unix str threads dynlink vlt parmap postgresql commons configparser existparser orgparser engine)
+        (preprocess (pps vlt.ppx)))
 	
 (env
 	(dev

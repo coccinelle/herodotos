@@ -12,7 +12,7 @@ let gen_cvsignore_prj v1 (p, _) =
   let cvsignore = !Setup.resultsdir ^ prjdir^"/.cvsignore" in
   if not (Sys.file_exists cvsignore) then
     let logmsg=Printf.sprintf "Generating %s" cvsignore in
-      Bolt.Logger.log "" Bolt.Level.INFO logmsg;
+      [%info_log logmsg];
       let cvsch = open_out cvsignore in
 	Printf.fprintf cvsch "*%s\n" Global.correlext;
 	Printf.fprintf cvsch "*%s\n" Global.listext;
@@ -26,7 +26,7 @@ let gen_cvsignore v1 prjs =
     List.iter (gen_cvsignore_prj v1) prjs;
     if not (Sys.file_exists cvsignore) then
       let logmsg=Printf.sprintf "Generating %s" cvsignore in
-      Bolt.Logger.log "" Bolt.Level.INFO logmsg;
+      [%info_log logmsg];
       let cvsch = open_out cvsignore in
 	Printf.fprintf cvsch ".depend\n";
 	Printf.fprintf cvsch ".depend.patterns\n";
@@ -55,7 +55,7 @@ let gen_makefile_vers verbose depch verscmds =
 let gen_makefile_patt verbose depch cmds =
   List.fold_left (fun datalist (data, verscmds) ->
       let logmsg=Printf.sprintf "make will generate data in %s" data in
-    Bolt.Logger.log "" Bolt.Level.INFO logmsg;
+    [%info_log logmsg];
     let targets = gen_makefile_vers verbose depch verscmds in
     Misc.create_dir verbose (Filename.dirname data);
     Printf.fprintf depch "%s: %s #PER-PRJ-PATT\n" data (String.concat " " targets);
@@ -67,11 +67,11 @@ let gen_makefile v1 v2 prjs patts exps =
   let deps = List.map
     (fun (p, cmds) ->
        let prjdir = Config.get_prjdir p in
-       if prjdir = "" then (let logmsg=Printf.sprintf "*** WARNING *** project dir is not set for %s" p in Bolt.Logger.log "" Bolt.Level.WARN logmsg);
+       if prjdir = "" then (let logmsg=Printf.sprintf "*** WARNING *** project dir is not set for %s" p in [%warn_log logmsg]);
        let depend = !Setup.resultsdir ^ prjdir ^"/.depend."^p in
        let depch = Misc.create_dir_and_open v1 depend in
        let logmsg2=Printf.sprintf "Generating %s" depend in
-       Bolt.Logger.log "" Bolt.Level.INFO logmsg2;
+       [%info_log logmsg2];
        let datalist = gen_makefile_patt v2 depch cmds in
        Printf.fprintf depch "%s: %s\n" p (String.concat " " datalist);
        close_out depch;
@@ -81,7 +81,7 @@ let gen_makefile v1 v2 prjs patts exps =
   let pattdepend = !Setup.prefix ^"/.depend.patterns" in
   let pattdepch = open_out pattdepend in
   let logmsg3=Printf.sprintf "Generating %s" pattdepend in
-  Bolt.Logger.log "" Bolt.Level.INFO logmsg3;
+  [%info_log logmsg3];
   List.iter (fun (patt, data) ->
     let datalist = String.concat " " data in
     Printf.fprintf pattdepch "%s: %s\n" patt datalist;
@@ -93,7 +93,7 @@ let gen_makefile v1 v2 prjs patts exps =
   let depend = !Setup.prefix ^"/.depend" in
   let depch = open_out depend in
   let logmsg4=Printf.sprintf "Generating %s" depend in
-  Bolt.Logger.log "" Bolt.Level.INFO logmsg4;
+  [%info_log logmsg4];
   Printf.fprintf depch ".PHONY:: %s %s" gphs expnames;
   List.iter (fun (p,_) -> Printf.fprintf depch " %s" p) prjs;
   Printf.fprintf depch "\n\n";
@@ -133,7 +133,7 @@ let erase_file v1 v2 prjs patts =
   let depend = !Setup.prefix ^"/.depend.erase" in
   let depch = open_out depend in
   let logmsg=Printf.sprintf "Generating %s" depend in
-  Bolt.Logger.log "" Bolt.Level.INFO logmsg;
+  [%info_log logmsg];
   let targetlist =
     List.flatten
       (List.map
@@ -162,7 +162,7 @@ let erase_file v1 v2 prjs patts =
 (* Check if a project is correctly configured *)
 let check_prj vb p =
   let prjdir = Config.get_prjdir p in
-  if prjdir = "" then (let logmsg=Printf.sprintf "*** WARNING *** project dir is not set for %s" p in Bolt.Logger.log "" Bolt.Level.WARN logmsg);
+  if prjdir = "" then (let logmsg=Printf.sprintf "*** WARNING *** project dir is not set for %s" p in [%warn_log logmsg]);
   let project = !Setup.projectsdir ^ prjdir in
   let (depth, versions) = Config.get_versions p in
   List.fold_left (fun l v ->
@@ -175,7 +175,7 @@ let check_prj vb p =
     else
       (
         let logmsg=Printf.sprintf "%s - OK" prj in
-	Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+	[%trace_log logmsg];
 	l
       )
   ) [] versions
@@ -189,7 +189,7 @@ let check_pat vb d =
   else
     (
       let logmsg=Printf.sprintf "%s - OK" cocci in
-      Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+      [%trace_log logmsg];
       []
     )
 
@@ -313,7 +313,7 @@ let compute_makefile () =
 
 let init_env v1 v2 v3 configfile cvs =
   ignore(Config.parse_config configfile);
-  Bolt.Logger.log "" Bolt.Level.INFO "Config parsing OK!";
+  [%info_log "Config parsing OK!"];
   Config.show_config ();
   let (prjs, patts, exps) = compute_makefile () in
   let err = check_setup v1 prjs patts in
@@ -325,7 +325,7 @@ let init_env v1 v2 v3 configfile cvs =
     )
   else
     (
-      Bolt.Logger.log "" Bolt.Level.ERROR " *** KNOWN PROBLEMS ***";
-      List.iter (fun msg -> Bolt.Logger.log "" Bolt.Level.ERROR msg) err;
-      Bolt.Logger.log "" Bolt.Level.ERROR " *** END OF REPORT ***"
+      [%error_log " *** KNOWN PROBLEMS ***"];
+      List.iter (fun msg -> [%error_log msg]) err;
+      [%error_log " *** END OF REPORT ***"]
     )

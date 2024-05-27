@@ -104,17 +104,17 @@ let rec read_diff prefix file in_ch =
       else
 	begin
           let logmsg=Printf.sprintf "Error: Desynchronized? no more diff found in %s at line %s" file (Int64.to_string !line) in
-	  Bolt.Logger.log "" Bolt.Level.ERROR logmsg;
+	  [%error_log logmsg];
           let logmsg2=Printf.sprintf "Expects a \"---\" line. Got \"%s\"" line_rm0 in
-	  Bolt.Logger.log "" Bolt.Level.ERROR logmsg2;
+	  [%error_log logmsg2];
           let logmsg3=Printf.sprintf "Looking for filename in \"%s\"" line_rm in
-	  Bolt.Logger.log "" Bolt.Level.ERROR logmsg3;
+	  [%error_log logmsg3];
 	  match lookfor_minusline in_ch with
 	      None ->
-		Bolt.Logger.log "" Bolt.Level.ERROR "Unable to re-synchronize"; []
+		[%error_log "Unable to re-synchronize"]; []
 	    | Some l ->
                (let logmsg4=Printf.sprintf "Re-synchronize on %s" l in
-		Bolt.Logger.log "" Bolt.Level.INFO logmsg4);
+		[%info_log logmsg4]);
 		match lookfor_minusline in_ch with
 		    None   -> []
 		  | Some l ->
@@ -129,7 +129,7 @@ let parse_diff v prefix file : Ast_diff.diffs =
     if Sys.file_exists file then
       begin
         let logmsg=Printf.sprintf "Parsing GNU Diff: %s" file in
-	Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+	[%trace_log logmsg];
 	let in_ch = open_in file in
 	try
 	  line := Int64.zero;
@@ -139,17 +139,17 @@ let parse_diff v prefix file : Ast_diff.diffs =
 	with
 	  Misc.Strip msg ->
            (let logmsg=Printf.sprintf "Strip: %s" msg in
-	      Bolt.Logger.log "" Bolt.Level.ERROR logmsg);
+	      [%error_log logmsg]);
 	      close_in in_ch;
 	      raise (Unexpected msg)
 	| (Unexpected msg) ->
            (let logmsg=Printf.sprintf "Unexpected token: %s" msg in
-	    Bolt.Logger.log "" Bolt.Level.ERROR logmsg);
+	    [%error_log logmsg]);
 	    close_in in_ch;
 	    raise (Unexpected msg)
 	| End_of_file ->
            (let logmsg=Printf.sprintf "*** DEBUG *** %s is empty !" file in
-	    Bolt.Logger.log "" Bolt.Level.DEBUG logmsg);
+	    [%debug_log logmsg]);
 	    close_in in_ch;
 	  []
       end
@@ -157,7 +157,7 @@ let parse_diff v prefix file : Ast_diff.diffs =
       [(ver_file, Ast_diff.DeletedFile)]
   with Sys_error msg ->
     (let logmsg=Printf.sprintf "*** WARNING *** %s" msg in
-    Bolt.Logger.log "" Bolt.Level.WARN logmsg);
+    [%warn_log logmsg]);
     []
 
 let compute_new_pos_with_hunks hunks line colb cole =

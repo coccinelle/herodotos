@@ -2,4 +2,7 @@
 	(name commons)
 	(wrapped false)
 	(modules_without_implementation ast)
-	(libraries unix str threads dynlink volt parmap postgresql))
+	(libraries unix str threads dynlink vlt parmap postgresql)
+        (preprocess (pps vlt.ppx)))
+
+

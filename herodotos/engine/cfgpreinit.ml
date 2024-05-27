@@ -3,13 +3,13 @@ let build_updated_cache cache_projects withsizes =
   Setup.PrjTbl.fold 
     (fun prj _ cache ->
       let logmsg=Printf.sprintf "Processing %s for cache" prj in
-      Bolt.Logger.log "" Bolt.Level.INFO logmsg;
+      [%info_log logmsg];
       (* Check for a regular expression *)
       let re = Config.get_versionsRE prj in
       try
 	let cacheddata = List.assoc prj cache_projects in
         let logmsg2=Printf.sprintf "Data found in the cache for %s" prj in
-	Bolt.Logger.log "" Bolt.Level.INFO logmsg2;
+	[%info_log logmsg2];
 	if re <> "" then
 	  let infos = Cpt_scm_stats.extract_vers_infos prj re cacheddata withsizes in
 	  (prj, infos)::cache
@@ -17,13 +17,13 @@ let build_updated_cache cache_projects withsizes =
 	  (prj, cacheddata)::cache
       with Not_found ->
         let logmsg3=Printf.sprintf "No data in cache for %s" prj in
-	Bolt.Logger.log "" Bolt.Level.INFO logmsg3;
+	[%info_log logmsg3];
 	let versinfos =
 	  try
 	    List.map (fun (name, days, date, size) -> (name, date, size))
 	      (Array.to_list (snd (Config.get_versinfos prj)))
 	  with _ ->
-	    Bolt.Logger.log "" Bolt.Level.DEBUG "No version information manually provided.";
+	    [%debug_log "No version information manually provided."];
 	    []
 	in
 	if re <> "" then
@@ -32,12 +32,12 @@ let build_updated_cache cache_projects withsizes =
 	else
 	  if versinfos = [] then
 	    begin
-	      Bolt.Logger.log "" Bolt.Level.FATAL "No data source provided.";
+	      [%fatal_log "No data source provided."];
 	      failwith "No data source provided."
 	    end
 	  else
 	    begin
-	      Bolt.Logger.log "" Bolt.Level.INFO "Use only user provided data.";
+	      [%info_log "Use only user provided data."];
 	      (prj, versinfos)::cache
 	    end
     )
@@ -56,7 +56,7 @@ let  print_cache out_channel prj_cache =
 
 let preinit v1 v2 v3 configfile withsizes =
   ignore(Config.parse_config_no_cache configfile);
-  Bolt.Logger.log "" Bolt.Level.INFO "Config parsing OK!";
+  [%info_log "Config parsing OK!"];
   (*  Config.show_config ();*)
   let cache_file = ".projects_"^configfile in
   let cache =

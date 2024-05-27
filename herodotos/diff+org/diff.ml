@@ -91,14 +91,14 @@ let gen_diff prefix vlist (orgarray: Ast_org.orgarray) : (string * string) list 
 
 let get_diff_job v prefix difffile cmd =
   let logmsg=Printf.sprintf "Running: %s" cmd in
-  Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+  [%trace_log logmsg];
   match
     Unix.system cmd
   with
       Unix.WEXITED 0 -> ()
     | Unix.WEXITED 1 -> ()
-    | Unix.WEXITED i -> (let logmsg=Printf.sprintf "*** FAILURE *** Code: %d %s" i cmd in Bolt.Logger.log "" Bolt.Level.ERROR logmsg)
-    | _ -> (let logmsg=Printf.sprintf "*** FAILURE *** %s" cmd in Bolt.Logger.log "" Bolt.Level.ERROR logmsg)
+    | Unix.WEXITED i -> (let logmsg=Printf.sprintf "*** FAILURE *** Code: %d %s" i cmd in [%error_log logmsg])
+    | _ -> (let logmsg=Printf.sprintf "*** FAILURE *** %s" cmd in [%error_log logmsg])
 
 let get_diff_nofail v prefix difffile cmd =
   try
@@ -106,7 +106,7 @@ let get_diff_nofail v prefix difffile cmd =
     0
   with Config.Warning msg ->
     (let logmsg=Printf.sprintf "*** WARNING *** %s" msg in
-    Bolt.Logger.log "" Bolt.Level.WARN logmsg);
+    [%warn_log logmsg]);
     1
 
 let run_get_diff_job v prefix difffile cmd =
@@ -115,10 +115,10 @@ let run_get_diff_job v prefix difffile cmd =
       begin
 	let pid = Unix.getpid() in
         let logmsg=Printf.sprintf "New child %d for %s" pid cmd in
-	Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+	[%trace_log logmsg];
 	let ret = get_diff_nofail v prefix difffile cmd in
         let logmsg=Printf.sprintf "Job done for child %d" pid in
-	Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+	[%trace_log logmsg];
 	let msg = Debug.profile_diagnostic () in
 	if msg <> "" then Debug.trace msg;
 	exit ret
@@ -131,7 +131,7 @@ let dispatch_get_diff_job v cpucore prefix difffile (perr, pidlist) cmd =
     if List.length pidlist > cpucore then
       let (death, status) = Unix.wait () in
       let logmsg=Printf.sprintf "Master: Job done for child %d" death in
-      Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+      [%trace_log logmsg];
       let error = match status with
 	  Unix.WEXITED 0 -> perr
 	| _              -> perr + 1
@@ -145,15 +145,15 @@ let dispatch_get_diff_job v cpucore prefix difffile (perr, pidlist) cmd =
 
 let gen_cmd_basic v prefix pair difffile =
   let logmsg=Printf.sprintf "*** CHECK CACHE *** %s" (get_difffile difffile) in
-  Bolt.Logger.log "" Bolt.Level.INFO logmsg;
+  [%info_log logmsg];
   Parmap.parfold (fun file_pair (outlist, cmdlist) ->
     let (ofile, nfile) = file_pair in
     let (outfile, cmd) = get_diffcmd prefix ofile nfile difffile in
     if not (Sys.file_exists outfile) then
-      (let logmsg=Printf.sprintf "Checking (%d) %s - Keep" (Unix.getpid()) outfile in Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+      (let logmsg=Printf.sprintf "Checking (%d) %s - Keep" (Unix.getpid()) outfile in [%trace_log logmsg];
        (outfile::outlist,(outfile, cmd)::cmdlist))
     else
-      (let logmsg=Printf.sprintf "Checking (%d) %s - Skip" (Unix.getpid()) outfile in Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+      (let logmsg=Printf.sprintf "Checking (%d) %s - Skip" (Unix.getpid()) outfile in [%trace_log logmsg];
        (outfile::outlist,cmdlist))
   ) (Parmap.L pair)
     ([],[])                                  (* Init. *)
@@ -176,7 +176,7 @@ let mkdir_cache_basic file =
   if not (Sys.file_exists file) then
     (Unix.mkdir file 0o770;
      let logmsg=Printf.sprintf "*** CREATING DIRECTORY *** %s" file in
-     Bolt.Logger.log "" Bolt.Level.INFO logmsg)
+     [%info_log logmsg])
 
 let mkdir_cache resultsdir pdir vlist orgfile difffile =
   let file = get_difffile difffile in
@@ -215,8 +215,8 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
     with
 	Unix.WEXITED 0 -> ()
       | Unix.WEXITED 1 -> ()
-      | Unix.WEXITED i -> (let logmsg=Printf.sprintf "*** FAILURE *** Code: %d %s" i cmd in Bolt.Logger.log "" Bolt.Level.ERROR logmsg)
-      | _ -> (let logmsg=Printf.sprintf "*** FAILURE *** %s" cmd in Bolt.Logger.log "" Bolt.Level.ERROR logmsg)
+      | Unix.WEXITED i -> (let logmsg=Printf.sprintf "*** FAILURE *** Code: %d %s" i cmd in [%error_log logmsg])
+      | _ -> (let logmsg=Printf.sprintf "*** FAILURE *** %s" cmd in [%error_log logmsg])
   ) dirs;
   let error =
     if cpucore = 1 then
@@ -232,7 +232,7 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
       let res = List.map (fun x ->
 	            let (death, status) = Unix.wait () in
                     let logmsg=Printf.sprintf "Master: Job done for child %d" death in
-	Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+	[%trace_log logmsg];
 	match status with
 	    Unix.WEXITED 0 -> 0
 	  | _ -> 1
@@ -242,14 +242,14 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
   in
   if error <> 0 then
     (let logmsg=Printf.sprintf "*** ERROR *** %d error(s) during the diff." error in
-    Bolt.Logger.log "" Bolt.Level.ERROR logmsg);
+    [%error_log logmsg]);
   match difffile with
       GNUDiff _ ->
 	List.flatten (
 	  Parmap.parmap (fun x ->
 	    try
 	      parse_diff v (file^Filename.dir_sep) (GNUDiff x)
-	    with e -> (let logmsg=Printf.sprintf "Error parsing %s" x in Bolt.Logger.log "" Bolt.Level.ERROR logmsg); raise e
+	    with e -> (let logmsg=Printf.sprintf "Error parsing %s" x in [%error_log logmsg]); raise e
 	  ) (Parmap.L outfiles)
 	)
     | Gumtree _ -> 
@@ -257,7 +257,7 @@ let get_diff v cpucore resultsdir pdir prefix vlist (orgs: Ast_org.orgarray) org
 	Parmap.parmap (fun x ->
 	  try
 	    parse_diff v (file^Filename.dir_sep) (Gumtree x)
-	  with e -> (let logmsg=Printf.sprintf "Error parsing %s" x in Bolt.Logger.log "" Bolt.Level.ERROR logmsg); raise e
+	  with e -> (let logmsg=Printf.sprintf "Error parsing %s" x in [%error_log logmsg]); raise e
 	) (Parmap.L outfiles)
       )
     | Hybrid _ -> Hybrid.parse_config v file; []
@@ -284,12 +284,12 @@ let show_gnudiff hunks =
     )
 
 let show_diff verbose vlist ast =
-  Bolt.Logger.log "" Bolt.Level.TRACE "SHOW DIFF";
+  [%trace_log "SHOW DIFF"];
   List.iter (fun ((ver, file), difftype) ->
       (let logmsg=Printf.sprintf "%s from %s to %s" file ver (Misc.get_next_version vlist ver) in
-    Bolt.Logger.log "" Bolt.Level.TRACE logmsg);
+    [%trace_log logmsg]);
     match difftype with
-	Ast_diff.GNUDiff hunks -> (let logmsg=Printf.sprintf "%s" (show_gnudiff hunks) in Bolt.Logger.log "" Bolt.Level.TRACE logmsg)
+	Ast_diff.GNUDiff hunks -> (let logmsg=Printf.sprintf "%s" (show_gnudiff hunks) in [%trace_log logmsg])
       | Ast_diff.Gumtree root -> Gumtree.show_gumtree true 0 root
-      | Ast_diff.DeletedFile -> Bolt.Logger.log "(deleted)" Bolt.Level.TRACE "";
+      | Ast_diff.DeletedFile -> [%trace_log "(deleted)"];
   ) ast

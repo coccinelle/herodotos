@@ -122,7 +122,7 @@ let show_entry (f, min, max) =
   print_newline ()
 
 let compute_exist vlist ast =
-  let (versions, entries) = ast in
+  let (_, entries) = ast in
   let maxidx = Array.length vlist - 1 in
     (maxidx, List.map (compute_entry maxidx) entries)
 

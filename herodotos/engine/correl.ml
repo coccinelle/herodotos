@@ -38,7 +38,7 @@ let get_bugs_in_next_of vlist orgs ver file =
 
 let may_have_changed strict prefix vlist bfl bug =
   let (_, s, _, file, ver, pos, _, t, _, next, _) = bug in
-  if next = {Ast_org.def = None} then Bolt.Logger.log "" Bolt.Level.TRACE "may_have_changed: no next computed";
+  if next = {Ast_org.def = None} then [%trace_log "may_have_changed: no next computed"];
   next = {Ast_org.def = None}
   &&
     List.exists
@@ -63,8 +63,7 @@ let find_disappeared strict prefix vlist (orgs:Ast_org.orgarray) : Ast_org.bugs 
 
 let is_STATUS_as_next_in_correl status correl file ver pos =
   (let logmsg=Printf.sprintf "is_STATUS_as_next_in_correl: start - %s/%s for status %s" ver file (Org_helper.get_status status) in
-  Bolt.Logger.log ""
-    Bolt.Level.TRACE logmsg);
+  [%trace_log logmsg]);
   let res =
     List.exists
       (fun (cs, _, _, _, cnfile, cnver, cnpos, _) ->
@@ -75,7 +74,7 @@ let is_STATUS_as_next_in_correl status correl file ver pos =
       ) correl
   in
   let logmsg=Printf.sprintf "is_STATUS_as_next_in_correl: %s/%s %b" ver file res in
-  Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+  [%trace_log logmsg];
   res
 
 let find_all_next strict prefix vlist (orgsarray:Ast_org.orgarray) correl bug =
@@ -84,8 +83,7 @@ let find_all_next strict prefix vlist (orgsarray:Ast_org.orgarray) correl bug =
   let vn = Misc.get_next_version vlist ver in
   let (_, cb, ce) = pos in
   let logmsg=Printf.sprintf "find_all_next: checking for %s/%s%s - %s" ver file (Org.get_string_pos pos) (Org.clean_link_text prefix ver file pos t) in
-  Bolt.Logger.log ""
-    Bolt.Level.TRACE logmsg;
+  [%trace_log logmsg];
     (*
       First, we find all bugs in next version with the same
       pattern size.
@@ -104,7 +102,7 @@ let find_all_next strict prefix vlist (orgsarray:Ast_org.orgarray) correl bug =
 		   let new_t = Org.clean_link_text prefix ver file pos t in
 		   let new_tb = Org.clean_link_text prefix ver2 file pos2 t2 in
                    let logmsg=Printf.sprintf "find_all_next: \"%s\" <-> \"%s\"" new_t new_tb in
-		   Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+		   [%trace_log logmsg];
 		   new_t = new_tb
 		 else true)
 	     && not (is_STATUS_as_next_in_correl Ast_org.SAME correl file vn pos2)
@@ -115,7 +113,7 @@ let find_all_next strict prefix vlist (orgsarray:Ast_org.orgarray) correl bug =
 	     && not (List.exists
 		       (fun (_, _, _, pfile, pver, ppos, _, _, _, next, _) ->
                          (let logmsg=Printf.sprintf "find_all_next: check %s/%s%s def:%s" pver pfile (Org.get_string_pos ppos) (show_opt next.Ast_org.def) in
-			 Bolt.Logger.log "" Bolt.Level.TRACE logmsg);
+			 [%trace_log logmsg]);
 			 next = {Ast_org.def = Some (Some (next2, true))} (* Check against automatically correlated reports only *)
 				&& not (file = pfile && ver = pver && pos = ppos)
 		       )
@@ -134,12 +132,11 @@ let exists_bug_for_correl vlist orgs cbug =
     cfile
     cver (Org.get_string_pos cpos)
     cnver (Org.get_string_pos cnpos) in
-  Bolt.Logger.log ""
-    Bolt.Level.TRACE logmsg;
+  [%trace_log logmsg];
   List.exists (fun bug ->
       let (_, _, _, file, ver, pos, _, _, _, next, _) = bug in
       let logmsg=Printf.sprintf "exists_bug_for_correl: %s def:%s" (Org.show_bug true bug) (show_opt next.Ast_org.def) in
-    Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+    [%trace_log logmsg];
     cpos = pos
     && cs = Ast_org.SAME
       && not (is_auto bug)
@@ -148,7 +145,7 @@ let exists_bug_for_correl vlist orgs cbug =
 let get_t_of_bug_for_next_correl strict prefix vlist orgs cbug =
   let (cs, _, _, _, cfile, cver, cpos, ct) = cbug in
   let logmsg=Printf.sprintf "get_t_of_bug_for_next_correl: check for %s/%s%s" cver cfile (Org.get_string_pos cpos) in
-  Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+  [%trace_log logmsg];
   let (_, _, _, _, _, _, _, t, _, _, _) =
     List.find (fun bug ->
       let (_, _, _, file, ver, pos, _, t, _, _, _) = bug in
@@ -157,7 +154,7 @@ let get_t_of_bug_for_next_correl strict prefix vlist orgs cbug =
   in
   let new_t = Org.clean_link_text prefix cver cfile cpos t in
   let logmsg=Printf.sprintf "get_t_of_bug_for_next_correl: check \"%s\" <-> \"%s\"" ct new_t in
-  Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+  [%trace_log logmsg];
   new_t
 
 let status_is org_type cbug =
@@ -168,7 +165,7 @@ let get_all_correl strict prefix vlist correl orgs bug =
   let (_, _, _, file, ver, pos, _, bug_t, _, _, _) = bug in
   let new_tb = Org.clean_link_text prefix ver file pos bug_t in
   let logmsg=Printf.sprintf "get_all_correl: start - %s - %s" (Org.show_bug true bug) new_tb in
-  Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+  [%trace_log logmsg];
   List.find_all
     (fun cbug ->
       let (cs, cfile, cver, cpos, cnfile, cnver, cnpos, t) = cbug in
@@ -180,11 +177,11 @@ let get_all_correl strict prefix vlist correl orgs bug =
 		let new_nt = get_t_of_bug_for_next_correl strict prefix vlist orgs cbug in
 		let new_t = Org.clean_link_text prefix ver file pos t in
                 let logmsg=Printf.sprintf "get_all_correl: %s \"%s\" <-> \"%s\"" (Org.show_bug true bug) new_t new_nt in
-		Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+		[%trace_log logmsg];
 		new_t = new_tb && new_t = new_nt
 	      with Not_found ->
                 (let logmsg=Printf.sprintf "get_all_correl: Not_found raised while checking for %s/%s%s" ver file (Org.get_string_pos pos) in
-		Bolt.Logger.log "" Bolt.Level.WARN logmsg);
+		[%warn_log logmsg]);
 		false
 	    else true)
     ) correl
@@ -196,7 +193,7 @@ let gen_todo ch strict vlist prefix orgs correl bug =
     every available bug in next.
    *)
   let logmsg=Printf.sprintf "gen_todo called for %s" (Org.show_bug true bug) in
-  Bolt.Logger.log "" Bolt.Level.TRACE logmsg;
+  [%trace_log logmsg];
   let next = find_all_next strict prefix vlist orgs correl bug in
   List.iter (fun nbug ->
 	       Printf.fprintf ch "* TODO %s\n %s\n"
@@ -215,13 +212,13 @@ let correlate verbose strict prefix vlist correlfile prefix unclean_correl orgsa
   let correl = Misc.unique_list unclean_correl in
   (* let buglist = List.flatten (List.map (fun x -> List.flatten (snd x)) orgs) in *)
   let disps = find_disappeared strict prefix vlist orgsarray in
-  Bolt.Logger.log "" Bolt.Level.TRACE "------------------";
+  [%trace_log "------------------"];
   Org.show_correlation true correl;
-  Bolt.Logger.log "" Bolt.Level.TRACE "------------------";
+  [%trace_log "------------------"];
   Org.show_buglist true disps;
-  Bolt.Logger.log "" Bolt.Level.TRACE "------------------";
+  [%trace_log "------------------"];
   let todo = List.map (fun bug ->
-    Bolt.Logger.log "" Bolt.Level.TRACE "correlate: Start mapping...";
+    [%trace_log "correlate: Start mapping..."];
     try
       (*
 	For bugs that still disappear, we keep the UNRELATED info.
@@ -240,7 +237,7 @@ let correlate verbose strict prefix vlist correlfile prefix unclean_correl orgsa
       else
 	let todo = List.map
 	  (fun (s, file, ver, pos, nfile, nver, npos, t) ->
-	    Bolt.Logger.log "" Bolt.Level.TRACE "correlate: Start nested map";
+	    [%trace_log "correlate: Start nested map"];
 	    let nbug =
 	      (max_int, s, "", nfile, nver, npos, "ovl-face1", "", {Ast_org.is_head = false}, {Ast_org.def = None},[]) in
 	    (* We have a TODO from the correlation file *)
@@ -281,7 +278,7 @@ let correlate verbose strict prefix vlist correlfile prefix unclean_correl orgsa
 	new_todo + List.length (List.filter (fun x -> x) todo)
     with e ->
       (let logmsg=Printf.sprintf "EXN %s" (Printexc.to_string e) in
-      Bolt.Logger.log "" Bolt.Level.FATAL logmsg);
+      [%fatal_log logmsg]);
       Debug.trace (Printexc.get_backtrace ());
       gen_todo ch strict vlist prefix orgsarray correl bug
   ) disps in
@@ -301,7 +298,7 @@ let correlate verbose strict prefix vlist correlfile prefix unclean_correl orgsa
 	    (Org.make_orglinkbug true prefix nbug)
 	else
           let logmsg=Printf.sprintf "*** INFO *** Drop an old SAME entry of a now non-existing bug: %s" (Org.show_bug true bug) in 
-	  Bolt.Logger.log "" Bolt.Level.INFO logmsg
+	  [%info_log logmsg]
     ) correl;
     Printf.fprintf ch "\n* org config\n#+SEQ_TODO: TODO | SAME UNRELATED\n";
     close_out ch;
