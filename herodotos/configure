@@ -67,6 +67,13 @@ my $error = 0;
 # Compilers and runtimes
 #---------------------------------------------------------------------
 $error +=
+    check_config("dune --version |",
+                 "(3\.15)",
+                 "Dune is present.",
+                 "The program dune is missing or is not a good version. We need at least 3.15",
+                 );
+
+$error +=
     check_config("ocamlc -version |",
                  "(3\.09|3\.1[0-9]|4\.[0-9]+|5\.[0-9]+)",
                  "OCaml (the wonderful language) is present.",
@@ -123,6 +130,32 @@ if ($opt eq ".opt") {
 #  TODO: Check with earlier version
                  "Menhir (the parser generator) is present.",
                  "The program menhir is missing or is not a good version.",
+                 );
+
+# Checking parmap lib
+$error +=
+    check_config("ocamlfind query parmap |",
+                 "lib\/parmap\$",
+                 "Parmap library is present.",
+                 "The parmap library is missing.",
+                 );
+
+
+# Checking vlt lib
+$error +=
+    check_config("ocamlfind query vlt |",
+                 "lib\/vlt\$",
+                 "Vlt library is present.",
+                 "The vlt library is missing.",
+                 );
+
+
+# Checking postgresql lib
+$error +=
+    check_config("ocamlfind query postgresql |",
+                 "lib\/postgresql\$",
+                 "Postgresql library is present.",
+                 "The postgresql library is missing.",
                  );
 
 
