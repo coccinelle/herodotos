@@ -214,7 +214,7 @@ let rec create_dir verbose dirname =
     with Unix.Unix_error (code, cmd, msg) ->
       prerr_endline ("Failed to create \""^msg^"\" directory.")
 *)
-let rec create_dir verbose dirname =
+let create_dir verbose dirname =
   try
     let ok = Unix.opendir dirname in
       Unix.closedir ok
