@@ -6,3 +6,5 @@ Makefile
 gr
 results/
 website/
+
+.depend*
