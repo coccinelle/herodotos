@@ -29,7 +29,7 @@ OPTOCAMLLIBS=$(OCAMLLIBS:.cma=.cmxa)
 EXEC = $(TARGET)
 DEP = $(SUBDIRS) $(DEPDIRS)
 
-MENHIR=$(MENHIR_PATH)/menhirLib.cmo
+MENHIR=$(MENHIR_PATH)/menhirLib.cma
 MENHIRO=$(MENHIR_PATH)/menhirLib.cmx
 
 # The Caml compilers.
